@@ -34,10 +34,10 @@ public class PlayerControl : MonoBehaviour
             return playerName;
         }
         set {
-            if (playerName.Length < 17) {
+            if (value.Length < 15) {
                 playerName = value;
             } else {
-                playerName = value[..16];
+                playerName = value[..14];
             }
         }
     }

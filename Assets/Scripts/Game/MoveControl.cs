@@ -64,6 +64,17 @@ public class MoveControl : MonoBehaviour
             }
         }
     }
+
+    public void UpdateSqueezeAnimation() {
+        foreach(PlayerControl player in _playerControls) {
+            TokenControl control = GameObject.Find(player.TokenName).GetComponent<TokenControl>();
+            if (player.MoveOrder == currentPlayer) {
+                control.StartSqueeze();
+            } else {
+                control.StopSqueeze();
+            }
+        }
+    }
     
     public void SetNextPlayer() {
         if (currentPlayer < 4) {
@@ -71,7 +82,9 @@ public class MoveControl : MonoBehaviour
         } else {
             currentPlayer = 1;
         }
+
         UpdateTokenLayerOrder();
+        UpdateSqueezeAnimation();
         _uiTextCurrentPlayerIndex.text = "Current player: " + currentPlayer;
     }
 

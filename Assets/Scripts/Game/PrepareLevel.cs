@@ -19,13 +19,19 @@ public class PrepareLevel : MonoBehaviour
         _playerControl2.TokenName = "token_2";
         _playerControl3.TokenName = "token_3";
         _playerControl4.TokenName = "token_4";
+        _playerControl1.PlayerName = "Игрок A";
+        _playerControl2.PlayerName = "Игрок B";
+        _playerControl3.PlayerName = "Игрок C";
+        _playerControl4.PlayerName = "1234567891123456789";
     }
 
     private void Start() {
         // порядок важен
         PreparePlayerMoveOrder();
         PrepareTokenLayerOrder();
+        SetAllTokenPlayerNames();
         _moveControl.MoveTokensToStart();
+        _moveControl.UpdateSqueezeAnimation();
     }
 
     public PlayerControl[] PlayerControls {
@@ -59,6 +65,13 @@ public class PrepareLevel : MonoBehaviour
             } else {
                 tokenControl.SetOrderInLayer(player.MoveOrder - 2);
             }
+        }
+    }
+
+    private void SetAllTokenPlayerNames() {
+        foreach(PlayerControl player in _playerControls) {
+            TokenControl tokenControl = GameObject.Find(player.TokenName).GetComponent<TokenControl>();
+            tokenControl.SetPlayerName(player.PlayerName);
         }
     }
 }
