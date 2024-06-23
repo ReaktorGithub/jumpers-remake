@@ -32,6 +32,7 @@ public class PrepareLevel : MonoBehaviour
         SetAllTokenPlayerNames();
         _moveControl.MoveTokensToStart();
         _moveControl.UpdateSqueezeAnimation();
+        _moveControl.PrepareNextPlayer();
     }
 
     public PlayerControl[] PlayerControls {

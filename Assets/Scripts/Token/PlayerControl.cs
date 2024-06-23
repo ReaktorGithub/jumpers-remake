@@ -8,6 +8,8 @@ public class PlayerControl : MonoBehaviour
 
     [SerializeField] private string tokenName;
     [SerializeField] private int moveOrder;
+    private int _placeAfterFinish;
+    private bool _isFinished = false;
 
     public int MoveOrder {
         get {
@@ -26,6 +28,26 @@ public class PlayerControl : MonoBehaviour
         }
         set {
             tokenName = value;
+        }
+    }
+
+    public int PlaceAfterFinish {
+        get {
+            return _placeAfterFinish;
+        }
+        set {
+            if (value >= 1 && value <= 4) {
+                _placeAfterFinish = value;
+            }
+        }
+    }
+
+    public bool IsFinished {
+        get {
+            return _isFinished;
+        }
+        set {
+            _isFinished = value;
         }
     }
 

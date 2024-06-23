@@ -133,6 +133,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveTime: 1
+  pedestalMoveTime: 7
   squeezeTime: 10
   squeezeMaxValue: 5.2
   squeezeMinValue: 4.6

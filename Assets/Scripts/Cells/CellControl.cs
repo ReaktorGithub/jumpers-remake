@@ -6,12 +6,20 @@ public class CellControl : MonoBehaviour
 {
     [SerializeField] private string nextCell = "";
     [SerializeField] private float alignTime = 0.15f;
+    [SerializeField] private ECellTypes cellType = ECellTypes.Void;
 
     private List<string> _currentTokens = new();
 
     public string NextCell {
         get {
             return nextCell;
+        }
+        private set {}
+    }
+
+    public ECellTypes CellType {
+        get {
+            return cellType;
         }
         private set {}
     }

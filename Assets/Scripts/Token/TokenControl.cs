@@ -3,10 +3,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 using TMPro;
+using Cinemachine;
 
 public class TokenControl : MonoBehaviour
 {
     [SerializeField] private float moveTime = 2f;
+    [SerializeField] private float pedestalMoveTime = 4f;
     private float _currentTime = 0f;
     private IEnumerator _coroutine;
     private string _currentCell;
@@ -19,17 +21,26 @@ public class TokenControl : MonoBehaviour
     [SerializeField] private float squeezeDefaultValue = 4.6f;
     private IEnumerator _squeezeCoroutine;
     private bool _isSqueeze = false;
+    private Camera _camera;
 
     private void Awake() {
         _currentCell = "start";
         _tokenImage = transform.Find("TokenImage").gameObject;
         _playerName = transform.Find("PlayerName").gameObject.GetComponent<TextMeshPro>();
         _sortingGroup = transform.gameObject.GetComponent<SortingGroup>();
+        _camera = Camera.main;
     }
 
     public string CurrentCell {
         get {
             return _currentCell;
+        }
+        private set {}
+    }
+
+    public GameObject TokenImage {
+        get {
+            return _tokenImage;
         }
         private set {}
     }
@@ -66,6 +77,28 @@ public class TokenControl : MonoBehaviour
             yield return null;
         }
         transform.localPosition = position;
+        callback();
+    }
+
+    public IEnumerator MoveToPedestalDefer(float delay, Action callback) {
+        yield return new WaitForSeconds(delay);
+        StopSqueeze();
+        ClearCoroutine();
+        _coroutine = MoveToPedestal(callback);
+        StartCoroutine(_coroutine);
+    }
+
+    public IEnumerator MoveToPedestal(Action callback) {
+        Vector3 position = _camera.ScreenToWorldPoint(new Vector3(0, Screen.height, 0));
+        Vector3 goalScale = new(0f, 0f, 0f);
+        while (Vector3.Distance(transform.localPosition, position) > 20) {
+            _currentTime += Time.fixedDeltaTime;
+            transform.localPosition = Vector3.Lerp(transform.localPosition, position, _currentTime / pedestalMoveTime);
+            transform.localScale = Vector3.Lerp(transform.localScale, goalScale, _currentTime / pedestalMoveTime);
+            yield return null;
+        }
+        transform.localPosition = position;
+        transform.localScale = goalScale;
         callback();
     }
 
