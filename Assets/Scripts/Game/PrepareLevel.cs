@@ -22,7 +22,7 @@ public class PrepareLevel : MonoBehaviour
         _playerControl1.PlayerName = "Игрок A";
         _playerControl2.PlayerName = "Игрок B";
         _playerControl3.PlayerName = "Игрок C";
-        _playerControl4.PlayerName = "1234567891123456789";
+        _playerControl4.PlayerName = "Игрок D";
     }
 
     private void Start() {

@@ -189,7 +189,7 @@ public class MoveControl : MonoBehaviour
             if (!player.IsFinished) {
                 TokenControl tokenControl = GameObject.Find(player.TokenName).GetComponent<TokenControl>();
                 IEnumerator coroutine = tokenControl.MoveToPedestalDefer(_endMoveDelay, () => {
-                    Destroy(tokenControl.gameObject);
+                    _pedestal.SetPlayerToMinPlace(player);
                 });
                 StartCoroutine(coroutine);
             }
