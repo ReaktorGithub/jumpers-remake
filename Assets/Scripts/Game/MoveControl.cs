@@ -6,10 +6,13 @@ public class MoveControl : MonoBehaviour
 {
     [SerializeField] private int currentPlayerIndex = 1;
     private int _stepsLeft;
+    private int _movesLeft = 1;
     [SerializeField] private float _stepDelay = 0.3f;
     [SerializeField] private float _endMoveDelay = 0.5f;
+    [SerializeField] private float _skipMoveDelay = 1.5f;
     private TokenControl _currentTokenControl;
     private PlayerControl _currentPlayer;
+    private EffectFinish _effectFinish;
     private TextMeshProUGUI _uiTextCurrentPlayerIndex;
     private Pedestal _pedestal;
     private PlayerControl[] _playerControls = new PlayerControl[4];
@@ -22,11 +25,26 @@ public class MoveControl : MonoBehaviour
         _cubicControl = GameObject.Find("CubicImage").GetComponent<CubicControl>();
         _startCellControl = GameObject.Find("start").GetComponent<CellControl>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
+        _effectFinish = GameObject.Find("Cells").GetComponent<EffectFinish>();
     }
 
     private void Start() {
         _uiTextCurrentPlayerIndex.text = "Current player: " + currentPlayerIndex;
         _playerControls = GameObject.Find("GameScripts").GetComponent<PrepareLevel>().PlayerControls;
+    }
+
+    public PlayerControl CurrentPlayer {
+        get {
+            return _currentPlayer;
+        }
+        private set {}
+    }
+
+    public TokenControl CurrentTokenControl {
+        get {
+            return _currentTokenControl;
+        }
+        private set {}
     }
 
     public void MoveTokensToStart() {
@@ -120,6 +138,12 @@ public class MoveControl : MonoBehaviour
                     UpdateTokenLayerOrder();
                     UpdateSqueezeAnimation();
                     _uiTextCurrentPlayerIndex.text = "Current player: " + currentPlayerIndex;
+                    if (_currentPlayer.MovesSkip == 0) {
+                        _movesLeft = 1;
+                        _cubicControl.SetCubicInteractable(true);
+                    } else {
+                        StartCoroutine(SkipMoveDefer());
+                    }
                 }
             }
         }
@@ -148,9 +172,10 @@ public class MoveControl : MonoBehaviour
         _currentTokenControl.SetToNextCell(() => {
 
             // проверяем тип клетки, на которой сейчас находимся
+            // некоторые типы прерывают движение
             CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
             if (cellControl.CellType == ECellTypes.Finish) {
-                FinishPlayer();
+                _effectFinish.FinishPlayer();
                 return;
             }
 
@@ -165,6 +190,7 @@ public class MoveControl : MonoBehaviour
 
     public void MakeMove(int score) {
         _stepsLeft = score;
+        _movesLeft--;
         CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
         cellControl.RemoveToken(_currentPlayer.TokenName);
         cellControl.AlignTokens();
@@ -180,7 +206,17 @@ public class MoveControl : MonoBehaviour
         CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
         cellControl.AddToken(_currentPlayer.TokenName);
         cellControl.AlignTokens();
-        // здесь будут прочие проверки, прежде чем завершать ход
+        // проверяем условия завершения хода
+        // 1. Бонусы
+        // 2. Исполнение эффекта
+        // 3. Исполнение стрелки, синей стрелки
+        // 4. Наличие соперников
+        if (cellControl.Effect == EControllableEffects.Green) {
+            _movesLeft++;
+        }
+        if (cellControl.Effect == EControllableEffects.Yellow) {
+            _currentPlayer.SkipMoveIncrease(_currentTokenControl);
+        }
         StartCoroutine(EndMoveDefer());
     }
 
@@ -201,6 +237,12 @@ public class MoveControl : MonoBehaviour
         EndMove();
     }
 
+    public IEnumerator SkipMoveDefer() {
+        yield return new WaitForSeconds(_skipMoveDelay);
+        _currentPlayer.SkipMoveDecrease(_currentTokenControl);
+        EndMove();
+    }
+
     public void EndMove() {
         bool isRaceOver = IsRaceOver();
         if (isRaceOver) {
@@ -208,18 +250,11 @@ public class MoveControl : MonoBehaviour
             MoveAllTokensToPedestal();
             return;
         }
-        SetNextPlayer();
-        _cubicControl.SetCubicInteractable(true);
+        if (_movesLeft == 0) {
+            SetNextPlayer();
+        } else {
+            _cubicControl.SetCubicInteractable(true);
+        }
         // _cellControl.ShowTokensAtCells();
-    }
-
-    public void FinishPlayer() {
-        Debug.Log("finish player");
-        _currentPlayer.IsFinished = true;
-        IEnumerator coroutine = _currentTokenControl.MoveToPedestalDefer(_endMoveDelay, () => {
-            _pedestal.SetPlayerToMaxPlace(_currentPlayer);
-            StartCoroutine(EndMoveDefer());
-        });
-        StartCoroutine(coroutine);
     }
 }

@@ -3,25 +3,21 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 using TMPro;
-using Cinemachine;
 
 public class TokenControl : MonoBehaviour
 {
     [SerializeField] private float moveTime = 2f;
     [SerializeField] private float pedestalMoveTime = 4f;
-    private float _currentTime = 0f;
-    private IEnumerator _coroutine;
-    private string _currentCell = "start";
-    private GameObject _tokenImage;
-    private SortingGroup _sortingGroup;
-    private GameObject _playerName;
-    private GameObject _playerNameBg;
     [SerializeField] private float squeezeTime = 0.8f;
     [SerializeField] private float squeezeMaxValue = 5.2f;
     [SerializeField] private float squeezeMinValue = 4.6f;
     [SerializeField] private float squeezeDefaultValue = 4.6f;
     [SerializeField] private float tokenScale = 0.7f;
-    private IEnumerator _squeezeCoroutine;
+    private float _currentTime = 0f;
+    private IEnumerator _coroutine, _squeezeCoroutine;
+    private string _currentCell = "start";
+    private GameObject _tokenImage, _playerName, _playerNameBg, _skip1, _skip2, _skip3;
+    private SortingGroup _sortingGroup;
     private bool _isSqueeze = false;
     private Vector3 _pedestalPosition;
 
@@ -29,6 +25,10 @@ public class TokenControl : MonoBehaviour
         _tokenImage = transform.Find("TokenImage").gameObject;
         _playerName = transform.Find("PlayerName").gameObject;
         _playerNameBg = transform.Find("token-text-bg").gameObject;
+        _skip1 = transform.Find("skip1").gameObject;
+        _skip2 = transform.Find("skip2").gameObject;
+        _skip3 = transform.Find("skip3").gameObject;
+        UpdateSkips(0);
         _sortingGroup = transform.gameObject.GetComponent<SortingGroup>();
         _pedestalPosition = GameObject.Find("Pedestal").transform.position;
     }
@@ -170,5 +170,13 @@ public class TokenControl : MonoBehaviour
 
     public void SetPlayerName(string name) {
         _playerName.GetComponent<TextMeshPro>().text = name;
+    }
+
+    // Булавки
+
+    public void UpdateSkips(int skips) {
+        _skip1.SetActive(skips == 1);
+        _skip2.SetActive(skips == 2);
+        _skip3.SetActive(skips > 2);
     }
 }

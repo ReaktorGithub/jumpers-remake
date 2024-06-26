@@ -10,6 +10,7 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private int moveOrder;
     private int _placeAfterFinish;
     private bool _isFinished = false;
+    private int _movesSkip = 0;
 
     public int MoveOrder {
         get {
@@ -20,6 +21,13 @@ public class PlayerControl : MonoBehaviour
                 moveOrder = value;
             }
         }
+    }
+
+    public int MovesSkip {
+        get {
+            return _movesSkip;
+        }
+        private set {}
     }
 
     public string TokenName {
@@ -63,4 +71,15 @@ public class PlayerControl : MonoBehaviour
             }
         }
     }
+
+    public void SkipMoveIncrease(TokenControl token) {
+        _movesSkip++;
+        token.UpdateSkips(_movesSkip);
+    }
+
+    public void SkipMoveDecrease(TokenControl token) {
+        _movesSkip--;
+        token.UpdateSkips(_movesSkip);
+    }
+
 }

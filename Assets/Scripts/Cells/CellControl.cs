@@ -6,7 +6,8 @@ public class CellControl : MonoBehaviour
 {
     [SerializeField] private string nextCell = "";
     [SerializeField] private float alignTime = 0.15f;
-    [SerializeField] private ECellTypes cellType = ECellTypes.Void;
+    [SerializeField] private ECellTypes cellType = ECellTypes.None;
+    [SerializeField] private EControllableEffects effect = EControllableEffects.None;
 
     private List<string> _currentTokens = new();
 
@@ -20,6 +21,13 @@ public class CellControl : MonoBehaviour
     public ECellTypes CellType {
         get {
             return cellType;
+        }
+        private set {}
+    }
+
+    public EControllableEffects Effect {
+        get {
+            return effect;
         }
         private set {}
     }

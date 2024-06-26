@@ -13,7 +13,7 @@ public class CubicControl : MonoBehaviour
     [SerializeField] private float holdTime = 1f;
     private int finalScore;
 
-    private void Start() {
+    private void Awake() {
         _anim = GetComponent<Animator>();
         _cubicButton = GameObject.Find("CubicButton").GetComponent<Button>();
         _moveControl = GameObject.Find("GameScripts").GetComponent<MoveControl>();

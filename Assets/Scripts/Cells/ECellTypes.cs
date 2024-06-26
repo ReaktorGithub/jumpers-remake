@@ -1,6 +1,6 @@
 public enum ECellTypes
 {
-    Void,
+    None,
     Start,
     Finish,
     Checkpoint,
