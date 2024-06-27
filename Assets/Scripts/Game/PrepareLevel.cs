@@ -30,6 +30,7 @@ public class PrepareLevel : MonoBehaviour
         PreparePlayerMoveOrder();
         PrepareTokenLayerOrder();
         SetAllTokenPlayerNames();
+        _moveControl.UpdatePlayerInfo();
         _moveControl.MoveTokensToStart();
         _moveControl.UpdateSqueezeAnimation();
         _moveControl.PrepareNextPlayer();
