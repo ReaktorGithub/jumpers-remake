@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1302088287141144327}
   - component: {fileID: 7801565633196733931}
   - component: {fileID: 9190000787215345519}
+  - component: {fileID: 918128595675989553}
   m_Layer: 5
   m_Name: GameMessageText
   m_TagString: Untagged
@@ -33,11 +34,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -109.68441, y: 254.93582}
-  m_SizeDelta: {x: 112.4, y: 32.300003}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 540.9236, y: -100.91419}
+  m_SizeDelta: {x: 346.45996, y: 0}
+  m_Pivot: {x: 0.47144824, y: 1.0000007}
 --- !u!222 &1302088287141144327
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -66,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "17:12:48   <color=#F5EC21>\u0418\u0413\u0420\u0410 \u041D\u0410\u0427\u0410\u041B\u0410\u0421\u042C!</color>"
+  m_text: "17:12:48   <color=#F5EC21>\u0413\u041E\u041D\u041A\u0410 \u041D\u0410\u0427\u0410\u041B\u0410\u0421\u042C!</color>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 16a981b2e0ab10045a0713d4e660aef6, type: 2}
   m_sharedMaterial: {fileID: 1883872191336618153, guid: 16a981b2e0ab10045a0713d4e660aef6, type: 2}
@@ -103,7 +104,7 @@ MonoBehaviour:
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
-  m_characterSpacing: -2.73
+  m_characterSpacing: -1.09
   m_wordSpacing: 0
   m_lineSpacing: 13.64
   m_lineSpacingMax: 0
@@ -129,7 +130,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -222.80902, w: -32.414112}
+  m_margin: {x: 0, y: 0.17053223, z: -0.086730935, w: -1.9123993}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -147,3 +148,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32115c81902a3274dbd67703fc126680, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fadeInTime: 0.6
+--- !u!114 &918128595675989553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7490198290302840759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2

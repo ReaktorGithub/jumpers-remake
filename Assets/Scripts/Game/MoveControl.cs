@@ -140,6 +140,8 @@ public class MoveControl : MonoBehaviour
                     if (_currentPlayer.MovesSkip == 0) {
                         _movesLeft = 1;
                         _cubicControl.SetCubicInteractable(true);
+                        string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " ходит";
+                        _messages.AddMessage(message);
                     } else {
                         StartCoroutine(SkipMoveDefer());
                     }
@@ -212,9 +214,13 @@ public class MoveControl : MonoBehaviour
         // 4. Наличие соперников
         if (cellControl.Effect == EControllableEffects.Green) {
             _movesLeft++;
+            string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + _messages.Wrap("зелёный", UIColors.Green) + " эффект и ходит ещё раз";
+            _messages.AddMessage(message);
         }
         if (cellControl.Effect == EControllableEffects.Yellow) {
             _currentPlayer.SkipMoveIncrease(_currentTokenControl);
+            string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + _messages.Wrap("жёлтый", UIColors.Yellow) + " эффект и пропустит ход";
+            _messages.AddMessage(message);
         }
         StartCoroutine(EndMoveDefer());
     }
@@ -245,13 +251,14 @@ public class MoveControl : MonoBehaviour
     }
 
     public IEnumerator SkipMoveDefer() {
+        string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " пропускает ход";
+        _messages.AddMessage(message);
         yield return new WaitForSeconds(skipMoveDelay);
         _currentPlayer.SkipMoveDecrease(_currentTokenControl);
         EndMove();
     }
 
     public void EndMove() {
-        _messages.AddMessage("Ход закончен");
         bool isRaceOver = IsRaceOver();
         if (isRaceOver) {
             Debug.Log("Race over");

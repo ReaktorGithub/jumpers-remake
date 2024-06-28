@@ -29,24 +29,26 @@ public class Pedestal : MonoBehaviour
         CleanPedestal();
     }
 
-    public void SetPlayerToMaxPlace(PlayerControl player) {
+    public int SetPlayerToMaxPlace(PlayerControl player) {
         for (int i = 0; i < _pedestal.Length; i++) {
             if (_pedestal[i] == false) {
                 _pedestal[i] = true;
                 SetPlayerToPlace(player, i + 1);
-                break;
+                return i + 1;
             }
         }
+        return 0;
     }
 
-    public void SetPlayerToMinPlace(PlayerControl player) {
+    public int SetPlayerToMinPlace(PlayerControl player) {
         for (int i = _pedestal.Length - 1; i >= 0; i--) {
             if (_pedestal[i] == false) {
                 _pedestal[i] = true;
                 SetPlayerToPlace(player, i + 1);
-                break;
+                return i + 1;
             }
         }
+        return 0;
     }
 
     private void SetPlayerToPlace(PlayerControl player, int place) {

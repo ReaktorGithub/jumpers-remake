@@ -107,7 +107,7 @@ public class CellControl : MonoBehaviour
                 break;
             }
             tokenControl.ClearCoroutine();
-            StartCoroutine(tokenControl.MoveTo(pos, moveTime, () => {}));
+            StartCoroutine(tokenControl.MoveTo(pos, moveTime, null));
         }
     }
 
