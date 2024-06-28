@@ -13,7 +13,6 @@ public class TokenControl : MonoBehaviour
     [SerializeField] private float squeezeMinValue = 4.6f;
     [SerializeField] private float squeezeDefaultValue = 4.6f;
     [SerializeField] private float tokenScale = 0.7f;
-    private float _currentTime = 0f;
     private IEnumerator _coroutine, _squeezeCoroutine;
     private string _currentCell = "start";
     private GameObject _tokenImage, _playerName, _playerNameBg, _skip1, _skip2, _skip3;
@@ -51,10 +50,9 @@ public class TokenControl : MonoBehaviour
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
         }
-        _currentTime = 0f;
     }
 
-    public void SetToNextCell(Action callback) {
+    public void SetToNextCell(Action callback = null) {
         ClearCoroutine();
         GameObject currentObj = GameObject.Find(_currentCell);
         if (!currentObj) {
@@ -72,19 +70,20 @@ public class TokenControl : MonoBehaviour
         StartCoroutine(_coroutine);
     }
 
-    public IEnumerator MoveTo(Vector3 position, float moveTime, Action callback) {
+    public IEnumerator MoveTo(Vector3 position, float moveTime, Action callback = null) {
+        float time = 0f;
         while (Vector3.Distance(transform.localPosition, position) > 0.1) {
-            _currentTime += Time.fixedDeltaTime;
-            transform.localPosition = Vector3.Lerp(transform.localPosition, position, _currentTime / moveTime);
+            time += Time.fixedDeltaTime;
+            transform.localPosition = Vector3.Lerp(transform.localPosition, position, time / moveTime);
             yield return null;
         }
         transform.localPosition = position;
-        callback();
+        callback?.Invoke();
     }
 
     // Пьедестал
 
-    public IEnumerator MoveToPedestalDefer(float delay, Action callback) {
+    public IEnumerator MoveToPedestalDefer(float delay, Action callback = null) {
         _playerName.SetActive(false);
         _playerNameBg.SetActive(false);
         yield return new WaitForSeconds(delay);
@@ -94,15 +93,16 @@ public class TokenControl : MonoBehaviour
         StartCoroutine(_coroutine);
     }
 
-    public IEnumerator MoveToPedestal(Action callback) {
+    public IEnumerator MoveToPedestal(Action callback = null) {
         Vector3 goalScale = new(0f, 0f, 0f);
+        float time = 0f;
         while (Vector3.Distance(transform.localPosition, _pedestalPosition) > 4) {
-            _currentTime += Time.fixedDeltaTime;
-            transform.localPosition = Vector3.Lerp(transform.localPosition, _pedestalPosition, _currentTime / pedestalMoveTime);
-            transform.localScale = Vector3.Lerp(transform.localScale, goalScale, _currentTime / pedestalMoveTime);
+            time += Time.fixedDeltaTime;
+            transform.localPosition = Vector3.Lerp(transform.localPosition, _pedestalPosition, time / pedestalMoveTime);
+            transform.localScale = Vector3.Lerp(transform.localScale, goalScale, time / pedestalMoveTime);
             yield return null;
         }
-        callback();
+        callback?.Invoke();
     }
 
     public void ResetView() {
@@ -143,26 +143,26 @@ public class TokenControl : MonoBehaviour
     }
 
     private IEnumerator Squeeze() {
-        float testCurrent = 0f;
+        float time = 0f;
         while (true) {
             while (_tokenImage.transform.localScale.y > squeezeMinValue) {
-                testCurrent += Time.fixedDeltaTime;
+                time += Time.fixedDeltaTime;
                 _tokenImage.transform.localScale = new Vector3(
                     squeezeMaxValue,
-                    _tokenImage.transform.localScale.y - (testCurrent / squeezeTime),
+                    _tokenImage.transform.localScale.y - (time / squeezeTime),
                     _tokenImage.transform.localScale.z);
                 yield return null;
             }
-            testCurrent = 0;
+            time = 0;
             while (_tokenImage.transform.localScale.y < squeezeMaxValue) {
-                testCurrent += Time.fixedDeltaTime;
+                time += Time.fixedDeltaTime;
                 _tokenImage.transform.localScale = new Vector3(
                     squeezeMaxValue,
-                    _tokenImage.transform.localScale.y + (testCurrent / squeezeTime),
+                    _tokenImage.transform.localScale.y + (time / squeezeTime),
                     _tokenImage.transform.localScale.z);
                 yield return null;
             }
-            testCurrent = 0;
+            time = 0;
         }
     }
 

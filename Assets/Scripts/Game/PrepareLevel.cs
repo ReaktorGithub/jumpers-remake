@@ -4,6 +4,7 @@ public class PrepareLevel : MonoBehaviour
 {
     private PlayerControl[] _playerControls = new PlayerControl[4];
     private MoveControl _moveControl;
+    private Messages _messages;
 
     private void Awake() {
         _moveControl = GameObject.Find("GameScripts").GetComponent<MoveControl>();
@@ -23,13 +24,17 @@ public class PrepareLevel : MonoBehaviour
         _playerControl2.PlayerName = "Игрок B";
         _playerControl3.PlayerName = "Игрок C";
         _playerControl4.PlayerName = "Игрок D";
+        _messages = GameObject.Find("Messages").GetComponent<Messages>();
     }
 
     private void Start() {
         // порядок важен
+        string message = _messages.Wrap("ГОНКА НАЧАЛАСЬ!", UIColors.Yellow);
+        _messages.AddMessage(message);
         PreparePlayerMoveOrder();
         PrepareTokenLayerOrder();
         SetAllTokenPlayerNames();
+        _moveControl.UpdatePlayerInfo();
         _moveControl.MoveTokensToStart();
         _moveControl.UpdateSqueezeAnimation();
         _moveControl.PrepareNextPlayer();

@@ -11,6 +11,9 @@ public class PlayerControl : MonoBehaviour
     private int _placeAfterFinish;
     private bool _isFinished = false;
     private int _movesSkip = 0;
+    [SerializeField] private int coins = 0;
+    [SerializeField] private int rubies = 0;
+    [SerializeField] private int power = 2;
 
     public int MoveOrder {
         get {
@@ -72,6 +75,27 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
+    public int Coins {
+        get {
+            return coins;
+        }
+        private set {}
+    }
+
+    public int Rubies {
+        get {
+            return rubies;
+        }
+        private set {}
+    }
+
+    public int Power {
+        get {
+            return power;
+        }
+        private set {}
+    }
+
     public void SkipMoveIncrease(TokenControl token) {
         _movesSkip++;
         token.UpdateSkips(_movesSkip);
@@ -81,5 +105,4 @@ public class PlayerControl : MonoBehaviour
         _movesSkip--;
         token.UpdateSkips(_movesSkip);
     }
-
 }
