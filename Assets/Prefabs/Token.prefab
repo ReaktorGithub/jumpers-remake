@@ -135,9 +135,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f56900c0cf1d1694eba71ba4109fad88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveTime: 1
-  pedestalMoveTime: 7
-  squeezeTime: 10
+  moveTime: 12
+  pedestalMoveTime: 4
+  squeezeTime: 1.8
   squeezeMaxValue: 5.2
   squeezeMinValue: 4.6
   squeezeDefaultValue: 4.6

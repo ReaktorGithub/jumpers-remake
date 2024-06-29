@@ -20,7 +20,7 @@ public class Message : MonoBehaviour
     private IEnumerator FadeIn() {
         float alpha = 0f;
         while (alpha < 1) {
-            alpha += Time.fixedDeltaTime;
+            alpha += Time.deltaTime;
             _message.color = new Color(1f, 1f, 1f, alpha / fadeInTime);
             yield return null;
         }

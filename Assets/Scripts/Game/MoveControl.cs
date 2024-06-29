@@ -10,6 +10,7 @@ public class MoveControl : MonoBehaviour
     [SerializeField] private float stepDelay = 0.3f;
     [SerializeField] private float endMoveDelay = 0.5f;
     [SerializeField] private float skipMoveDelay = 1.5f;
+    [SerializeField] private float alignTime = 5f;
     private TokenControl _currentTokenControl;
     private PlayerControl _currentPlayer;
     private EffectFinish _effectFinish;
@@ -21,7 +22,7 @@ public class MoveControl : MonoBehaviour
     private Messages _messages;
 
     private void Awake() {
-        _cubicControl = GameObject.Find("CubicImage").GetComponent<CubicControl>();
+        _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
         _startCellControl = GameObject.Find("start").GetComponent<CellControl>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
         _effectFinish = GameObject.Find("Cells").GetComponent<EffectFinish>();
@@ -33,16 +34,12 @@ public class MoveControl : MonoBehaviour
     }
 
     public PlayerControl CurrentPlayer {
-        get {
-            return _currentPlayer;
-        }
+        get { return _currentPlayer; }
         private set {}
     }
 
     public TokenControl CurrentTokenControl {
-        get {
-            return _currentTokenControl;
-        }
+        get { return _currentTokenControl; }
         private set {}
     }
 
@@ -51,7 +48,7 @@ public class MoveControl : MonoBehaviour
         _startCellControl.AddToken("token_2");
         _startCellControl.AddToken("token_3");
         _startCellControl.AddToken("token_4");
-        _startCellControl.AlignTokens(2f);
+        _startCellControl.AlignTokens(alignTime / 1.5f);
     }
 
     public string GetTokenNameByMoveOrder(int order) {
@@ -142,6 +139,8 @@ public class MoveControl : MonoBehaviour
                         _cubicControl.SetCubicInteractable(true);
                         string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " ходит";
                         _messages.AddMessage(message);
+                        message = _cubicControl.Wrap("ваш ход!", UIColors.Green);
+                        _cubicControl.WriteStatus(message);
                     } else {
                         StartCoroutine(SkipMoveDefer());
                     }
@@ -194,7 +193,7 @@ public class MoveControl : MonoBehaviour
         _movesLeft--;
         CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
         cellControl.RemoveToken(_currentPlayer.TokenName);
-        cellControl.AlignTokens();
+        cellControl.AlignTokens(alignTime);
         MakeStep();
     }
 
@@ -206,7 +205,7 @@ public class MoveControl : MonoBehaviour
     public void ConfirmNewPosition() {
         CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
         cellControl.AddToken(_currentPlayer.TokenName);
-        cellControl.AlignTokens();
+        cellControl.AlignTokens(alignTime);
         // проверяем условия завершения хода
         // 1. Бонусы
         // 2. Исполнение эффекта
@@ -216,6 +215,8 @@ public class MoveControl : MonoBehaviour
             _movesLeft++;
             string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + _messages.Wrap("зелёный", UIColors.Green) + " эффект и ходит ещё раз";
             _messages.AddMessage(message);
+            message = _cubicControl.Wrap("бонусный ход!", UIColors.Green);
+            _cubicControl.WriteStatus(message);
         }
         if (cellControl.Effect == EControllableEffects.Yellow) {
             _currentPlayer.SkipMoveIncrease(_currentTokenControl);
@@ -228,9 +229,13 @@ public class MoveControl : MonoBehaviour
     public void MoveAllTokensToPedestal() {
         foreach (PlayerControl player in _playerControls) {
             if (!player.IsFinished) {
+                player.IsFinished = true;
                 TokenControl tokenControl = GameObject.Find(player.TokenName).GetComponent<TokenControl>();
                 IEnumerator coroutine = tokenControl.MoveToPedestalDefer(endMoveDelay, () => {
                     _pedestal.SetPlayerToMinPlace(player);
+                    string name = "PlayerInfo" + player.MoveOrder;
+                    PlayerInfo info = GameObject.Find(name).GetComponent<PlayerInfo>();
+                    info.UpdatePlayerInfoDisplay(player, currentPlayerIndex);
                 });
                 StartCoroutine(coroutine);
             }
@@ -253,6 +258,8 @@ public class MoveControl : MonoBehaviour
     public IEnumerator SkipMoveDefer() {
         string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " пропускает ход";
         _messages.AddMessage(message);
+        message = _cubicControl.Wrap("пропуск", UIColors.Yellow);
+        _cubicControl.WriteStatus(message);
         yield return new WaitForSeconds(skipMoveDelay);
         _currentPlayer.SkipMoveDecrease(_currentTokenControl);
         EndMove();
@@ -262,6 +269,7 @@ public class MoveControl : MonoBehaviour
         bool isRaceOver = IsRaceOver();
         if (isRaceOver) {
             Debug.Log("Race over");
+            UpdatePlayerInfo();
             MoveAllTokensToPedestal();
             return;
         }

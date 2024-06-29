@@ -19,7 +19,7 @@ public class CameraControl : MonoBehaviour
 
     private void FixedUpdate() {
         float scroll = Input.mouseScrollDelta.y;
-        _zoom -= scroll * zoomSpeed * Time.fixedDeltaTime;
+        _zoom -= scroll * zoomSpeed * Time.deltaTime;
         _zoom = Mathf.Clamp(_zoom, minZoom, maxZoom);
         _cinemachineCamera.m_Lens.OrthographicSize = Mathf.SmoothDamp(
             _cinemachineCamera.m_Lens.OrthographicSize,

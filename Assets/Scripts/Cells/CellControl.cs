@@ -5,37 +5,28 @@ using UnityEngine;
 public class CellControl : MonoBehaviour
 {
     [SerializeField] private string nextCell = "";
-    [SerializeField] private float alignTime = 0.15f;
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
 
     private List<string> _currentTokens = new();
 
     public string NextCell {
-        get {
-            return nextCell;
-        }
+        get { return nextCell; }
         private set {}
     }
 
     public ECellTypes CellType {
-        get {
-            return cellType;
-        }
+        get { return cellType; }
         private set {}
     }
 
     public EControllableEffects Effect {
-        get {
-            return effect;
-        }
+        get { return effect; }
         private set {}
     }
 
     public List<string> CurrentTokens {
-        get {
-            return _currentTokens;
-        }
+        get { return _currentTokens; }
         private set {}
     }
 
@@ -61,8 +52,7 @@ public class CellControl : MonoBehaviour
         Перераспределить позиции фишек на клетке
     */
 
-    public void AlignTokens(float time = 0) {
-        float moveTime = time == 0 ? alignTime : time;
+    public void AlignTokens(float moveTime) {
         int done = 0;
 
         foreach(string tokenName in _currentTokens) {

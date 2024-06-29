@@ -231,8 +231,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nextCell: 
-  alignTime: 0.3
+  alignTime: 1.5
   cellType: 0
+  effect: 0
 --- !u!1 &7413940346425836726
 GameObject:
   m_ObjectHideFlags: 0
