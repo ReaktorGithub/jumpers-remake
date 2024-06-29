@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -16,9 +14,7 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private int power = 2;
 
     public int MoveOrder {
-        get {
-            return moveOrder;
-        }
+        get { return moveOrder; }
         set {
             if (value >= 1 && value <= 4) {
                 moveOrder = value;
@@ -27,25 +23,17 @@ public class PlayerControl : MonoBehaviour
     }
 
     public int MovesSkip {
-        get {
-            return _movesSkip;
-        }
+        get { return _movesSkip; }
         private set {}
     }
 
     public string TokenName {
-        get {
-            return tokenName;
-        }
-        set {
-            tokenName = value;
-        }
+        get { return tokenName; }
+        set { tokenName = value; }
     }
 
     public int PlaceAfterFinish {
-        get {
-            return _placeAfterFinish;
-        }
+        get { return _placeAfterFinish; }
         set {
             if (value >= 1 && value <= 4) {
                 _placeAfterFinish = value;
@@ -54,18 +42,12 @@ public class PlayerControl : MonoBehaviour
     }
 
     public bool IsFinished {
-        get {
-            return _isFinished;
-        }
-        set {
-            _isFinished = value;
-        }
+        get { return _isFinished; }
+        set { _isFinished = value; }
     }
 
     public string PlayerName {
-        get {
-            return playerName;
-        }
+        get { return playerName; }
         set {
             if (value.Length < 15) {
                 playerName = value;
@@ -76,23 +58,17 @@ public class PlayerControl : MonoBehaviour
     }
 
     public int Coins {
-        get {
-            return coins;
-        }
+        get { return coins; }
         private set {}
     }
 
     public int Rubies {
-        get {
-            return rubies;
-        }
+        get { return rubies; }
         private set {}
     }
 
     public int Power {
-        get {
-            return power;
-        }
+        get { return power; }
         private set {}
     }
 

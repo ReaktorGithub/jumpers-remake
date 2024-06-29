@@ -71,10 +71,8 @@ public class TokenControl : MonoBehaviour
     }
 
     public IEnumerator MoveTo(Vector3 position, float moveTime, Action callback = null) {
-        float time = 0f;
         while (Vector3.Distance(transform.localPosition, position) > 0.1) {
-            time += Time.fixedDeltaTime;
-            transform.localPosition = Vector3.Lerp(transform.localPosition, position, time / moveTime);
+            transform.localPosition = Vector3.Lerp(transform.localPosition, position, moveTime * Time.deltaTime);
             yield return null;
         }
         transform.localPosition = position;
@@ -95,11 +93,9 @@ public class TokenControl : MonoBehaviour
 
     public IEnumerator MoveToPedestal(Action callback = null) {
         Vector3 goalScale = new(0f, 0f, 0f);
-        float time = 0f;
         while (Vector3.Distance(transform.localPosition, _pedestalPosition) > 4) {
-            time += Time.fixedDeltaTime;
-            transform.localPosition = Vector3.Lerp(transform.localPosition, _pedestalPosition, time / pedestalMoveTime);
-            transform.localScale = Vector3.Lerp(transform.localScale, goalScale, time / pedestalMoveTime);
+            transform.localPosition = Vector3.Lerp(transform.localPosition, _pedestalPosition, pedestalMoveTime * Time.deltaTime);
+            transform.localScale = Vector3.Lerp(transform.localScale, goalScale, pedestalMoveTime * Time.deltaTime);
             yield return null;
         }
         callback?.Invoke();
@@ -143,26 +139,24 @@ public class TokenControl : MonoBehaviour
     }
 
     private IEnumerator Squeeze() {
-        float time = 0f;
+        bool isIn = true;
         while (true) {
-            while (_tokenImage.transform.localScale.y > squeezeMinValue) {
-                time += Time.fixedDeltaTime;
+            while (isIn && _tokenImage.transform.localScale.y > squeezeMinValue) {
                 _tokenImage.transform.localScale = new Vector3(
                     squeezeMaxValue,
-                    _tokenImage.transform.localScale.y - (time / squeezeTime),
+                    _tokenImage.transform.localScale.y - (squeezeTime * Time.deltaTime),
                     _tokenImage.transform.localScale.z);
                 yield return null;
             }
-            time = 0;
-            while (_tokenImage.transform.localScale.y < squeezeMaxValue) {
-                time += Time.fixedDeltaTime;
+            isIn = false;
+            while (!isIn && _tokenImage.transform.localScale.y < squeezeMaxValue) {
                 _tokenImage.transform.localScale = new Vector3(
                     squeezeMaxValue,
-                    _tokenImage.transform.localScale.y + (time / squeezeTime),
+                    _tokenImage.transform.localScale.y + (squeezeTime * Time.deltaTime),
                     _tokenImage.transform.localScale.z);
                 yield return null;
             }
-            time = 0;
+            isIn = true;
         }
     }
 
