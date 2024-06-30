@@ -18,10 +18,11 @@ public class Message : MonoBehaviour
     }
 
     private IEnumerator FadeIn() {
-        float alpha = 0f;
-        while (alpha < 1) {
-            alpha += Time.deltaTime;
-            _message.color = new Color(1f, 1f, 1f, alpha / fadeInTime);
+        float startTime = Time.time;
+        while (Time.time - startTime < fadeInTime) {
+            float progress = (Time.time - startTime) / fadeInTime;
+            float alpha = Mathf.Lerp(0f, 1f, progress);
+            _message.color = new Color(1f, 1f, 1f, alpha);
             yield return null;
         }
     }
