@@ -3,9 +3,11 @@ using UnityEngine;
 public class GameExit : MonoBehaviour
 {
     private GameObject _modal;
+    private ModalWindow _window;
 
     private void Awake() {
         _modal = GameObject.Find("ModalExitGame");
+        _window = _modal.transform.Find("WindowExit").GetComponent<ModalWindow>();
         _modal.SetActive(false);
     }
 
@@ -15,8 +17,14 @@ public class GameExit : MonoBehaviour
 
     private void FixedUpdate() {
         if (Input.GetKeyDown(KeyCode.Escape)) {
-            Debug.Log("escape");
+            OpenWindow();
+        }
+    }
+
+    public void OpenWindow() {
+        if (!_modal.activeInHierarchy) {
             _modal.SetActive(true);
+            StartCoroutine(_window.FadeIn());
         }
     }
 }

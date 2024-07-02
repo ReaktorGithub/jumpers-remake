@@ -48,15 +48,15 @@ public class CellControl : MonoBehaviour
         return _currentTokens.Count == 0;
     }
 
-    /*
-        Перераспределить позиции фишек на клетке
-    */
+    // Перераспределить позиции фишек на клетке
 
-    public void AlignTokens(float moveTime) {
+    public void AlignTokens(float moveTime, Action callback = null) {
         int done = 0;
+        int coroutinesCompleted = 0;
 
         foreach(string tokenName in _currentTokens) {
             if (tokenName == null) {
+                coroutinesCompleted++;
                 continue;
             }
             TokenControl tokenControl = GameObject.Find(tokenName).GetComponent<TokenControl>();
@@ -97,9 +97,16 @@ public class CellControl : MonoBehaviour
                 break;
             }
             tokenControl.ClearCoroutine();
-            StartCoroutine(tokenControl.MoveTo(pos, moveTime, null));
+            StartCoroutine(tokenControl.MoveTo(pos, moveTime, () => {
+                coroutinesCompleted++;
+                if (coroutinesCompleted == _currentTokens.Count) {
+                    callback?.Invoke();
+                }
+            }));
         }
     }
+
+    // вывести в дебаг клетки, где есть фишки
 
     public void ShowTokensAtCells() {
         GameObject[] allCells = GameObject.FindGameObjectsWithTag("cell");

@@ -1,5 +1,5 @@
 using System.Collections;
-using TMPro;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MoveControl : MonoBehaviour
@@ -20,6 +20,8 @@ public class MoveControl : MonoBehaviour
     private CubicControl _cubicControl;
     private CellControl _startCellControl;
     private Messages _messages;
+    private WindowAttackContent _windowAttackContent;
+    private WindowAttack _windowAttack;
 
     private void Awake() {
         _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
@@ -27,6 +29,8 @@ public class MoveControl : MonoBehaviour
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
         _effectFinish = GameObject.Find("Cells").GetComponent<EffectFinish>();
         _messages = GameObject.Find("Messages").GetComponent<Messages>();
+        _windowAttackContent = GameObject.Find("WindowAttack").GetComponent<WindowAttackContent>();
+        _windowAttack = GameObject.Find("GameScripts").GetComponent<WindowAttack>();
     }
 
     private void Start() {
@@ -202,15 +206,24 @@ public class MoveControl : MonoBehaviour
         ConfirmNewPosition();
     }
 
-    public void ConfirmNewPosition() {
+    // подтверждение новой позиции по окончании движения
+
+    private void ConfirmNewPosition() {
         CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
         cellControl.AddToken(_currentPlayer.TokenName);
-        cellControl.AlignTokens(alignTime);
-        // проверяем условия завершения хода
-        // 1. Бонусы
-        // 2. Исполнение эффекта
-        // 3. Исполнение стрелки, синей стрелки
-        // 4. Наличие соперников
+        cellControl.AlignTokens(alignTime, () => {
+            CheckCellConditions(cellControl);
+        });
+    }
+
+    // Необходимые действия перед завершением хода:
+    // 1.	Подбор бонуса.
+    // 2.	Срабатывание капкана.
+    // 3.	Исполнение эффекта.
+    // 4.	Исполнение эффекта «стрелка», либо «синяя стрелка».
+    // 5.	Атака на соперников.
+
+    private void CheckCellConditions(CellControl cellControl) {
         if (cellControl.Effect == EControllableEffects.Green) {
             _movesLeft++;
             string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + _messages.Wrap("зелёный", UIColors.Green) + " эффект и ходит ещё раз";
@@ -218,11 +231,33 @@ public class MoveControl : MonoBehaviour
             message = _cubicControl.Wrap("бонусный ход!", UIColors.Green);
             _cubicControl.WriteStatus(message);
         }
+
         if (cellControl.Effect == EControllableEffects.Yellow) {
             _currentPlayer.SkipMoveIncrease(_currentTokenControl);
             string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + _messages.Wrap("жёлтый", UIColors.Yellow) + " эффект и пропустит ход";
             _messages.AddMessage(message);
         }
+
+        // проверка наличия соперников и возможности атаки
+
+        List<string> tokens = cellControl.CurrentTokens;
+
+        if (tokens.Count > 1) {
+            List<PlayerControl> rivals = new();
+            foreach(PlayerControl player in _playerControls) {
+                if (tokens.Contains(player.TokenName) && _currentPlayer.TokenName != player.TokenName) {
+                    rivals.Add(player);
+                }
+            }
+            
+            _windowAttackContent.BuildContent(rivals, _currentPlayer);
+            _windowAttack.OpenWindow();
+
+            return;
+        }
+
+        // закончить ход
+
         StartCoroutine(EndMoveDefer());
     }
 

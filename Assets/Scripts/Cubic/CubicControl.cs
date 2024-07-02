@@ -95,7 +95,6 @@ public class CubicControl : MonoBehaviour
     }
 
     public void WriteStatus(string text) {
-        Debug.Log(text);
         _statusText.text = text;
     }
 
