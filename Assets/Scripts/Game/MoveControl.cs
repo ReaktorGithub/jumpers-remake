@@ -141,9 +141,9 @@ public class MoveControl : MonoBehaviour
                     if (_currentPlayer.MovesSkip == 0) {
                         _movesLeft = 1;
                         _cubicControl.SetCubicInteractable(true);
-                        string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " ходит";
+                        string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " ходит";
                         _messages.AddMessage(message);
-                        message = _cubicControl.Wrap("ваш ход!", UIColors.Green);
+                        message = Utils.Wrap("ваш ход!", UIColors.Green);
                         _cubicControl.WriteStatus(message);
                     } else {
                         StartCoroutine(SkipMoveDefer());
@@ -226,15 +226,15 @@ public class MoveControl : MonoBehaviour
     private void CheckCellConditions(CellControl cellControl) {
         if (cellControl.Effect == EControllableEffects.Green) {
             _movesLeft++;
-            string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + _messages.Wrap("зелёный", UIColors.Green) + " эффект и ходит ещё раз";
+            string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("зелёный", UIColors.Green) + " эффект и ходит ещё раз";
             _messages.AddMessage(message);
-            message = _cubicControl.Wrap("бонусный ход!", UIColors.Green);
+            message = Utils.Wrap("бонусный ход!", UIColors.Green);
             _cubicControl.WriteStatus(message);
         }
 
         if (cellControl.Effect == EControllableEffects.Yellow) {
             _currentPlayer.SkipMoveIncrease(_currentTokenControl);
-            string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + _messages.Wrap("жёлтый", UIColors.Yellow) + " эффект и пропустит ход";
+            string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("жёлтый", UIColors.Yellow) + " эффект и пропустит ход";
             _messages.AddMessage(message);
         }
 
@@ -291,9 +291,9 @@ public class MoveControl : MonoBehaviour
     }
 
     public IEnumerator SkipMoveDefer() {
-        string message = _messages.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " пропускает ход";
+        string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " пропускает ход";
         _messages.AddMessage(message);
-        message = _cubicControl.Wrap("пропуск", UIColors.Yellow);
+        message = Utils.Wrap("пропуск", UIColors.Yellow);
         _cubicControl.WriteStatus(message);
         yield return new WaitForSeconds(skipMoveDelay);
         _currentPlayer.SkipMoveDecrease(_currentTokenControl);

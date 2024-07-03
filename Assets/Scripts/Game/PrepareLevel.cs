@@ -29,7 +29,7 @@ public class PrepareLevel : MonoBehaviour
 
     private void Start() {
         // порядок важен
-        string message = _messages.Wrap("ГОНКА НАЧАЛАСЬ!", UIColors.Yellow);
+        string message = Utils.Wrap("ГОНКА НАЧАЛАСЬ!", UIColors.Yellow);
         _messages.AddMessage(message);
         PreparePlayerMoveOrder();
         PrepareTokenLayerOrder();

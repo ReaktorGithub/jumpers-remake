@@ -54,22 +54,22 @@ public class Pedestal : MonoBehaviour
     private void SetPlayerToPlace(PlayerControl player, int place) {
         player.PlaceAfterFinish = place;
         GameObject token = GameObject.Find(player.TokenName);
-        SpriteRenderer tokenSprite = token.transform.Find("TokenImage").GetComponent<SpriteRenderer>();
+        Sprite tokenSprite = player.GetTokenSprite();
         switch (place) {
             case 1:
-            _place1.sprite = tokenSprite.sprite;
+            _place1.sprite = tokenSprite;
             _name1.text = player.PlayerName;
             break;
             case 2:
-            _place2.sprite = tokenSprite.sprite;
+            _place2.sprite = tokenSprite;
             _name2.text = player.PlayerName;
             break;
             case 3:
-            _place3.sprite = tokenSprite.sprite;
+            _place3.sprite = tokenSprite;
             _name3.text = player.PlayerName;
             break;
             case 4:
-            _place4.sprite = tokenSprite.sprite;
+            _place4.sprite = tokenSprite;
             _name4.text = player.PlayerName;
             break;
         }

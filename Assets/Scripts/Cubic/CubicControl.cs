@@ -90,10 +90,6 @@ public class CubicControl : MonoBehaviour
         }
     }
 
-    public string Wrap(string text, string color) {
-        return "<color=" + color + ">" + text + "</color>";
-    }
-
     public void WriteStatus(string text) {
         _statusText.text = text;
     }

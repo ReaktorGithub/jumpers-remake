@@ -81,4 +81,8 @@ public class PlayerControl : MonoBehaviour
         _movesSkip--;
         token.UpdateSkips(_movesSkip);
     }
+
+    public Sprite GetTokenSprite() {
+        return GameObject.Find(tokenName).transform.Find("TokenImage").GetComponent<SpriteRenderer>().sprite;
+    }
 }
