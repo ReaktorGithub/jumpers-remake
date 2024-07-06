@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class WindowAttackContent : MonoBehaviour
 {
     private GameObject _optionalSectionTokens;
-    private TextMeshProUGUI _tokenName, _attackHeading, _attackDescription, _powerNow, _powerLeft;
+    private TextMeshProUGUI _tokenName, _attackHeading, _attackDescription, _powerNow, _powerLeft, _warningText;
     private List<TokenAttackButton> _tokenAttackButtons = new();
     private List<AttackTypeButton> _attackTypeButtons = new();
     private PlayerControl _selectedPlayer = null;
@@ -17,30 +17,25 @@ public class WindowAttackContent : MonoBehaviour
 
     private void Awake() {
         _optionalSectionTokens = transform.Find("OptionalSectionTokens").gameObject;
-        GameObject box = _optionalSectionTokens.transform.Find("BoxTokens").gameObject;
-        _tokenName = box.transform.Find("TokenName").gameObject.GetComponent<TextMeshProUGUI>();
+        _tokenName = Utils.FindChildByName(_optionalSectionTokens, "TokenName").GetComponent<TextMeshProUGUI>();
         TokenAttackButton[] allButtons = _optionalSectionTokens.GetComponentsInChildren<TokenAttackButton>();
         foreach (TokenAttackButton button in allButtons) {
             _tokenAttackButtons.Add(button);
         }
-        GameObject boxType = transform.Find("BoxAttackType").gameObject;
-        GameObject list = boxType.transform.Find("AttackList").gameObject;
-        GameObject description = boxType.transform.Find("AttackDescription").gameObject;
-        AttackTypeButton[] allAttackButtons = list.GetComponentsInChildren<AttackTypeButton>();
+        AttackTypeButton[] allAttackButtons = Utils.FindChildByName(transform.gameObject, "AttackList").GetComponentsInChildren<AttackTypeButton>();
         foreach (AttackTypeButton button in allAttackButtons) {
             button.GetComponent<Button>().onClick.AddListener(() => {
                 SetSelectedAttackType(button.AttackType);
             });
             _attackTypeButtons.Add(button);
         }
-        _attackHeading = description.transform.Find("HeadText").gameObject.transform.GetComponent<TextMeshProUGUI>();
-        _attackDescription = description.transform.Find("BodyText").gameObject.transform.GetComponent<TextMeshProUGUI>();
-        GameObject buts = transform.Find("BoxButtons").gameObject;
-        _buttonAttack = buts.transform.Find("ButtonOk").GetComponent<Button>();
-        _buttonCancel = buts.transform.Find("ButtonCancel").GetComponent<Button>();
-        GameObject sub = transform.Find("Subhead3").gameObject;
-        _powerNow = sub.transform.Find("PowerNow").GetComponent<TextMeshProUGUI>();
-        _powerLeft = sub.transform.Find("PowerLeft").GetComponent<TextMeshProUGUI>();
+        _attackHeading = Utils.FindChildByName(transform.gameObject, "HeadText").transform.GetComponent<TextMeshProUGUI>();
+        _attackDescription = Utils.FindChildByName(transform.gameObject, "BodyText").transform.GetComponent<TextMeshProUGUI>();
+        _buttonAttack = Utils.FindChildByName(transform.gameObject, "ButtonOk").GetComponent<Button>();
+        _buttonCancel = Utils.FindChildByName(transform.gameObject, "ButtonCancel").GetComponent<Button>();
+        _powerNow = Utils.FindChildByName(transform.gameObject, "PowerNow").GetComponent<TextMeshProUGUI>();
+        _powerLeft = Utils.FindChildByName(transform.gameObject, "PowerLeft").GetComponent<TextMeshProUGUI>();
+        _warningText = Utils.FindChildByName(transform.gameObject, "WarningText").GetComponent<TextMeshProUGUI>();
     }
 
     private void Start() {
@@ -49,11 +44,26 @@ public class WindowAttackContent : MonoBehaviour
     }
 
     public void BuildContent(List<PlayerControl> rivals, PlayerControl currentPlayer) {
+        // раздел с атаками
+
+        foreach(AttackTypeButton button in _attackTypeButtons) {
+            if (currentPlayer.AvailableAttackTypes.Contains(button.AttackType)) {
+                button.SetAsEnabled();
+            } else {
+                button.SetAsDisabled();
+            }
+        }
+
+        // сила
+
         _powerInitial = currentPlayer.Power;
         UpdatePower();
 
+        // раздел с соперниками
+
         if (rivals.Count < 2) {
             _optionalSectionTokens.SetActive(false);
+            _selectedPlayer = rivals[0];
         } else {
             _optionalSectionTokens.SetActive(true);
             _tokenName.text = "";
@@ -74,6 +84,10 @@ public class WindowAttackContent : MonoBehaviour
                 index++;
             }
         }
+
+        // кнопка атаки
+
+        UpdateAttackButtonStatus();
     }
 
     public void SetSelectedPlayer(PlayerControl player) {
@@ -93,6 +107,7 @@ public class WindowAttackContent : MonoBehaviour
         foreach(TokenAttackButton button in _tokenAttackButtons) {
             button.SetSelected(button.Player == _selectedPlayer);
         }
+        UpdateAttackButtonStatus();
     }
 
     public void SetSelectedAttackType(EAttackTypes type) {
@@ -149,8 +164,10 @@ public class WindowAttackContent : MonoBehaviour
     }
 
     public void SetButtonsInteractable(bool value) {
-        foreach(AttackTypeButton button in _attackTypeButtons) {
-            button.GetComponent<Button>().interactable = value;
+        if (!value) {
+            foreach(AttackTypeButton button in _attackTypeButtons) {
+                button.SetAsDisabled();
+            }
         }
         foreach(TokenAttackButton tokenButton in _tokenAttackButtons) {
             tokenButton.GetComponent<Button>().interactable = value;
@@ -181,5 +198,20 @@ public class WindowAttackContent : MonoBehaviour
 
         _powerNow.text = "Сил в наличии: <b>" + _powerInitial + "</b>";
         _powerLeft.text = "Сил останется: <b>" + powerLeftString + "</b>";
+
+        UpdateAttackButtonStatus();
+    }
+
+    private void UpdateAttackButtonStatus() {
+        if (_selectedPlayer == null) {
+            _buttonAttack.interactable = false;
+            _warningText.text = "Выберите соперника";
+        } else if (_powerInitial - _powerNeed < 0) {
+            _buttonAttack.interactable = false;
+            _warningText.text = "Мало сил";
+        } else {
+            _buttonAttack.interactable = true;
+            _warningText.text = "";
+        }
     }
 }

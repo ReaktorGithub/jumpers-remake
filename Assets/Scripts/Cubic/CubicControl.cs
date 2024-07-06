@@ -49,7 +49,6 @@ public class CubicControl : MonoBehaviour
         finalScore = score;
         _anim.SetInteger("score", finalScore);
         _anim.SetBool("isRotate", false);
-        Debug.Log("finalScore: " + finalScore);
         _coroutine = MakeMoveDefer();
         StartCoroutine(_coroutine);
     }

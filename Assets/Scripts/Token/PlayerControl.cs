@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -12,6 +13,12 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private int coins = 0;
     [SerializeField] private int rubies = 0;
     [SerializeField] private int power = 2;
+    private List<EAttackTypes> _availableAttackTypes = new();
+
+    private void Awake() {
+        _availableAttackTypes.Add(EAttackTypes.Usual);
+        _availableAttackTypes.Add(EAttackTypes.Knockout);
+    }
 
     public int MoveOrder {
         get { return moveOrder; }
@@ -84,5 +91,10 @@ public class PlayerControl : MonoBehaviour
 
     public Sprite GetTokenSprite() {
         return GameObject.Find(tokenName).transform.Find("TokenImage").GetComponent<SpriteRenderer>().sprite;
+    }
+
+    public List<EAttackTypes> AvailableAttackTypes {
+        get { return _availableAttackTypes; }
+        private set {}
     }
 }

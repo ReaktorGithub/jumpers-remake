@@ -1,9 +1,11 @@
+using System.Collections;
 using UnityEngine;
 
 public class GameExit : MonoBehaviour
 {
     private GameObject _modal;
     private ModalWindow _window;
+    private IEnumerator _coroutine;
 
     private void Awake() {
         _modal = GameObject.Find("ModalExitGame");
@@ -24,7 +26,16 @@ public class GameExit : MonoBehaviour
     public void OpenWindow() {
         if (!_modal.activeInHierarchy) {
             _modal.SetActive(true);
-            StartCoroutine(_window.FadeIn());
+            _coroutine = _window.FadeIn();
+            StartCoroutine(_coroutine);
         }
+    }
+
+    public void CloseWindow() {
+        if (_coroutine != null) {
+            StopCoroutine(_coroutine);
+        }
+        _modal.SetActive(false);
+        _window.ResetScale();
     }
 }

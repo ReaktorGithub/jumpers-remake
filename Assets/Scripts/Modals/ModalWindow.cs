@@ -6,11 +6,11 @@ public class ModalWindow : MonoBehaviour
     [SerializeField] private float fadeInTime = 1f;
 
     private void Awake() {
-        transform.localScale = new Vector3(0f, 0f, 1f);
+        ResetScale();
     }
 
     public IEnumerator FadeIn() {
-        transform.localScale = new Vector3(0f, 0f, 1f);
+        ResetScale();
         float startTime = Time.time;
         float velocity = 0f;
         while (Time.time - startTime < fadeInTime) {
@@ -19,5 +19,9 @@ public class ModalWindow : MonoBehaviour
             transform.localScale = new Vector3(size, size, 1f);
             yield return null;
         }
+    }
+
+    public void ResetScale() {
+        transform.localScale = new Vector3(0f, 0f, 1f);
     }
 }
