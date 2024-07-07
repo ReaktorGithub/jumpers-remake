@@ -12,6 +12,7 @@ public class PlayerControl : MonoBehaviour
     private int _placeAfterFinish;
     private bool _isFinished = false;
     private int _movesSkip = 0;
+    [SerializeField] private float finishDelay = 0.5f;
     [SerializeField] private int coins = 0;
     [SerializeField] private int rubies = 0;
     [SerializeField] private int power = 2;
@@ -20,6 +21,7 @@ public class PlayerControl : MonoBehaviour
     private Messages _messages;
     private ModalWarning _modalWarning;
     private ModalLose _modalLose;
+    private ModalWin _modalWin;
     [SerializeField] private float loseDelay = 2f;
     private Pedestal _pedestal;
 
@@ -29,6 +31,7 @@ public class PlayerControl : MonoBehaviour
         _messages = GameObject.Find("Messages").GetComponent<Messages>();
         _modalWarning = GameObject.Find("GameScripts").GetComponent<ModalWarning>();
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
+        _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
     }
 
@@ -177,5 +180,20 @@ public class PlayerControl : MonoBehaviour
         }
 
         _moveControl.CheckCellRivals();
+    }
+
+    // финиш
+
+    public void ExecuteFinish() {
+        _modalWin.OpenWindow();
+        _isFinished = true;
+        TokenControl tokenControl = GetTokenControl();
+        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(finishDelay, () => {
+            int place = _pedestal.SetPlayerToMaxPlace(this);
+            string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ФИНИШИРОВАЛ ", UIColors.Green) + " на " + place + " месте!";
+            _messages.AddMessage(message);
+            StartCoroutine(_moveControl.EndMoveDefer());
+        });
+        StartCoroutine(coroutine);
     }
 }

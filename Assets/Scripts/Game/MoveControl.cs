@@ -13,7 +13,6 @@ public class MoveControl : MonoBehaviour
     [SerializeField] private float alignTime = 5f;
     private TokenControl _currentTokenControl;
     private PlayerControl _currentPlayer;
-    private EffectFinish _effectFinish;
     private Pedestal _pedestal;
     private PlayerControl[] _playerControls = new PlayerControl[4];
 
@@ -26,7 +25,6 @@ public class MoveControl : MonoBehaviour
         _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
         _startCellControl = GameObject.Find("start").GetComponent<CellControl>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
-        _effectFinish = GameObject.Find("Cells").GetComponent<EffectFinish>();
         _messages = GameObject.Find("Messages").GetComponent<Messages>();
         _popupAttack = GameObject.Find("GameScripts").GetComponent<PopupAttack>();
     }
@@ -184,7 +182,7 @@ public class MoveControl : MonoBehaviour
 
             CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
             if (cellControl.CellType == ECellTypes.Finish) {
-                _effectFinish.FinishPlayer();
+                _currentPlayer.ExecuteFinish();
                 return;
             }
 
