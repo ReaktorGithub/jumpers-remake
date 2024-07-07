@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,12 +19,17 @@ public class PlayerControl : MonoBehaviour
     private MoveControl _moveControl;
     private Messages _messages;
     private ModalWarning _modalWarning;
+    private ModalLose _modalLose;
+    [SerializeField] private float loseDelay = 2f;
+    private Pedestal _pedestal;
 
     private void Awake() {
         _availableAttackTypes.Add(EAttackTypes.Usual);
         _moveControl = GameObject.Find("GameScripts").GetComponent<MoveControl>();
         _messages = GameObject.Find("Messages").GetComponent<Messages>();
         _modalWarning = GameObject.Find("GameScripts").GetComponent<ModalWarning>();
+        _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
+        _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
     }
 
     public int MoveOrder {
@@ -110,6 +116,21 @@ public class PlayerControl : MonoBehaviour
         _modalWarning.OpenWindow();
     }
 
+    public void ConfirmLose() {
+        _modalLose.OpenWindow();
+        _isFinished = true;
+        TokenControl tokenControl = GetTokenControl();
+        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(loseDelay, () => {
+            CellControl cellControl = GameObject.Find(tokenControl.CurrentCell).GetComponent<CellControl>();
+            cellControl.RemoveToken(tokenName);
+            int place = _pedestal.SetPlayerToMinPlace(this);
+            string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" СЛЕТЕЛ С ТРАССЫ!", UIColors.Red);
+            _messages.AddMessage(message);
+            StartCoroutine(_moveControl.EndMoveDefer());
+        });
+        StartCoroutine(coroutine);
+    }
+
     // атака
 
     public List<EAttackTypes> AvailableAttackTypes {
@@ -151,7 +172,8 @@ public class PlayerControl : MonoBehaviour
         }
 
         if (power < 0) {
-            // todo
+            ConfirmLose();
+            return;
         }
 
         _moveControl.CheckCellRivals();

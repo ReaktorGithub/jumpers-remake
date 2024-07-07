@@ -179,9 +179,9 @@ public class MoveControl : MonoBehaviour
     private void MakeStep() {
         _stepsLeft--;
         _currentTokenControl.SetToNextCell(() => {
-
             // проверяем тип клетки, на которой сейчас находимся
             // некоторые типы прерывают движение
+
             CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
             if (cellControl.CellType == ECellTypes.Finish) {
                 _effectFinish.FinishPlayer();
@@ -189,6 +189,7 @@ public class MoveControl : MonoBehaviour
             }
 
             // если тип клетки не прерывает движение, то проверяем условие выхода из цикла шагов
+            
             if (_stepsLeft > 0) {
                 StartCoroutine(MakeStepDefer());
             } else {
@@ -310,15 +311,9 @@ public class MoveControl : MonoBehaviour
         EndMove();
     }
 
-    /*
-        Порядок проверок перед завершением хода:
-        1. Закончился ли заезд.
-        2. Есть ли дополнительные хода.
-        3. Если нет доп ходов, то передать ход другому.
-        4. Если есть доп ходы, то проверить на пропуски хода.
-    */
-
     public void EndMove() {
+        // проверка на окончание гонки
+
         bool isRaceOver = IsRaceOver();
 
         if (isRaceOver) {
@@ -328,6 +323,15 @@ public class MoveControl : MonoBehaviour
             return;
         }
 
+        // текущий игрок мог финишировать во время хода - проверить
+
+        if (_currentPlayer.IsFinished) {
+            SetNextPlayerIndex();
+            return;
+        }
+
+        // проверка на бонусные ходы
+
         _movesLeft--;
 
         if (_movesLeft <= 0) {
@@ -335,12 +339,14 @@ public class MoveControl : MonoBehaviour
             return;
         }
 
-        // у текущего игрока есть доп ход
+        // проверка на пропуск хода
 
         if (_currentPlayer.MovesSkip > 0) {
             StartCoroutine(SkipMoveDefer());
             return;
         }
+
+        // текущий игрок продолжает ходить
 
         string cubicMessage = Utils.Wrap("бонусный ход!", UIColors.Green);
         PreparePlayerForMove(cubicMessage);
