@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,10 +15,15 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private int rubies = 0;
     [SerializeField] private int power = 2;
     private List<EAttackTypes> _availableAttackTypes = new();
+    private MoveControl _moveControl;
+    private Messages _messages;
+    private ModalWarning _modalWarning;
 
     private void Awake() {
         _availableAttackTypes.Add(EAttackTypes.Usual);
-        _availableAttackTypes.Add(EAttackTypes.Knockout);
+        _moveControl = GameObject.Find("GameScripts").GetComponent<MoveControl>();
+        _messages = GameObject.Find("Messages").GetComponent<Messages>();
+        _modalWarning = GameObject.Find("GameScripts").GetComponent<ModalWarning>();
     }
 
     public int MoveOrder {
@@ -93,8 +99,61 @@ public class PlayerControl : MonoBehaviour
         return GameObject.Find(tokenName).transform.Find("TokenImage").GetComponent<SpriteRenderer>().sprite;
     }
 
+    public TokenControl GetTokenControl() {
+        return GameObject.Find(tokenName).GetComponent<TokenControl>();
+    }
+
+    public void OpenPowerWarningModal(Action callback = null) {
+        _modalWarning.SetHeadingText("Предупреждение");
+        _modalWarning.SetBodyText("Силы на нуле. Красная или чёрная клетки приведут к поражению!");
+        _modalWarning.SetCallback(callback);
+        _modalWarning.OpenWindow();
+    }
+
+    // атака
+
     public List<EAttackTypes> AvailableAttackTypes {
         get { return _availableAttackTypes; }
         private set {}
+    }
+
+    public void ExecuteAttackUsual(PlayerControl rival) {
+        power--;
+        _moveControl.AddMovesLeft(1);
+        rival.SkipMoveIncrease(rival.GetTokenControl());
+        _moveControl.UpdatePlayerInfo();
+        string message1 = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" АТАКУЕТ ", UIColors.Red) + Utils.Wrap(rival.PlayerName, UIColors.Yellow) + "!";
+        _messages.AddMessage(message1);
+        string message2 = Utils.Wrap(rival.PlayerName, UIColors.Yellow) + " пропустит ход, а " + Utils.Wrap(PlayerName, UIColors.Yellow) + " ходит ещё раз";
+        _messages.AddMessage(message2);
+
+        if (power == 0) {
+            OpenPowerWarningModal(() => {
+                StartCoroutine(_moveControl.EndMoveDefer());
+            });
+            return;
+        }
+
+        StartCoroutine(_moveControl.EndMoveDefer());
+    }
+
+    public void ExecuteBlackEffect() {
+        power--;
+        _moveControl.UpdatePlayerInfo();
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попался на " + Utils.Wrap("ЧЁРНЫЙ", UIColors.Black) + " эффект! Минус 1 сила";
+        _messages.AddMessage(message);
+
+        if (power == 0) {
+            OpenPowerWarningModal(() => {
+                _moveControl.CheckCellRivals();
+            });
+            return;
+        }
+
+        if (power < 0) {
+            // todo
+        }
+
+        _moveControl.CheckCellRivals();
     }
 }

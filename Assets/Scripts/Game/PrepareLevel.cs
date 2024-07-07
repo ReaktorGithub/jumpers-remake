@@ -37,7 +37,7 @@ public class PrepareLevel : MonoBehaviour
         _moveControl.UpdatePlayerInfo();
         _moveControl.MoveTokensToStart();
         _moveControl.UpdateSqueezeAnimation();
-        _moveControl.PrepareNextPlayer();
+        _moveControl.SwitchPlayer();
     }
 
     public PlayerControl[] PlayerControls {

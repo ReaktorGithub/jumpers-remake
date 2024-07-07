@@ -1,11 +1,16 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class WindowAttackContent : MonoBehaviour
+public class PopupAttack : MonoBehaviour
 {
-    private GameObject _optionalSectionTokens;
+    private GameObject _attack, _optionalSectionTokens;
+    private float _shift;
+    [SerializeField] private float fadeTime = 0.5f;
+    private IEnumerator _coroutine;
     private TextMeshProUGUI _tokenName, _attackHeading, _attackDescription, _powerNow, _powerLeft, _warningText;
     private List<TokenAttackButton> _tokenAttackButtons = new();
     private List<AttackTypeButton> _attackTypeButtons = new();
@@ -14,40 +19,92 @@ public class WindowAttackContent : MonoBehaviour
     private Button _buttonAttack, _buttonCancel;
     private int _powerInitial = 0;
     private int _powerNeed = 0;
+    private MoveControl _moveControl;
+    [SerializeField] private float attackDelay = 0.7f;
+    private Messages _messages;
 
     private void Awake() {
-        _optionalSectionTokens = transform.Find("OptionalSectionTokens").gameObject;
+        _attack = GameObject.Find("PopupAttack");
+        _shift = _attack.GetComponent<RectTransform>().rect.width + 70;
+        _attack.transform.localPosition = new(_attack.transform.localPosition.x - _shift, _attack.transform.localPosition.y, _attack.transform.localPosition.z);
+        _optionalSectionTokens = _attack.transform.Find("OptionalSectionTokens").gameObject;
         _tokenName = Utils.FindChildByName(_optionalSectionTokens, "TokenName").GetComponent<TextMeshProUGUI>();
         TokenAttackButton[] allButtons = _optionalSectionTokens.GetComponentsInChildren<TokenAttackButton>();
         foreach (TokenAttackButton button in allButtons) {
             _tokenAttackButtons.Add(button);
         }
-        AttackTypeButton[] allAttackButtons = Utils.FindChildByName(transform.gameObject, "AttackList").GetComponentsInChildren<AttackTypeButton>();
+        AttackTypeButton[] allAttackButtons = Utils.FindChildByName(_attack, "AttackList").GetComponentsInChildren<AttackTypeButton>();
         foreach (AttackTypeButton button in allAttackButtons) {
             button.GetComponent<Button>().onClick.AddListener(() => {
                 SetSelectedAttackType(button.AttackType);
             });
             _attackTypeButtons.Add(button);
         }
-        _attackHeading = Utils.FindChildByName(transform.gameObject, "HeadText").transform.GetComponent<TextMeshProUGUI>();
-        _attackDescription = Utils.FindChildByName(transform.gameObject, "BodyText").transform.GetComponent<TextMeshProUGUI>();
-        _buttonAttack = Utils.FindChildByName(transform.gameObject, "ButtonOk").GetComponent<Button>();
-        _buttonCancel = Utils.FindChildByName(transform.gameObject, "ButtonCancel").GetComponent<Button>();
-        _powerNow = Utils.FindChildByName(transform.gameObject, "PowerNow").GetComponent<TextMeshProUGUI>();
-        _powerLeft = Utils.FindChildByName(transform.gameObject, "PowerLeft").GetComponent<TextMeshProUGUI>();
-        _warningText = Utils.FindChildByName(transform.gameObject, "WarningText").GetComponent<TextMeshProUGUI>();
+        _attackHeading = Utils.FindChildByName(_attack, "HeadText").transform.GetComponent<TextMeshProUGUI>();
+        _attackDescription = Utils.FindChildByName(_attack, "BodyText").transform.GetComponent<TextMeshProUGUI>();
+        _buttonAttack = Utils.FindChildByName(_attack, "ButtonOk").GetComponent<Button>();
+        _buttonCancel = Utils.FindChildByName(_attack, "ButtonCancel").GetComponent<Button>();
+        _powerNow = Utils.FindChildByName(_attack, "PowerNow").GetComponent<TextMeshProUGUI>();
+        _powerLeft = Utils.FindChildByName(_attack, "PowerLeft").GetComponent<TextMeshProUGUI>();
+        _warningText = Utils.FindChildByName(_attack, "WarningText").GetComponent<TextMeshProUGUI>();
+        _moveControl = GameObject.Find("GameScripts").GetComponent<MoveControl>();
+        _messages = GameObject.Find("Messages").GetComponent<Messages>();
     }
 
     private void Start() {
-        UpdateAttackTypeSelection();
-        SetButtonsInteractable(true);
+        _attack.SetActive(false);
     }
 
-    public void BuildContent(List<PlayerControl> rivals, PlayerControl currentPlayer) {
+    // перед открытием окна сперва запускать BuildContent!
+
+    public void OpenWindow() {
+        if (_attack.activeInHierarchy) {
+            return;
+        }
+        if (_coroutine != null) {
+            StopCoroutine(_coroutine);
+        }
+        _attack.SetActive(true);
+        SetButtonsInteractable(true);
+        UpdateAttackTypeSelection();
+        _coroutine = FadeInOut(_shift);
+        StartCoroutine(_coroutine);
+    }
+
+    public void CloseWindow() {
+        if (!_attack.activeInHierarchy) {
+            return;
+        }
+        if (_coroutine != null) {
+            StopCoroutine(_coroutine);
+        }
+        SetButtonsInteractable(false);
+        _coroutine = FadeInOut(_shift * -1, () => {
+            _attack.SetActive(false);
+        });
+        StartCoroutine(_coroutine);
+    }
+
+    private IEnumerator FadeInOut(float shift, Action callback = null) {
+        float startX = _attack.transform.localPosition.x;
+        float endX = _attack.transform.localPosition.x + shift;
+        float startTime = Time.time;
+        float velocity = 0f;
+        while (Time.time - startTime < fadeTime) {
+            float progress = (Time.time - startTime) / fadeTime;
+            float x = Mathf.SmoothDamp(startX, endX, ref velocity, 0.1f, Mathf.Infinity, progress); 
+            _attack.transform.localPosition = new Vector3(x, _attack.transform.localPosition.y, _attack.transform.localPosition.z);
+            yield return null;
+        }
+
+        callback?.Invoke();
+    }
+
+    public void BuildContent(List<PlayerControl> rivals) {
         // раздел с атаками
 
         foreach(AttackTypeButton button in _attackTypeButtons) {
-            if (currentPlayer.AvailableAttackTypes.Contains(button.AttackType)) {
+            if (_moveControl.CurrentPlayer.AvailableAttackTypes.Contains(button.AttackType)) {
                 button.SetAsEnabled();
             } else {
                 button.SetAsDisabled();
@@ -56,7 +113,7 @@ public class WindowAttackContent : MonoBehaviour
 
         // сила
 
-        _powerInitial = currentPlayer.Power;
+        _powerInitial = _moveControl.CurrentPlayer.Power;
         UpdatePower();
 
         // раздел с соперниками
@@ -213,5 +270,30 @@ public class WindowAttackContent : MonoBehaviour
             _buttonAttack.interactable = true;
             _warningText.text = "";
         }
+    }
+
+    private IEnumerator ConfirmAttackDefer() {
+        yield return new WaitForSeconds(attackDelay);
+        if (_selectedAttackType == EAttackTypes.Usual) {
+            _moveControl.CurrentPlayer.ExecuteAttackUsual(_selectedPlayer);
+        } else {
+            Debug.Log("ERROR: Attack type not found");
+        }
+    }
+
+    private IEnumerator CancelAttackDefer() {
+        yield return new WaitForSeconds(attackDelay);
+        ResetContent();
+        string message = Utils.Wrap(_moveControl.CurrentPlayer.PlayerName, UIColors.Yellow) + " отказался от атаки";
+        _messages.AddMessage(message);
+        StartCoroutine(_moveControl.EndMoveDefer());
+    }
+
+    public void ConfirmAttack() {
+        StartCoroutine(ConfirmAttackDefer());
+    }
+
+    public void CancelAttack() {
+        StartCoroutine(CancelAttackDefer());
     }
 }

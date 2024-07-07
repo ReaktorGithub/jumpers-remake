@@ -1,15 +1,18 @@
 using System.Collections;
 using UnityEngine;
 
-public class GameExit : MonoBehaviour
+public class ModalGameExit : MonoBehaviour
 {
     private GameObject _modal;
-    private ModalWindow _window;
+    private ModalWindow _windowControl;
     private IEnumerator _coroutine;
 
     private void Awake() {
-        _modal = GameObject.Find("ModalExitGame");
-        _window = _modal.transform.Find("WindowExit").GetComponent<ModalWindow>();
+        _modal = GameObject.Find("ModalGameExit");
+        _windowControl = _modal.transform.Find("WindowExit").GetComponent<ModalWindow>();
+    }
+
+    private void Start() {
         _modal.SetActive(false);
     }
 
@@ -26,7 +29,7 @@ public class GameExit : MonoBehaviour
     public void OpenWindow() {
         if (!_modal.activeInHierarchy) {
             _modal.SetActive(true);
-            _coroutine = _window.FadeIn();
+            _coroutine = _windowControl.FadeIn();
             StartCoroutine(_coroutine);
         }
     }
@@ -36,6 +39,6 @@ public class GameExit : MonoBehaviour
             StopCoroutine(_coroutine);
         }
         _modal.SetActive(false);
-        _window.ResetScale();
+        _windowControl.ResetScale();
     }
 }
