@@ -15,8 +15,7 @@ public class PlayerInfo : MonoBehaviour
     private SpriteRenderer[] _symbolImages = new SpriteRenderer[4];
     [SerializeField] private int infoOrder;
 
-    private void Awake()
-    {
+    private void Awake() {
         _hover = transform.Find("hover_player").gameObject;
         _active = transform.Find("current_player").gameObject;
         _playerNameText = transform.Find("player_name").gameObject.GetComponent<TextMeshProUGUI>();

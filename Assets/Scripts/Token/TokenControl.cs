@@ -28,7 +28,7 @@ public class TokenControl : MonoBehaviour
         _skip2 = transform.Find("skip2").gameObject;
         _skip3 = transform.Find("skip3").gameObject;
         UpdateSkips(0);
-        _sortingGroup = transform.gameObject.GetComponent<SortingGroup>();
+        _sortingGroup = GetComponent<SortingGroup>();
         _pedestalPosition = GameObject.Find("Pedestal").transform.position;
     }
 

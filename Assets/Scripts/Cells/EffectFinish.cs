@@ -18,7 +18,7 @@ public class EffectFinish : MonoBehaviour
         _moveControl.CurrentPlayer.IsFinished = true;
         IEnumerator coroutine = _moveControl.CurrentTokenControl.MoveToPedestalDefer(finishDelay, () => {
             int place = _pedestal.SetPlayerToMaxPlace(_moveControl.CurrentPlayer);
-            string message = _messages.Wrap(_moveControl.CurrentPlayer.PlayerName, UIColors.Yellow) + _messages.Wrap(" ФИНИШИРОВАЛ ", UIColors.Green) + " на " + place + " месте!";
+            string message = Utils.Wrap(_moveControl.CurrentPlayer.PlayerName, UIColors.Yellow) + Utils.Wrap(" ФИНИШИРОВАЛ ", UIColors.Green) + " на " + place + " месте!";
             _messages.AddMessage(message);
             StartCoroutine(_moveControl.EndMoveDefer());
         });

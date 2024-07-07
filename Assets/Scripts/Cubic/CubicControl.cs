@@ -49,7 +49,6 @@ public class CubicControl : MonoBehaviour
         finalScore = score;
         _anim.SetInteger("score", finalScore);
         _anim.SetBool("isRotate", false);
-        Debug.Log("finalScore: " + finalScore);
         _coroutine = MakeMoveDefer();
         StartCoroutine(_coroutine);
     }
@@ -90,12 +89,7 @@ public class CubicControl : MonoBehaviour
         }
     }
 
-    public string Wrap(string text, string color) {
-        return "<color=" + color + ">" + text + "</color>";
-    }
-
     public void WriteStatus(string text) {
-        Debug.Log(text);
         _statusText.text = text;
     }
 

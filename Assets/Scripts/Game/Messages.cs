@@ -15,8 +15,4 @@ public class Messages : MonoBehaviour
         Message messageControl = newMessageObject.GetComponent<Message>();
         messageControl.Write(message);
     }
-
-    public string Wrap(string text, string color) {
-        return "<color=" + color + ">" + text + "</color>";
-    }
 }
