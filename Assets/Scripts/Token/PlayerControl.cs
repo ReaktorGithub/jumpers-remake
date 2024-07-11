@@ -13,9 +13,6 @@ public class PlayerControl : MonoBehaviour
     private bool _isFinished = false;
     private int _movesSkip = 0;
     [SerializeField] private float finishDelay = 0.5f;
-    [SerializeField] private int coins = 0;
-    [SerializeField] private int rubies = 0;
-    [SerializeField] private int power = 2;
     private List<EAttackTypes> _availableAttackTypes = new();
     private MoveControl _moveControl;
     private Messages _messages;
@@ -24,6 +21,11 @@ public class PlayerControl : MonoBehaviour
     private ModalWin _modalWin;
     [SerializeField] private float loseDelay = 2f;
     private Pedestal _pedestal;
+    // player resources
+    [SerializeField] private int coins = 0;
+    [SerializeField] private int mallows = 0;
+    [SerializeField] private int rubies = 0;
+    [SerializeField] private int power = 2;
 
     private void Awake() {
         _availableAttackTypes.Add(EAttackTypes.Usual);
@@ -84,6 +86,11 @@ public class PlayerControl : MonoBehaviour
         private set {}
     }
 
+    public int Mallows {
+        get { return mallows; }
+        private set {}
+    }
+
     public int Rubies {
         get { return rubies; }
         private set {}
@@ -122,16 +129,32 @@ public class PlayerControl : MonoBehaviour
     public void ConfirmLose() {
         _modalLose.OpenWindow();
         _isFinished = true;
+        int place = _pedestal.SetPlayerToMinPlace(this);
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" СЛЕТЕЛ С ТРАССЫ!", UIColors.Red);
+        _messages.AddMessage(message);
+
         TokenControl tokenControl = GetTokenControl();
         IEnumerator coroutine = tokenControl.MoveToPedestalDefer(loseDelay, () => {
+            _pedestal.SetTokenToPedestal(this, place);
             CellControl cellControl = GameObject.Find(tokenControl.CurrentCell).GetComponent<CellControl>();
             cellControl.RemoveToken(tokenName);
-            int place = _pedestal.SetPlayerToMinPlace(this);
-            string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" СЛЕТЕЛ С ТРАССЫ!", UIColors.Red);
-            _messages.AddMessage(message);
             StartCoroutine(_moveControl.EndMoveDefer());
         });
         StartCoroutine(coroutine);
+    }
+
+    // изменение ресурсов
+
+    public void AddCoins(int value) {
+        Coins += value;
+    }
+
+    public void AddMallows(int value) {
+        Mallows += value;
+    }
+
+    public void AddRubies(int value) {
+        Rubies += value;
     }
 
     // атака
@@ -187,11 +210,13 @@ public class PlayerControl : MonoBehaviour
     public void ExecuteFinish() {
         _modalWin.OpenWindow();
         _isFinished = true;
+        int place = _pedestal.SetPlayerToMaxPlace(this);
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ФИНИШИРОВАЛ ", UIColors.Green) + " на " + place + " месте!";
+        _messages.AddMessage(message);
+
         TokenControl tokenControl = GetTokenControl();
         IEnumerator coroutine = tokenControl.MoveToPedestalDefer(finishDelay, () => {
-            int place = _pedestal.SetPlayerToMaxPlace(this);
-            string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ФИНИШИРОВАЛ ", UIColors.Green) + " на " + place + " месте!";
-            _messages.AddMessage(message);
+            _pedestal.SetTokenToPedestal(this, place);
             StartCoroutine(_moveControl.EndMoveDefer());
         });
         StartCoroutine(coroutine);

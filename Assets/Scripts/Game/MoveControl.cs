@@ -20,6 +20,8 @@ public class MoveControl : MonoBehaviour
     private CellControl _startCellControl;
     private Messages _messages;
     private PopupAttack _popupAttack;
+    private LevelData _levelData;
+    private ModalResults _modalResults;
 
     private void Awake() {
         _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
@@ -27,6 +29,8 @@ public class MoveControl : MonoBehaviour
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
         _messages = GameObject.Find("Messages").GetComponent<Messages>();
         _popupAttack = GameObject.Find("GameScripts").GetComponent<PopupAttack>();
+        _levelData = GameObject.Find("GameScripts").GetComponent<LevelData>();
+        _modalResults = GameObject.Find("ModalResults").GetComponent<ModalResults>();
     }
 
     private void Start() {
@@ -274,12 +278,14 @@ public class MoveControl : MonoBehaviour
         foreach (PlayerControl player in _playerControls) {
             if (!player.IsFinished) {
                 player.IsFinished = true;
-                TokenControl tokenControl = GameObject.Find(player.TokenName).GetComponent<TokenControl>();
+                int place = _pedestal.SetPlayerToMinPlace(player);
+                string name = "PlayerInfo" + player.MoveOrder;
+                PlayerInfo info = GameObject.Find(name).GetComponent<PlayerInfo>();
+                info.UpdatePlayerInfoDisplay(player, currentPlayerIndex);
+
+                TokenControl tokenControl = player.GetTokenControl();
                 IEnumerator coroutine = tokenControl.MoveToPedestalDefer(endMoveDelay, () => {
-                    _pedestal.SetPlayerToMinPlace(player);
-                    string name = "PlayerInfo" + player.MoveOrder;
-                    PlayerInfo info = GameObject.Find(name).GetComponent<PlayerInfo>();
-                    info.UpdatePlayerInfoDisplay(player, currentPlayerIndex);
+                    _pedestal.SetTokenToPedestal(player, place);
                 });
                 StartCoroutine(coroutine);
             }
@@ -318,6 +324,7 @@ public class MoveControl : MonoBehaviour
             Debug.Log("Race over");
             UpdatePlayerInfo();
             MoveAllTokensToPedestal();
+            StartCoroutine(RaceOverDefer());
             return;
         }
 
@@ -354,5 +361,25 @@ public class MoveControl : MonoBehaviour
 
     public void AddMovesLeft(int count) {
         _movesLeft += count;
+    }
+
+    public IEnumerator RaceOverDefer() {
+        yield return new WaitForSeconds(endMoveDelay);
+        RaceOver();
+    }
+
+    public void RaceOver() {
+        // раздача ресурсов
+
+        foreach(PlayerControl player in _playerControls) {
+            int coinsEarned = _levelData.PrizeCoins[player.PlaceAfterFinish - 1];
+            int mallowsEarned = _levelData.PrizeMallows[player.PlaceAfterFinish - 1];
+            int rubiesEarned = _levelData.PrizeRubies[player.PlaceAfterFinish - 1];
+            player.AddCoins(coinsEarned);
+            player.AddMallows(mallowsEarned);
+            player.AddRubies(rubiesEarned);
+        }
+
+        _modalResults.OpenWindow(_playerControls);
     }
 }

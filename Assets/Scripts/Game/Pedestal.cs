@@ -33,7 +33,7 @@ public class Pedestal : MonoBehaviour
         for (int i = 0; i < _pedestal.Length; i++) {
             if (_pedestal[i] == false) {
                 _pedestal[i] = true;
-                SetPlayerToPlace(player, i + 1);
+                player.PlaceAfterFinish = i + 1;
                 return i + 1;
             }
         }
@@ -44,15 +44,14 @@ public class Pedestal : MonoBehaviour
         for (int i = _pedestal.Length - 1; i >= 0; i--) {
             if (_pedestal[i] == false) {
                 _pedestal[i] = true;
-                SetPlayerToPlace(player, i + 1);
+                player.PlaceAfterFinish = i + 1;
                 return i + 1;
             }
         }
         return 0;
     }
 
-    private void SetPlayerToPlace(PlayerControl player, int place) {
-        player.PlaceAfterFinish = place;
+    public void SetTokenToPedestal(PlayerControl player, int place) {
         GameObject token = GameObject.Find(player.TokenName);
         Sprite tokenSprite = player.GetTokenSprite();
         switch (place) {
