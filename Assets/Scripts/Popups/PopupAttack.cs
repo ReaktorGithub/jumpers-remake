@@ -127,7 +127,7 @@ public class PopupAttack : MonoBehaviour
             int index = 0;
             foreach(TokenAttackButton button in _tokenAttackButtons) {
                 if (index < rivals.Count) {
-                    Sprite sprite = rivals[index].GetTokenSprite();
+                    Sprite sprite = rivals[index].TokenImage;
                     button.SetTokenImage(sprite);
                     button.BindPlayer(rivals[index]);
                     Button buttonComponent = button.gameObject.GetComponent<Button>();

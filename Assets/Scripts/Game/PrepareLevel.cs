@@ -33,7 +33,7 @@ public class PrepareLevel : MonoBehaviour
         _messages.AddMessage(message);
         PreparePlayerMoveOrder();
         PrepareTokenLayerOrder();
-        SetAllTokenPlayerNames();
+        BindTokensToPlayers();
         _moveControl.UpdatePlayerInfo();
         _moveControl.MoveTokensToStart();
         _moveControl.UpdateSqueezeAnimation();
@@ -74,9 +74,16 @@ public class PrepareLevel : MonoBehaviour
         }
     }
 
-    private void SetAllTokenPlayerNames() {
+    // в игроке сохранить изображение фишки
+    // в фишке сохранить имя игрока
+
+    private void BindTokensToPlayers() {
         foreach(PlayerControl player in _playerControls) {
-            TokenControl tokenControl = GameObject.Find(player.TokenName).GetComponent<TokenControl>();
+            GameObject token = GameObject.Find(player.TokenName);
+            Sprite sprite = token.transform.Find("TokenImage").GetComponent<SpriteRenderer>().sprite;
+            player.TokenImage = sprite;
+
+            TokenControl tokenControl = token.GetComponent<TokenControl>();
             tokenControl.SetPlayerName(player.PlayerName);
         }
     }

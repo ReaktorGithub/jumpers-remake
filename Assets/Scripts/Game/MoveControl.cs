@@ -22,6 +22,8 @@ public class MoveControl : MonoBehaviour
     private PopupAttack _popupAttack;
     private LevelData _levelData;
     private ModalResults _modalResults;
+    private ModalWin _modalWin;
+    private ModalLose _modalLose;
 
     private void Awake() {
         _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
@@ -31,6 +33,8 @@ public class MoveControl : MonoBehaviour
         _popupAttack = GameObject.Find("GameScripts").GetComponent<PopupAttack>();
         _levelData = GameObject.Find("GameScripts").GetComponent<LevelData>();
         _modalResults = GameObject.Find("ModalResults").GetComponent<ModalResults>();
+        _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
+        _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
     }
 
     private void Start() {
@@ -321,7 +325,6 @@ public class MoveControl : MonoBehaviour
         bool isRaceOver = IsRaceOver();
 
         if (isRaceOver) {
-            Debug.Log("Race over");
             UpdatePlayerInfo();
             MoveAllTokensToPedestal();
             StartCoroutine(RaceOverDefer());
@@ -380,6 +383,17 @@ public class MoveControl : MonoBehaviour
             player.AddRubies(rubiesEarned);
         }
 
+        CloseAllOptionalModals();
         _modalResults.OpenWindow(_playerControls);
+    }
+
+    public void CloseAllOptionalModals() {
+        if (_modalLose.gameObject.activeInHierarchy) {
+            _modalLose.CloseWindow();
+        }
+
+        if (_modalWin.gameObject.activeInHierarchy) {
+            _modalWin.CloseWindow();
+        }
     }
 }

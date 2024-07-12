@@ -53,7 +53,7 @@ public class Pedestal : MonoBehaviour
 
     public void SetTokenToPedestal(PlayerControl player, int place) {
         GameObject token = GameObject.Find(player.TokenName);
-        Sprite tokenSprite = player.GetTokenSprite();
+        Sprite tokenSprite = player.TokenImage;
         switch (place) {
             case 1:
             _place1.sprite = tokenSprite;

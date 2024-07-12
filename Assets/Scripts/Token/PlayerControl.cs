@@ -21,6 +21,8 @@ public class PlayerControl : MonoBehaviour
     private ModalWin _modalWin;
     [SerializeField] private float loseDelay = 2f;
     private Pedestal _pedestal;
+    private Sprite _tokenImage;
+
     // player resources
     [SerializeField] private int coins = 0;
     [SerializeField] private int mallows = 0;
@@ -70,6 +72,11 @@ public class PlayerControl : MonoBehaviour
         set { _isFinished = value; }
     }
 
+    public Sprite TokenImage {
+        get { return _tokenImage; }
+        set { _tokenImage = value; }
+    }
+
     public string PlayerName {
         get { return playerName; }
         set {
@@ -111,10 +118,6 @@ public class PlayerControl : MonoBehaviour
         token.UpdateSkips(_movesSkip);
     }
 
-    public Sprite GetTokenSprite() {
-        return GameObject.Find(tokenName).transform.Find("TokenImage").GetComponent<SpriteRenderer>().sprite;
-    }
-
     public TokenControl GetTokenControl() {
         return GameObject.Find(tokenName).GetComponent<TokenControl>();
     }
@@ -146,15 +149,15 @@ public class PlayerControl : MonoBehaviour
     // изменение ресурсов
 
     public void AddCoins(int value) {
-        Coins += value;
+        coins += value;
     }
 
     public void AddMallows(int value) {
-        Mallows += value;
+        mallows += value;
     }
 
     public void AddRubies(int value) {
-        Rubies += value;
+        rubies += value;
     }
 
     // атака
