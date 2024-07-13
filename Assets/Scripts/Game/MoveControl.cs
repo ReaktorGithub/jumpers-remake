@@ -13,7 +13,6 @@ public class MoveControl : MonoBehaviour
     [SerializeField] private float alignTime = 5f;
     private TokenControl _currentTokenControl;
     private PlayerControl _currentPlayer;
-    private EffectFinish _effectFinish;
     private Pedestal _pedestal;
     private PlayerControl[] _playerControls = new PlayerControl[4];
 
@@ -21,14 +20,21 @@ public class MoveControl : MonoBehaviour
     private CellControl _startCellControl;
     private Messages _messages;
     private PopupAttack _popupAttack;
+    private LevelData _levelData;
+    private ModalResults _modalResults;
+    private ModalWin _modalWin;
+    private ModalLose _modalLose;
 
     private void Awake() {
         _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
         _startCellControl = GameObject.Find("start").GetComponent<CellControl>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
-        _effectFinish = GameObject.Find("Cells").GetComponent<EffectFinish>();
         _messages = GameObject.Find("Messages").GetComponent<Messages>();
         _popupAttack = GameObject.Find("GameScripts").GetComponent<PopupAttack>();
+        _levelData = GameObject.Find("GameScripts").GetComponent<LevelData>();
+        _modalResults = GameObject.Find("ModalResults").GetComponent<ModalResults>();
+        _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
+        _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
     }
 
     private void Start() {
@@ -179,16 +185,17 @@ public class MoveControl : MonoBehaviour
     private void MakeStep() {
         _stepsLeft--;
         _currentTokenControl.SetToNextCell(() => {
-
             // проверяем тип клетки, на которой сейчас находимся
             // некоторые типы прерывают движение
+
             CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
             if (cellControl.CellType == ECellTypes.Finish) {
-                _effectFinish.FinishPlayer();
+                _currentPlayer.ExecuteFinish();
                 return;
             }
 
             // если тип клетки не прерывает движение, то проверяем условие выхода из цикла шагов
+            
             if (_stepsLeft > 0) {
                 StartCoroutine(MakeStepDefer());
             } else {
@@ -275,12 +282,14 @@ public class MoveControl : MonoBehaviour
         foreach (PlayerControl player in _playerControls) {
             if (!player.IsFinished) {
                 player.IsFinished = true;
-                TokenControl tokenControl = GameObject.Find(player.TokenName).GetComponent<TokenControl>();
+                int place = _pedestal.SetPlayerToMinPlace(player);
+                string name = "PlayerInfo" + player.MoveOrder;
+                PlayerInfo info = GameObject.Find(name).GetComponent<PlayerInfo>();
+                info.UpdatePlayerInfoDisplay(player, currentPlayerIndex);
+
+                TokenControl tokenControl = player.GetTokenControl();
                 IEnumerator coroutine = tokenControl.MoveToPedestalDefer(endMoveDelay, () => {
-                    _pedestal.SetPlayerToMinPlace(player);
-                    string name = "PlayerInfo" + player.MoveOrder;
-                    PlayerInfo info = GameObject.Find(name).GetComponent<PlayerInfo>();
-                    info.UpdatePlayerInfoDisplay(player, currentPlayerIndex);
+                    _pedestal.SetTokenToPedestal(player, place);
                 });
                 StartCoroutine(coroutine);
             }
@@ -310,23 +319,26 @@ public class MoveControl : MonoBehaviour
         EndMove();
     }
 
-    /*
-        Порядок проверок перед завершением хода:
-        1. Закончился ли заезд.
-        2. Есть ли дополнительные хода.
-        3. Если нет доп ходов, то передать ход другому.
-        4. Если есть доп ходы, то проверить на пропуски хода.
-    */
-
     public void EndMove() {
+        // проверка на окончание гонки
+
         bool isRaceOver = IsRaceOver();
 
         if (isRaceOver) {
-            Debug.Log("Race over");
             UpdatePlayerInfo();
             MoveAllTokensToPedestal();
+            StartCoroutine(RaceOverDefer());
             return;
         }
+
+        // текущий игрок мог финишировать во время хода - проверить
+
+        if (_currentPlayer.IsFinished) {
+            SetNextPlayerIndex();
+            return;
+        }
+
+        // проверка на бонусные ходы
 
         _movesLeft--;
 
@@ -335,12 +347,14 @@ public class MoveControl : MonoBehaviour
             return;
         }
 
-        // у текущего игрока есть доп ход
+        // проверка на пропуск хода
 
         if (_currentPlayer.MovesSkip > 0) {
             StartCoroutine(SkipMoveDefer());
             return;
         }
+
+        // текущий игрок продолжает ходить
 
         string cubicMessage = Utils.Wrap("бонусный ход!", UIColors.Green);
         PreparePlayerForMove(cubicMessage);
@@ -350,5 +364,36 @@ public class MoveControl : MonoBehaviour
 
     public void AddMovesLeft(int count) {
         _movesLeft += count;
+    }
+
+    public IEnumerator RaceOverDefer() {
+        yield return new WaitForSeconds(endMoveDelay);
+        RaceOver();
+    }
+
+    public void RaceOver() {
+        // раздача ресурсов
+
+        foreach(PlayerControl player in _playerControls) {
+            int coinsEarned = _levelData.PrizeCoins[player.PlaceAfterFinish - 1];
+            int mallowsEarned = _levelData.PrizeMallows[player.PlaceAfterFinish - 1];
+            int rubiesEarned = _levelData.PrizeRubies[player.PlaceAfterFinish - 1];
+            player.AddCoins(coinsEarned);
+            player.AddMallows(mallowsEarned);
+            player.AddRubies(rubiesEarned);
+        }
+
+        CloseAllOptionalModals();
+        _modalResults.OpenWindow(_playerControls);
+    }
+
+    public void CloseAllOptionalModals() {
+        if (_modalLose.gameObject.activeInHierarchy) {
+            _modalLose.CloseWindow();
+        }
+
+        if (_modalWin.gameObject.activeInHierarchy) {
+            _modalWin.CloseWindow();
+        }
     }
 }

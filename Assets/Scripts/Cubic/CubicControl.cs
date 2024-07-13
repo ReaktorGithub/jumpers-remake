@@ -38,9 +38,11 @@ public class CubicControl : MonoBehaviour
         }
     }
 
-    private void SetScore() {
+    private void SetScore(int specifiedScore = 0) {
         int score;
-        if (overrideScore != 0) {
+        if (specifiedScore != 0) {
+            score = specifiedScore;
+        } else if (overrideScore != 0) {
             score = overrideScore;
         } else {
             System.Random random = new();
@@ -53,7 +55,12 @@ public class CubicControl : MonoBehaviour
         StartCoroutine(_coroutine);
     }
 
-    public void Throw() {
+    // specifiedScore - указать на выброс определенного числа, без рандома
+    // overrideScore - это число, которое указывается в редакторе Unity
+    // specifiedScore имеет приоритет над overrideScore
+    // finalScore - сохранение числа перемещений фишки после всех вычислений
+
+    public void Throw(int specifiedScore = 0) {
         SetCubicInteractable(false);
         _statusText.text = "";
         if (_coroutine != null) {
@@ -61,13 +68,13 @@ public class CubicControl : MonoBehaviour
         }
         _anim.SetInteger("score", 0);
         _anim.SetBool("isRotate", true);
-        _coroutine = SetScoreDefer();
+        _coroutine = SetScoreDefer(specifiedScore);
         StartCoroutine(_coroutine);
     }
 
-    private IEnumerator SetScoreDefer() {
+    private IEnumerator SetScoreDefer(int specifiedScore = 0) {
         yield return new WaitForSeconds(rotateTime);
-        SetScore();
+        SetScore(specifiedScore);
     }
 
     private IEnumerator MakeMoveDefer() {

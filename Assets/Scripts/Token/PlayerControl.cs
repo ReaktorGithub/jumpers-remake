@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,19 +12,31 @@ public class PlayerControl : MonoBehaviour
     private int _placeAfterFinish;
     private bool _isFinished = false;
     private int _movesSkip = 0;
-    [SerializeField] private int coins = 0;
-    [SerializeField] private int rubies = 0;
-    [SerializeField] private int power = 2;
+    [SerializeField] private float finishDelay = 0.5f;
     private List<EAttackTypes> _availableAttackTypes = new();
     private MoveControl _moveControl;
     private Messages _messages;
     private ModalWarning _modalWarning;
+    private ModalLose _modalLose;
+    private ModalWin _modalWin;
+    [SerializeField] private float loseDelay = 2f;
+    private Pedestal _pedestal;
+    private Sprite _tokenImage;
+
+    // player resources
+    [SerializeField] private int coins = 0;
+    [SerializeField] private int mallows = 0;
+    [SerializeField] private int rubies = 0;
+    [SerializeField] private int power = 2;
 
     private void Awake() {
         _availableAttackTypes.Add(EAttackTypes.Usual);
         _moveControl = GameObject.Find("GameScripts").GetComponent<MoveControl>();
         _messages = GameObject.Find("Messages").GetComponent<Messages>();
         _modalWarning = GameObject.Find("GameScripts").GetComponent<ModalWarning>();
+        _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
+        _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
+        _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
     }
 
     public int MoveOrder {
@@ -59,6 +72,11 @@ public class PlayerControl : MonoBehaviour
         set { _isFinished = value; }
     }
 
+    public Sprite TokenImage {
+        get { return _tokenImage; }
+        set { _tokenImage = value; }
+    }
+
     public string PlayerName {
         get { return playerName; }
         set {
@@ -72,6 +90,11 @@ public class PlayerControl : MonoBehaviour
 
     public int Coins {
         get { return coins; }
+        private set {}
+    }
+
+    public int Mallows {
+        get { return mallows; }
         private set {}
     }
 
@@ -95,10 +118,6 @@ public class PlayerControl : MonoBehaviour
         token.UpdateSkips(_movesSkip);
     }
 
-    public Sprite GetTokenSprite() {
-        return GameObject.Find(tokenName).transform.Find("TokenImage").GetComponent<SpriteRenderer>().sprite;
-    }
-
     public TokenControl GetTokenControl() {
         return GameObject.Find(tokenName).GetComponent<TokenControl>();
     }
@@ -108,6 +127,37 @@ public class PlayerControl : MonoBehaviour
         _modalWarning.SetBodyText("Силы на нуле. Красная или чёрная клетки приведут к поражению!");
         _modalWarning.SetCallback(callback);
         _modalWarning.OpenWindow();
+    }
+
+    public void ConfirmLose() {
+        _modalLose.OpenWindow();
+        _isFinished = true;
+        int place = _pedestal.SetPlayerToMinPlace(this);
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" СЛЕТЕЛ С ТРАССЫ!", UIColors.Red);
+        _messages.AddMessage(message);
+
+        TokenControl tokenControl = GetTokenControl();
+        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(loseDelay, () => {
+            _pedestal.SetTokenToPedestal(this, place);
+            CellControl cellControl = GameObject.Find(tokenControl.CurrentCell).GetComponent<CellControl>();
+            cellControl.RemoveToken(tokenName);
+            StartCoroutine(_moveControl.EndMoveDefer());
+        });
+        StartCoroutine(coroutine);
+    }
+
+    // изменение ресурсов
+
+    public void AddCoins(int value) {
+        coins += value;
+    }
+
+    public void AddMallows(int value) {
+        mallows += value;
+    }
+
+    public void AddRubies(int value) {
+        rubies += value;
     }
 
     // атака
@@ -151,9 +201,27 @@ public class PlayerControl : MonoBehaviour
         }
 
         if (power < 0) {
-            // todo
+            ConfirmLose();
+            return;
         }
 
         _moveControl.CheckCellRivals();
+    }
+
+    // финиш
+
+    public void ExecuteFinish() {
+        _modalWin.OpenWindow();
+        _isFinished = true;
+        int place = _pedestal.SetPlayerToMaxPlace(this);
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ФИНИШИРОВАЛ ", UIColors.Green) + " на " + place + " месте!";
+        _messages.AddMessage(message);
+
+        TokenControl tokenControl = GetTokenControl();
+        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(finishDelay, () => {
+            _pedestal.SetTokenToPedestal(this, place);
+            StartCoroutine(_moveControl.EndMoveDefer());
+        });
+        StartCoroutine(coroutine);
     }
 }
