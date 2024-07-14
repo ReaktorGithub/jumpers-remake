@@ -52,6 +52,10 @@ public class TokenControl : MonoBehaviour
         }
     }
 
+    public CellControl GetCurrentCellControl() {
+        return GameObject.Find(CurrentCell).GetComponent<CellControl>();
+    }
+
     public void SetToNextCell(Action callback = null) {
         ClearCoroutine();
         GameObject currentObj = GameObject.Find(_currentCell);

@@ -123,4 +123,20 @@ public class CellControl : MonoBehaviour
             Debug.Log(message);
         }
     }
+
+    // вычислить, в какую сторону пойдет игрок
+    // 1 - вправо, -1 - влево, 0 - другие стороны
+
+    public int GetNextCellDirection() {
+        float currentX = transform.position.x;
+        GameObject nextObj = GameObject.Find(nextCell);
+        if (nextObj == null) {
+            return 0;
+        }
+        float nextX = nextObj.transform.position.x;
+        if (nextX == currentX) {
+            return 0;
+        }
+        return nextX < currentX ? -1 : 1;
+    }
 }

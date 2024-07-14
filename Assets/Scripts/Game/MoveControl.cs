@@ -24,6 +24,7 @@ public class MoveControl : MonoBehaviour
     private ModalResults _modalResults;
     private ModalWin _modalWin;
     private ModalLose _modalLose;
+    private CameraControl _camera;
 
     private void Awake() {
         _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
@@ -35,6 +36,7 @@ public class MoveControl : MonoBehaviour
         _modalResults = GameObject.Find("ModalResults").GetComponent<ModalResults>();
         _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
+        _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
     }
 
     private void Start() {
@@ -139,7 +141,7 @@ public class MoveControl : MonoBehaviour
                     break;
                 } else {
                     _currentPlayer = _playerControls[i];
-                    _currentTokenControl = GameObject.Find(_playerControls[i].TokenName).GetComponent<TokenControl>();
+                    _currentTokenControl = _playerControls[i].GetTokenControl();
                     UpdateTokenLayerOrder();
                     UpdateSqueezeAnimation();
                     UpdatePlayerInfo();
@@ -156,12 +158,19 @@ public class MoveControl : MonoBehaviour
         }
     }
 
-    public void PreparePlayerForMove(string cubicMessage, string messengerMessage = null) {
+    private void PreparePlayerForMove(string cubicMessage, string messengerMessage = null) {
         _cubicControl.SetCubicInteractable(true);
         _cubicControl.WriteStatus(cubicMessage);
         if (messengerMessage != null) {
             _messages.AddMessage(messengerMessage);
         }
+
+        // настройка и установка камеры
+
+        CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
+        int direction = cellControl.GetNextCellDirection();
+        _camera.SetTransposerOffsetX(direction);
+        _camera.FollowObject(_currentTokenControl.gameObject.transform);
     }
 
     public int CurrentPlayerIndex {
@@ -191,6 +200,7 @@ public class MoveControl : MonoBehaviour
             CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
             if (cellControl.CellType == ECellTypes.Finish) {
                 _currentPlayer.ExecuteFinish();
+                _camera.ClearFollow();
                 return;
             }
 
@@ -220,7 +230,7 @@ public class MoveControl : MonoBehaviour
     // подтверждение новой позиции по окончании движения
 
     private void ConfirmNewPosition() {
-        CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
+        CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
         cellControl.AddToken(_currentPlayer.TokenName);
         cellControl.AlignTokens(alignTime, () => {
             CheckCellEffects(cellControl);
