@@ -164,12 +164,6 @@ public class MoveControl : MonoBehaviour
         if (messengerMessage != null) {
             _messages.AddMessage(messengerMessage);
         }
-
-        // настройка и установка камеры
-
-        CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
-        int direction = cellControl.GetNextCellDirection();
-        _camera.SetTransposerOffsetX(direction);
         _camera.FollowObject(_currentTokenControl.gameObject.transform);
     }
 
@@ -197,7 +191,7 @@ public class MoveControl : MonoBehaviour
             // проверяем тип клетки, на которой сейчас находимся
             // некоторые типы прерывают движение
 
-            CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
+            CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
             if (cellControl.CellType == ECellTypes.Finish) {
                 _currentPlayer.ExecuteFinish();
                 _camera.ClearFollow();
@@ -216,7 +210,7 @@ public class MoveControl : MonoBehaviour
 
     public void MakeMove(int score) {
         _stepsLeft = score;
-        CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
+        CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
         cellControl.RemoveToken(_currentPlayer.TokenName);
         cellControl.AlignTokens(alignTime);
         MakeStep();
@@ -266,7 +260,7 @@ public class MoveControl : MonoBehaviour
     }
 
     public void CheckCellRivals() {
-        CellControl cellControl = GameObject.Find(_currentTokenControl.CurrentCell).GetComponent<CellControl>();
+        CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
         List<string> tokens = cellControl.CurrentTokens;
 
         if (tokens.Count > 1) {
