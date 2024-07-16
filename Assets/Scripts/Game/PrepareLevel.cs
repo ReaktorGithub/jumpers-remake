@@ -29,8 +29,6 @@ public class PrepareLevel : MonoBehaviour
 
     private void Start() {
         // порядок важен
-        string message = Utils.Wrap("ГОНКА НАЧАЛАСЬ!", UIColors.Yellow);
-        _messages.AddMessage(message);
         PreparePlayerMoveOrder();
         PrepareTokenLayerOrder();
         BindTokensToPlayers();
@@ -38,6 +36,8 @@ public class PrepareLevel : MonoBehaviour
         _moveControl.MoveTokensToStart();
         _moveControl.UpdateSqueezeAnimation();
         _moveControl.SwitchPlayer();
+        string message = Utils.Wrap("ГОНКА НАЧАЛАСЬ!", UIColors.Yellow);
+        _messages.AddMessage(message);
     }
 
     public PlayerControl[] PlayerControls {
