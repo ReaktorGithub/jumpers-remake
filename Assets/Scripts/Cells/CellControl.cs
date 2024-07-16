@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.Splines;
 
 public class CellControl : MonoBehaviour
 {
     [SerializeField] private string nextCell = "";
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
+    [SerializeField] private GameObject arrowSpline;
+    [SerializeField] private string arrowToCell;
 
     private List<string> _currentTokens = new();
 
@@ -21,6 +23,11 @@ public class CellControl : MonoBehaviour
         private set {}
     }
 
+    public string ArrowToCell {
+        get { return arrowToCell; }
+        private set {}
+    }
+
     public EControllableEffects Effect {
         get { return effect; }
         private set {}
@@ -28,6 +35,11 @@ public class CellControl : MonoBehaviour
 
     public List<string> CurrentTokens {
         get { return _currentTokens; }
+        private set {}
+    }
+
+    public SplineContainer ArrowSpline {
+        get { return arrowSpline.GetComponent<SplineContainer>(); }
         private set {}
     }
 
