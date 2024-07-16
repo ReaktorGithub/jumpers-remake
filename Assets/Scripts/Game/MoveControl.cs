@@ -223,7 +223,7 @@ public class MoveControl : MonoBehaviour
 
     // подтверждение новой позиции по окончании движения
 
-    private void ConfirmNewPosition() {
+    public void ConfirmNewPosition() {
         CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
         cellControl.AddToken(_currentPlayer.TokenName);
         cellControl.AlignTokens(alignTime, () => {
@@ -253,6 +253,17 @@ public class MoveControl : MonoBehaviour
 
         if (cellControl.Effect == EControllableEffects.Black) {
             _currentPlayer.ExecuteBlackEffect();
+            return;
+        }
+
+        CheckCellArrows();
+    }
+
+    public void CheckCellArrows() {
+        CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
+
+        if (cellControl.CellType == ECellTypes.Arrow) {
+            _currentTokenControl.PutTokenToArrowSpline(cellControl.ArrowSpline);
             return;
         }
 

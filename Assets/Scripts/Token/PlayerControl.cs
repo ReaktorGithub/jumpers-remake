@@ -139,7 +139,7 @@ public class PlayerControl : MonoBehaviour
         TokenControl tokenControl = GetTokenControl();
         IEnumerator coroutine = tokenControl.MoveToPedestalDefer(loseDelay, () => {
             _pedestal.SetTokenToPedestal(this, place);
-            CellControl cellControl = GameObject.Find(tokenControl.CurrentCell).GetComponent<CellControl>();
+            CellControl cellControl = tokenControl.GetCurrentCellControl();
             cellControl.RemoveToken(tokenName);
             StartCoroutine(_moveControl.EndMoveDefer());
         });
@@ -205,7 +205,7 @@ public class PlayerControl : MonoBehaviour
             return;
         }
 
-        _moveControl.CheckCellRivals();
+        _moveControl.CheckCellArrows();
     }
 
     // финиш
