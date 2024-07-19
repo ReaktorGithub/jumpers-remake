@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MoveControl : MonoBehaviour
@@ -27,6 +29,7 @@ public class MoveControl : MonoBehaviour
     private ModalLose _modalLose;
     private CameraControl _camera;
     private TopPanel _topPanel;
+    private ECellTypes[] _skipRivalCheckTypes = new ECellTypes[2];
 
     private void Awake() {
         _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
@@ -40,6 +43,8 @@ public class MoveControl : MonoBehaviour
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
+        _skipRivalCheckTypes[0] = ECellTypes.Start;
+        _skipRivalCheckTypes[1] = ECellTypes.Checkpoint;
     }
 
     private void Start() {
@@ -188,7 +193,11 @@ public class MoveControl : MonoBehaviour
         MakeStep();
     }
 
-    // перед движением на следующую клетку нужно проверить, является ли текущая клетка бранчем
+    // метод запускает серию проверок перед перемещением на следующую клетку
+
+    private void InitTokenStep() {
+        CheckBranch();
+    }
 
     private void CheckBranch() {
         if (_currentCellControl.CellType == ECellTypes.Branch) {
@@ -207,9 +216,15 @@ public class MoveControl : MonoBehaviour
         _stepsLeft--;
         _currentTokenControl.SetToNextCell(() => {
             // проверяем тип клетки, на которой сейчас находимся
-            // некоторые типы прерывают движение
+            // некоторые типы прерывают движение, либо вызывают код во время движения
 
             _currentCellControl = _currentTokenControl.GetCurrentCellControl();
+
+            if (_currentCellControl.CellType == ECellTypes.Checkpoint) {
+                string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " достигает " + Utils.Wrap("чекпойнта", UIColors.Blue);
+                _messages.AddMessage(message);
+            }
+
             if (_currentCellControl.CellType == ECellTypes.Finish) {
                 _currentPlayer.ExecuteFinish();
                 _camera.ClearFollow();
@@ -218,7 +233,7 @@ public class MoveControl : MonoBehaviour
 
             // если тип клетки не прерывает движение, то проверяем условие выхода из цикла шагов
             if (_stepsLeft > 0) {
-                CheckBranch();
+                InitTokenStep();
             } else {
                 StartCoroutine(ConfirmNewPositionDefer());
             }
@@ -230,7 +245,7 @@ public class MoveControl : MonoBehaviour
         _currentCellControl = _currentTokenControl.GetCurrentCellControl();
         _currentCellControl.RemoveToken(_currentPlayer.TokenName);
         _currentCellControl.AlignTokens(alignTime);
-        CheckBranch();
+        InitTokenStep();
     }
 
     private IEnumerator ConfirmNewPositionDefer() {
@@ -289,6 +304,13 @@ public class MoveControl : MonoBehaviour
             return;
         }
 
+        if (cellControl.Effect == EControllableEffects.Red) {
+            _movesLeft = 0;
+            _stepsLeft = 0;
+            _currentPlayer.ExecuteRedEffect();
+            return;
+        }
+
         CheckCellArrows();
     }
 
@@ -302,6 +324,11 @@ public class MoveControl : MonoBehaviour
     }
 
     public void CheckCellRivals() {
+        if (_skipRivalCheckTypes.Contains(_currentCellControl.CellType)) {
+            StartCoroutine(EndMoveDefer());
+            return;
+        }
+        
         List<string> tokens = _currentCellControl.CurrentTokens;
 
         if (tokens.Count > 1) {
@@ -440,5 +467,14 @@ public class MoveControl : MonoBehaviour
         if (_modalWin.gameObject.activeInHierarchy) {
             _modalWin.CloseWindow();
         }
+    }
+
+    public void DebugStatus() {
+        Debug.Log("currentPlayerIndex " + currentPlayerIndex);
+        Debug.Log("_stepsLeft " + _stepsLeft);
+        Debug.Log("_movesLeft " + _movesLeft);
+        Debug.Log("CurrentCell " + _currentTokenControl.CurrentCell);
+        Debug.Log("_currentPlayer " + _currentPlayer.PlayerName);
+        Debug.Log("Cerrent cell control name " + _currentCellControl.transform.name);
     }
 }

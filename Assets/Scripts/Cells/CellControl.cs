@@ -10,6 +10,7 @@ public class CellControl : MonoBehaviour
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
     [SerializeField] private GameObject arrowSpline;
     [SerializeField] private string arrowToCell;
+    [SerializeField] private string penaltyCell;
     [SerializeField] private string branchName;
 
     private List<string> _currentTokens = new();
@@ -34,9 +35,14 @@ public class CellControl : MonoBehaviour
         private set {}
     }
 
+    public string PenaltyCell {
+        get { return penaltyCell; }
+        set {}
+    }
+
     public EControllableEffects Effect {
         get { return effect; }
-        private set {}
+        set {}
     }
 
     public List<string> CurrentTokens {
@@ -140,23 +146,5 @@ public class CellControl : MonoBehaviour
             }
             Debug.Log(message);
         }
-    }
-
-    // вычислить, в какую сторону пойдет игрок
-    // 1 - вправо, -1 - влево, 0 - другие стороны
-
-    public int GetNextCellDirection() {
-        float currentX = Mathf.Round(transform.position.x);
-        GameObject nextObj = GameObject.Find(nextCell);
-        if (nextObj == null) {
-            return 0;
-        }
-        float nextX = Mathf.Round(nextObj.transform.position.x);
-        Debug.Log("current: " + currentX + " next: " + nextX);
-        Debug.Log("current: " + transform.gameObject.name + " next: " + nextObj.transform.gameObject.name);
-        if (nextX == currentX) {
-            return 0;
-        }
-        return nextX < currentX ? -1 : 1;
     }
 }
