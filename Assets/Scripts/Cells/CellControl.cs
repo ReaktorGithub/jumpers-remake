@@ -10,11 +10,17 @@ public class CellControl : MonoBehaviour
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
     [SerializeField] private GameObject arrowSpline;
     [SerializeField] private string arrowToCell;
+    [SerializeField] private string branchName;
 
     private List<string> _currentTokens = new();
 
     public string NextCell {
         get { return nextCell; }
+        set { nextCell = value; }
+    }
+
+    public string BranchName {
+        get { return branchName; }
         private set {}
     }
 
