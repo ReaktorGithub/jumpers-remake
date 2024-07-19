@@ -13,6 +13,7 @@ public class MoveControl : MonoBehaviour
     [SerializeField] private float alignTime = 5f;
     private TokenControl _currentTokenControl;
     private PlayerControl _currentPlayer;
+    private CellControl _currentCellControl;
     private Pedestal _pedestal;
     private PlayerControl[] _playerControls = new PlayerControl[4];
 
@@ -25,6 +26,7 @@ public class MoveControl : MonoBehaviour
     private ModalWin _modalWin;
     private ModalLose _modalLose;
     private CameraControl _camera;
+    private TopPanel _topPanel;
 
     private void Awake() {
         _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
@@ -37,6 +39,7 @@ public class MoveControl : MonoBehaviour
         _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
+        _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
     }
 
     private void Start() {
@@ -185,23 +188,37 @@ public class MoveControl : MonoBehaviour
         MakeStep();
     }
 
+    // перед движением на следующую клетку нужно проверить, является ли текущая клетка бранчем
+
+    private void CheckBranch() {
+        if (_currentCellControl.CellType == ECellTypes.Branch) {
+            BranchControl branch = GameObject.Find(_currentCellControl.BranchName).GetComponent<BranchControl>();
+            branch.ShowAllBranches();
+            _topPanel.OpenWindow();
+            string message = Utils.Wrap("Остаток: " + _stepsLeft, UIColors.Green);
+            _cubicControl.WriteStatus(message);
+            return;
+        }
+
+        StartCoroutine(MakeStepDefer());
+    }
+
     private void MakeStep() {
         _stepsLeft--;
         _currentTokenControl.SetToNextCell(() => {
             // проверяем тип клетки, на которой сейчас находимся
             // некоторые типы прерывают движение
 
-            CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
-            if (cellControl.CellType == ECellTypes.Finish) {
+            _currentCellControl = _currentTokenControl.GetCurrentCellControl();
+            if (_currentCellControl.CellType == ECellTypes.Finish) {
                 _currentPlayer.ExecuteFinish();
                 _camera.ClearFollow();
                 return;
             }
 
             // если тип клетки не прерывает движение, то проверяем условие выхода из цикла шагов
-            
             if (_stepsLeft > 0) {
-                StartCoroutine(MakeStepDefer());
+                CheckBranch();
             } else {
                 StartCoroutine(ConfirmNewPositionDefer());
             }
@@ -210,10 +227,10 @@ public class MoveControl : MonoBehaviour
 
     public void MakeMove(int score) {
         _stepsLeft = score;
-        CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
-        cellControl.RemoveToken(_currentPlayer.TokenName);
-        cellControl.AlignTokens(alignTime);
-        MakeStep();
+        _currentCellControl = _currentTokenControl.GetCurrentCellControl();
+        _currentCellControl.RemoveToken(_currentPlayer.TokenName);
+        _currentCellControl.AlignTokens(alignTime);
+        CheckBranch();
     }
 
     private IEnumerator ConfirmNewPositionDefer() {
@@ -224,11 +241,27 @@ public class MoveControl : MonoBehaviour
     // подтверждение новой позиции по окончании движения
 
     public void ConfirmNewPosition() {
-        CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
-        cellControl.AddToken(_currentPlayer.TokenName);
-        cellControl.AlignTokens(alignTime, () => {
-            CheckCellEffects(cellControl);
+        _currentCellControl = _currentTokenControl.GetCurrentCellControl();
+        _currentCellControl.AddToken(_currentPlayer.TokenName);
+        _currentCellControl.AlignTokens(alignTime, () => {
+            CheckCellEffects(_currentCellControl);
         });
+    }
+
+    // смена направления
+
+    public void SwitchBranch(string nextCell) {
+        if (_currentCellControl.CellType != ECellTypes.Branch) {
+            Debug.Log("Error while switching branch");
+            return;
+        }
+        
+        BranchControl branch = GameObject.Find(_currentCellControl.BranchName).GetComponent<BranchControl>();
+        branch.HideAllBranches();
+        _topPanel.CloseWindow();
+        _currentCellControl.NextCell = nextCell;
+        _cubicControl.WriteStatus("");
+        StartCoroutine(MakeStepDefer());
     }
 
     // Необходимые действия перед завершением хода:
@@ -260,10 +293,8 @@ public class MoveControl : MonoBehaviour
     }
 
     public void CheckCellArrows() {
-        CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
-
-        if (cellControl.CellType == ECellTypes.Arrow) {
-            _currentTokenControl.PutTokenToArrowSpline(cellControl.ArrowSpline);
+        if (_currentCellControl.CellType == ECellTypes.Arrow) {
+            _currentTokenControl.PutTokenToArrowSpline(_currentCellControl.ArrowSpline);
             return;
         }
 
@@ -271,8 +302,7 @@ public class MoveControl : MonoBehaviour
     }
 
     public void CheckCellRivals() {
-        CellControl cellControl = _currentTokenControl.GetCurrentCellControl();
-        List<string> tokens = cellControl.CurrentTokens;
+        List<string> tokens = _currentCellControl.CurrentTokens;
 
         if (tokens.Count > 1) {
             List<PlayerControl> rivals = new();

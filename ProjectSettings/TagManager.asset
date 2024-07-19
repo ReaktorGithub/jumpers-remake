@@ -55,6 +55,9 @@ TagManager:
   - name: Tokens
     uniqueID: 356337675
     locked: 0
+  - name: Branches
+    uniqueID: 2643324061
+    locked: 0
   - name: UI
     uniqueID: 927285429
     locked: 0

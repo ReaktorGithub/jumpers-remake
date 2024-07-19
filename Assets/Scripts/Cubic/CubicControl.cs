@@ -14,6 +14,7 @@ public class CubicControl : MonoBehaviour
     [SerializeField] private float rotateTime = 1.4f;
     [SerializeField] private float holdTime = 1f;
     [SerializeField] private float pulseTime = 0.5f;
+    [SerializeField] private float pulseMinAlpha = 0.2f;
     private int finalScore;
     private GameObject _border, _borderSelect;
 
@@ -86,38 +87,18 @@ public class CubicControl : MonoBehaviour
         _cubicButton.interactable = value;
         _border.SetActive(!value);
         _borderSelect.SetActive(value);
+        SpriteRenderer borderSelectSprite = _borderSelect.GetComponent<SpriteRenderer>();
         if (value) {
-            _coroutinePulse = StartPulse();
+            _coroutinePulse = Utils.StartPulse(borderSelectSprite, pulseTime, pulseMinAlpha);
             StartCoroutine(_coroutinePulse);
         } else if (_coroutinePulse != null) {
             StopCoroutine(_coroutinePulse);
-            SpriteRenderer sprite = _borderSelect.GetComponent<SpriteRenderer>();
+            SpriteRenderer sprite = borderSelectSprite;
             sprite.color = new Color(1f, 1f, 1f, 1f);
         }
     }
 
     public void WriteStatus(string text) {
         _statusText.text = text;
-    }
-
-    private IEnumerator StartPulse() {
-        float alpha = 0.2f;
-        bool isIn = true;
-        SpriteRenderer sprite = _borderSelect.GetComponent<SpriteRenderer>();
-        
-        while (true) {
-            while (isIn && alpha < 1f) {
-                alpha += Time.deltaTime * pulseTime;
-                sprite.color = new Color(1f, 1f, 1f, alpha);
-                yield return null;
-            }
-            isIn = false;
-            while (!isIn && alpha > 0.2f) {
-                alpha -= Time.deltaTime * pulseTime;
-                sprite.color = new Color(1f, 1f, 1f, alpha / pulseTime);
-                yield return null;
-            }
-            isIn = true;
-        }
     }
 }
