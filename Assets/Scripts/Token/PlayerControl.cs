@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -20,6 +21,7 @@ public class PlayerControl : MonoBehaviour
     private ModalLose _modalLose;
     private ModalWin _modalWin;
     [SerializeField] private float loseDelay = 2f;
+    [SerializeField] private float redEffectDelay = 1f;
     private Pedestal _pedestal;
     private Sprite _tokenImage;
 
@@ -133,7 +135,7 @@ public class PlayerControl : MonoBehaviour
         _modalLose.OpenWindow();
         _isFinished = true;
         int place = _pedestal.SetPlayerToMinPlace(this);
-        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" СЛЕТЕЛ С ТРАССЫ!", UIColors.Red);
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ВЫЛЕТАЕТ С ТРАССЫ!", UIColors.Red);
         _messages.AddMessage(message);
 
         TokenControl tokenControl = GetTokenControl();
@@ -187,10 +189,12 @@ public class PlayerControl : MonoBehaviour
         StartCoroutine(_moveControl.EndMoveDefer());
     }
 
+    // исполнение эффектов
+
     public void ExecuteBlackEffect() {
         power--;
         _moveControl.UpdatePlayerInfo();
-        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попался на " + Utils.Wrap("ЧЁРНЫЙ", UIColors.Black) + " эффект! Минус 1 сила";
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("ЧЁРНЫЙ", UIColors.Black) + " эффект! Минус 1 сила";
         _messages.AddMessage(message);
 
         if (power == 0) {
@@ -208,13 +212,47 @@ public class PlayerControl : MonoBehaviour
         _moveControl.CheckCellArrows();
     }
 
-    // финиш
+    public void ExecuteRedEffect() {
+        power--;
+        _moveControl.UpdatePlayerInfo();
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Минус 1 сила";
+        _messages.AddMessage(message);
+
+        if (power == 0) {
+            OpenPowerWarningModal(() => {
+                RedEffectTokenMove();
+            });
+            return;
+        }
+
+        if (power < 0) {
+            ConfirmLose();
+            return;
+        }
+
+        StartCoroutine(RedEffectTokenMoveDefer());
+    }
+
+    private IEnumerator RedEffectTokenMoveDefer() {
+        yield return new WaitForSeconds(redEffectDelay);
+        RedEffectTokenMove();
+    }
+
+    private void RedEffectTokenMove() {
+        TokenControl tokenControl = GetTokenControl();
+        CellControl cellControl = tokenControl.GetCurrentCellControl();
+        CellControl nextCellcontrol = GameObject.Find(cellControl.PenaltyCell).GetComponent<CellControl>();
+        tokenControl.SetToSpecifiedCell(nextCellcontrol, cellControl.PenaltyCell, () => {
+            cellControl.RemoveToken(TokenName);
+            _moveControl.ConfirmNewPosition();
+        });
+    }
 
     public void ExecuteFinish() {
         _modalWin.OpenWindow();
         _isFinished = true;
         int place = _pedestal.SetPlayerToMaxPlace(this);
-        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ФИНИШИРОВАЛ ", UIColors.Green) + " на " + place + " месте!";
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ФИНИШИРУЕТ ", UIColors.Green) + " на " + place + " месте!";
         _messages.AddMessage(message);
 
         TokenControl tokenControl = GetTokenControl();

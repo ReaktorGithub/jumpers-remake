@@ -70,13 +70,20 @@ public class TokenControl : MonoBehaviour
             return;
         }
         CellControl cell = currentCellObject.GetComponent<CellControl>();
-        if (cell.NextCell == "") {
+        if (cell.NextCell == "" || cell.NextCell == null) {
             Debug.Log("Next cell not found");
             return;
         }
         GameObject nextCellObject = GameObject.Find(cell.NextCell);
         _currentCell = cell.NextCell;
         _coroutine = MoveTo(nextCellObject.transform.position, moveTime, callback);
+        StartCoroutine(_coroutine);
+    }
+
+    public void SetToSpecifiedCell(CellControl nextCellControl, string nextCellName, Action callback = null) {
+        ClearCoroutine();
+        _currentCell = nextCellName;
+        _coroutine = MoveTo(nextCellControl.transform.position, moveTime, callback);
         StartCoroutine(_coroutine);
     }
 
