@@ -200,8 +200,8 @@ public class MoveControl : MonoBehaviour
     }
 
     private void CheckBranch() {
-        if (_currentCellControl.CellType == ECellTypes.Branch) {
-            BranchControl branch = GameObject.Find(_currentCellControl.BranchName).GetComponent<BranchControl>();
+        if (_currentCellControl.IsBranch()) {
+            BranchControl branch = _currentCellControl.BranchObject.GetComponent<BranchControl>();
             branch.ShowAllBranches();
             _topPanel.OpenWindow();
             string message = Utils.Wrap("Остаток: " + _stepsLeft, UIColors.Green);
@@ -266,12 +266,12 @@ public class MoveControl : MonoBehaviour
     // смена направления
 
     public void SwitchBranch(string nextCell) {
-        if (_currentCellControl.CellType != ECellTypes.Branch) {
+        if (!_currentCellControl.IsBranch()) {
             Debug.Log("Error while switching branch");
             return;
         }
         
-        BranchControl branch = GameObject.Find(_currentCellControl.BranchName).GetComponent<BranchControl>();
+        BranchControl branch = _currentCellControl.BranchObject.GetComponent<BranchControl>();
         branch.HideAllBranches();
         _topPanel.CloseWindow();
         _currentCellControl.NextCell = nextCell;

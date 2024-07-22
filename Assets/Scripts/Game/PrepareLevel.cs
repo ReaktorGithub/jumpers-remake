@@ -29,6 +29,7 @@ public class PrepareLevel : MonoBehaviour
 
     private void Start() {
         // порядок важен
+        GameObject.Find("arrow-body").SetActive(false);
         PreparePlayerMoveOrder();
         PrepareTokenLayerOrder();
         BindTokensToPlayers();
