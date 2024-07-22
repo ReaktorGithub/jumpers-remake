@@ -11,7 +11,7 @@ public class CellControl : MonoBehaviour
     [SerializeField] private GameObject arrowSpline;
     [SerializeField] private string arrowToCell;
     [SerializeField] private string penaltyCell;
-    [SerializeField] private string branchName;
+    [SerializeField] private GameObject branchObject;
 
     private List<string> _currentTokens = new();
 
@@ -20,8 +20,8 @@ public class CellControl : MonoBehaviour
         set { nextCell = value; }
     }
 
-    public string BranchName {
-        get { return branchName; }
+    public GameObject BranchObject {
+        get { return branchObject; }
         private set {}
     }
 
@@ -69,8 +69,8 @@ public class CellControl : MonoBehaviour
         }
     }
 
-    public bool IsFree() {
-        return _currentTokens.Count == 0;
+    public bool IsBranch() {
+        return branchObject != null;
     }
 
     // Перераспределить позиции фишек на клетке

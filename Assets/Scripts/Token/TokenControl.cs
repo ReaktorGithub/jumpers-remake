@@ -195,6 +195,7 @@ public class TokenControl : MonoBehaviour
 
     public void PutTokenToArrowSpline(SplineContainer spline) {
         _splineAnimate.Container = spline;
+        _splineAnimate.Restart(false);
         _splineAnimate.Play();
         StartCoroutine(ConfirmNewArrowPositionDefer());
     }
@@ -205,12 +206,13 @@ public class TokenControl : MonoBehaviour
     }
 
     public void ConfirmNewArrowPosition() {
+        _splineAnimate.StopAllCoroutines();
         _splineAnimate.Container = null;
         CellControl currentCellControl = GetCurrentCellControl();
         currentCellControl.RemoveToken(transform.name);
         _currentCell = currentCellControl.ArrowToCell;
         GameObject nextCellObject = GameObject.Find(_currentCell);
-        transform.position = nextCellObject.transform.position;
+        transform.SetLocalPositionAndRotation(nextCellObject.transform.localPosition, Quaternion.Euler(new Vector3(0,0,0)));
         _moveControl.ConfirmNewPosition();
     }
 }

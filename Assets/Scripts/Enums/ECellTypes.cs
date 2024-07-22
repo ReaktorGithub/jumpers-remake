@@ -4,7 +4,6 @@ public enum ECellTypes
     Start,
     Finish,
     Checkpoint,
-    Branch,
     Moneybox,
     Lightning,
     Wall,
