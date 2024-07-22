@@ -210,7 +210,7 @@ public class TokenControl : MonoBehaviour
         _splineAnimate.Container = null;
         CellControl currentCellControl = GetCurrentCellControl();
         currentCellControl.RemoveToken(transform.name);
-        _currentCell = currentCellControl.ArrowToCell;
+        _currentCell = currentCellControl.transform.GetComponent<ArrowCell>().ArrowToCell;
         GameObject nextCellObject = GameObject.Find(_currentCell);
         transform.SetLocalPositionAndRotation(nextCellObject.transform.localPosition, Quaternion.Euler(new Vector3(0,0,0)));
         _moveControl.ConfirmNewPosition();

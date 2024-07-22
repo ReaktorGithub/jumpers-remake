@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -13,17 +12,17 @@ public class PlayerControl : MonoBehaviour
     private int _placeAfterFinish;
     private bool _isFinished = false;
     private int _movesSkip = 0;
-    [SerializeField] private float finishDelay = 0.5f;
+    
     private List<EAttackTypes> _availableAttackTypes = new();
     private MoveControl _moveControl;
     private Messages _messages;
     private ModalWarning _modalWarning;
     private ModalLose _modalLose;
     private ModalWin _modalWin;
-    [SerializeField] private float loseDelay = 2f;
-    [SerializeField] private float redEffectDelay = 1f;
+    
     private Pedestal _pedestal;
     private Sprite _tokenImage;
+    private PlayersControl _playersControl;
 
     // player resources
     [SerializeField] private int coins = 0;
@@ -39,6 +38,7 @@ public class PlayerControl : MonoBehaviour
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
         _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
+        _playersControl = GameObject.Find("Players").GetComponent<PlayersControl>();
     }
 
     public int MoveOrder {
@@ -139,7 +139,7 @@ public class PlayerControl : MonoBehaviour
         _messages.AddMessage(message);
 
         TokenControl tokenControl = GetTokenControl();
-        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(loseDelay, () => {
+        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(_playersControl.LoseDelay, () => {
             _pedestal.SetTokenToPedestal(this, place);
             CellControl cellControl = tokenControl.GetCurrentCellControl();
             cellControl.RemoveToken(tokenName);
@@ -234,15 +234,19 @@ public class PlayerControl : MonoBehaviour
     }
 
     private IEnumerator RedEffectTokenMoveDefer() {
-        yield return new WaitForSeconds(redEffectDelay);
+        yield return new WaitForSeconds(_playersControl.RedEffectDelay);
         RedEffectTokenMove();
     }
 
     private void RedEffectTokenMove() {
         TokenControl tokenControl = GetTokenControl();
         CellControl cellControl = tokenControl.GetCurrentCellControl();
-        CellControl nextCellcontrol = GameObject.Find(cellControl.PenaltyCell).GetComponent<CellControl>();
-        tokenControl.SetToSpecifiedCell(nextCellcontrol, cellControl.PenaltyCell, () => {
+        if (!GameObject.Find(tokenControl.CurrentCell).TryGetComponent(out RedCell redCell)) {
+            Debug.Log("Red cell not found");
+            return;
+        }
+        CellControl nextCellcontrol = GameObject.Find(redCell.PenaltyCell).GetComponent<CellControl>();
+        tokenControl.SetToSpecifiedCell(nextCellcontrol, redCell.PenaltyCell, () => {
             cellControl.RemoveToken(TokenName);
             _moveControl.ConfirmNewPosition();
         });
@@ -256,7 +260,7 @@ public class PlayerControl : MonoBehaviour
         _messages.AddMessage(message);
 
         TokenControl tokenControl = GetTokenControl();
-        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(finishDelay, () => {
+        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(_playersControl.FinishDelay, () => {
             _pedestal.SetTokenToPedestal(this, place);
             StartCoroutine(_moveControl.EndMoveDefer());
         });

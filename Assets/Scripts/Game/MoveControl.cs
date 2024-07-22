@@ -200,8 +200,8 @@ public class MoveControl : MonoBehaviour
     }
 
     private void CheckBranch() {
-        if (_currentCellControl.IsBranch()) {
-            BranchControl branch = _currentCellControl.BranchObject.GetComponent<BranchControl>();
+        if (_currentCellControl.TryGetComponent(out BranchCell branchCell)) {
+            BranchControl branch = branchCell.BranchObject.GetComponent<BranchControl>();
             branch.ShowAllBranches();
             _topPanel.OpenWindow();
             string message = Utils.Wrap("Остаток: " + _stepsLeft, UIColors.Green);
@@ -266,12 +266,12 @@ public class MoveControl : MonoBehaviour
     // смена направления
 
     public void SwitchBranch(string nextCell) {
-        if (!_currentCellControl.IsBranch()) {
+        if (!_currentCellControl.TryGetComponent(out BranchCell branchCell)) {
             Debug.Log("Error while switching branch");
             return;
         }
         
-        BranchControl branch = _currentCellControl.BranchObject.GetComponent<BranchControl>();
+        BranchControl branch = branchCell.BranchObject.GetComponent<BranchControl>();
         branch.HideAllBranches();
         _topPanel.CloseWindow();
         _currentCellControl.NextCell = nextCell;
@@ -304,7 +304,7 @@ public class MoveControl : MonoBehaviour
             return;
         }
 
-        if (cellControl.Effect == EControllableEffects.Red) {
+        if (cellControl.transform.TryGetComponent(out RedCell _)) {
             _movesLeft = 0;
             _stepsLeft = 0;
             _currentPlayer.ExecuteRedEffect();
@@ -315,8 +315,8 @@ public class MoveControl : MonoBehaviour
     }
 
     public void CheckCellArrows() {
-        if (_currentCellControl.CellType == ECellTypes.Arrow) {
-            _currentTokenControl.PutTokenToArrowSpline(_currentCellControl.ArrowSpline);
+        if (_currentCellControl.transform.TryGetComponent(out ArrowCell arrowCell)) {
+            _currentTokenControl.PutTokenToArrowSpline(arrowCell.ArrowSpline);
             return;
         }
 
