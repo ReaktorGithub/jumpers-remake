@@ -4319,9 +4319,6 @@ MonoBehaviour:
   playerName: "\u0418\u0433\u0440\u043E\u043A D"
   tokenName: 
   moveOrder: 0
-  finishDelay: 0.5
-  loseDelay: 2
-  redEffectDelay: 0.8
   coins: 0
   mallows: 0
   rubies: 0
@@ -8061,9 +8058,6 @@ MonoBehaviour:
   playerName: "\u0418\u0433\u0440\u043E\u043A C"
   tokenName: 
   moveOrder: 0
-  finishDelay: 0.5
-  loseDelay: 2
-  redEffectDelay: 0.8
   coins: 0
   mallows: 0
   rubies: 0
@@ -9393,9 +9387,6 @@ MonoBehaviour:
   playerName: "\u0418\u0433\u0440\u043E\u043A B"
   tokenName: 
   moveOrder: 0
-  finishDelay: 0.5
-  loseDelay: 2
-  redEffectDelay: 0.8
   coins: 0
   mallows: 0
   rubies: 0
@@ -11172,9 +11163,6 @@ MonoBehaviour:
   playerName: "\u0418\u0433\u0440\u043E\u043A A"
   tokenName: 
   moveOrder: 0
-  finishDelay: 0.5
-  loseDelay: 2
-  redEffectDelay: 0.8
   coins: 0
   mallows: 0
   rubies: 0
@@ -24733,6 +24721,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1806436257}
+  - component: {fileID: 1806436258}
   m_Layer: 0
   m_Name: Players
   m_TagString: Untagged
@@ -24759,6 +24748,21 @@ Transform:
   - {fileID: 312397160}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1806436258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1806436256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a54a524008612ea45b21341e9ff3d844, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  finishDelay: 0.5
+  loseDelay: 2
+  redEffectDelay: 1
 --- !u!1 &1819940250 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1839313095580720373, guid: 90ef5158265cf104981f9cf1c274ad34, type: 3}
