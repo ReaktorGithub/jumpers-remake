@@ -1,17 +1,12 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Splines;
 
 public class CellControl : MonoBehaviour
 {
     [SerializeField] private string nextCell = "";
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
-    [SerializeField] private GameObject arrowSpline;
-    [SerializeField] private string arrowToCell;
-    [SerializeField] private string penaltyCell;
-    [SerializeField] private GameObject branchObject;
 
     private List<string> _currentTokens = new();
 
@@ -20,24 +15,9 @@ public class CellControl : MonoBehaviour
         set { nextCell = value; }
     }
 
-    public GameObject BranchObject {
-        get { return branchObject; }
-        private set {}
-    }
-
     public ECellTypes CellType {
         get { return cellType; }
         private set {}
-    }
-
-    public string ArrowToCell {
-        get { return arrowToCell; }
-        private set {}
-    }
-
-    public string PenaltyCell {
-        get { return penaltyCell; }
-        set {}
     }
 
     public EControllableEffects Effect {
@@ -47,11 +27,6 @@ public class CellControl : MonoBehaviour
 
     public List<string> CurrentTokens {
         get { return _currentTokens; }
-        private set {}
-    }
-
-    public SplineContainer ArrowSpline {
-        get { return arrowSpline.GetComponent<SplineContainer>(); }
         private set {}
     }
 
@@ -67,10 +42,6 @@ public class CellControl : MonoBehaviour
         if (HasToken(tokenName)) {
             _currentTokens.Remove(tokenName);
         }
-    }
-
-    public bool IsBranch() {
-        return branchObject != null;
     }
 
     // Перераспределить позиции фишек на клетке

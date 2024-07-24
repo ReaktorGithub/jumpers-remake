@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -13,15 +12,12 @@ public class PlayerControl : MonoBehaviour
     private int _placeAfterFinish;
     private bool _isFinished = false;
     private int _movesSkip = 0;
-    [SerializeField] private float finishDelay = 0.5f;
+    
     private List<EAttackTypes> _availableAttackTypes = new();
-    private MoveControl _moveControl;
-    private Messages _messages;
     private ModalWarning _modalWarning;
     private ModalLose _modalLose;
     private ModalWin _modalWin;
-    [SerializeField] private float loseDelay = 2f;
-    [SerializeField] private float redEffectDelay = 1f;
+    
     private Pedestal _pedestal;
     private Sprite _tokenImage;
 
@@ -33,8 +29,6 @@ public class PlayerControl : MonoBehaviour
 
     private void Awake() {
         _availableAttackTypes.Add(EAttackTypes.Usual);
-        _moveControl = GameObject.Find("GameScripts").GetComponent<MoveControl>();
-        _messages = GameObject.Find("Messages").GetComponent<Messages>();
         _modalWarning = GameObject.Find("GameScripts").GetComponent<ModalWarning>();
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
         _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
@@ -136,14 +130,14 @@ public class PlayerControl : MonoBehaviour
         _isFinished = true;
         int place = _pedestal.SetPlayerToMinPlace(this);
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ВЫЛЕТАЕТ С ТРАССЫ!", UIColors.Red);
-        _messages.AddMessage(message);
+        Messages.Instance.AddMessage(message);
 
         TokenControl tokenControl = GetTokenControl();
-        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(loseDelay, () => {
+        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(PlayersControl.Instance.LoseDelay, () => {
             _pedestal.SetTokenToPedestal(this, place);
             CellControl cellControl = tokenControl.GetCurrentCellControl();
             cellControl.RemoveToken(tokenName);
-            StartCoroutine(_moveControl.EndMoveDefer());
+            StartCoroutine(MoveControl.Instance.EndMoveDefer());
         });
         StartCoroutine(coroutine);
     }
@@ -169,37 +163,37 @@ public class PlayerControl : MonoBehaviour
         private set {}
     }
 
-    public void ExecuteAttackUsual(PlayerControl rival) {
+    public void ExecuteAttackUsual(PlayerControl rival, int currentPlayerIndex) {
         power--;
-        _moveControl.AddMovesLeft(1);
+        MoveControl.Instance.AddMovesLeft(1);
         rival.SkipMoveIncrease(rival.GetTokenControl());
-        _moveControl.UpdatePlayerInfo();
+        PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
         string message1 = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" АТАКУЕТ ", UIColors.Red) + Utils.Wrap(rival.PlayerName, UIColors.Yellow) + "!";
-        _messages.AddMessage(message1);
+        Messages.Instance.AddMessage(message1);
         string message2 = Utils.Wrap(rival.PlayerName, UIColors.Yellow) + " пропустит ход, а " + Utils.Wrap(PlayerName, UIColors.Yellow) + " ходит ещё раз";
-        _messages.AddMessage(message2);
+        Messages.Instance.AddMessage(message2);
 
         if (power == 0) {
             OpenPowerWarningModal(() => {
-                StartCoroutine(_moveControl.EndMoveDefer());
+                StartCoroutine(MoveControl.Instance.EndMoveDefer());
             });
             return;
         }
 
-        StartCoroutine(_moveControl.EndMoveDefer());
+        StartCoroutine(MoveControl.Instance.EndMoveDefer());
     }
 
     // исполнение эффектов
 
-    public void ExecuteBlackEffect() {
+    public void ExecuteBlackEffect(CellControl cellControl, TokenControl tokenControl, int currentPlayerIndex) {
         power--;
-        _moveControl.UpdatePlayerInfo();
+        PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("ЧЁРНЫЙ", UIColors.Black) + " эффект! Минус 1 сила";
-        _messages.AddMessage(message);
+        Messages.Instance.AddMessage(message);
 
         if (power == 0) {
             OpenPowerWarningModal(() => {
-                _moveControl.CheckCellRivals();
+                CellChecker.Instance.CheckCellRivals(cellControl, this);
             });
             return;
         }
@@ -209,14 +203,14 @@ public class PlayerControl : MonoBehaviour
             return;
         }
 
-        _moveControl.CheckCellArrows();
+        CellChecker.Instance.CheckCellArrows(cellControl, this, tokenControl);
     }
 
-    public void ExecuteRedEffect() {
+    public void ExecuteRedEffect(int currentPlayerIndex) {
         power--;
-        _moveControl.UpdatePlayerInfo();
+        PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Минус 1 сила";
-        _messages.AddMessage(message);
+        Messages.Instance.AddMessage(message);
 
         if (power == 0) {
             OpenPowerWarningModal(() => {
@@ -234,17 +228,21 @@ public class PlayerControl : MonoBehaviour
     }
 
     private IEnumerator RedEffectTokenMoveDefer() {
-        yield return new WaitForSeconds(redEffectDelay);
+        yield return new WaitForSeconds(PlayersControl.Instance.RedEffectDelay);
         RedEffectTokenMove();
     }
 
     private void RedEffectTokenMove() {
         TokenControl tokenControl = GetTokenControl();
         CellControl cellControl = tokenControl.GetCurrentCellControl();
-        CellControl nextCellcontrol = GameObject.Find(cellControl.PenaltyCell).GetComponent<CellControl>();
-        tokenControl.SetToSpecifiedCell(nextCellcontrol, cellControl.PenaltyCell, () => {
+        if (!GameObject.Find(tokenControl.CurrentCell).TryGetComponent(out RedCell redCell)) {
+            Debug.Log("Red cell not found");
+            return;
+        }
+        CellControl nextCellcontrol = GameObject.Find(redCell.PenaltyCell).GetComponent<CellControl>();
+        tokenControl.SetToSpecifiedCell(nextCellcontrol, redCell.PenaltyCell, () => {
             cellControl.RemoveToken(TokenName);
-            _moveControl.ConfirmNewPosition();
+            MoveControl.Instance.ConfirmNewPosition();
         });
     }
 
@@ -253,12 +251,12 @@ public class PlayerControl : MonoBehaviour
         _isFinished = true;
         int place = _pedestal.SetPlayerToMaxPlace(this);
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ФИНИШИРУЕТ ", UIColors.Green) + " на " + place + " месте!";
-        _messages.AddMessage(message);
+        Messages.Instance.AddMessage(message);
 
         TokenControl tokenControl = GetTokenControl();
-        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(finishDelay, () => {
+        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(PlayersControl.Instance.FinishDelay, () => {
             _pedestal.SetTokenToPedestal(this, place);
-            StartCoroutine(_moveControl.EndMoveDefer());
+            StartCoroutine(MoveControl.Instance.EndMoveDefer());
         });
         StartCoroutine(coroutine);
     }

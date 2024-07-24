@@ -1,54 +1,34 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class MoveControl : MonoBehaviour
 {
-    [SerializeField] private int currentPlayerIndex = 1;
+    public static MoveControl Instance { get; private set; }
+    private int _currentPlayerIndex = 1;
     private int _stepsLeft;
     private int _movesLeft = 1;
     [SerializeField] private float stepDelay = 0.3f;
     [SerializeField] private float endMoveDelay = 0.5f;
     [SerializeField] private float skipMoveDelay = 1.5f;
     [SerializeField] private float alignTime = 5f;
-    private TokenControl _currentTokenControl;
+    private TokenControl _currentToken;
     private PlayerControl _currentPlayer;
-    private CellControl _currentCellControl;
-    private Pedestal _pedestal;
-    private PlayerControl[] _playerControls = new PlayerControl[4];
-
+    private CellControl _currentCell;
     private CubicControl _cubicControl;
-    private CellControl _startCellControl;
-    private Messages _messages;
-    private PopupAttack _popupAttack;
-    private LevelData _levelData;
     private ModalResults _modalResults;
     private ModalWin _modalWin;
     private ModalLose _modalLose;
     private CameraControl _camera;
     private TopPanel _topPanel;
-    private ECellTypes[] _skipRivalCheckTypes = new ECellTypes[2];
 
     private void Awake() {
+        Instance = this;
         _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
-        _startCellControl = GameObject.Find("start").GetComponent<CellControl>();
-        _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
-        _messages = GameObject.Find("Messages").GetComponent<Messages>();
-        _popupAttack = GameObject.Find("GameScripts").GetComponent<PopupAttack>();
-        _levelData = GameObject.Find("GameScripts").GetComponent<LevelData>();
         _modalResults = GameObject.Find("ModalResults").GetComponent<ModalResults>();
         _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
-        _skipRivalCheckTypes[0] = ECellTypes.Start;
-        _skipRivalCheckTypes[1] = ECellTypes.Checkpoint;
-    }
-
-    private void Start() {
-        _playerControls = GameObject.Find("GameScripts").GetComponent<PrepareLevel>().PlayerControls;
     }
 
     public PlayerControl CurrentPlayer {
@@ -56,80 +36,45 @@ public class MoveControl : MonoBehaviour
         private set {}
     }
 
-    public TokenControl CurrentTokenControl {
-        get { return _currentTokenControl; }
-        private set {}
+    public int MovesLeft {
+        get { return _movesLeft; }
+        set {}
     }
 
-    public void MoveTokensToStart() {
-        _startCellControl.AddToken("token_1");
-        _startCellControl.AddToken("token_2");
-        _startCellControl.AddToken("token_3");
-        _startCellControl.AddToken("token_4");
-        _startCellControl.AlignTokens(alignTime / 1.5f);
+    public void AddMovesLeft(int count) {
+        _movesLeft += count;
     }
 
-    public string GetTokenNameByMoveOrder(int order) {
-        foreach(PlayerControl player in _playerControls) {
-            if (player.MoveOrder == order) {
-                return player.TokenName;
-            }
-        }
-        return null;
-    }
-
-    /*
-        Порядок слоев фишек по умолчанию:
-        order 1 - 3 - текущий
-        order 2 - 0
-        order 3 - 1
-        order 4 - 2
-        При смене игрока текущий порядок устанавливается на 3, все остальные -1
-    */
-
-    public void UpdateTokenLayerOrder() {
-        foreach(PlayerControl player in _playerControls) {
-            string tokenName = GetTokenNameByMoveOrder(player.MoveOrder);
-            GameObject token = GameObject.Find(tokenName);
-            if (token == null) {
-                continue;
-            }
-            TokenControl tokenControl = token.GetComponent<TokenControl>();
-            if (player.MoveOrder == currentPlayerIndex) {
-                tokenControl.SetOrderInLayer(3);
-            } else {
-                tokenControl.SetOrderInLayer(tokenControl.GetOrderInLayer() - 1);
-            }
-        }
-    }
-
-    public void UpdateSqueezeAnimation() {
-        foreach(PlayerControl player in _playerControls) {
-            GameObject token = GameObject.Find(player.TokenName);
-            if (token == null) {
-                continue;
-            }
-            TokenControl tokenControl = token.GetComponent<TokenControl>();
-            if (player.MoveOrder == currentPlayerIndex) {
-                tokenControl.StartSqueeze();
-            } else {
-                tokenControl.StopSqueeze();
-            }
-        }
+    public int StepsLeft {
+        get { return _stepsLeft; }
+        set {}
     }
 
     public void SetNextPlayerIndex() {
-        if (currentPlayerIndex < 4) {
-            currentPlayerIndex += 1;
+        if (_currentPlayerIndex < 4) {
+            _currentPlayerIndex += 1;
         } else {
-            currentPlayerIndex = 1;
+            _currentPlayerIndex = 1;
         }
         SwitchPlayer();
     }
 
+    public int CurrentPlayerIndex {
+        get {
+            return _currentPlayerIndex;
+        }
+        set {
+            if (value >= 1 && value <= 4) {
+                _currentPlayerIndex = value;
+            } else {
+                Debug.Log("Error while set current player " + value);
+            }
+        }
+    }
+
     public bool IsRaceOver() {
         int count = 0;
-        foreach(PlayerControl player in _playerControls) {
+        foreach(PlayerControl player in PlayersControl.Instance.Players) {
             if (!player.IsFinished) {
                 count++;
             }
@@ -142,17 +87,19 @@ public class MoveControl : MonoBehaviour
     // ОСТОРОЖНО! рекурсия
     
     public void SwitchPlayer() {
-        for (int i = 0; i < _playerControls.Length; i++) {
-            if (_playerControls[i].MoveOrder == currentPlayerIndex) {
-                if (_playerControls[i].IsFinished) {
+        PlayerControl[] playerControls = PlayersControl.Instance.Players;
+
+        for (int i = 0; i < playerControls.Length; i++) {
+            if (playerControls[i].MoveOrder == _currentPlayerIndex) {
+                if (playerControls[i].IsFinished) {
                     SetNextPlayerIndex();
                     break;
                 } else {
-                    _currentPlayer = _playerControls[i];
-                    _currentTokenControl = _playerControls[i].GetTokenControl();
-                    UpdateTokenLayerOrder();
-                    UpdateSqueezeAnimation();
-                    UpdatePlayerInfo();
+                    _currentPlayer = playerControls[i];
+                    _currentToken = playerControls[i].GetTokenControl();
+                    PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
+                    PlayersControl.Instance.UpdateSqueezeAnimation(_currentPlayerIndex);
+                    PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
                     if (_currentPlayer.MovesSkip == 0) {
                         _movesLeft = 1;
                         string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " ходит";
@@ -170,70 +117,39 @@ public class MoveControl : MonoBehaviour
         _cubicControl.SetCubicInteractable(true);
         _cubicControl.WriteStatus(cubicMessage);
         if (messengerMessage != null) {
-            _messages.AddMessage(messengerMessage);
+            Messages.Instance.AddMessage(messengerMessage);
         }
-        _camera.FollowObject(_currentTokenControl.gameObject.transform);
+        _camera.FollowObject(_currentToken.gameObject.transform);
     }
 
-    public int CurrentPlayerIndex {
-        get {
-            return currentPlayerIndex;
-        }
-        set {
-            if (value >= 1 && value <= 4) {
-                currentPlayerIndex = value;
-            } else {
-                Debug.Log("Error while set current player " + value);
-            }
+    private void StartCellCheckBeforeStep() {
+        bool check = CellChecker.Instance.CheckBranch(_currentCell, _stepsLeft);
+        if (check) {
+            StartCoroutine(MakeStepDefer());
         }
     }
 
-    private IEnumerator MakeStepDefer() {
+    public IEnumerator MakeStepDefer() {
         yield return new WaitForSeconds(stepDelay);
         MakeStep();
     }
 
-    // метод запускает серию проверок перед перемещением на следующую клетку
-
-    private void InitTokenStep() {
-        CheckBranch();
-    }
-
-    private void CheckBranch() {
-        if (_currentCellControl.IsBranch()) {
-            BranchControl branch = _currentCellControl.BranchObject.GetComponent<BranchControl>();
-            branch.ShowAllBranches();
-            _topPanel.OpenWindow();
-            string message = Utils.Wrap("Остаток: " + _stepsLeft, UIColors.Green);
-            _cubicControl.WriteStatus(message);
-            return;
-        }
-
-        StartCoroutine(MakeStepDefer());
-    }
-
     private void MakeStep() {
         _stepsLeft--;
-        _currentTokenControl.SetToNextCell(() => {
+        _currentToken.SetToNextCell(() => {
             // проверяем тип клетки, на которой сейчас находимся
             // некоторые типы прерывают движение, либо вызывают код во время движения
 
-            _currentCellControl = _currentTokenControl.GetCurrentCellControl();
+            _currentCell = _currentToken.GetCurrentCellControl();
 
-            if (_currentCellControl.CellType == ECellTypes.Checkpoint) {
-                string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " достигает " + Utils.Wrap("чекпойнта", UIColors.Blue);
-                _messages.AddMessage(message);
-            }
-
-            if (_currentCellControl.CellType == ECellTypes.Finish) {
-                _currentPlayer.ExecuteFinish();
-                _camera.ClearFollow();
+            bool check = CellChecker.Instance.CheckCellAfterStep(_currentCell.CellType, _currentPlayer);
+            if (!check) {
                 return;
             }
 
             // если тип клетки не прерывает движение, то проверяем условие выхода из цикла шагов
             if (_stepsLeft > 0) {
-                InitTokenStep();
+                StartCellCheckBeforeStep();
             } else {
                 StartCoroutine(ConfirmNewPositionDefer());
             }
@@ -242,10 +158,10 @@ public class MoveControl : MonoBehaviour
 
     public void MakeMove(int score) {
         _stepsLeft = score;
-        _currentCellControl = _currentTokenControl.GetCurrentCellControl();
-        _currentCellControl.RemoveToken(_currentPlayer.TokenName);
-        _currentCellControl.AlignTokens(alignTime);
-        InitTokenStep();
+        _currentCell = _currentToken.GetCurrentCellControl();
+        _currentCell.RemoveToken(_currentPlayer.TokenName);
+        _currentCell.AlignTokens(alignTime);
+        StartCellCheckBeforeStep();
     }
 
     private IEnumerator ConfirmNewPositionDefer() {
@@ -256,124 +172,27 @@ public class MoveControl : MonoBehaviour
     // подтверждение новой позиции по окончании движения
 
     public void ConfirmNewPosition() {
-        _currentCellControl = _currentTokenControl.GetCurrentCellControl();
-        _currentCellControl.AddToken(_currentPlayer.TokenName);
-        _currentCellControl.AlignTokens(alignTime, () => {
-            CheckCellEffects(_currentCellControl);
+        _currentCell = _currentToken.GetCurrentCellControl();
+        _currentCell.AddToken(_currentPlayer.TokenName);
+        _currentCell.AlignTokens(alignTime, () => {
+            CellChecker.Instance.CheckCellEffects(_currentCell, _currentPlayer, _currentToken, _currentPlayerIndex);
         });
     }
 
     // смена направления
 
     public void SwitchBranch(string nextCell) {
-        if (!_currentCellControl.IsBranch()) {
+        if (!_currentCell.TryGetComponent(out BranchCell branchCell)) {
             Debug.Log("Error while switching branch");
             return;
         }
         
-        BranchControl branch = _currentCellControl.BranchObject.GetComponent<BranchControl>();
+        BranchControl branch = branchCell.BranchObject.GetComponent<BranchControl>();
         branch.HideAllBranches();
         _topPanel.CloseWindow();
-        _currentCellControl.NextCell = nextCell;
+        _currentCell.NextCell = nextCell;
         _cubicControl.WriteStatus("");
         StartCoroutine(MakeStepDefer());
-    }
-
-    // Необходимые действия перед завершением хода:
-    // 1.	Подбор бонуса.
-    // 2.	Срабатывание капкана.
-    // 3.	Исполнение эффекта.
-    // 4.	Исполнение эффекта «стрелка», либо «синяя стрелка».
-    // 5.	Атака на соперников.
-
-    private void CheckCellEffects(CellControl cellControl) {
-        if (cellControl.Effect == EControllableEffects.Green) {
-            _movesLeft++;
-            string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("зелёный", UIColors.Green) + " эффект и ходит ещё раз";
-            _messages.AddMessage(message);
-        }
-
-        if (cellControl.Effect == EControllableEffects.Yellow) {
-            _currentPlayer.SkipMoveIncrease(_currentTokenControl);
-            string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("жёлтый", UIColors.Yellow) + " эффект и пропустит ход";
-            _messages.AddMessage(message);
-        }
-
-        if (cellControl.Effect == EControllableEffects.Black) {
-            _currentPlayer.ExecuteBlackEffect();
-            return;
-        }
-
-        if (cellControl.Effect == EControllableEffects.Red) {
-            _movesLeft = 0;
-            _stepsLeft = 0;
-            _currentPlayer.ExecuteRedEffect();
-            return;
-        }
-
-        CheckCellArrows();
-    }
-
-    public void CheckCellArrows() {
-        if (_currentCellControl.CellType == ECellTypes.Arrow) {
-            _currentTokenControl.PutTokenToArrowSpline(_currentCellControl.ArrowSpline);
-            return;
-        }
-
-        CheckCellRivals();
-    }
-
-    public void CheckCellRivals() {
-        if (_skipRivalCheckTypes.Contains(_currentCellControl.CellType)) {
-            StartCoroutine(EndMoveDefer());
-            return;
-        }
-        
-        List<string> tokens = _currentCellControl.CurrentTokens;
-
-        if (tokens.Count > 1) {
-            List<PlayerControl> rivals = new();
-            foreach(PlayerControl player in _playerControls) {
-                if (tokens.Contains(player.TokenName) && _currentPlayer.TokenName != player.TokenName) {
-                    rivals.Add(player);
-                }
-            }
-            
-            _popupAttack.BuildContent(rivals);
-            _popupAttack.OpenWindow();
-
-            return;
-        }
-
-        // закончить ход, если нет соперников
-
-        StartCoroutine(EndMoveDefer());
-    }
-
-    public void MoveAllTokensToPedestal() {
-        foreach (PlayerControl player in _playerControls) {
-            if (!player.IsFinished) {
-                player.IsFinished = true;
-                int place = _pedestal.SetPlayerToMinPlace(player);
-                string name = "PlayerInfo" + player.MoveOrder;
-                PlayerInfo info = GameObject.Find(name).GetComponent<PlayerInfo>();
-                info.UpdatePlayerInfoDisplay(player, currentPlayerIndex);
-
-                TokenControl tokenControl = player.GetTokenControl();
-                IEnumerator coroutine = tokenControl.MoveToPedestalDefer(endMoveDelay, () => {
-                    _pedestal.SetTokenToPedestal(player, place);
-                });
-                StartCoroutine(coroutine);
-            }
-        }
-    }
-
-    public void UpdatePlayerInfo() {
-        foreach(PlayerControl player in _playerControls) {
-            string name = "PlayerInfo" + player.MoveOrder;
-            PlayerInfo info = GameObject.Find(name).GetComponent<PlayerInfo>();
-            info.UpdatePlayerInfoDisplay(player, currentPlayerIndex);
-        }
     }
 
     public IEnumerator EndMoveDefer() {
@@ -383,11 +202,11 @@ public class MoveControl : MonoBehaviour
 
     public IEnumerator SkipMoveDefer() {
         string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " пропускает ход";
-        _messages.AddMessage(message);
+        Messages.Instance.AddMessage(message);
         message = Utils.Wrap("пропуск", UIColors.Yellow);
         _cubicControl.WriteStatus(message);
         yield return new WaitForSeconds(skipMoveDelay);
-        _currentPlayer.SkipMoveDecrease(_currentTokenControl);
+        _currentPlayer.SkipMoveDecrease(_currentToken);
         EndMove();
     }
 
@@ -397,8 +216,8 @@ public class MoveControl : MonoBehaviour
         bool isRaceOver = IsRaceOver();
 
         if (isRaceOver) {
-            UpdatePlayerInfo();
-            MoveAllTokensToPedestal();
+            PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
+            PlayersControl.Instance.MoveAllTokensToPedestal(_currentPlayerIndex, endMoveDelay);
             StartCoroutine(RaceOverDefer());
             return;
         }
@@ -434,29 +253,15 @@ public class MoveControl : MonoBehaviour
         // _cellControl.ShowTokensAtCells();
     }
 
-    public void AddMovesLeft(int count) {
-        _movesLeft += count;
-    }
-
     public IEnumerator RaceOverDefer() {
         yield return new WaitForSeconds(endMoveDelay);
         RaceOver();
     }
 
     public void RaceOver() {
-        // раздача ресурсов
-
-        foreach(PlayerControl player in _playerControls) {
-            int coinsEarned = _levelData.PrizeCoins[player.PlaceAfterFinish - 1];
-            int mallowsEarned = _levelData.PrizeMallows[player.PlaceAfterFinish - 1];
-            int rubiesEarned = _levelData.PrizeRubies[player.PlaceAfterFinish - 1];
-            player.AddCoins(coinsEarned);
-            player.AddMallows(mallowsEarned);
-            player.AddRubies(rubiesEarned);
-        }
-
+        PlayersControl.Instance.GiveResourcesAfterRace();
         CloseAllOptionalModals();
-        _modalResults.OpenWindow(_playerControls);
+        _modalResults.OpenWindow(PlayersControl.Instance.Players);
     }
 
     public void CloseAllOptionalModals() {
@@ -469,12 +274,14 @@ public class MoveControl : MonoBehaviour
         }
     }
 
+    // debug
+
     public void DebugStatus() {
-        Debug.Log("currentPlayerIndex " + currentPlayerIndex);
+        Debug.Log("_currentPlayerIndex " + _currentPlayerIndex);
         Debug.Log("_stepsLeft " + _stepsLeft);
         Debug.Log("_movesLeft " + _movesLeft);
-        Debug.Log("CurrentCell " + _currentTokenControl.CurrentCell);
+        Debug.Log("CurrentCell " + _currentToken.CurrentCell);
         Debug.Log("_currentPlayer " + _currentPlayer.PlayerName);
-        Debug.Log("Cerrent cell control name " + _currentCellControl.transform.name);
+        Debug.Log("Cerrent cell control name " + _currentCell.transform.name);
     }
 }

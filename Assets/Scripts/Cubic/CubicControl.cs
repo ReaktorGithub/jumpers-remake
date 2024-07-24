@@ -7,7 +7,6 @@ public class CubicControl : MonoBehaviour
 {
     private Button _cubicButton;
     private Animator _anim;
-    private MoveControl _moveControl;
     private IEnumerator _coroutine, _coroutinePulse;
     private TextMeshProUGUI _statusText;
     [SerializeField] private int overrideScore = 0;
@@ -22,7 +21,6 @@ public class CubicControl : MonoBehaviour
     private void Awake() {
         _anim = transform.Find("CubicImage").GetComponent<Animator>();
         _cubicButton = transform.Find("CubicButton").GetComponent<Button>();
-        _moveControl = GameObject.Find("GameScripts").GetComponent<MoveControl>();
         _statusText = transform.Find("StatusText").GetComponent<TextMeshProUGUI>();
         _statusText.text = "";
         _border = transform.Find("cubic_border").gameObject;
@@ -80,7 +78,7 @@ public class CubicControl : MonoBehaviour
 
     private IEnumerator MakeMoveDefer() {
         yield return new WaitForSeconds(holdTime);
-        _moveControl.MakeMove(finalScore);
+        MoveControl.Instance.MakeMove(finalScore);
     }
 
     public void SetCubicInteractable(bool value) {
