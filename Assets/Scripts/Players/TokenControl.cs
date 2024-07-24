@@ -22,7 +22,6 @@ public class TokenControl : MonoBehaviour
     private bool _isSqueeze = false;
     private Vector3 _pedestalPosition;
     private SplineAnimate _splineAnimate;
-    private MoveControl _moveControl;
 
     private void Awake() {
         _tokenImage = transform.Find("TokenImage").gameObject;
@@ -35,7 +34,6 @@ public class TokenControl : MonoBehaviour
         _sortingGroup = GetComponent<SortingGroup>();
         _pedestalPosition = GameObject.Find("Pedestal").transform.position;
         _splineAnimate = GetComponent<SplineAnimate>();
-        _moveControl = GameObject.Find("GameScripts").GetComponent<MoveControl>();
     }
 
     public string CurrentCell {
@@ -213,6 +211,6 @@ public class TokenControl : MonoBehaviour
         _currentCell = currentCellControl.transform.GetComponent<ArrowCell>().ArrowToCell;
         GameObject nextCellObject = GameObject.Find(_currentCell);
         transform.SetLocalPositionAndRotation(nextCellObject.transform.localPosition, Quaternion.Euler(new Vector3(0,0,0)));
-        _moveControl.ConfirmNewPosition();
+        MoveControl.Instance.ConfirmNewPosition();
     }
 }

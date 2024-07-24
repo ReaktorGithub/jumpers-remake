@@ -9,12 +9,10 @@ public class BranchButton : MonoBehaviour
     [SerializeField] private float pulseMinValue = 0.4f;
     [SerializeField] private float pulseDefaultValue = 0.6f;
     [SerializeField] private string nextCell;
-    private MoveControl _moveControl;
     private float _currentX;
     private bool _pausePulse = false;
     
     private void Awake() {
-        _moveControl = GameObject.Find("GameScripts").GetComponent<MoveControl>();
         _currentX = transform.localScale.x;
     }
 
@@ -87,6 +85,6 @@ public class BranchButton : MonoBehaviour
     }
 
     public void ConfirmNewDirection() {
-        _moveControl.SwitchBranch(nextCell);
+        MoveControl.Instance.SwitchBranch(nextCell);
     }
 }

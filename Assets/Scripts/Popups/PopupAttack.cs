@@ -19,9 +19,7 @@ public class PopupAttack : MonoBehaviour
     private Button _buttonAttack, _buttonCancel;
     private int _powerInitial = 0;
     private int _powerNeed = 0;
-    private MoveControl _moveControl;
     [SerializeField] private float attackDelay = 0.7f;
-    private Messages _messages;
 
     private void Awake() {
         _attack = GameObject.Find("PopupAttack");
@@ -47,8 +45,6 @@ public class PopupAttack : MonoBehaviour
         _powerNow = Utils.FindChildByName(_attack, "PowerNow").GetComponent<TextMeshProUGUI>();
         _powerLeft = Utils.FindChildByName(_attack, "PowerLeft").GetComponent<TextMeshProUGUI>();
         _warningText = Utils.FindChildByName(_attack, "WarningText").GetComponent<TextMeshProUGUI>();
-        _moveControl = GameObject.Find("GameScripts").GetComponent<MoveControl>();
-        _messages = GameObject.Find("Messages").GetComponent<Messages>();
     }
 
     private void Start() {
@@ -100,11 +96,11 @@ public class PopupAttack : MonoBehaviour
         callback?.Invoke();
     }
 
-    public void BuildContent(List<PlayerControl> rivals) {
+    public void BuildContent(PlayerControl currentPlayer, List<PlayerControl> rivals) {
         // раздел с атаками
 
         foreach(AttackTypeButton button in _attackTypeButtons) {
-            if (_moveControl.CurrentPlayer.AvailableAttackTypes.Contains(button.AttackType)) {
+            if (currentPlayer.AvailableAttackTypes.Contains(button.AttackType)) {
                 button.SetAsEnabled();
             } else {
                 button.SetAsDisabled();
@@ -113,7 +109,7 @@ public class PopupAttack : MonoBehaviour
 
         // сила
 
-        _powerInitial = _moveControl.CurrentPlayer.Power;
+        _powerInitial = currentPlayer.Power;
         UpdatePower();
 
         // раздел с соперниками
@@ -275,7 +271,8 @@ public class PopupAttack : MonoBehaviour
     private IEnumerator ConfirmAttackDefer() {
         yield return new WaitForSeconds(attackDelay);
         if (_selectedAttackType == EAttackTypes.Usual) {
-            _moveControl.CurrentPlayer.ExecuteAttackUsual(_selectedPlayer);
+            int currentPlayerIndex = MoveControl.Instance.CurrentPlayerIndex;
+            MoveControl.Instance.CurrentPlayer.ExecuteAttackUsual(_selectedPlayer, currentPlayerIndex);
         } else {
             Debug.Log("ERROR: Attack type not found");
         }
@@ -284,9 +281,9 @@ public class PopupAttack : MonoBehaviour
     private IEnumerator CancelAttackDefer() {
         yield return new WaitForSeconds(attackDelay);
         ResetContent();
-        string message = Utils.Wrap(_moveControl.CurrentPlayer.PlayerName, UIColors.Yellow) + " отказался от атаки";
-        _messages.AddMessage(message);
-        StartCoroutine(_moveControl.EndMoveDefer());
+        string message = Utils.Wrap(MoveControl.Instance.CurrentPlayer.PlayerName, UIColors.Yellow) + " отказался от атаки";
+        Messages.Instance.AddMessage(message);
+        StartCoroutine(MoveControl.Instance.EndMoveDefer());
     }
 
     public void ConfirmAttack() {

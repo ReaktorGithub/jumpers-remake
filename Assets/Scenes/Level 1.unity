@@ -3008,6 +3008,7 @@ GameObject:
   m_Component:
   - component: {fileID: 209808278}
   - component: {fileID: 209808277}
+  - component: {fileID: 209808286}
   - component: {fileID: 209808279}
   - component: {fileID: 209808280}
   - component: {fileID: 209808282}
@@ -3066,6 +3067,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9d8e74c10da7fe4f94033df294aac33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveToStartTime: 5
 --- !u!114 &209808280
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3143,6 +3145,18 @@ MonoBehaviour:
   prizeCoins: 2c010000c80000009600000064000000
   prizeMallows: 02000000010000000100000000000000
   prizeRubies: 03000000020000000100000000000000
+--- !u!114 &209808286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 209808276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b76299b2ab471441aa2d5d4c2d0d8a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &218239842
 GameObject:
   m_ObjectHideFlags: 0
@@ -9254,6 +9268,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 655775035}
+  - component: {fileID: 655775036}
   m_Layer: 0
   m_Name: Cells
   m_TagString: Untagged
@@ -9340,6 +9355,19 @@ Transform:
   - {fileID: 915180465}
   m_Father: {fileID: 75496289}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &655775036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655775034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce8bb9582775d5b4f826791ed457b2ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _skipRivalCheckTypes: 0100000003000000
 --- !u!1 &668012811
 GameObject:
   m_ObjectHideFlags: 0
@@ -24762,7 +24790,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   finishDelay: 0.5
   loseDelay: 2
-  redEffectDelay: 1
+  redEffectDelay: 0.8
 --- !u!1 &1819940250 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1839313095580720373, guid: 90ef5158265cf104981f9cf1c274ad34, type: 3}

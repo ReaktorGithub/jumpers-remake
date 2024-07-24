@@ -7,7 +7,6 @@ public class PlayerInfo : MonoBehaviour
 {
     private TextMeshProUGUI _playerNameText;
     private SpriteRenderer _tokenImage;
-    private SpriteRenderer _tokenColor;
     private TextMeshProUGUI _coinText;
     private TextMeshProUGUI _rubyText;
     private GameObject _powerCells, _powerOn, _powerOff, _place, _finish, _hover, _active;
@@ -22,7 +21,6 @@ public class PlayerInfo : MonoBehaviour
         _finish = transform.Find("icon_finish").gameObject;
         _place = transform.Find("place").gameObject;
         _tokenImage = transform.Find("token_image").gameObject.GetComponent<SpriteRenderer>();
-        _tokenColor = transform.Find("token_color").gameObject.GetComponent<SpriteRenderer>();
         _coinText = transform.Find("coin_text").gameObject.GetComponent<TextMeshProUGUI>();
         _rubyText = transform.Find("ruby_text").gameObject.GetComponent<TextMeshProUGUI>();
         _powerCells = transform.Find("PowerCells").gameObject;
