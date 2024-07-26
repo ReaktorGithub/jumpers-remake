@@ -6,7 +6,6 @@ public class Jumpers : MonoBehaviour
 {
     private void Start() {
         CleanInstances();
-        PlayersControl.Instance.PreparePlayersControl();
         PlayersControl.Instance.BindTokensToPlayers();
     }
 
