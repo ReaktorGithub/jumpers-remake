@@ -13,6 +13,7 @@ public class PlayersControl : MonoBehaviour
 
     private void Awake() {
         Instance = this;
+        PreparePlayersControl();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
         _levelData = GameObject.Find("GameScripts").GetComponent<LevelData>();
     }
@@ -37,7 +38,7 @@ public class PlayersControl : MonoBehaviour
         private set {}
     }
 
-    public void PreparePlayersControl() {
+    private void PreparePlayersControl() {
         PlayerControl _playerControl1 = GameObject.Find("player_1").GetComponent<PlayerControl>();
         PlayerControl _playerControl2 = GameObject.Find("player_2").GetComponent<PlayerControl>();
         PlayerControl _playerControl3 = GameObject.Find("player_3").GetComponent<PlayerControl>();
