@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 public class CameraControl : MonoBehaviour
 {
     private CinemachineVirtualCamera _cinemachineCamera;
+    private LevelData _levelData;
     private Transform _savedObjectToFollow = null;
     [SerializeField] private bool isFollow = true;
     
@@ -16,6 +17,7 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private float defaultZoom = 64f;
     [SerializeField] private bool isZoom = true;
     private float _zoom;
+    private float _savedZoom = 0;
     private float _scroll;
     [SerializeField] private float zoomSmoothTime = 0.2f;
     private float _velocity = 0f;
@@ -30,6 +32,7 @@ public class CameraControl : MonoBehaviour
     private void Awake() {
         _cinemachineCamera = GetComponent<CinemachineVirtualCamera>();
         _cameraTarget = GameObject.Find("CameraTarget");
+        _levelData = GameObject.Find("GameScripts").GetComponent<LevelData>();
         _zoom = defaultZoom;
     }
 
@@ -111,6 +114,22 @@ public class CameraControl : MonoBehaviour
         }
         if (!changed) {
             SetIsZoom(true);
+        }
+    }
+
+    public void MoveCameraToLevelCenter() {
+        _cameraTarget.transform.position = new Vector3(
+            _levelData.LevelCenterPosition[0],
+            _levelData.LevelCenterPosition[1],
+            _cameraTarget.transform.position.z
+        );
+        _savedZoom = _zoom;
+        _zoom = _levelData.LevelCenterCameraZoom;
+    }
+
+    public void RestoreSavedZoom() {
+        if (_savedZoom != 0) {
+            _zoom = _savedZoom;
         }
     }
 }

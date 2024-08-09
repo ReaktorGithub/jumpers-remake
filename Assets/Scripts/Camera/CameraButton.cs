@@ -1,25 +1,46 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class CameraButton : MonoBehaviour
 {
-    private Toggle _toggle;
-    private Image _image;
+    [SerializeField] private GameObject _followOnImage;
+    [SerializeField] private GameObject _followOffImage;
     private CameraControl _camera;
+    private bool _disabled = false;
+    private bool _isOn = true;
 
     private void Awake() {
-        _toggle = GetComponent<Toggle>();
-        _image = transform.Find("Background").GetComponent<Image>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
     }
 
-    public void OnChangeValue() {
-        if (_toggle.isOn) {
-            _image.enabled = false;
+    private void Start() {
+        UpdateImages();
+    }
+
+    public bool IsOn {
+        get { return _isOn; }
+        private set {}
+    }
+
+    private void UpdateImages() {
+        _followOnImage.SetActive(_isOn);
+        _followOffImage.SetActive(!_isOn);
+    }
+
+    public void OnClick() {
+        if (_disabled) {
+            return;
+        }
+        _isOn = !_isOn;
+        UpdateImages();
+        if (_isOn) {
             _camera.FollowOn();
         } else {
-            _image.enabled = true;
             _camera.FollowOff();
         }
+    }
+
+    public void SetDisabled(bool value) {
+        _disabled = value;
+        transform.gameObject.SetActive(!value);
     }
 }

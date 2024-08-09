@@ -6,6 +6,8 @@ public class LevelData : MonoBehaviour
     [SerializeField] private int[] prizeCoins = new int[4];
     [SerializeField] private int[] prizeMallows = new int[4];
     [SerializeField] private int[] prizeRubies = new int[4];
+    [SerializeField] private float[] levelCenterPosition = new float[2];
+    [SerializeField] private float levelCenterCameraZoom;
 
     public int[] PrizeCoins {
         get { return prizeCoins; }
@@ -19,6 +21,16 @@ public class LevelData : MonoBehaviour
 
     public int[] PrizeRubies {
         get { return prizeRubies; }
+        private set {}
+    }
+
+    public float[] LevelCenterPosition {
+        get { return levelCenterPosition; }
+        private set {}
+    }
+
+    public float LevelCenterCameraZoom {
+        get { return levelCenterCameraZoom; }
         private set {}
     }
 
