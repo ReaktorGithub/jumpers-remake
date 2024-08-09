@@ -7,8 +7,18 @@ public class CellControl : MonoBehaviour
     [SerializeField] private string nextCell = "";
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
-
+    private GameObject _container;
+    private SpriteRenderer _spriteRenderer;
+    private float[] cellScale = new float[2];
     private List<string> _currentTokens = new();
+    private bool _isEffectPlacementMode = false;
+
+    private void Awake() {
+        _container = transform.Find("container").gameObject;
+        _spriteRenderer = _container.transform.Find("cell").gameObject.GetComponent<SpriteRenderer>();
+        cellScale[0] = 1;
+        cellScale[1] = 1.15f;
+    }
 
     public string NextCell {
         get { return nextCell; }
@@ -32,6 +42,10 @@ public class CellControl : MonoBehaviour
 
     public bool HasToken(string tokenName) {
         return _currentTokens.Contains(tokenName);
+    }
+
+    public bool IsNoTokens() {
+        return _currentTokens.Count == 0;
     }
 
     public void AddToken(string tokenName) {
@@ -117,5 +131,43 @@ public class CellControl : MonoBehaviour
             }
             Debug.Log(message);
         }
+    }
+
+    // выбор клетки игроком
+
+    public void TurnOnEffectPlacementMode() {
+        _isEffectPlacementMode = cellType == ECellTypes.None && effect == EControllableEffects.None && IsNoTokens();
+    }
+
+    public void TurnOffEffectPlacementMode() {
+        _isEffectPlacementMode = false;
+    }
+
+    public void UpscaleCell() {
+        if (!_isEffectPlacementMode) {
+            return;
+        }
+        _spriteRenderer.sortingOrder = 1;
+        _container.transform.localScale = new Vector3(
+            cellScale[1],
+            cellScale[1],
+            _container.transform.localScale.z
+        );
+    }
+
+    public void DownscaleCell() {
+        _spriteRenderer.sortingOrder = 0;
+        _container.transform.localScale = new Vector3(
+            cellScale[0],
+            cellScale[0],
+            _container.transform.localScale.z
+        );
+    }
+
+    public void OnClick() {
+        if (!_isEffectPlacementMode) {
+            return;
+        }
+        Debug.Log("Click");
     }
 }

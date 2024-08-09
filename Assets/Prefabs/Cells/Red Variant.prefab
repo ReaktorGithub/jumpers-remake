@@ -50,16 +50,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2324068203896962674, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_Name
-      value: Cell Prefab Variant
+      value: Red Variant
       objectReference: {fileID: 0}
     - target: {fileID: 2656521992059027252, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 7413e2b78e411494cb482557b1c079be, type: 3}
-    - target: {fileID: 7917971435729288403, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
-      propertyPath: effect
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 8856356108022217249, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_fontColor.b
       value: 0.14117648

@@ -9,6 +9,7 @@ public class EffectControl : MonoBehaviour
     private bool _isSelectionMode;
     private CameraControl _cameraControl;
     private TopPanel _topPanel;
+    private CellsControl _cellsControl;
     [SerializeField] private List<EffectButton> _effectButtonsList;
 
     private void Awake() {
@@ -16,6 +17,7 @@ public class EffectControl : MonoBehaviour
         _cameraControl = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
         _cameraButton = GameObject.Find("CameraButton").GetComponent<CameraButton>();
+        _cellsControl = GameObject.Find("Cells").GetComponent<CellsControl>();
     }
 
     public EControllableEffects SelectedEffect {
@@ -43,6 +45,7 @@ public class EffectControl : MonoBehaviour
         _topPanel.SetCancelButtonActive(true, () => {
             DeactivateSelectionMode();
         });
+        _cellsControl.TurnOnEffectPlacementMode();
     }
 
     public void DeactivateSelectionMode() {
@@ -50,6 +53,7 @@ public class EffectControl : MonoBehaviour
             return;
         }
         _isSelectionMode = false;
+        _cellsControl.TurnOffEffectPlacementMode();
         _cubicControl.SetCubicInteractable(true);
         _topPanel.CloseWindow();
         _selectedEffect = EControllableEffects.None;
