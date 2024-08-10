@@ -22,6 +22,8 @@ public class CellChecker : MonoBehaviour
         if (currentCellControl.TryGetComponent(out BranchCell branchCell)) {
             BranchControl branch = branchCell.BranchObject.GetComponent<BranchControl>();
             branch.ShowAllBranches();
+            _topPanel.SetText("Выберите направление");
+            _topPanel.SetCancelButtonActive(false);
             _topPanel.OpenWindow();
             string message = Utils.Wrap("Остаток: " + stepsLeft, UIColors.Green);
             _cubicControl.WriteStatus(message);

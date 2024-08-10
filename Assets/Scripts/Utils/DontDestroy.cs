@@ -11,10 +11,8 @@ public class DontDestroy : MonoBehaviour
     private void Start() {
         DontDestroy[] objects = FindObjectsOfType<DontDestroy>();
         for (int i = 0; i < objects.Length; i++) {
-            if (objects[i] != this) {
-                if (objects[i].objectId == objectId) {
-                    Destroy(gameObject);
-                }
+            if (objects[i] != this && objects[i].objectId == objectId) {
+                Destroy(gameObject);
             }
         }
 

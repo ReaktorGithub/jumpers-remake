@@ -61,6 +61,7 @@ public class CubicControl : MonoBehaviour
 
     public void Throw(int specifiedScore = 0) {
         SetCubicInteractable(false);
+        EffectsControl.Instance.SetDisabledEffectButtons(true);
         _statusText.text = "";
         if (_coroutine != null) {
             StopCoroutine(_coroutine);

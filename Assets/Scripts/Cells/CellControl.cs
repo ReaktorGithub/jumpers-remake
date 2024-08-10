@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class CellControl : MonoBehaviour
@@ -7,8 +9,29 @@ public class CellControl : MonoBehaviour
     [SerializeField] private string nextCell = "";
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
-
+    private GameObject _container;
+    private SpriteRenderer _spriteRenderer;
+    private float[] cellScale = new float[2];
     private List<string> _currentTokens = new();
+    private bool _isEffectPlacementMode = false;
+    private TextMeshPro _text;
+    private bool _isChanging = false;
+    private IEnumerator _changingCoroutine;
+    private CellsControl _cellsControl;
+    private Sprite _oldSprite, _newSprite;
+    private Color _oldTextColor, _newTextColor;
+
+    private void Awake() {
+        _container = transform.Find("container").gameObject;
+        _spriteRenderer = _container.transform.Find("cell").gameObject.GetComponent<SpriteRenderer>();
+        cellScale[0] = 1;
+        cellScale[1] = 1.15f;
+        Transform number = _container.transform.Find("number");
+        if (number != null) {
+            _text = number.GetComponent<TextMeshPro>();
+        }
+        _cellsControl = GameObject.Find("Cells").GetComponent<CellsControl>();
+    }
 
     public string NextCell {
         get { return nextCell; }
@@ -32,6 +55,10 @@ public class CellControl : MonoBehaviour
 
     public bool HasToken(string tokenName) {
         return _currentTokens.Contains(tokenName);
+    }
+
+    public bool IsNoTokens() {
+        return _currentTokens.Count == 0;
     }
 
     public void AddToken(string tokenName) {
@@ -117,5 +144,119 @@ public class CellControl : MonoBehaviour
             }
             Debug.Log(message);
         }
+    }
+
+    // выбор клетки игроком
+
+    public void TurnOnEffectPlacementMode() {
+        _isEffectPlacementMode = cellType == ECellTypes.None && effect == EControllableEffects.None && IsNoTokens();
+    }
+
+    public void TurnOffEffectPlacementMode() {
+        DownscaleCell();
+        _isEffectPlacementMode = false;
+    }
+
+    public void UpscaleCell() {
+        if (!_isEffectPlacementMode) {
+            return;
+        }
+        _spriteRenderer.sortingOrder = 1;
+        _container.transform.localScale = new Vector3(
+            cellScale[1],
+            cellScale[1],
+            _container.transform.localScale.z
+        );
+    }
+
+    public void DownscaleCell() {
+        if (!_isEffectPlacementMode) {
+            return;
+        }
+        _spriteRenderer.sortingOrder = 0;
+        _container.transform.localScale = new Vector3(
+            cellScale[0],
+            cellScale[0],
+            _container.transform.localScale.z
+        );
+    }
+
+    public void OnClick() {
+        if (!_isEffectPlacementMode) {
+            return;
+        }
+        EffectsControl.Instance.OnChangeEffect(this);
+    }
+
+    public void ChangeEffect(EControllableEffects newEffect, Sprite newSprite) {
+        effect = newEffect;
+
+        _oldSprite = _spriteRenderer.sprite;
+        _newSprite = newSprite;
+        _oldTextColor = _text.color;
+
+        switch(newEffect) {
+            case EControllableEffects.Yellow:
+            case EControllableEffects.Red:
+            case EControllableEffects.Green: {
+                Color newCol;
+                if (ColorUtility.TryParseHtmlString(UIColors.CellGrey, out newCol)) {
+                    _newTextColor = newCol;
+                }
+                break;
+            }
+            default: {
+                Color newCol;
+                if (ColorUtility.TryParseHtmlString(UIColors.CellDefault, out newCol)) {
+                    _newTextColor = newCol;
+                }
+                break;
+            }
+        }
+        
+        StartChanging();
+    }
+
+    private void SetNewEffect() {
+        _spriteRenderer.sprite = _newSprite;
+        _text.color = _newTextColor;
+    }
+
+    private void SetOldEffect() {
+        _spriteRenderer.sprite = _oldSprite;
+        _text.color = _oldTextColor;
+    }
+
+    private void StartChanging() {
+        if (!_isChanging) {
+            _isChanging = true;
+            _changingCoroutine = Changing();
+            StartCoroutine(_changingCoroutine);
+            StartCoroutine(ChangingAnimationScheduler());
+        }
+    }
+
+    public void StopChanging() {
+        if (_changingCoroutine != null) {
+            StopCoroutine(_changingCoroutine);
+            _isChanging = false;
+            SetNewEffect();
+            _newSprite = null;
+            _oldSprite = null;
+        }
+    }
+
+    private IEnumerator Changing() {
+        while (true) {
+            SetNewEffect();
+            yield return new WaitForSeconds(_cellsControl.ChangingEffectTime);
+            SetOldEffect();
+            yield return new WaitForSeconds(_cellsControl.ChangingEffectTime);
+        }
+    }
+
+    private IEnumerator ChangingAnimationScheduler() {
+        yield return new WaitForSeconds(_cellsControl.ChangingEffectDuration);
+        StopChanging();
     }
 }
