@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -75,15 +76,29 @@ public class EffectsControl : MonoBehaviour
     }
 
     public void DeactivateSelectionMode() {
+        DeactivateSelectionModePhase1();
+        DeactivateSelectionModePhase2();
+    }
+
+    public IEnumerator DeactivateSelectionModeDefer() {
+        DeactivateSelectionModePhase1();
+        yield return new WaitForSeconds(_cellsControl.ChangingEffectDelay);
+        DeactivateSelectionModePhase2();
+    }
+
+    public void DeactivateSelectionModePhase1() {
         if (!_isSelectionMode) {
             return;
         }
         _isSelectionMode = false;
         _cellsControl.TurnOffEffectPlacementMode();
-        _cubicControl.SetCubicInteractable(true);
         _topPanel.CloseWindow();
         _selectedEffect = EControllableEffects.None;
         UpdateButtonsSelection();
+    }
+
+    public void DeactivateSelectionModePhase2() {
+        _cubicControl.SetCubicInteractable(true);
         _cameraControl.RestoreSavedZoom();
         _cameraButton.SetDisabled(false);
         if (_cameraButton.IsOn) {
@@ -123,11 +138,11 @@ public class EffectsControl : MonoBehaviour
                 break;
             }
         }
-        cellControl.ChangeEffect(_selectedEffect, sprite);
         UpdateQuantityText(player);
         UpdateEffectEmptiness(player);
         SetDisabledEffectButtons(true);
-        DeactivateSelectionMode();
+        cellControl.ChangeEffect(_selectedEffect, sprite);
+        StartCoroutine(DeactivateSelectionModeDefer());
     }
 
     public void UpdateEffectEmptiness(PlayerControl player) {
