@@ -22,6 +22,11 @@ public class PlayerControl : MonoBehaviour
     private Sprite _tokenImage;
 
     // player resources
+    [SerializeField] private int effectsGreen = 0;
+    [SerializeField] private int effectsYellow = 0;
+    [SerializeField] private int effectsBlack = 0;
+    [SerializeField] private int effectsRed = 0;
+    [SerializeField] private int effectsStar = 0;
     [SerializeField] private int coins = 0;
     [SerializeField] private int mallows = 0;
     [SerializeField] private int rubies = 0;
@@ -104,6 +109,31 @@ public class PlayerControl : MonoBehaviour
         private set {}
     }
 
+    public int EffectsGreen {
+        get { return effectsGreen; }
+        set { effectsGreen = value; }
+    }
+
+    public int EffectsYellow {
+        get { return effectsYellow; }
+        set { effectsYellow = value; }
+    }
+
+    public int EffectsRed {
+        get { return effectsRed; }
+        set { effectsRed = value; }
+    }
+
+    public int EffectsBlack {
+        get { return effectsBlack; }
+        set { effectsBlack = value; }
+    }
+
+    public int EffectsStar {
+        get { return effectsStar; }
+        set { effectsStar = value; }
+    }
+
     public void SkipMoveIncrease(TokenControl token) {
         _movesSkip++;
         token.UpdateSkips(_movesSkip);
@@ -154,6 +184,26 @@ public class PlayerControl : MonoBehaviour
 
     public void AddRubies(int value) {
         rubies += value;
+    }
+
+    public void AddEffectGreen(int value) {
+        effectsGreen += value;
+    }
+
+    public void AddEffectYellow(int value) {
+        effectsYellow += value;
+    }
+
+    public void AddEffectBlack(int value) {
+        effectsBlack += value;
+    }
+
+    public void AddEffectRed(int value) {
+        effectsRed += value;
+    }
+
+    public void AddEffectStar(int value) {
+        effectsStar += value;
     }
 
     // атака

@@ -15,7 +15,11 @@ public class PlayersControl : MonoBehaviour
         Instance = this;
         PreparePlayersControl();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
-        _levelData = GameObject.Find("GameScripts").GetComponent<LevelData>();
+        _levelData = GameObject.Find("LevelScripts").GetComponent<LevelData>();
+    }
+
+    private void Start() {
+        
     }
 
     public float FinishDelay {
@@ -59,6 +63,15 @@ public class PlayersControl : MonoBehaviour
         _players[1] = _playerControl2;
         _players[2] = _playerControl3;
         _players[3] = _playerControl4;
+    }
+
+    public PlayerControl GetPlayer(int index) {
+        foreach(PlayerControl player in _players) {
+            if (player.MoveOrder == index) {
+                return player;
+            }
+        }
+        return null;
     }
 
     public string GetTokenNameByMoveOrder(int order) {
@@ -167,6 +180,21 @@ public class PlayersControl : MonoBehaviour
             PlayerInfo info = GameObject.Find(name).GetComponent<PlayerInfo>();
             info.UpdatePlayerInfoDisplay(player, currentPlayerIndex);
         }
+    }
+
+    // ресурсы
+
+    public void GiveEffectsBeforeRace(int currentPlayerIndex) {
+        foreach(PlayerControl player in _players) {
+            player.EffectsGreen = _levelData.EffectsGreen;
+            player.EffectsYellow = _levelData.EffectsYellow;
+            player.EffectsBlack = _levelData.EffectsBlack;
+            player.EffectsRed = _levelData.EffectsRed;
+            player.EffectsStar = _levelData.EffectsStar;
+        }
+        PlayerControl currentPlayer = GetPlayer(currentPlayerIndex);
+        EffectsControl.Instance.UpdateQuantityText(currentPlayer);
+        EffectsControl.Instance.UpdateEffectEmptiness(currentPlayer);
     }
 
     public void GiveResourcesAfterRace() {

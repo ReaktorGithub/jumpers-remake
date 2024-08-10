@@ -11,7 +11,7 @@ public class ModalResults : MonoBehaviour
 
     private void Awake() {
         _windowControl = transform.Find("WindowResults").GetComponent<ModalWindow>();
-        _levelData = GameObject.Find("GameScripts").GetComponent<LevelData>();
+        _levelData = GameObject.Find("LevelScripts").GetComponent<LevelData>();
     }
 
     private void Start() {

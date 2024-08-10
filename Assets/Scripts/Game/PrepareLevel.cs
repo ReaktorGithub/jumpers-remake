@@ -10,6 +10,7 @@ public class PrepareLevel : MonoBehaviour
 
         int currentPlayerIndex = MoveControl.Instance.CurrentPlayerIndex;
         PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
+        PlayersControl.Instance.GiveEffectsBeforeRace(currentPlayerIndex);
 
         MoveTokensToStart();
         

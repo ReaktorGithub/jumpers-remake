@@ -32,7 +32,7 @@ public class CameraControl : MonoBehaviour
     private void Awake() {
         _cinemachineCamera = GetComponent<CinemachineVirtualCamera>();
         _cameraTarget = GameObject.Find("CameraTarget");
-        _levelData = GameObject.Find("GameScripts").GetComponent<LevelData>();
+        _levelData = GameObject.Find("LevelScripts").GetComponent<LevelData>();
         _zoom = defaultZoom;
     }
 

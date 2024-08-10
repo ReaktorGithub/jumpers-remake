@@ -168,6 +168,11 @@ public class CellControl : MonoBehaviour
         if (!_isEffectPlacementMode) {
             return;
         }
-        Debug.Log("Click");
+        EffectsControl.Instance.OnChangeEffect(this);
+    }
+
+    public void ChangeEffect(EControllableEffects newEffect, Sprite newSprite) {
+        effect = newEffect;
+        _spriteRenderer.sprite = newSprite;
     }
 }

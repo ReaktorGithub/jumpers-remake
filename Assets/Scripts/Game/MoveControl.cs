@@ -100,6 +100,8 @@ public class MoveControl : MonoBehaviour
                     PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
                     PlayersControl.Instance.UpdateSqueezeAnimation(_currentPlayerIndex);
                     PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
+                    EffectsControl.Instance.UpdateQuantityText(_currentPlayer);
+                    EffectsControl.Instance.UpdateEffectEmptiness(_currentPlayer);
                     if (_currentPlayer.MovesSkip == 0) {
                         _movesLeft = 1;
                         string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " ходит";
@@ -120,6 +122,7 @@ public class MoveControl : MonoBehaviour
             Messages.Instance.AddMessage(messengerMessage);
         }
         _camera.FollowObject(_currentToken.gameObject.transform);
+        EffectsControl.Instance.SetDisabledEffectButtons(false);
     }
 
     private void StartCellCheckBeforeStep() {
