@@ -6,7 +6,8 @@ using UnityEngine;
 
 public class CellControl : MonoBehaviour
 {
-    [SerializeField] private string nextCell = "";
+    [SerializeField] private GameObject nextCell;
+    [SerializeField] private GameObject previousCell;
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
     private GameObject _container;
@@ -17,7 +18,6 @@ public class CellControl : MonoBehaviour
     private TextMeshPro _text;
     private bool _isChanging = false;
     private IEnumerator _changingCoroutine;
-    private CellsControl _cellsControl;
     private Sprite _oldSprite, _newSprite;
     private Color _oldTextColor, _newTextColor;
 
@@ -30,12 +30,16 @@ public class CellControl : MonoBehaviour
         if (number != null) {
             _text = number.GetComponent<TextMeshPro>();
         }
-        _cellsControl = GameObject.Find("Cells").GetComponent<CellsControl>();
     }
 
-    public string NextCell {
+    public GameObject NextCell {
         get { return nextCell; }
         set { nextCell = value; }
+    }
+
+    public GameObject PreviousCell {
+        get { return previousCell; }
+        set { previousCell = value; }
     }
 
     public ECellTypes CellType {
@@ -249,14 +253,14 @@ public class CellControl : MonoBehaviour
     private IEnumerator Changing() {
         while (true) {
             SetNewEffect();
-            yield return new WaitForSeconds(_cellsControl.ChangingEffectTime);
+            yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectTime);
             SetOldEffect();
-            yield return new WaitForSeconds(_cellsControl.ChangingEffectTime);
+            yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectTime);
         }
     }
 
     private IEnumerator ChangingAnimationScheduler() {
-        yield return new WaitForSeconds(_cellsControl.ChangingEffectDuration);
+        yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDuration);
         StopChanging();
     }
 

@@ -18,9 +18,13 @@ public class CellChecker : MonoBehaviour
         _popupAttack = GameObject.Find("GameScripts").GetComponent<PopupAttack>();
     }
 
-    public bool CheckBranch(CellControl currentCellControl, int stepsLeft) {
+    public bool CheckBranch(CellControl currentCellControl, int stepsLeft, bool isReverseMove) {
         if (currentCellControl.TryGetComponent(out BranchCell branchCell)) {
             BranchControl branch = branchCell.BranchObject.GetComponent<BranchControl>();
+            if (branch.IsReverse != isReverseMove) {
+                // Если направление движения фишки не соответствует направлению бранча, то скипаем
+                return true;
+            }
             branch.ShowAllBranches();
             _topPanel.SetText("Выберите направление");
             _topPanel.SetCancelButtonActive(false);
@@ -41,6 +45,11 @@ public class CellChecker : MonoBehaviour
 
         if (cellType == ECellTypes.Finish) {
             currentPlayer.ExecuteFinish();
+            _camera.ClearFollow();
+            return false;
+        }
+
+        if (cellType == ECellTypes.Start && currentPlayer.IsReverseMove) {
             _camera.ClearFollow();
             return false;
         }

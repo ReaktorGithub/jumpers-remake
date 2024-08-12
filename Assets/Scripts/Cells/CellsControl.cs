@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class CellsControl : MonoBehaviour
 {
+    public static CellsControl Instance { get; private set; }
     private List<CellControl> _allCellControls = new();
     [SerializeField] private float changingEffectTime = 0.5f;
     [SerializeField] private float changingEffectDuration = 3.25f;
@@ -14,12 +15,12 @@ public class CellsControl : MonoBehaviour
     [SerializeField] private GameObject blackCellPrefab;
     private Vector3 _savedCellPosition;
     private string _savedCellNumber;
-    private string _savedNextCell;
+    private GameObject _savedNextCell;
     private string _savedCellName;
     private List<string> _savedCurrentTokens = new();
-    private GameObject _cellsObject;
 
     private void Awake() {
+        Instance = this;
         Transform[] children = GetComponentsInChildren<Transform>();
 
         foreach (Transform child in children) {
@@ -27,8 +28,6 @@ public class CellsControl : MonoBehaviour
                 _allCellControls.Add(child.gameObject.GetComponent<CellControl>());
             }
         }
-
-        _cellsObject = GameObject.Find("Cells");
     }
 
     private void Start() {
@@ -109,17 +108,101 @@ public class CellsControl : MonoBehaviour
         newCellControl.NextCell = _savedNextCell;
         newCellControl.CurrentTokens = _savedCurrentTokens;
         newCell.name = _savedCellName;
-        newCell.transform.SetParent(_cellsObject.transform, false);
+        newCell.transform.SetParent(transform, false);
         newCell.SetActive(true);
         newCellControl.SetCellNumber(_savedCellNumber);
     }
 
-    public GameObject FindNearestCheckpoint(CellControl cell) {
-        GameObject foundCell = null;
-        bool over = false;
-        // do {
-            
-        // } while (!over);
+    // Синхронно сравнивает клетки по признаку: чекпойнт / старт или нет
+
+    private List<bool> IsCheckpointCells(List<GameObject> cells) {
+        List<bool> result = new();
+        foreach(GameObject cell in cells) {
+            if (cell == null) {
+                result.Add(false);
+            } else {
+               CellControl control = cell.GetComponent<CellControl>();
+                if (control.CellType == ECellTypes.Checkpoint || control.CellType == ECellTypes.Start) {
+                    result.Add(true);
+                } else {
+                    result.Add(false);
+                } 
+            }
+        }
+        return result;
+    }
+
+    // Синхронно сравнивает клетки по признаку: бранч реверс или нет
+
+    private List<bool> IsBranchReverseCells(List<GameObject> cells) {
+        List<bool> result = new();
+        foreach(GameObject cell in cells) {
+            if (cell == null) {
+                result.Add(false);
+            } else {
+                if (cell.TryGetComponent(out BranchCell branchCell)) {
+                    if (branchCell.BranchObject.GetComponent<BranchControl>().IsReverse) {
+                        result.Add(true);
+                    } else {
+                        result.Add(false);
+                    }
+                } else {
+                    result.Add(false);
+                }
+            }
+        }
+        return result;
+    }
+
+    /*
+        1 проверить текущую клетку с помощью IsCheckpointCells
+        2 если true, то остановка и возврат клетки
+        3 если false, то проверить на реверс бранч IsBranchCells
+        4 если обычный бранч, или вообще не бранч, то перейти к предыдущей клетке
+        5 если реверс бранч, то взять все следующие клетки из бранчей и запихнуть их в IsCheckpointCells
+        6 двигаться по шагам
+        7 для каждого пути повторить шаги 1 - 5
+        если на пути IsCheckpointCells возвращает true, то остановка всех циклов
+        если на пути IsBranchCells возвращает обычный бранч, то удалить из проверки все прочие ветки и продолжать проверять
+    */
+
+    private GameObject FindNearestCheckpointRecursive(List<GameObject> list) {
+        List<bool> isFoundList = IsCheckpointCells(list);
+        foreach(GameObject cell in list) {
+            if (isFoundList[list.IndexOf(cell)]) {
+                return cell;
+            } else {
+                List<bool> isCheckedList = IsBranchReverseCells(list);
+                foreach(GameObject cellBranch in list) {
+                    if (isCheckedList[list.IndexOf(cellBranch)]) {
+                        BranchCell branchCell = cellBranch.GetComponent<BranchCell>();
+                        BranchControl branchControl = branchCell.BranchObject.GetComponent<BranchControl>();
+                        List<GameObject> cellsForCheck = new();
+                        foreach(GameObject button in branchControl.BranchButtonsList) {
+                            cellsForCheck.Add(button.GetComponent<BranchButton>().NextCell);
+                        }
+                        return FindNearestCheckpointRecursive(cellsForCheck);
+                    } else {
+                        GameObject prevCell = cell.GetComponent<CellControl>().PreviousCell;
+                        if (prevCell == null) {
+                            return null;
+                        }
+                        List<GameObject> newList = new() {
+                            prevCell
+                        };
+                        return FindNearestCheckpointRecursive(newList);
+                    }
+                }
+            }
+        }
         return null;
+    }
+
+    public GameObject FindNearestCheckpoint(GameObject startCell) {
+        List<GameObject> list = new() {
+            startCell
+        };
+        
+        return FindNearestCheckpointRecursive(list);
     }
 }

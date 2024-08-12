@@ -8,7 +8,7 @@ public class BranchButton : MonoBehaviour
     [SerializeField] private float pulseMaxValue = 0.6f;
     [SerializeField] private float pulseMinValue = 0.4f;
     [SerializeField] private float pulseDefaultValue = 0.6f;
-    [SerializeField] private string nextCell;
+    [SerializeField] private GameObject nextCell;
     private float _currentX;
     private bool _pausePulse = false;
     
@@ -16,7 +16,7 @@ public class BranchButton : MonoBehaviour
         _currentX = transform.localScale.x;
     }
 
-    public string NextCell {
+    public GameObject NextCell {
         get { return nextCell; }
         private set {}
     }

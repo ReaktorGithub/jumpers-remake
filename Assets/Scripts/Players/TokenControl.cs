@@ -16,7 +16,7 @@ public class TokenControl : MonoBehaviour
     [SerializeField] private float tokenScale = 0.7f;
     [SerializeField] private float arrowMovingTime = 1.5f;
     private IEnumerator _coroutine, _squeezeCoroutine;
-    private string _currentCell = "start";
+    [SerializeField] private GameObject _currentCell;
     private GameObject _tokenImage, _playerName, _playerNameBg, _skip1, _skip2, _skip3;
     private SortingGroup _sortingGroup;
     private bool _isSqueeze = false;
@@ -36,17 +36,13 @@ public class TokenControl : MonoBehaviour
         _splineAnimate = GetComponent<SplineAnimate>();
     }
 
-    public string CurrentCell {
-        get {
-            return _currentCell;
-        }
-        private set {}
+    public GameObject CurrentCell {
+        get { return _currentCell; }
+        set { _currentCell = value; }
     }
 
     public GameObject TokenImage {
-        get {
-            return _tokenImage;
-        }
+        get { return _tokenImage; }
         private set {}
     }
 
@@ -57,34 +53,30 @@ public class TokenControl : MonoBehaviour
     }
 
     public CellControl GetCurrentCellControl() {
-        return GameObject.Find(CurrentCell).GetComponent<CellControl>();
+        return _currentCell.GetComponent<CellControl>();
     }
 
     public void SetToNextCell(Action callback = null) {
         ClearCoroutine();
-        GameObject currentCellObject = GameObject.Find(_currentCell);
-        if (!currentCellObject) {
+        if (_currentCell == null) {
             Debug.Log("Current cell not found");
             return;
         }
-        CellControl cell = currentCellObject.GetComponent<CellControl>();
-        if (cell.NextCell == "" || cell.NextCell == null) {
+        CellControl cell = _currentCell.GetComponent<CellControl>();
+        GameObject nextCell = MoveControl.Instance.CurrentPlayer.IsReverseMove ? cell.PreviousCell : cell.NextCell;
+
+        if (nextCell == null) {
             Debug.Log("Next cell not specified");
             return;
         }
-        GameObject nextCellObject = GameObject.Find(cell.NextCell);
-        if (nextCellObject == null) {
-            Debug.Log("Next cell not found");
-            return;
-        }
-        _currentCell = cell.NextCell;
-        _coroutine = MoveTo(nextCellObject.transform.position, moveTime, callback);
+        _currentCell = nextCell;
+        _coroutine = MoveTo(nextCell.transform.position, moveTime, callback);
         StartCoroutine(_coroutine);
     }
 
-    public void SetToSpecifiedCell(CellControl nextCellControl, string nextCellName, Action callback = null) {
+    public void SetToSpecifiedCell(CellControl nextCellControl, GameObject nextCell, Action callback = null) {
         ClearCoroutine();
-        _currentCell = nextCellName;
+        _currentCell = nextCell;
         _coroutine = MoveTo(nextCellControl.transform.position, moveTime, callback);
         StartCoroutine(_coroutine);
     }
@@ -213,8 +205,7 @@ public class TokenControl : MonoBehaviour
         CellControl currentCellControl = GetCurrentCellControl();
         currentCellControl.RemoveToken(transform.name);
         _currentCell = currentCellControl.transform.GetComponent<ArrowCell>().ArrowToCell;
-        GameObject nextCellObject = GameObject.Find(_currentCell);
-        transform.SetLocalPositionAndRotation(nextCellObject.transform.localPosition, Quaternion.Euler(new Vector3(0,0,0)));
+        transform.SetLocalPositionAndRotation(_currentCell.transform.localPosition, Quaternion.Euler(new Vector3(0,0,0)));
         MoveControl.Instance.ConfirmNewPosition();
     }
 }

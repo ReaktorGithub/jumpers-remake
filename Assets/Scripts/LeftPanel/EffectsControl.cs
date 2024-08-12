@@ -12,7 +12,6 @@ public class EffectsControl : MonoBehaviour
     private bool _isSelectionMode;
     private CameraControl _cameraControl;
     private TopPanel _topPanel;
-    private CellsControl _cellsControl;
     private List<EffectButton> _effectButtonsList = new();
     private EffectButton _greenEffectButton;
     private EffectButton _yellowEffectButton;
@@ -34,7 +33,6 @@ public class EffectsControl : MonoBehaviour
         _cameraControl = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
         _cameraButton = GameObject.Find("CameraButton").GetComponent<CameraButton>();
-        _cellsControl = GameObject.Find("Cells").GetComponent<CellsControl>();
         _greenQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityGreen").GetComponent<TextMeshProUGUI>();
         _yellowQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityYellow").GetComponent<TextMeshProUGUI>();
         _redQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityRed").GetComponent<TextMeshProUGUI>();
@@ -82,7 +80,7 @@ public class EffectsControl : MonoBehaviour
         _topPanel.SetCancelButtonActive(true, () => {
             DeactivateSelectionMode();
         });
-        _cellsControl.TurnOnEffectPlacementMode();
+        CellsControl.Instance.TurnOnEffectPlacementMode();
     }
 
     public void DeactivateSelectionMode() {
@@ -92,7 +90,7 @@ public class EffectsControl : MonoBehaviour
 
     public IEnumerator DeactivateSelectionModeDefer() {
         DeactivateSelectionModePhase1();
-        yield return new WaitForSeconds(_cellsControl.ChangingEffectDelay);
+        yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDelay);
         DeactivateSelectionModePhase2();
     }
 
@@ -101,7 +99,7 @@ public class EffectsControl : MonoBehaviour
             return;
         }
         _isSelectionMode = false;
-        _cellsControl.TurnOffEffectPlacementMode();
+        CellsControl.Instance.TurnOffEffectPlacementMode();
         _topPanel.CloseWindow();
         _selectedEffect = EControllableEffects.None;
         UpdateButtonsSelection();
@@ -183,8 +181,8 @@ public class EffectsControl : MonoBehaviour
         UpdateQuantityText(player);
         UpdateEffectEmptiness(player);
         SetDisabledEffectButtons(true);
-        _cellsControl.SaveAndRemoveCell(cellControl);
-        _cellsControl.PlaceNewCell(_selectedEffect);
+        CellsControl.Instance.SaveAndRemoveCell(cellControl);
+        CellsControl.Instance.PlaceNewCell(_selectedEffect);
         StartCoroutine(DeactivateSelectionModeDefer());
     }
 

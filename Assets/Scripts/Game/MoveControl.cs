@@ -126,7 +126,7 @@ public class MoveControl : MonoBehaviour
     }
 
     private void StartCellCheckBeforeStep() {
-        bool check = CellChecker.Instance.CheckBranch(_currentCell, _stepsLeft);
+        bool check = CellChecker.Instance.CheckBranch(_currentCell, _stepsLeft, _currentPlayer.IsReverseMove);
         if (check) {
             StartCoroutine(MakeStepDefer());
         }
@@ -184,7 +184,7 @@ public class MoveControl : MonoBehaviour
 
     // смена направления
 
-    public void SwitchBranch(string nextCell) {
+    public void SwitchBranch(GameObject nextCell) {
         if (!_currentCell.TryGetComponent(out BranchCell branchCell)) {
             Debug.Log("Error while switching branch");
             return;
@@ -193,7 +193,11 @@ public class MoveControl : MonoBehaviour
         BranchControl branch = branchCell.BranchObject.GetComponent<BranchControl>();
         branch.HideAllBranches();
         _topPanel.CloseWindow();
-        _currentCell.NextCell = nextCell;
+        if (CurrentPlayer.IsReverseMove) {
+            _currentCell.PreviousCell = nextCell;
+        } else {
+            _currentCell.NextCell = nextCell;
+        }
         _cubicControl.WriteStatus("");
         StartCoroutine(MakeStepDefer());
     }
