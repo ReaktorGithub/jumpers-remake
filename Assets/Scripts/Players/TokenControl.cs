@@ -69,10 +69,14 @@ public class TokenControl : MonoBehaviour
         }
         CellControl cell = currentCellObject.GetComponent<CellControl>();
         if (cell.NextCell == "" || cell.NextCell == null) {
-            Debug.Log("Next cell not found");
+            Debug.Log("Next cell not specified");
             return;
         }
         GameObject nextCellObject = GameObject.Find(cell.NextCell);
+        if (nextCellObject == null) {
+            Debug.Log("Next cell not found");
+            return;
+        }
         _currentCell = cell.NextCell;
         _coroutine = MoveTo(nextCellObject.transform.position, moveTime, callback);
         StartCoroutine(_coroutine);

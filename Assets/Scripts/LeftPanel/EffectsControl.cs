@@ -16,6 +16,8 @@ public class EffectsControl : MonoBehaviour
     private List<EffectButton> _effectButtonsList = new();
     private EffectButton _greenEffectButton;
     private EffectButton _yellowEffectButton;
+    private EffectButton _redEffectButton;
+    private EffectButton _blackEffectButton;
     [SerializeField] private GameObject emptyCellSprite;
     [SerializeField] private GameObject greenCellSprite;
     [SerializeField] private GameObject yellowCellSprite;
@@ -23,6 +25,8 @@ public class EffectsControl : MonoBehaviour
     [SerializeField] private GameObject redCellSprite;
     private TextMeshProUGUI _greenQuantityText;
     private TextMeshProUGUI _yellowQuantityText;
+    private TextMeshProUGUI _redQuantityText;
+    private TextMeshProUGUI _blackQuantityText;
 
     private void Awake() {
         Instance = this;
@@ -33,10 +37,16 @@ public class EffectsControl : MonoBehaviour
         _cellsControl = GameObject.Find("Cells").GetComponent<CellsControl>();
         _greenQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityGreen").GetComponent<TextMeshProUGUI>();
         _yellowQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityYellow").GetComponent<TextMeshProUGUI>();
+        _redQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityRed").GetComponent<TextMeshProUGUI>();
+        _blackQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityBlack").GetComponent<TextMeshProUGUI>();
         _greenEffectButton = Utils.FindChildByName(transform.gameObject, "EffectButtonGreen").GetComponent<EffectButton>();
         _yellowEffectButton = Utils.FindChildByName(transform.gameObject, "EffectButtonYellow").GetComponent<EffectButton>();
+        _redEffectButton = Utils.FindChildByName(transform.gameObject, "EffectButtonRed").GetComponent<EffectButton>();
+        _blackEffectButton = Utils.FindChildByName(transform.gameObject, "EffectButtonBlack").GetComponent<EffectButton>();
         _effectButtonsList.Add(_greenEffectButton);
         _effectButtonsList.Add(_yellowEffectButton);
+        _effectButtonsList.Add(_redEffectButton);
+        _effectButtonsList.Add(_blackEffectButton);
     }
 
     private void Start() {
@@ -108,51 +118,88 @@ public class EffectsControl : MonoBehaviour
         }
     }
 
+    // public void OnChangeEffect(CellControl cellControl) {
+    //     Sprite sprite;
+    //     PlayerControl player = MoveControl.Instance.CurrentPlayer;
+
+    //     switch(_selectedEffect) {
+    //         case EControllableEffects.Green: {
+    //             sprite = greenCellSprite.GetComponent<SpriteRenderer>().sprite;
+    //             player.AddEffectGreen(-1);
+    //             break;
+    //         }
+    //         case EControllableEffects.Red: {
+    //             sprite = redCellSprite.GetComponent<SpriteRenderer>().sprite;
+    //             player.AddEffectRed(-1);
+    //             break;
+    //         }
+    //         case EControllableEffects.Yellow: {
+    //             sprite = yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
+    //             player.AddEffectYellow(-1);
+    //             break;
+    //         }
+    //         case EControllableEffects.Black: {
+    //             sprite = blackCellSprite.GetComponent<SpriteRenderer>().sprite;
+    //             player.AddEffectBlack(-1);
+    //             break;
+    //         }
+    //         default: {
+    //             sprite = emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
+    //             break;
+    //         }
+    //     }
+    //     UpdateQuantityText(player);
+    //     UpdateEffectEmptiness(player);
+    //     SetDisabledEffectButtons(true);
+    //     cellControl.ChangeEffect(_selectedEffect, sprite);
+    //     StartCoroutine(DeactivateSelectionModeDefer());
+    // }
+
     public void OnChangeEffect(CellControl cellControl) {
-        Sprite sprite;
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
 
         switch(_selectedEffect) {
             case EControllableEffects.Green: {
-                sprite = greenCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectGreen(-1);
                 break;
             }
             case EControllableEffects.Red: {
-                sprite = redCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectRed(-1);
                 break;
             }
             case EControllableEffects.Yellow: {
-                sprite = yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectYellow(-1);
                 break;
             }
             case EControllableEffects.Black: {
-                sprite = blackCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectBlack(-1);
                 break;
             }
             default: {
-                sprite = emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
                 break;
             }
         }
+
         UpdateQuantityText(player);
         UpdateEffectEmptiness(player);
         SetDisabledEffectButtons(true);
-        cellControl.ChangeEffect(_selectedEffect, sprite);
+        _cellsControl.SaveAndRemoveCell(cellControl);
+        _cellsControl.PlaceNewCell(_selectedEffect);
         StartCoroutine(DeactivateSelectionModeDefer());
     }
 
     public void UpdateEffectEmptiness(PlayerControl player) {
         _greenEffectButton.SetIsEmpty(player.EffectsGreen == 0);
         _yellowEffectButton.SetIsEmpty(player.EffectsYellow == 0);
+        _redEffectButton.SetIsEmpty(player.EffectsRed == 0);
+        _blackEffectButton.SetIsEmpty(player.EffectsBlack == 0);
     }
 
     public void UpdateQuantityText(PlayerControl player) {
         _greenQuantityText.text = "x " + player.EffectsGreen;
         _yellowQuantityText.text = "x " + player.EffectsYellow;
+        _redQuantityText.text = "x " + player.EffectsRed;
+        _blackQuantityText.text = "x " + player.EffectsBlack;
     }
 
     public void SetDisabledEffectButtons(bool value) {

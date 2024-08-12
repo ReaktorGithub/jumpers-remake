@@ -50,7 +50,7 @@ public class CellControl : MonoBehaviour
 
     public List<string> CurrentTokens {
         get { return _currentTokens; }
-        private set {}
+        set { _currentTokens = value; }
     }
 
     public bool HasToken(string tokenName) {
@@ -258,5 +258,25 @@ public class CellControl : MonoBehaviour
     private IEnumerator ChangingAnimationScheduler() {
         yield return new WaitForSeconds(_cellsControl.ChangingEffectDuration);
         StopChanging();
+    }
+
+    // методы, связанные с копированием, удалением и изменением клетки
+
+    public Vector3 GetPosition() {
+        return transform.position;
+    }
+
+    public string GetCellNumber() {
+        return _text.text;
+    }
+
+    public void DestroyCell() {
+        Destroy(transform.gameObject);
+    }
+
+    public void SetCellNumber(string text) {
+        if (_text != null) {
+            _text.text = text;
+        }
     }
 }
