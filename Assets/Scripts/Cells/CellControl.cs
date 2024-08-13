@@ -6,7 +6,8 @@ using UnityEngine;
 
 public class CellControl : MonoBehaviour
 {
-    [SerializeField] private string nextCell = "";
+    [SerializeField] private GameObject nextCell;
+    [SerializeField] private GameObject previousCell;
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
     private GameObject _container;
@@ -17,7 +18,6 @@ public class CellControl : MonoBehaviour
     private TextMeshPro _text;
     private bool _isChanging = false;
     private IEnumerator _changingCoroutine;
-    private CellsControl _cellsControl;
     private Sprite _oldSprite, _newSprite;
     private Color _oldTextColor, _newTextColor;
 
@@ -30,12 +30,16 @@ public class CellControl : MonoBehaviour
         if (number != null) {
             _text = number.GetComponent<TextMeshPro>();
         }
-        _cellsControl = GameObject.Find("Cells").GetComponent<CellsControl>();
     }
 
-    public string NextCell {
+    public GameObject NextCell {
         get { return nextCell; }
         set { nextCell = value; }
+    }
+
+    public GameObject PreviousCell {
+        get { return previousCell; }
+        set { previousCell = value; }
     }
 
     public ECellTypes CellType {
@@ -50,7 +54,7 @@ public class CellControl : MonoBehaviour
 
     public List<string> CurrentTokens {
         get { return _currentTokens; }
-        private set {}
+        set { _currentTokens = value; }
     }
 
     public bool HasToken(string tokenName) {
@@ -191,6 +195,8 @@ public class CellControl : MonoBehaviour
     public void ChangeEffect(EControllableEffects newEffect, Sprite newSprite) {
         effect = newEffect;
 
+        // Наложение спрайта и изменение цвета текста
+
         _oldSprite = _spriteRenderer.sprite;
         _newSprite = newSprite;
         _oldTextColor = _text.color;
@@ -213,6 +219,22 @@ public class CellControl : MonoBehaviour
                 break;
             }
         }
+
+        // Назначение скриптов
+
+        TryGetComponent(out RedCell redCellComponent);
+
+        if (newEffect == EControllableEffects.Red) {
+            if (redCellComponent == null) {
+                transform.gameObject.AddComponent<RedCell>();
+            }
+        } else {
+            if (redCellComponent != null) {
+                Destroy(redCellComponent);
+            }
+        }
+
+        // Старт анимации
         
         StartChanging();
     }
@@ -249,14 +271,14 @@ public class CellControl : MonoBehaviour
     private IEnumerator Changing() {
         while (true) {
             SetNewEffect();
-            yield return new WaitForSeconds(_cellsControl.ChangingEffectTime);
+            yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectTime);
             SetOldEffect();
-            yield return new WaitForSeconds(_cellsControl.ChangingEffectTime);
+            yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectTime);
         }
     }
 
     private IEnumerator ChangingAnimationScheduler() {
-        yield return new WaitForSeconds(_cellsControl.ChangingEffectDuration);
+        yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDuration);
         StopChanging();
     }
 }

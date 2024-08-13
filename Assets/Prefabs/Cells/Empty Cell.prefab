@@ -428,7 +428,7 @@ GameObject:
   - component: {fileID: 275629510173075881}
   - component: {fileID: 7917971435729288403}
   m_Layer: 0
-  m_Name: Cell Prefab
+  m_Name: Empty Cell
   m_TagString: cell
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

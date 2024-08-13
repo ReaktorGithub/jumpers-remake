@@ -9,6 +9,7 @@ public class PlayerControl : MonoBehaviour
 
     [SerializeField] private string tokenName;
     [SerializeField] private int moveOrder;
+    [SerializeField] private bool isReverseMove;
     private int _placeAfterFinish;
     private bool _isFinished = false;
     private int _movesSkip = 0;
@@ -52,6 +53,11 @@ public class PlayerControl : MonoBehaviour
     public int MovesSkip {
         get { return _movesSkip; }
         private set {}
+    }
+
+    public bool IsReverseMove {
+        get { return isReverseMove; }
+        set {}
     }
 
     public string TokenName {
@@ -285,11 +291,11 @@ public class PlayerControl : MonoBehaviour
     private void RedEffectTokenMove() {
         TokenControl tokenControl = GetTokenControl();
         CellControl cellControl = tokenControl.GetCurrentCellControl();
-        if (!GameObject.Find(tokenControl.CurrentCell).TryGetComponent(out RedCell redCell)) {
+        if (!tokenControl.CurrentCell.TryGetComponent(out RedCell redCell)) {
             Debug.Log("Red cell not found");
             return;
         }
-        CellControl nextCellcontrol = GameObject.Find(redCell.PenaltyCell).GetComponent<CellControl>();
+        CellControl nextCellcontrol = redCell.PenaltyCell.GetComponent<CellControl>();
         tokenControl.SetToSpecifiedCell(nextCellcontrol, redCell.PenaltyCell, () => {
             cellControl.RemoveToken(TokenName);
             MoveControl.Instance.ConfirmNewPosition();

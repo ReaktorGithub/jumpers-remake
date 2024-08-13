@@ -182,6 +182,12 @@ public class PlayersControl : MonoBehaviour
         }
     }
 
+    public void UpdateTokensCurrentCell(GameObject newCurrentCell) {
+        foreach(PlayerControl player in _players) {
+            player.GetTokenControl().CurrentCell = newCurrentCell;
+        }
+    }
+
     // ресурсы
 
     public void GiveEffectsBeforeRace(int currentPlayerIndex) {

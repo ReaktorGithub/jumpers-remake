@@ -9,4 +9,8 @@ public class BranchCell : MonoBehaviour
         get { return branchObject; }
         private set {}
     }
+
+    public bool IsReverse() {
+        return branchObject.GetComponent<BranchControl>().IsReverse;
+    }
 }

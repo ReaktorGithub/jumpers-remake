@@ -5,9 +5,9 @@ using UnityEngine.Splines;
 public class ArrowCell : MonoBehaviour
 {
     [SerializeField] private GameObject arrowSpline;
-    [SerializeField] private string arrowToCell;
+    [SerializeField] private GameObject arrowToCell;
 
-    public string ArrowToCell {
+    public GameObject ArrowToCell {
         get { return arrowToCell; }
         private set {}
     }

@@ -3,6 +3,7 @@ using UnityEngine;
 public class PrepareLevel : MonoBehaviour
 {
     [SerializeField] private float moveToStartTime = 3.3f;
+    [SerializeField] private GameObject startCell;
 
     private void Start() {
         // порядок важен
@@ -23,11 +24,12 @@ public class PrepareLevel : MonoBehaviour
     }
 
     public void MoveTokensToStart() {
-        CellControl startCellControl = GameObject.Find("start").GetComponent<CellControl>();
+        CellControl startCellControl = startCell.GetComponent<CellControl>();
         startCellControl.AddToken("token_1");
         startCellControl.AddToken("token_2");
         startCellControl.AddToken("token_3");
         startCellControl.AddToken("token_4");
+        PlayersControl.Instance.UpdateTokensCurrentCell(startCell);
         startCellControl.AlignTokens(moveToStartTime);
     }
 }
