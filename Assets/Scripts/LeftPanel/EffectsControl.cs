@@ -116,73 +116,42 @@ public class EffectsControl : MonoBehaviour
         }
     }
 
-    // public void OnChangeEffect(CellControl cellControl) {
-    //     Sprite sprite;
-    //     PlayerControl player = MoveControl.Instance.CurrentPlayer;
-
-    //     switch(_selectedEffect) {
-    //         case EControllableEffects.Green: {
-    //             sprite = greenCellSprite.GetComponent<SpriteRenderer>().sprite;
-    //             player.AddEffectGreen(-1);
-    //             break;
-    //         }
-    //         case EControllableEffects.Red: {
-    //             sprite = redCellSprite.GetComponent<SpriteRenderer>().sprite;
-    //             player.AddEffectRed(-1);
-    //             break;
-    //         }
-    //         case EControllableEffects.Yellow: {
-    //             sprite = yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
-    //             player.AddEffectYellow(-1);
-    //             break;
-    //         }
-    //         case EControllableEffects.Black: {
-    //             sprite = blackCellSprite.GetComponent<SpriteRenderer>().sprite;
-    //             player.AddEffectBlack(-1);
-    //             break;
-    //         }
-    //         default: {
-    //             sprite = emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
-    //             break;
-    //         }
-    //     }
-    //     UpdateQuantityText(player);
-    //     UpdateEffectEmptiness(player);
-    //     SetDisabledEffectButtons(true);
-    //     cellControl.ChangeEffect(_selectedEffect, sprite);
-    //     StartCoroutine(DeactivateSelectionModeDefer());
-    // }
-
-    public void OnChangeEffect(CellControl cellControl) {
+    public void OnChangeEffect(CellControl cell) {
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
+        Sprite sprite;
 
         switch(_selectedEffect) {
             case EControllableEffects.Green: {
+                sprite = greenCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectGreen(-1);
                 break;
             }
             case EControllableEffects.Red: {
+                sprite = redCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectRed(-1);
                 break;
             }
             case EControllableEffects.Yellow: {
+                sprite = yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectYellow(-1);
                 break;
             }
             case EControllableEffects.Black: {
+                sprite = blackCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectBlack(-1);
                 break;
             }
             default: {
+                sprite = emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
                 break;
             }
         }
 
+        cell.ChangeEffect(_selectedEffect, sprite);
+
         UpdateQuantityText(player);
         UpdateEffectEmptiness(player);
         SetDisabledEffectButtons(true);
-        CellsControl.Instance.SaveAndRemoveCell(cellControl);
-        CellsControl.Instance.PlaceNewCell(_selectedEffect);
         StartCoroutine(DeactivateSelectionModeDefer());
     }
 

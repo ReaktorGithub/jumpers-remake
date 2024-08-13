@@ -195,6 +195,8 @@ public class CellControl : MonoBehaviour
     public void ChangeEffect(EControllableEffects newEffect, Sprite newSprite) {
         effect = newEffect;
 
+        // Наложение спрайта и изменение цвета текста
+
         _oldSprite = _spriteRenderer.sprite;
         _newSprite = newSprite;
         _oldTextColor = _text.color;
@@ -217,6 +219,22 @@ public class CellControl : MonoBehaviour
                 break;
             }
         }
+
+        // Назначение скриптов
+
+        TryGetComponent(out RedCell redCellComponent);
+
+        if (newEffect == EControllableEffects.Red) {
+            if (redCellComponent == null) {
+                transform.gameObject.AddComponent<RedCell>();
+            }
+        } else {
+            if (redCellComponent != null) {
+                Destroy(redCellComponent);
+            }
+        }
+
+        // Старт анимации
         
         StartChanging();
     }
@@ -262,25 +280,5 @@ public class CellControl : MonoBehaviour
     private IEnumerator ChangingAnimationScheduler() {
         yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDuration);
         StopChanging();
-    }
-
-    // методы, связанные с копированием, удалением и изменением клетки
-
-    public Vector3 GetPosition() {
-        return transform.position;
-    }
-
-    public string GetCellNumber() {
-        return _text.text;
-    }
-
-    public void DestroyCell() {
-        Destroy(transform.gameObject);
-    }
-
-    public void SetCellNumber(string text) {
-        if (_text != null) {
-            _text.text = text;
-        }
     }
 }

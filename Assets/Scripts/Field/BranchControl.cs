@@ -25,6 +25,14 @@ public class BranchControl : MonoBehaviour
         private set {}
     }
 
+    public List<GameObject> GetAllNextCells() {
+        List<GameObject> result = new();
+        foreach (GameObject button in _branchButtonsList) {
+            result.Add(button.GetComponent<BranchButton>().NextCell);
+        }
+        return result;
+    }
+
     public bool IsReverse {
         get { return isReverse; }
         private set {}
