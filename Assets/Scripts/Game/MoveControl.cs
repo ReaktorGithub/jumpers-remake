@@ -36,6 +36,11 @@ public class MoveControl : MonoBehaviour
         private set {}
     }
 
+    public CellControl CurrentCell {
+        get { return _currentCell; }
+        private set {}
+    }
+
     public int MovesLeft {
         get { return _movesLeft; }
         set {}
@@ -178,8 +183,12 @@ public class MoveControl : MonoBehaviour
         _currentCell = _currentToken.GetCurrentCellControl();
         _currentCell.AddToken(_currentPlayer.TokenName);
         _currentCell.AlignTokens(alignTime, () => {
-            CellChecker.Instance.CheckCellEffects(_currentCell, _currentPlayer, _currentToken, _currentPlayerIndex);
+            CellChecker.Instance.CheckCellCharacter(_currentCell, _currentPlayer, _currentToken, _currentPlayerIndex);
         });
+    }
+
+    public void CheckCellEffects() {
+        CellChecker.Instance.CheckCellEffects(_currentCell, _currentPlayer, _currentToken, _currentPlayerIndex);
     }
 
     // смена направления

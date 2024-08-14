@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -10,22 +11,17 @@ public class EffectsControl : MonoBehaviour
     private CameraButton _cameraButton;
     private EControllableEffects _selectedEffect = EControllableEffects.None;
     private bool _isSelectionMode;
+    private bool _isReplaceMode;
     private CameraControl _cameraControl;
     private TopPanel _topPanel;
     private List<EffectButton> _effectButtonsList = new();
-    private EffectButton _greenEffectButton;
-    private EffectButton _yellowEffectButton;
-    private EffectButton _redEffectButton;
-    private EffectButton _blackEffectButton;
-    [SerializeField] private GameObject emptyCellSprite;
-    [SerializeField] private GameObject greenCellSprite;
-    [SerializeField] private GameObject yellowCellSprite;
-    [SerializeField] private GameObject blackCellSprite;
-    [SerializeField] private GameObject redCellSprite;
-    private TextMeshProUGUI _greenQuantityText;
-    private TextMeshProUGUI _yellowQuantityText;
-    private TextMeshProUGUI _redQuantityText;
-    private TextMeshProUGUI _blackQuantityText;
+    private EffectButton _greenEffectButton, _yellowEffectButton, _redEffectButton, _blackEffectButton;
+    [SerializeField] private GameObject emptyCellSprite, greenCellSprite, yellowCellSprite, blackCellSprite, redCellSprite;
+    [SerializeField] private GameObject greenBrush, yellowBrush, redBrush, blackBrush;
+    private TextMeshProUGUI _greenQuantityText, _yellowQuantityText, _redQuantityText, _blackQuantityText;
+    private GameObject _cellsObject;
+    [SerializeField] private float replaceTime = 1f;
+    private IEnumerator _coroutine;
 
     private void Awake() {
         Instance = this;
@@ -45,6 +41,7 @@ public class EffectsControl : MonoBehaviour
         _effectButtonsList.Add(_yellowEffectButton);
         _effectButtonsList.Add(_redEffectButton);
         _effectButtonsList.Add(_blackEffectButton);
+        _cellsObject = GameObject.Find("Cells");
     }
 
     private void Start() {
@@ -53,6 +50,10 @@ public class EffectsControl : MonoBehaviour
         yellowCellSprite.SetActive(false);
         blackCellSprite.SetActive(false);
         redCellSprite.SetActive(false);
+        greenBrush.SetActive(false);
+        redBrush.SetActive(false);
+        yellowBrush.SetActive(false);
+        blackBrush.SetActive(false);
     }
 
     public EControllableEffects SelectedEffect {
@@ -66,22 +67,32 @@ public class EffectsControl : MonoBehaviour
         }
     }
 
-    public void ActivateSelectionMode() {
+    public void ActivateSelectionMode(bool isReplace = false) {
         if (_isSelectionMode) {
             return;
         }
         _isSelectionMode = true;
+        _isReplaceMode = isReplace;
         _cubicControl.SetCubicInteractable(false);
         _cameraControl.FollowOff();
         _cameraControl.MoveCameraToLevelCenter();
         _cameraButton.SetDisabled(true);
         _topPanel.SetText("Выберите свободную клетку на поле");
         _topPanel.OpenWindow();
-        _topPanel.SetCancelButtonActive(true, () => {
-            DeactivateSelectionMode();
-        });
+        _topPanel.SetCancelButtonActive(true, OnCancel);
         CellsControl.Instance.TurnOnEffectPlacementMode();
     }
+
+    private void OnCancel() {
+        if (_isReplaceMode) {
+            DeactivateReplaceMode();
+            MoveControl.Instance.CheckCellEffects();
+        } else {
+            DeactivateSelectionMode();
+        }
+    }
+
+    // отмена во время установки нового эффекта
 
     public void DeactivateSelectionMode() {
         DeactivateSelectionModePhase1();
@@ -107,6 +118,10 @@ public class EffectsControl : MonoBehaviour
 
     public void DeactivateSelectionModePhase2() {
         _cubicControl.SetCubicInteractable(true);
+        RestoreCamera();
+    }
+
+    public void RestoreCamera() {
         _cameraControl.RestoreSavedZoom();
         _cameraButton.SetDisabled(false);
         if (_cameraButton.IsOn) {
@@ -115,6 +130,42 @@ public class EffectsControl : MonoBehaviour
             _cameraControl.FollowOff();
         }
     }
+
+    // отмена во время перемещения эффекта
+
+    public void DeactivateReplaceMode() {
+        DeactivateSelectionModePhase1();
+        RestoreCamera();
+    }
+
+    // отключение режима перемещения в момент подтверждения
+
+    public void DeactivateOnConfirmReplacePhase1() {
+        if (!_isSelectionMode) {
+            return;
+        }
+        _isSelectionMode = false;
+        CellsControl.Instance.TurnOffEffectPlacementMode();
+        _topPanel.CloseWindow();
+    }
+
+    // окончательное отключение режима перемещения
+
+    public void DeactivateOnConfirmReplacePhase2() {
+        _selectedEffect = EControllableEffects.None;
+        RestoreCamera();
+        MoveControl.Instance.CheckCellEffects();
+    }
+
+    public void OnConfirmChangeEffect(CellControl cell) {
+        if (_isReplaceMode) {
+            OnReplaceEffect(cell);
+        } else {
+            OnChangeEffect(cell);
+        }
+    }
+
+    // установка нового эффекта
 
     public void OnChangeEffect(CellControl cell) {
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
@@ -148,6 +199,7 @@ public class EffectsControl : MonoBehaviour
         }
 
         cell.ChangeEffect(_selectedEffect, sprite);
+        cell.StartChanging();
 
         UpdateQuantityText(player);
         UpdateEffectEmptiness(player);
@@ -173,5 +225,82 @@ public class EffectsControl : MonoBehaviour
         foreach (EffectButton button in _effectButtonsList) {
             button.SetDisabled(value);
         }
+    }
+
+    // перемещение эффекта
+
+    public void OnReplaceEffect(CellControl newCell) {
+        DeactivateOnConfirmReplacePhase1();
+
+        // изменить ресурсы игрока
+
+        PlayerControl player = MoveControl.Instance.CurrentPlayer;
+        player.ExecuteReplaceEffect(_selectedEffect, MoveControl.Instance.CurrentPlayerIndex);
+        UpdateQuantityText(player);
+        UpdateEffectEmptiness(player);
+
+        // удалить эффект на текущей клетке
+
+        CellControl oldCell = MoveControl.Instance.CurrentCell;
+        Sprite sprite = emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
+        oldCell.ChangeEffect(EControllableEffects.None, sprite);
+        Sprite newCellSprite;
+
+        // спавнить спрайт краски на текущей клетке
+
+        GameObject brushSprite;
+
+        switch(_selectedEffect) {
+            case EControllableEffects.Green: {
+                brushSprite = Instantiate(greenBrush);
+                newCellSprite = greenCellSprite.GetComponent<SpriteRenderer>().sprite;
+                break;
+            }
+            case EControllableEffects.Red: {
+                brushSprite = Instantiate(redBrush);
+                newCellSprite = redCellSprite.GetComponent<SpriteRenderer>().sprite;
+                break;
+            }
+            case EControllableEffects.Yellow: {
+                brushSprite = Instantiate(yellowBrush);
+                newCellSprite = yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
+                break;
+            }
+            case EControllableEffects.Black: {
+                brushSprite = Instantiate(blackBrush);
+                newCellSprite = blackCellSprite.GetComponent<SpriteRenderer>().sprite;
+                break;
+            }
+            default: {
+                brushSprite = emptyCellSprite;
+                newCellSprite = emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
+                break;
+            }
+        }
+
+        brushSprite.transform.position = oldCell.transform.position;
+        brushSprite.transform.SetParent(_cellsObject.transform);
+        brushSprite.SetActive(true);
+
+        // начать анимацию - отправить спрайт на координаты новой клетки
+        
+        if (_coroutine != null) {
+            StopCoroutine(_coroutine);
+        }
+        _coroutine = Utils.MoveTo(brushSprite, newCell.transform.position, replaceTime, () => {
+            // по окончании анимации удалить спрайт
+
+            Destroy(brushSprite);
+
+            // добавить эффект на новой клетке
+
+            newCell.ChangeEffect(_selectedEffect, newCellSprite);
+            newCell.StartChanging();
+
+            // выйти из режима перемещения
+
+            DeactivateOnConfirmReplacePhase2();
+        });
+        StartCoroutine(_coroutine);
     }
 }
