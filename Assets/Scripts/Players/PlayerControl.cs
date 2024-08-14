@@ -184,6 +184,10 @@ public class PlayerControl : MonoBehaviour
         coins += value;
     }
 
+    public void AddPower(int value) {
+        power += value;
+    }
+
     public void AddMallows(int value) {
         mallows += value;
     }
@@ -220,7 +224,7 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void ExecuteAttackUsual(PlayerControl rival, int currentPlayerIndex) {
-        power--;
+        AddPower(-1);
         MoveControl.Instance.AddMovesLeft(1);
         rival.SkipMoveIncrease(rival.GetTokenControl());
         PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
@@ -242,7 +246,7 @@ public class PlayerControl : MonoBehaviour
     // исполнение эффектов
 
     public void ExecuteBlackEffect(CellControl cellControl, TokenControl tokenControl, int currentPlayerIndex) {
-        power--;
+        AddPower(-1);
         PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("ЧЁРНЫЙ", UIColors.Black) + " эффект! Минус 1 сила";
         Messages.Instance.AddMessage(message);
@@ -263,7 +267,7 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void ExecuteRedEffect(int currentPlayerIndex) {
-        power--;
+        AddPower(-1);
         PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Минус 1 сила";
         Messages.Instance.AddMessage(message);
@@ -315,5 +319,63 @@ public class PlayerControl : MonoBehaviour
             StartCoroutine(MoveControl.Instance.EndMoveDefer());
         });
         StartCoroutine(coroutine);
+    }
+
+    public void ExecuteReplaceEffect(EControllableEffects effect, int playerIndex) {
+        ManualContent manual = Manual.Instance.GetEffectManual(effect);
+
+        // todo уровень эффекта должен вычисляться из PlayerControl
+        int effectLevel = 1;
+
+        int cost = manual.GetCostToReplaceEffect(effectLevel);
+        if (manual.ReplaceEffectResourceType == EResourceTypes.Power) {
+            AddPower(-cost);
+        } else {
+            AddCoins(-cost);
+        }
+        PlayersControl.Instance.UpdatePlayersInfo(playerIndex);
+
+        switch(effect) {
+            case EControllableEffects.Green: {
+                AddEffectGreen(-1);
+                break;
+            }
+            case EControllableEffects.Red: {
+                AddEffectRed(-1);
+                break;
+            }
+            case EControllableEffects.Yellow: {
+                AddEffectYellow(-1);
+                break;
+            }
+            case EControllableEffects.Black: {
+                AddEffectBlack(-1);
+                break;
+            }
+        }
+
+        if (power == 0) {
+            OpenPowerWarningModal();
+        }
+    }
+
+    // разное
+
+    public bool IsEnoughEffects(EControllableEffects effect) {
+        switch(effect) {
+            case EControllableEffects.Green: {
+                return effectsGreen > 0;
+            }
+            case EControllableEffects.Yellow: {
+                return effectsYellow > 0;
+            }
+            case EControllableEffects.Black: {
+                return effectsBlack > 0;
+            }
+            case EControllableEffects.Red: {
+                return effectsRed > 0;
+            }
+            default: return false;
+        }
     }
 }

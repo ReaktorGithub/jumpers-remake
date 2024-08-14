@@ -124,7 +124,7 @@ public class CellControl : MonoBehaviour
                 break;
             }
             tokenControl.ClearCoroutine();
-            StartCoroutine(tokenControl.MoveTo(pos, moveTime, () => {
+            StartCoroutine(Utils.MoveTo(tokenControl.gameObject, pos, moveTime, () => {
                 coroutinesCompleted++;
                 if (coroutinesCompleted == _currentTokens.Count) {
                     callback?.Invoke();
@@ -189,8 +189,10 @@ public class CellControl : MonoBehaviour
         if (!_isEffectPlacementMode) {
             return;
         }
-        EffectsControl.Instance.OnChangeEffect(this);
+        EffectsControl.Instance.OnConfirmChangeEffect(this);
     }
+
+    // установка нового эффекта на эту клетку
 
     public void ChangeEffect(EControllableEffects newEffect, Sprite newSprite) {
         effect = newEffect;
@@ -234,10 +236,12 @@ public class CellControl : MonoBehaviour
             }
         }
 
-        // Старт анимации
-        
-        StartChanging();
+        // визуальное отображение без анимации
+
+        SetNewEffect();
     }
+
+    // анимация нанесения нового эффекта
 
     private void SetNewEffect() {
         _spriteRenderer.sprite = _newSprite;
@@ -249,7 +253,7 @@ public class CellControl : MonoBehaviour
         _text.color = _oldTextColor;
     }
 
-    private void StartChanging() {
+    public void StartChanging() {
         if (!_isChanging) {
             _isChanging = true;
             _changingCoroutine = Changing();
@@ -280,5 +284,11 @@ public class CellControl : MonoBehaviour
     private IEnumerator ChangingAnimationScheduler() {
         yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDuration);
         StopChanging();
+    }
+
+    // разное
+
+    public bool IsNegativeEffect() {
+        return Manual.Instance.GetEffectCharacter(effect) == EResourceCharacters.Negative;
     }
 }

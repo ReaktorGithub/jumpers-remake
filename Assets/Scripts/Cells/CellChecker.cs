@@ -9,6 +9,7 @@ public class CellChecker : MonoBehaviour
     private CameraControl _camera;
     private PopupAttack _popupAttack;
     [SerializeField] private List<ECellTypes> _skipRivalCheckTypes = new();
+    private ModalReplaceEffect _modalReplace;
 
     private void Awake() {
         Instance = this;
@@ -16,6 +17,7 @@ public class CellChecker : MonoBehaviour
         _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _popupAttack = GameObject.Find("GameScripts").GetComponent<PopupAttack>();
+        _modalReplace = GameObject.Find("GameScripts").GetComponent<ModalReplaceEffect>();
     }
 
     public bool CheckBranch(CellControl currentCellControl, int stepsLeft, bool isReverseMove) {
@@ -57,6 +59,19 @@ public class CellChecker : MonoBehaviour
         return true;
     }
 
+    // Проверка, может ли игрок избежать вредного эффекта
+
+    public void CheckCellCharacter(CellControl cellControl, PlayerControl currentPlayer, TokenControl tokenControl, int currentPlayerIndex) {
+        if (cellControl.IsNegativeEffect() && currentPlayer.IsEnoughEffects(cellControl.Effect)) {
+            EffectsControl.Instance.SelectedEffect = cellControl.Effect;
+            _modalReplace.BuildContent(currentPlayer);
+            _modalReplace.OpenWindow();
+            return;
+        }
+
+        CheckCellEffects(cellControl, currentPlayer, tokenControl, currentPlayerIndex);
+    }
+
     // Необходимые действия перед завершением хода:
     // 1.	Подбор бонуса.
     // 2.	Срабатывание капкана.
@@ -82,7 +97,7 @@ public class CellChecker : MonoBehaviour
             return;
         }
 
-        if (cellControl.transform.TryGetComponent(out RedCell _)) {
+        if (cellControl.Effect == EControllableEffects.Red) {
             MoveControl.Instance.MovesLeft = 0;
             MoveControl.Instance.StepsLeft = 0;
             currentPlayer.ExecuteRedEffect(currentPlayerIndex);

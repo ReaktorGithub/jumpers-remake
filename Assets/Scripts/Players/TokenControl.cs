@@ -70,24 +70,15 @@ public class TokenControl : MonoBehaviour
             return;
         }
         _currentCell = nextCell;
-        _coroutine = MoveTo(nextCell.transform.position, moveTime, callback);
+        _coroutine = Utils.MoveTo(transform.gameObject, nextCell.transform.position, moveTime, callback);
         StartCoroutine(_coroutine);
     }
 
     public void SetToSpecifiedCell(CellControl nextCellControl, GameObject nextCell, Action callback = null) {
         ClearCoroutine();
         _currentCell = nextCell;
-        _coroutine = MoveTo(nextCellControl.transform.position, moveTime, callback);
+        _coroutine = Utils.MoveTo(transform.gameObject, nextCellControl.transform.position, moveTime, callback);
         StartCoroutine(_coroutine);
-    }
-
-    public IEnumerator MoveTo(Vector3 position, float moveTime, Action callback = null) {
-        while (Vector3.Distance(transform.localPosition, position) > 0.1) {
-            transform.localPosition = Vector3.Lerp(transform.localPosition, position, moveTime * Time.deltaTime);
-            yield return null;
-        }
-        transform.localPosition = position;
-        callback?.Invoke();
     }
 
     // Пьедестал

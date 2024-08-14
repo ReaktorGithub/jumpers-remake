@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -40,5 +41,16 @@ public static class Utils
             }
             isIn = true;
         }
+    }
+
+    public static IEnumerator MoveTo(GameObject objectToMove, Vector3 position, float time, Action callback = null) {
+        while (Vector3.Distance(objectToMove.transform.localPosition, position) > 0.1) {
+            objectToMove.transform.localPosition = Vector3.Lerp(
+                objectToMove.transform.localPosition, position, time * Time.deltaTime
+                );
+            yield return null;
+        }
+        objectToMove.transform.localPosition = position;
+        callback?.Invoke();
     }
 }
