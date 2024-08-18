@@ -75,6 +75,10 @@ public class CellControl : MonoBehaviour
         }
     }
 
+    public string GetCellText() {
+        return _text.text;
+    }
+
     // Перераспределить позиции фишек на клетке
 
     public void AlignTokens(float moveTime, Action callback = null) {

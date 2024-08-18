@@ -23653,7 +23653,7 @@ MonoBehaviour:
   effectsGreen: 3
   effectsYellow: 2
   effectsBlack: 2
-  effectsRed: 10
+  effectsRed: 2
   effectsStar: 0
 --- !u!4 &1427459173
 Transform:

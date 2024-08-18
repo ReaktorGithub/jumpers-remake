@@ -20,10 +20,10 @@ public class CellChecker : MonoBehaviour
         _modalReplace = GameObject.Find("GameScripts").GetComponent<ModalReplaceEffect>();
     }
 
-    public bool CheckBranch(CellControl currentCellControl, int stepsLeft, bool isReverseMove) {
+    public bool CheckBranch(CellControl currentCellControl, int stepsLeft, PlayerControl player) {
         if (currentCellControl.TryGetComponent(out BranchCell branchCell)) {
             BranchControl branch = branchCell.BranchObject.GetComponent<BranchControl>();
-            if (branch.IsReverse != isReverseMove) {
+            if (branch.IsReverse != player.IsReverseMove) {
                 // Если направление движения фишки не соответствует направлению бранча, то скипаем
                 return true;
             }
@@ -31,8 +31,10 @@ public class CellChecker : MonoBehaviour
             _topPanel.SetText("Выберите направление");
             _topPanel.SetCancelButtonActive(false);
             _topPanel.OpenWindow();
-            string message = Utils.Wrap("Остаток: " + stepsLeft, UIColors.Green);
-            _cubicControl.WriteStatus(message);
+            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " выбирает направление";
+            Messages.Instance.AddMessage(message);
+            string cubicStatus = Utils.Wrap("Остаток: " + stepsLeft, UIColors.Green);
+            _cubicControl.WriteStatus(cubicStatus);
             return false;
         }
 
@@ -110,6 +112,8 @@ public class CellChecker : MonoBehaviour
     public void CheckCellArrows(CellControl cellControl, PlayerControl currentPlayer, TokenControl tokenControl) {
         if (cellControl.transform.TryGetComponent(out ArrowCell arrowCell)) {
             tokenControl.PutTokenToArrowSpline(arrowCell.ArrowSpline);
+            string message = Utils.Wrap(currentPlayer.PlayerName, UIColors.Yellow) + " перемещается по стрелке";
+            Messages.Instance.AddMessage(message);
             return;
         }
 

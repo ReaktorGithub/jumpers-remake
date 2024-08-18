@@ -170,26 +170,31 @@ public class EffectsControl : MonoBehaviour
     public void OnChangeEffect(CellControl cell) {
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
         Sprite sprite;
+        string effectName = "";
 
         switch(_selectedEffect) {
             case EControllableEffects.Green: {
                 sprite = greenCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectGreen(-1);
+                effectName = "зеленый";
                 break;
             }
             case EControllableEffects.Red: {
                 sprite = redCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectRed(-1);
+                effectName = "красный";
                 break;
             }
             case EControllableEffects.Yellow: {
                 sprite = yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectYellow(-1);
+                effectName = "желтый";
                 break;
             }
             case EControllableEffects.Black: {
                 sprite = blackCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectBlack(-1);
+                effectName = "черный";
                 break;
             }
             default: {
@@ -197,6 +202,9 @@ public class EffectsControl : MonoBehaviour
                 break;
             }
         }
+
+        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " ставит эффект <b>" + effectName + "</b> на клетку " + cell.GetCellText();
+        Messages.Instance.AddMessage(message);
 
         cell.ChangeEffect(_selectedEffect, sprite);
         cell.StartChanging();
@@ -249,26 +257,31 @@ public class EffectsControl : MonoBehaviour
         // спавнить спрайт краски на текущей клетке
 
         GameObject brushSprite;
+        string effectName = "";
 
         switch(_selectedEffect) {
             case EControllableEffects.Green: {
                 brushSprite = Instantiate(greenBrush);
                 newCellSprite = greenCellSprite.GetComponent<SpriteRenderer>().sprite;
+                effectName = "зеленый";
                 break;
             }
             case EControllableEffects.Red: {
                 brushSprite = Instantiate(redBrush);
                 newCellSprite = redCellSprite.GetComponent<SpriteRenderer>().sprite;
+                effectName = "красный";
                 break;
             }
             case EControllableEffects.Yellow: {
                 brushSprite = Instantiate(yellowBrush);
                 newCellSprite = yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
+                effectName = "желтый";
                 break;
             }
             case EControllableEffects.Black: {
                 brushSprite = Instantiate(blackBrush);
                 newCellSprite = blackCellSprite.GetComponent<SpriteRenderer>().sprite;
+                effectName = "черный";
                 break;
             }
             default: {
@@ -281,6 +294,10 @@ public class EffectsControl : MonoBehaviour
         brushSprite.transform.position = oldCell.transform.position;
         brushSprite.transform.SetParent(_cellsObject.transform);
         brushSprite.SetActive(true);
+
+        // сообщения в мессенджер
+        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " перемещает эффект <b>" + effectName + "</b> на клетку " + newCell.GetCellText();
+        Messages.Instance.AddMessage(message);
 
         // начать анимацию - отправить спрайт на координаты новой клетки
         
