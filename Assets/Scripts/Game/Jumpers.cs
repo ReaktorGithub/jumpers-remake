@@ -10,6 +10,9 @@ public class Jumpers : MonoBehaviour
     }
 
     private void CleanInstances() {
-        GameObject.Find("arrow-body").SetActive(false);
+        GameObject Instances = GameObject.Find("Instances");
+        Instances.transform.Find("arrow-body").gameObject.SetActive(false);
+        Instances.transform.Find("magnet").gameObject.SetActive(false);
+        Instances.transform.Find("magnet-super").gameObject.SetActive(false);
     }
 }

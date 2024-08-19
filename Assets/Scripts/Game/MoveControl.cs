@@ -107,6 +107,7 @@ public class MoveControl : MonoBehaviour
                     PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
                     EffectsControl.Instance.UpdateQuantityText(_currentPlayer);
                     EffectsControl.Instance.UpdateEffectEmptiness(_currentPlayer);
+                    BoostersControl.Instance.UpdateBoostersFromPlayer(_currentPlayer);
                     if (_currentPlayer.MovesSkip == 0) {
                         _movesLeft = 1;
                         string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " ходит";
@@ -128,6 +129,7 @@ public class MoveControl : MonoBehaviour
         }
         _camera.FollowObject(_currentToken.gameObject.transform);
         EffectsControl.Instance.SetDisabledEffectButtons(false);
+        // todo SetDisabledBoostersButtons
     }
 
     private void StartCellCheckBeforeStep() {

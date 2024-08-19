@@ -22,16 +22,22 @@ public class PlayerControl : MonoBehaviour
     private Pedestal _pedestal;
     private Sprite _tokenImage;
 
-    // player resources
+    // Ресурсы игрока
+    [SerializeField] private int coins = 0;
+    [SerializeField] private int mallows = 0;
+    [SerializeField] private int rubies = 0;
+    [SerializeField] private int power = 2;
+
+    // Эффекты
     [SerializeField] private int effectsGreen = 0;
     [SerializeField] private int effectsYellow = 0;
     [SerializeField] private int effectsBlack = 0;
     [SerializeField] private int effectsRed = 0;
     [SerializeField] private int effectsStar = 0;
-    [SerializeField] private int coins = 0;
-    [SerializeField] private int mallows = 0;
-    [SerializeField] private int rubies = 0;
-    [SerializeField] private int power = 2;
+
+    // Усилители
+    [SerializeField] private int boosterMagnet = 0;
+    [SerializeField] private int boosterSuperMagnet = 0;
 
     private void Awake() {
         _availableAttackTypes.Add(EAttackTypes.Usual);
@@ -138,6 +144,16 @@ public class PlayerControl : MonoBehaviour
     public int EffectsStar {
         get { return effectsStar; }
         set { effectsStar = value; }
+    }
+
+    public int BoosterMagnet {
+        get { return boosterMagnet; }
+        set { boosterMagnet = value; }
+    }
+
+    public int BoosterSuperMagnet {
+        get { return boosterSuperMagnet; }
+        set { boosterSuperMagnet = value; }
     }
 
     public void SkipMoveIncrease(TokenControl token) {
