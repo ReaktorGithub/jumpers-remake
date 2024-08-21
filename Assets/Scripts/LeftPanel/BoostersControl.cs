@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BoostersControl : MonoBehaviour
@@ -7,6 +8,9 @@ public class BoostersControl : MonoBehaviour
     private Sprite _magnetSuperSprite;
     [SerializeField] private GameObject _magnetsRow;
     private BoostersRow _magnetsRowScript;
+    private PopupMagnet _popupMagnet;
+    [SerializeField] private List<GameObject> boostersList;
+    private List<BoosterButton> _boosterButtonsList = new();
 
     private void Awake() {
         Instance = this;
@@ -15,6 +19,10 @@ public class BoostersControl : MonoBehaviour
         _magnetSuperSprite = Instances.transform.Find("magnet-super").GetComponent<SpriteRenderer>().sprite;
         if (_magnetsRow != null) {
             _magnetsRowScript = _magnetsRow.GetComponent<BoostersRow>();
+        }
+        _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
+        foreach(GameObject button in boostersList) {
+            _boosterButtonsList.Add(button.GetComponent<BoosterButton>());
         }
     }
 
@@ -26,6 +34,33 @@ public class BoostersControl : MonoBehaviour
     public Sprite MagnetSuperSprite {
         get { return _magnetSuperSprite; }
         private set {}
+    }
+
+    public void DisableAllButtons(BoosterButton exceptButton = null) {
+        foreach(BoosterButton button in _boosterButtonsList) {
+            button.SetDisabled(button != exceptButton);
+        }
+    }
+
+    public void EnableAllButtons() {
+        foreach(BoosterButton button in _boosterButtonsList) {
+            button.SetDisabled(false);
+            button.SetSelected(false);
+        }
+    }
+
+    public void UnselectAllButtons() {
+        foreach(BoosterButton button in _boosterButtonsList) {
+            button.SetSelected(false);
+        }
+    }
+
+    // Кнопки эффектов энейблятся, только если игрок их еще не использовал
+
+    public void TryToEnableAllEffectButtons() {
+        if (!MoveControl.Instance.CurrentPlayer.IsEffectPlaced) {
+            EffectsControl.Instance.DisableAllButtons(false);
+        }
     }
 
     public void UpdateBoostersFromPlayer(PlayerControl player) {
@@ -60,26 +95,20 @@ public class BoostersControl : MonoBehaviour
         }
     }
 
-    // Активация разных усилителей
+    // Открытие разных усилителей при нажатиях на кнопки в левой панели
 
     public void ActivateBooster(EBoosters booster) {
         switch(booster) {
             case EBoosters.Magnet: {
-                ActivateMagnetMode();
+                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, false);
+                _popupMagnet.OnOpenWindow();
                 break;
             }
             case EBoosters.MagnetSuper: {
-                ActivateMagnetMode();
+                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, true);
+                _popupMagnet.OnOpenWindow();
                 break;
             }
         }
-    }
-
-    public void ActivateMagnetMode() {
-        
-    }
-
-    public void ActivateMagnetSuperMode() {
-        Debug.Log("ActivateMagnetSuperMode");
     }
 }

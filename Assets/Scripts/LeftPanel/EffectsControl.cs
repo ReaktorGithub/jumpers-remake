@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -73,6 +72,7 @@ public class EffectsControl : MonoBehaviour
         }
         _isSelectionMode = true;
         _isReplaceMode = isReplace;
+        BoostersControl.Instance.DisableAllButtons();
         _cubicControl.SetCubicInteractable(false);
         _cameraControl.FollowOff();
         _cameraControl.MoveCameraToLevelCenter();
@@ -88,6 +88,7 @@ public class EffectsControl : MonoBehaviour
             DeactivateReplaceMode();
             MoveControl.Instance.CheckCellEffects();
         } else {
+            BoostersControl.Instance.EnableAllButtons();
             DeactivateSelectionMode();
         }
     }
@@ -118,6 +119,7 @@ public class EffectsControl : MonoBehaviour
 
     public void DeactivateSelectionModePhase2() {
         _cubicControl.SetCubicInteractable(true);
+        BoostersControl.Instance.EnableAllButtons();
         RestoreCamera();
     }
 
@@ -169,6 +171,7 @@ public class EffectsControl : MonoBehaviour
 
     public void OnChangeEffect(CellControl cell) {
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
+        player.IsEffectPlaced = true;
         Sprite sprite;
         string effectName = "";
 
@@ -211,7 +214,7 @@ public class EffectsControl : MonoBehaviour
 
         UpdateQuantityText(player);
         UpdateEffectEmptiness(player);
-        SetDisabledEffectButtons(true);
+        DisableAllButtons(true);
         StartCoroutine(DeactivateSelectionModeDefer());
     }
 
@@ -229,7 +232,7 @@ public class EffectsControl : MonoBehaviour
         _blackQuantityText.text = "x " + player.EffectsBlack;
     }
 
-    public void SetDisabledEffectButtons(bool value) {
+    public void DisableAllButtons(bool value) {
         foreach (EffectButton button in _effectButtonsList) {
             button.SetDisabled(value);
         }

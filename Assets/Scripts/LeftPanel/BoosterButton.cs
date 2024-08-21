@@ -24,10 +24,8 @@ public class BoosterButton : MonoBehaviour
 
     public void OnSelect() {
         SetSelected(true);
-        Debug.Log("click " + _boosterType);
-        // BoostersControl.Instance.SelectedBooster = boosterType;
-        // BoostersControl.Instance.UpdateButtonsSelection();
-        // BoostersControl.Instance.ActivateSelectionMode();
+        BoostersControl.Instance.DisableAllButtons(this);
+        EffectsControl.Instance.DisableAllButtons(true);
         BoostersControl.Instance.ActivateBooster(_boosterType);
     }
 

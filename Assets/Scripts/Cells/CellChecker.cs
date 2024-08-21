@@ -137,7 +137,7 @@ public class CellChecker : MonoBehaviour
             }
             
             _popupAttack.BuildContent(currentPlayer, rivals);
-            _popupAttack.OpenWindow();
+            _popupAttack.OnOpenWindow();
 
             return;
         }

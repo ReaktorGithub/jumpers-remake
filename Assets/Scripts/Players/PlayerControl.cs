@@ -34,10 +34,14 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private int effectsBlack = 0;
     [SerializeField] private int effectsRed = 0;
     [SerializeField] private int effectsStar = 0;
+    private bool _isEffectPlaced;
 
     // Усилители
     [SerializeField] private int boosterMagnet = 0;
     [SerializeField] private int boosterSuperMagnet = 0;
+
+    // Кубик
+    [SerializeField] private int cubicMaxScore = 6;
 
     private void Awake() {
         _availableAttackTypes.Add(EAttackTypes.Usual);
@@ -146,6 +150,11 @@ public class PlayerControl : MonoBehaviour
         set { effectsStar = value; }
     }
 
+    public bool IsEffectPlaced {
+        get { return _isEffectPlaced; }
+        set { _isEffectPlaced = value; }
+    }
+
     public int BoosterMagnet {
         get { return boosterMagnet; }
         set { boosterMagnet = value; }
@@ -154,6 +163,11 @@ public class PlayerControl : MonoBehaviour
     public int BoosterSuperMagnet {
         get { return boosterSuperMagnet; }
         set { boosterSuperMagnet = value; }
+    }
+
+    public int CubicMaxScore {
+        get { return cubicMaxScore; }
+        set { cubicMaxScore = value; }
     }
 
     public void SkipMoveIncrease(TokenControl token) {
@@ -230,6 +244,14 @@ public class PlayerControl : MonoBehaviour
 
     public void AddEffectStar(int value) {
         effectsStar += value;
+    }
+
+    public void AddMagnets(int value) {
+        boosterMagnet += value;
+    }
+
+    public void AddMagnetsSuper(int value) {
+        boosterSuperMagnet += value;
     }
 
     // атака

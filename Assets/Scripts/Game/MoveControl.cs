@@ -128,8 +128,9 @@ public class MoveControl : MonoBehaviour
             Messages.Instance.AddMessage(messengerMessage);
         }
         _camera.FollowObject(_currentToken.gameObject.transform);
-        EffectsControl.Instance.SetDisabledEffectButtons(false);
-        // todo SetDisabledBoostersButtons
+        _currentPlayer.IsEffectPlaced = false;
+        EffectsControl.Instance.DisableAllButtons(false);
+        BoostersControl.Instance.EnableAllButtons();
     }
 
     private void StartCellCheckBeforeStep() {
