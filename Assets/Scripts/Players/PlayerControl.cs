@@ -347,8 +347,8 @@ public class PlayerControl : MonoBehaviour
             Debug.Log("Red cell not found");
             return;
         }
-        CellControl nextCellcontrol = redCell.PenaltyCell.GetComponent<CellControl>();
-        tokenControl.SetToSpecifiedCell(nextCellcontrol, redCell.PenaltyCell, () => {
+        float moveTime = MoveControl.Instance.SpecifiedMoveTime;
+        tokenControl.SetToSpecifiedCell(redCell.PenaltyCell, moveTime, () => {
             cellControl.RemoveToken(TokenName);
             MoveControl.Instance.ConfirmNewPosition();
         });

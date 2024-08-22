@@ -23,10 +23,6 @@ public class BoosterButton : MonoBehaviour
     }
 
     public void OnSelect() {
-        if (_boosterType == EBoosters.Lasso) {
-            BoostersControl.Instance.ActivateBooster(_boosterType);
-            return;
-        }
         SetSelected(true);
         BoostersControl.Instance.DisableAllButtons(this);
         EffectsControl.Instance.DisableAllButtons(true);

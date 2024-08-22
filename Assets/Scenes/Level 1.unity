@@ -4042,6 +4042,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: symbol_2
       objectReference: {fileID: 0}
+    - target: {fileID: 4469988915230476511, guid: 47464e6c795c68d42a07582ff3effea3, type: 3}
+      propertyPath: lassoTime
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5753755990970219512, guid: 47464e6c795c68d42a07582ff3effea3, type: 3}
       propertyPath: m_LoopMode
       value: 0
@@ -5209,6 +5213,10 @@ PrefabInstance:
     - target: {fileID: 7991894400739770324, guid: 467a4577712dd5b479025e1cf1b02895, type: 3}
       propertyPath: m_Name
       value: c2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9133522649374658302, guid: 467a4577712dd5b479025e1cf1b02895, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16659,6 +16667,10 @@ PrefabInstance:
     - target: {fileID: 3460655427475179083, guid: 47464e6c795c68d42a07582ff3effea3, type: 3}
       propertyPath: m_Name
       value: symbol_3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4469988915230476511, guid: 47464e6c795c68d42a07582ff3effea3, type: 3}
+      propertyPath: lassoTime
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5753755990970219512, guid: 47464e6c795c68d42a07582ff3effea3, type: 3}
       propertyPath: m_LoopMode
@@ -30642,6 +30654,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: symbol_4
       objectReference: {fileID: 0}
+    - target: {fileID: 4469988915230476511, guid: 47464e6c795c68d42a07582ff3effea3, type: 3}
+      propertyPath: lassoTime
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5753755990970219512, guid: 47464e6c795c68d42a07582ff3effea3, type: 3}
       propertyPath: m_LoopMode
       value: 0
@@ -34648,10 +34664,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: c1
       objectReference: {fileID: 0}
-    - target: {fileID: 2656521992059027252, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 5ea29e4f036fed641ab9d333e7b82147, type: 3}
     - target: {fileID: 7917971435729288403, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: effect
       value: 0
@@ -34664,6 +34676,10 @@ PrefabInstance:
       propertyPath: nextCell
       value: 
       objectReference: {fileID: 249760081}
+    - target: {fileID: 7917971435729288403, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
+      propertyPath: pulseTime
+      value: 1.2
+      objectReference: {fileID: 0}
     - target: {fileID: 7917971435729288403, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: previousCell
       value: 
@@ -35159,6 +35175,10 @@ PrefabInstance:
     - target: {fileID: 3460655427475179083, guid: 47464e6c795c68d42a07582ff3effea3, type: 3}
       propertyPath: m_Name
       value: symbol_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4469988915230476511, guid: 47464e6c795c68d42a07582ff3effea3, type: 3}
+      propertyPath: lassoTime
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5753755990970219512, guid: 47464e6c795c68d42a07582ff3effea3, type: 3}
       propertyPath: m_LoopMode

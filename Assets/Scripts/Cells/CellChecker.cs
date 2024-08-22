@@ -5,7 +5,6 @@ public class CellChecker : MonoBehaviour
 {
     public static CellChecker Instance { get; private set; }
     private TopPanel _topPanel;
-    private CubicControl _cubicControl;
     private CameraControl _camera;
     private PopupAttack _popupAttack;
     [SerializeField] private List<ECellTypes> _skipRivalCheckTypes = new();
@@ -14,7 +13,6 @@ public class CellChecker : MonoBehaviour
     private void Awake() {
         Instance = this;
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
-        _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _popupAttack = GameObject.Find("GameScripts").GetComponent<PopupAttack>();
         _modalReplace = GameObject.Find("GameScripts").GetComponent<ModalReplaceEffect>();
@@ -34,7 +32,7 @@ public class CellChecker : MonoBehaviour
             string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " выбирает направление";
             Messages.Instance.AddMessage(message);
             string cubicStatus = Utils.Wrap("Остаток: " + stepsLeft, UIColors.Green);
-            _cubicControl.WriteStatus(cubicStatus);
+            CubicControl.Instance.WriteStatus(cubicStatus);
             return false;
         }
 

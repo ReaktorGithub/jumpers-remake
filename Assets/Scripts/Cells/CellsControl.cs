@@ -24,6 +24,11 @@ public class CellsControl : MonoBehaviour
         }
     }
 
+    public List<CellControl> AllCellsControls {
+        get { return _allCellControls; }
+        private set {}
+    }
+
     public float ChangingEffectTime {
         get { return changingEffectTime; }
         private set {}
@@ -271,5 +276,22 @@ public class CellsControl : MonoBehaviour
         }
 
         return result;
+    }
+
+    // Дебаг
+
+    public void ShowTokensAtCells() {
+        GameObject[] allCells = GameObject.FindGameObjectsWithTag("cell");
+        foreach(GameObject obj in allCells) {
+            CellControl cell = obj.GetComponent<CellControl>();
+            if (cell.CurrentTokens.Count == 0) {
+                continue;
+            }
+            string message = "Tokens at " + cell.name + ": ";
+            foreach(string token in cell.CurrentTokens) {
+                message = message + token + " ";
+            }
+            Debug.Log(message);
+        }
     }
 }

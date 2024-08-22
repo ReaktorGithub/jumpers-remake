@@ -10,6 +10,7 @@ public class BoostersControl : MonoBehaviour
     private PopupMagnet _popupMagnet;
     [SerializeField] private List<GameObject> boostersList;
     private List<BoosterButton> _boosterButtonsList = new();
+    private TopPanel _topPanel;
 
     private void Awake() {
         Instance = this;
@@ -27,6 +28,7 @@ public class BoostersControl : MonoBehaviour
         foreach(GameObject button in boostersList) {
             _boosterButtonsList.Add(button.GetComponent<BoosterButton>());
         }
+        _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
     }
 
     public Sprite MagnetSprite {
@@ -70,6 +72,8 @@ public class BoostersControl : MonoBehaviour
             EffectsControl.Instance.DisableAllButtons(false);
         }
     }
+
+    // Обновление содержимого панели усилителей у игрока
 
     public void UpdateBoostersFromPlayer(PlayerControl player) {
         // Магниты
@@ -125,12 +129,40 @@ public class BoostersControl : MonoBehaviour
                 break;
             }
             case EBoosters.Lasso: {
+                CubicControl.Instance.SetCubicInteractable(false);
+                _topPanel.SetText("Подвиньте свою фишку в пределах 3 шагов"); // todo зависит от уровня лассо
+                _topPanel.OpenWindow();
                 List<GameObject> collected = CellsControl.Instance.GetNearCellsDeepTwoSide(MoveControl.Instance.CurrentCell, 3);
-                foreach(GameObject obj in collected) {
-                    Debug.Log(obj.name);
+                foreach(GameObject cell in collected) {
+                    cell.GetComponent<CellControl>().TurnOnLassoMode();
                 }
+                _topPanel.SetCancelButtonActive(true, () => {
+                    _topPanel.CloseWindow();
+                    foreach(GameObject cell in collected) {
+                        cell.GetComponent<CellControl>().TurnOffLassoMode();
+                    }
+                    TryToEnableAllEffectButtons();
+                    EnableAllButtons();
+                    CubicControl.Instance.SetCubicInteractable(true);
+                });
                 break;
             }
         }
+    }
+
+    // Исполнение некоторых усилителей
+
+    public void ExecuteLasso(CellControl targetCell) {
+        foreach(CellControl cell in CellsControl.Instance.AllCellsControls) {
+            cell.TurnOffLassoMode();
+        }
+        _topPanel.CloseWindow();
+        PlayerControl player = MoveControl.Instance.CurrentPlayer;
+        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " решил прокатиться на " + Utils.Wrap("лассо", UIColors.Orange);
+        Messages.Instance.AddMessage(message);
+        player.AddLasso(-1);
+        UpdateBoostersFromPlayer(player);
+        UnselectAllButtons();
+        MoveControl.Instance.MakeLassoMove(targetCell);
     }
 }
