@@ -104,6 +104,7 @@ public class MoveControl : MonoBehaviour
                 } else {
                     _currentPlayer = playerControls[i];
                     _currentToken = playerControls[i].GetTokenControl();
+                    _currentCell = _currentToken.GetCurrentCellControl();
                     PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
                     PlayersControl.Instance.UpdateSqueezeAnimation(_currentPlayerIndex);
                     PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);

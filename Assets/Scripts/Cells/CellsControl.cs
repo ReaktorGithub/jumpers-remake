@@ -158,4 +158,118 @@ public class CellsControl : MonoBehaviour
         
         return FindNearestCheckpointRecursive(list);
     }
+
+    /*
+        Метод возвращает коллекцию из ближайших клеток, делая отсчет с текущей
+        isForward - если true, то двигаться вперед
+        Если текущая клетка - это бранч, то надо проверить ряд условий
+        Если движемся вперед, а бранч не реверс, то клеток будет по числу ответвлений бранча
+        Если движемся вперед, а бранч реверс, то обрабатываем как обычную клетку, результат будет 1 клетка
+        Если движемся назад, а бранч реверс, то клеток будет по числу ответвлений бранча
+        Если движемся назад, а бранч не реверс, то обрабатываем как обычную клетку, результат будет 1 клетка
+        Если текущая клетка не бранч, то обрабатываем как обычную клетку, учитывая направление
+        Текущая клетка не кладется в результирующий список!
+    */
+
+    public List<GameObject> GetNearCells(CellControl currentCell, bool isForward) {
+        List<GameObject> result = new();
+        bool isBranch = currentCell.TryGetComponent(out BranchCell branchCell);
+
+        if (isForward) {
+            if (isBranch) {
+                if (branchCell.IsReverse()) {
+                    GameObject newCell = currentCell.NextCell;
+                    if (newCell) {
+                        result.Add(newCell);
+                    }
+                } else {
+                    BranchControl branchControl = branchCell.BranchObject.GetComponent<BranchControl>();
+                    List<GameObject> newCells = branchControl.GetAllNextCells();
+                    foreach(GameObject obj in newCells) {
+                        result.Add(obj);
+                    }
+                }
+            } else {
+                GameObject newCell = currentCell.NextCell;
+                if (newCell) {
+                    result.Add(newCell);
+                }
+            }
+        } else {
+            if (isBranch) {
+                if (branchCell.IsReverse()) {
+                    BranchControl branchControl = branchCell.BranchObject.GetComponent<BranchControl>();
+                    List<GameObject> newCells = branchControl.GetAllNextCells();
+                    foreach(GameObject obj in newCells) {
+                        result.Add(obj);
+                    }
+                } else {
+                    GameObject newCell = currentCell.PreviousCell;
+                    if (newCell) {
+                        result.Add(newCell);
+                    }
+                }
+            } else {
+                GameObject newCell = currentCell.PreviousCell;
+                if (newCell) {
+                    result.Add(newCell);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    // Делает тоже самое, что GetNearCells, но на несколько шагов
+
+    public List<GameObject> GetNearCellsDeep(CellControl currentCell, bool isForward, int howDeep) {
+        List<GameObject> result = new();
+
+        List<GameObject> resultCurrentStep = new() {
+            currentCell.gameObject
+        };
+
+        for (int i = 0; i < howDeep; i++) {
+            List<GameObject> temp = new();
+            foreach(GameObject tempCell in resultCurrentStep) {
+                CellControl tempControl = tempCell.GetComponent<CellControl>();
+                List<GameObject> tempResult = GetNearCells(tempControl, isForward);
+                foreach(GameObject obj in tempResult) {
+                    temp.Add(obj);
+                }
+            }
+
+            // сохранить результат
+            foreach(GameObject obj in temp) {
+                result.Add(obj);
+            }
+
+            // подготовить массив для следующего шага
+            resultCurrentStep.Clear();
+            foreach(GameObject obj in temp) {
+                resultCurrentStep.Add(obj);
+            }
+        }
+        
+        return result;
+    }
+
+    // Делает тоже самое, что GetNearCellsDeep, но в обе стороны
+
+    public List<GameObject> GetNearCellsDeepTwoSide(CellControl currentCell, int howDeep) {
+        List<GameObject> result = new();
+
+        List<GameObject> forwardResult = GetNearCellsDeep(currentCell, true, howDeep);
+        List<GameObject> backwardResult = GetNearCellsDeep(currentCell, false, howDeep);
+
+        foreach(GameObject obj in forwardResult) {
+            result.Add(obj);
+        }
+        
+        foreach(GameObject obj in backwardResult) {
+            result.Add(obj);
+        }
+
+        return result;
+    }
 }

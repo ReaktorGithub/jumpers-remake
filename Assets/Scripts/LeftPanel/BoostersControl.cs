@@ -4,10 +4,9 @@ using UnityEngine;
 public class BoostersControl : MonoBehaviour
 {
     public static BoostersControl Instance { get; private set; }
-    private Sprite _magnetSprite;
-    private Sprite _magnetSuperSprite;
-    [SerializeField] private GameObject _magnetsRow;
-    private BoostersRow _magnetsRowScript;
+    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite;
+    [SerializeField] private GameObject magnetsRow, lassoRow;
+    private BoostersRow _magnetsRowScript, _lassoRowScript;
     private PopupMagnet _popupMagnet;
     [SerializeField] private List<GameObject> boostersList;
     private List<BoosterButton> _boosterButtonsList = new();
@@ -17,8 +16,12 @@ public class BoostersControl : MonoBehaviour
         GameObject Instances = GameObject.Find("Instances");
         _magnetSprite = Instances.transform.Find("magnet").GetComponent<SpriteRenderer>().sprite;
         _magnetSuperSprite = Instances.transform.Find("magnet-super").GetComponent<SpriteRenderer>().sprite;
-        if (_magnetsRow != null) {
-            _magnetsRowScript = _magnetsRow.GetComponent<BoostersRow>();
+        _lassoSprite = Instances.transform.Find("lasso").GetComponent<SpriteRenderer>().sprite;
+        if (magnetsRow != null) {
+            _magnetsRowScript = magnetsRow.GetComponent<BoostersRow>();
+        }
+        if (lassoRow != null) {
+            _lassoRowScript = lassoRow.GetComponent<BoostersRow>();
         }
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
         foreach(GameObject button in boostersList) {
@@ -33,6 +36,11 @@ public class BoostersControl : MonoBehaviour
 
     public Sprite MagnetSuperSprite {
         get { return _magnetSuperSprite; }
+        private set {}
+    }
+
+    public Sprite LassoSprite {
+        get { return _lassoSprite; }
         private set {}
     }
 
@@ -64,9 +72,9 @@ public class BoostersControl : MonoBehaviour
     }
 
     public void UpdateBoostersFromPlayer(PlayerControl player) {
-        int magnetButtonNumber = 1;
-
         // Магниты
+
+        int magnetButtonNumber = 1;
 
         for (int i = 0; i < player.BoosterMagnet; i++) {
             if (magnetButtonNumber > 3) {
@@ -93,6 +101,13 @@ public class BoostersControl : MonoBehaviour
                 _magnetsRowScript.UpdateButton(i, EBoosters.None);
             }
         }
+
+        // Лассо
+
+        for (int i = 1; i <= 3; i++) {
+            EBoosters booster = player.BoosterLasso >= i ? EBoosters.Lasso : EBoosters.None;
+            _lassoRowScript.UpdateButton(i, booster);
+        }
     }
 
     // Открытие разных усилителей при нажатиях на кнопки в левой панели
@@ -107,6 +122,13 @@ public class BoostersControl : MonoBehaviour
             case EBoosters.MagnetSuper: {
                 _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, true);
                 _popupMagnet.OnOpenWindow();
+                break;
+            }
+            case EBoosters.Lasso: {
+                List<GameObject> collected = CellsControl.Instance.GetNearCellsDeepTwoSide(MoveControl.Instance.CurrentCell, 3);
+                foreach(GameObject obj in collected) {
+                    Debug.Log(obj.name);
+                }
                 break;
             }
         }

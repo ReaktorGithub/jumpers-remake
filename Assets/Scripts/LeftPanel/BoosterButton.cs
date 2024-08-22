@@ -23,6 +23,10 @@ public class BoosterButton : MonoBehaviour
     }
 
     public void OnSelect() {
+        if (_boosterType == EBoosters.Lasso) {
+            BoostersControl.Instance.ActivateBooster(_boosterType);
+            return;
+        }
         SetSelected(true);
         BoostersControl.Instance.DisableAllButtons(this);
         EffectsControl.Instance.DisableAllButtons(true);
@@ -47,6 +51,10 @@ public class BoosterButton : MonoBehaviour
             }
             case EBoosters.MagnetSuper: {
                 _booster.sprite = BoostersControl.Instance.MagnetSuperSprite;
+                break;
+            }
+            case EBoosters.Lasso: {
+                _booster.sprite = BoostersControl.Instance.LassoSprite;
                 break;
             }
             default: {

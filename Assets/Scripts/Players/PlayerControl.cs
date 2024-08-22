@@ -39,6 +39,7 @@ public class PlayerControl : MonoBehaviour
     // Усилители
     [SerializeField] private int boosterMagnet = 0;
     [SerializeField] private int boosterSuperMagnet = 0;
+    [SerializeField] private int boosterLasso = 0;
 
     // Кубик
     [SerializeField] private int cubicMaxScore = 6;
@@ -165,6 +166,11 @@ public class PlayerControl : MonoBehaviour
         set { boosterSuperMagnet = value; }
     }
 
+    public int BoosterLasso {
+        get { return boosterLasso; }
+        set { boosterLasso = value; }
+    }
+
     public int CubicMaxScore {
         get { return cubicMaxScore; }
         set { cubicMaxScore = value; }
@@ -252,6 +258,10 @@ public class PlayerControl : MonoBehaviour
 
     public void AddMagnetsSuper(int value) {
         boosterSuperMagnet += value;
+    }
+
+    public void AddLasso(int value) {
+        boosterLasso += value;
     }
 
     // атака
