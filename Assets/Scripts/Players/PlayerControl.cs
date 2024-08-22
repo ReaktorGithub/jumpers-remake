@@ -22,16 +22,26 @@ public class PlayerControl : MonoBehaviour
     private Pedestal _pedestal;
     private Sprite _tokenImage;
 
-    // player resources
+    // Ресурсы игрока
+    [SerializeField] private int coins = 0;
+    [SerializeField] private int mallows = 0;
+    [SerializeField] private int rubies = 0;
+    [SerializeField] private int power = 2;
+
+    // Эффекты
     [SerializeField] private int effectsGreen = 0;
     [SerializeField] private int effectsYellow = 0;
     [SerializeField] private int effectsBlack = 0;
     [SerializeField] private int effectsRed = 0;
     [SerializeField] private int effectsStar = 0;
-    [SerializeField] private int coins = 0;
-    [SerializeField] private int mallows = 0;
-    [SerializeField] private int rubies = 0;
-    [SerializeField] private int power = 2;
+    private bool _isEffectPlaced;
+
+    // Усилители
+    [SerializeField] private int boosterMagnet = 0;
+    [SerializeField] private int boosterSuperMagnet = 0;
+
+    // Кубик
+    [SerializeField] private int cubicMaxScore = 6;
 
     private void Awake() {
         _availableAttackTypes.Add(EAttackTypes.Usual);
@@ -140,6 +150,26 @@ public class PlayerControl : MonoBehaviour
         set { effectsStar = value; }
     }
 
+    public bool IsEffectPlaced {
+        get { return _isEffectPlaced; }
+        set { _isEffectPlaced = value; }
+    }
+
+    public int BoosterMagnet {
+        get { return boosterMagnet; }
+        set { boosterMagnet = value; }
+    }
+
+    public int BoosterSuperMagnet {
+        get { return boosterSuperMagnet; }
+        set { boosterSuperMagnet = value; }
+    }
+
+    public int CubicMaxScore {
+        get { return cubicMaxScore; }
+        set { cubicMaxScore = value; }
+    }
+
     public void SkipMoveIncrease(TokenControl token) {
         _movesSkip++;
         token.UpdateSkips(_movesSkip);
@@ -214,6 +244,14 @@ public class PlayerControl : MonoBehaviour
 
     public void AddEffectStar(int value) {
         effectsStar += value;
+    }
+
+    public void AddMagnets(int value) {
+        boosterMagnet += value;
+    }
+
+    public void AddMagnetsSuper(int value) {
+        boosterSuperMagnet += value;
     }
 
     // атака

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -8,9 +7,7 @@ using UnityEngine.UI;
 public class PopupAttack : MonoBehaviour
 {
     private GameObject _attack, _optionalSectionTokens;
-    private float _shift;
-    [SerializeField] private float fadeTime = 0.5f;
-    private IEnumerator _coroutine;
+    private Popup _popup;
     private TextMeshProUGUI _tokenName, _attackHeading, _attackDescription, _powerNow, _powerLeft, _warningText;
     private List<TokenAttackButton> _tokenAttackButtons = new();
     private List<AttackTypeButton> _attackTypeButtons = new();
@@ -23,8 +20,7 @@ public class PopupAttack : MonoBehaviour
 
     private void Awake() {
         _attack = GameObject.Find("PopupAttack");
-        _shift = _attack.GetComponent<RectTransform>().rect.width + 70;
-        _attack.transform.localPosition = new(_attack.transform.localPosition.x - _shift, _attack.transform.localPosition.y, _attack.transform.localPosition.z);
+        _popup = _attack.GetComponent<Popup>();
         _optionalSectionTokens = _attack.transform.Find("OptionalSectionTokens").gameObject;
         _tokenName = Utils.FindChildByName(_optionalSectionTokens, "TokenName").GetComponent<TextMeshProUGUI>();
         TokenAttackButton[] allButtons = _optionalSectionTokens.GetComponentsInChildren<TokenAttackButton>();
@@ -47,53 +43,21 @@ public class PopupAttack : MonoBehaviour
         _warningText = Utils.FindChildByName(_attack, "WarningText").GetComponent<TextMeshProUGUI>();
     }
 
-    private void Start() {
-        _attack.SetActive(false);
-    }
-
     // перед открытием окна сперва запускать BuildContent!
 
-    public void OpenWindow() {
-        if (_attack.activeInHierarchy) {
-            return;
+    public void OnOpenWindow() {
+        bool opened = _popup.OpenWindow();
+        if (opened) {
+            SetButtonsInteractable(true);
+            UpdateAttackTypeSelection();
         }
-        if (_coroutine != null) {
-            StopCoroutine(_coroutine);
-        }
-        _attack.SetActive(true);
-        SetButtonsInteractable(true);
-        UpdateAttackTypeSelection();
-        _coroutine = FadeInOut(_shift);
-        StartCoroutine(_coroutine);
     }
 
-    public void CloseWindow() {
-        if (!_attack.activeInHierarchy) {
-            return;
+    public void OnCloseWindow() {
+        bool closed = _popup.CloseWindow();
+        if (closed) {
+            SetButtonsInteractable(false);
         }
-        if (_coroutine != null) {
-            StopCoroutine(_coroutine);
-        }
-        SetButtonsInteractable(false);
-        _coroutine = FadeInOut(_shift * -1, () => {
-            _attack.SetActive(false);
-        });
-        StartCoroutine(_coroutine);
-    }
-
-    private IEnumerator FadeInOut(float shift, Action callback = null) {
-        float startX = _attack.transform.localPosition.x;
-        float endX = _attack.transform.localPosition.x + shift;
-        float startTime = Time.time;
-        float velocity = 0f;
-        while (Time.time - startTime < fadeTime) {
-            float progress = (Time.time - startTime) / fadeTime;
-            float x = Mathf.SmoothDamp(startX, endX, ref velocity, 0.1f, Mathf.Infinity, progress); 
-            _attack.transform.localPosition = new Vector3(x, _attack.transform.localPosition.y, _attack.transform.localPosition.z);
-            yield return null;
-        }
-
-        callback?.Invoke();
     }
 
     public void BuildContent(PlayerControl currentPlayer, List<PlayerControl> rivals) {

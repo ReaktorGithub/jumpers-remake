@@ -9,6 +9,7 @@ TagManager:
   - OptionalModal
   - wall
   - LockZoom
+  - boosterButton
   layers:
   - Default
   - TransparentFX

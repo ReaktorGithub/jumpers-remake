@@ -9,14 +9,13 @@ public class CubicControl : MonoBehaviour
     private Animator _anim;
     private IEnumerator _coroutine, _coroutinePulse;
     private TextMeshProUGUI _statusText;
-    [SerializeField] private int overrideScore = 0;
     [SerializeField] private float rotateTime = 1.4f;
     [SerializeField] private float holdTime = 1f;
     [SerializeField] private float pulseTime = 0.5f;
     [SerializeField] private float pulseMinAlpha = 0.2f;
     private int finalScore;
     private GameObject _border, _borderSelect;
-
+    private PopupMagnet _popupMagnet;
 
     private void Awake() {
         _anim = transform.Find("CubicImage").GetComponent<Animator>();
@@ -25,6 +24,7 @@ public class CubicControl : MonoBehaviour
         _statusText.text = "";
         _border = transform.Find("cubic_border").gameObject;
         _borderSelect = transform.Find("cubic_border_select").gameObject;
+        _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
     }
 
     private void Start() {
@@ -41,11 +41,10 @@ public class CubicControl : MonoBehaviour
         int score;
         if (specifiedScore != 0) {
             score = specifiedScore;
-        } else if (overrideScore != 0) {
-            score = overrideScore;
         } else {
+            int max = MoveControl.Instance.CurrentPlayer.CubicMaxScore + 1;
             System.Random random = new();
-            score = random.Next(1,7);
+            score = random.Next(1, max);
         }
         finalScore = score;
         _anim.SetInteger("score", finalScore);
@@ -54,26 +53,34 @@ public class CubicControl : MonoBehaviour
         StartCoroutine(_coroutine);
     }
 
+    public void OnCubicClick(int specifiedScore = 0) {
+        Throw(specifiedScore);
+    }
+
     // specifiedScore - указать на выброс определенного числа, без рандома
-    // overrideScore - это число, которое указывается в редакторе Unity
-    // specifiedScore имеет приоритет над overrideScore
     // finalScore - сохранение числа перемещений фишки после всех вычислений
 
-    public void Throw(int specifiedScore = 0) {
+    public void Throw(int specifiedScore = 0, bool isMagnet = false) {
         SetCubicInteractable(false);
-        EffectsControl.Instance.SetDisabledEffectButtons(true);
-        _statusText.text = "";
+        EffectsControl.Instance.DisableAllButtons(true);
+        BoostersControl.Instance.DisableAllButtons();
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
         }
         _anim.SetInteger("score", 0);
         _anim.SetBool("isRotate", true);
-        _coroutine = SetScoreDefer(specifiedScore);
+        _coroutine = SetScoreDefer(specifiedScore, isMagnet);
         StartCoroutine(_coroutine);
     }
 
-    private IEnumerator SetScoreDefer(int specifiedScore = 0) {
+    private IEnumerator SetScoreDefer(int specifiedScore = 0, bool isMagnet = false) {
         yield return new WaitForSeconds(rotateTime);
+        if (isMagnet) {
+            bool isSuccess = specifiedScore == _popupMagnet.SelectedScore;
+            string text1 = isSuccess ? Utils.Wrap("Магнит сработал! ", UIColors.Green) : Utils.Wrap("Магнит не сработал! ", UIColors.Red);
+            string text2 = "Загадано: <b>" + _popupMagnet.SelectedScore + "</b> Выпало: <b>" + specifiedScore + "</b>";
+            Messages.Instance.AddMessage(text1 + text2);
+        }
         SetScore(specifiedScore);
     }
 
@@ -95,6 +102,16 @@ public class CubicControl : MonoBehaviour
             SpriteRenderer sprite = borderSelectSprite;
             sprite.color = new Color(1f, 1f, 1f, 1f);
         }
+
+        string message;
+
+        if (value) {
+            message = Utils.Wrap("ваш ход!", UIColors.Green);
+        } else {
+            message = "";
+        }
+
+        WriteStatus(message);
     }
 
     public void WriteStatus(string text) {
