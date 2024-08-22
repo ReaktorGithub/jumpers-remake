@@ -7,6 +7,8 @@ public class MoveControl : MonoBehaviour
     private int _currentPlayerIndex = 1;
     private int _stepsLeft;
     private int _movesLeft = 1;
+    [SerializeField] private float moveTime = 12f;
+    [SerializeField] private float specifiedMoveTime = 6f;
     [SerializeField] private float stepDelay = 0.3f;
     [SerializeField] private float endMoveDelay = 0.5f;
     [SerializeField] private float skipMoveDelay = 1.5f;
@@ -14,17 +16,16 @@ public class MoveControl : MonoBehaviour
     private TokenControl _currentToken;
     private PlayerControl _currentPlayer;
     private CellControl _currentCell;
-    private CubicControl _cubicControl;
     private ModalResults _modalResults;
     private ModalWin _modalWin;
     private ModalLose _modalLose;
     private CameraControl _camera;
     private TopPanel _topPanel;
     private ModifiersControl _modifiersControl;
+    private bool _isLassoMode = false;
 
     private void Awake() {
         Instance = this;
-        _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
         _modalResults = GameObject.Find("ModalResults").GetComponent<ModalResults>();
         _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
@@ -43,9 +44,19 @@ public class MoveControl : MonoBehaviour
         private set {}
     }
 
+    public float MoveTime {
+        get { return moveTime; }
+        private set {}
+    }
+
+    public float SpecifiedMoveTime {
+        get { return specifiedMoveTime; }
+        private set {}
+    }
+
     public int MovesLeft {
         get { return _movesLeft; }
-        set {}
+        set { _movesLeft = value; }
     }
 
     public void AddMovesLeft(int count) {
@@ -54,7 +65,12 @@ public class MoveControl : MonoBehaviour
 
     public int StepsLeft {
         get { return _stepsLeft; }
-        set {}
+        set { _stepsLeft = value; }
+    }
+
+    public bool IsLassoMode {
+        get { return _isLassoMode; }
+        private set {}
     }
 
     public void SetNextPlayerIndex() {
@@ -104,6 +120,7 @@ public class MoveControl : MonoBehaviour
                 } else {
                     _currentPlayer = playerControls[i];
                     _currentToken = playerControls[i].GetTokenControl();
+                    _currentCell = _currentToken.GetCurrentCellControl();
                     PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
                     PlayersControl.Instance.UpdateSqueezeAnimation(_currentPlayerIndex);
                     PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
@@ -123,9 +140,9 @@ public class MoveControl : MonoBehaviour
     }
 
     private void PreparePlayerForMove(string cubicMessage = null, string messengerMessage = null) {
-        _cubicControl.SetCubicInteractable(true);
+        CubicControl.Instance.SetCubicInteractable(true);
         if (cubicMessage != null) {
-            _cubicControl.WriteStatus(cubicMessage);
+            CubicControl.Instance.WriteStatus(cubicMessage);
         }
         if (messengerMessage != null) {
             Messages.Instance.AddMessage(messengerMessage);
@@ -150,32 +167,45 @@ public class MoveControl : MonoBehaviour
 
     private void MakeStep() {
         _stepsLeft--;
-        _currentToken.SetToNextCell(() => {
-            // проверяем тип клетки, на которой сейчас находимся
-            // некоторые типы прерывают движение, либо вызывают код во время движения
+        _currentToken.SetToNextCell(moveTime, AfterStep);
+    }
 
-            _currentCell = _currentToken.GetCurrentCellControl();
+    private void AfterStep() {
+        // проверяем тип клетки, на которой сейчас находимся
+        // некоторые типы прерывают движение, либо вызывают код во время движения
 
-            bool check = CellChecker.Instance.CheckCellAfterStep(_currentCell.CellType, _currentPlayer);
-            if (!check) {
-                return;
-            }
+        _currentCell = _currentToken.GetCurrentCellControl();
 
-            // если тип клетки не прерывает движение, то проверяем условие выхода из цикла шагов
-            if (_stepsLeft > 0) {
-                StartCellCheckBeforeStep();
-            } else {
-                StartCoroutine(ConfirmNewPositionDefer());
-            }
-        });
+        bool check = CellChecker.Instance.CheckCellAfterStep(_currentCell.CellType, _currentPlayer);
+        if (!check) {
+            return;
+        }
+
+        // если тип клетки не прерывает движение, то проверяем условие выхода из цикла шагов
+        if (_stepsLeft > 0) {
+            StartCellCheckBeforeStep();
+        } else {
+            StartCoroutine(ConfirmNewPositionDefer());
+        }
     }
 
     public void MakeMove(int score) {
+        _isLassoMode = false;
         _stepsLeft = score;
         _currentCell = _currentToken.GetCurrentCellControl();
         _currentCell.RemoveToken(_currentPlayer.TokenName);
         _currentCell.AlignTokens(alignTime);
         StartCellCheckBeforeStep();
+    }
+
+    public void MakeLassoMove(CellControl targetCell) {
+        _isLassoMode = true;
+        _stepsLeft = 0;
+        _movesLeft++;
+        _currentCell = _currentToken.GetCurrentCellControl();
+        _currentCell.RemoveToken(_currentPlayer.TokenName);
+        _currentCell.AlignTokens(alignTime);
+        _currentToken.SetToSpecifiedCell(targetCell.gameObject, specifiedMoveTime, AfterStep);
     }
 
     private IEnumerator ConfirmNewPositionDefer() {
@@ -213,7 +243,7 @@ public class MoveControl : MonoBehaviour
         } else {
             _currentCell.NextCell = nextCell;
         }
-        _cubicControl.WriteStatus("");
+        CubicControl.Instance.WriteStatus("");
         StartCoroutine(MakeStepDefer());
     }
 
@@ -226,13 +256,14 @@ public class MoveControl : MonoBehaviour
         string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " пропускает ход";
         Messages.Instance.AddMessage(message);
         message = Utils.Wrap("пропуск", UIColors.Yellow);
-        _cubicControl.WriteStatus(message);
+        CubicControl.Instance.WriteStatus(message);
         yield return new WaitForSeconds(skipMoveDelay);
         _currentPlayer.SkipMoveDecrease(_currentToken);
         EndMove();
     }
 
     public void EndMove() {
+        // CellsControl.Instance.ShowTokensAtCells();
         _modifiersControl.HideModifierMagnet();
 
         // проверка на окончание гонки
@@ -271,10 +302,8 @@ public class MoveControl : MonoBehaviour
 
         // текущий игрок продолжает ходить
 
-        string cubicMessage = Utils.Wrap("бонусный ход!", UIColors.Green);
+        string cubicMessage = Utils.Wrap(_isLassoMode ? "ваш ход!" : "бонусный ход!", UIColors.Green);
         PreparePlayerForMove(cubicMessage);
-
-        // _cellControl.ShowTokensAtCells();
     }
 
     public IEnumerator RaceOverDefer() {

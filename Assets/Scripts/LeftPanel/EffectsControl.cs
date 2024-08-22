@@ -6,7 +6,6 @@ using UnityEngine;
 public class EffectsControl : MonoBehaviour
 {
     public static EffectsControl Instance { get; private set; }
-    private CubicControl _cubicControl;
     private CameraButton _cameraButton;
     private EControllableEffects _selectedEffect = EControllableEffects.None;
     private bool _isSelectionMode;
@@ -24,7 +23,6 @@ public class EffectsControl : MonoBehaviour
 
     private void Awake() {
         Instance = this;
-        _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
         _cameraControl = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
         _cameraButton = GameObject.Find("CameraButton").GetComponent<CameraButton>();
@@ -73,7 +71,7 @@ public class EffectsControl : MonoBehaviour
         _isSelectionMode = true;
         _isReplaceMode = isReplace;
         BoostersControl.Instance.DisableAllButtons();
-        _cubicControl.SetCubicInteractable(false);
+        CubicControl.Instance.SetCubicInteractable(false);
         _cameraControl.FollowOff();
         _cameraControl.MoveCameraToLevelCenter();
         _cameraButton.SetDisabled(true);
@@ -118,7 +116,7 @@ public class EffectsControl : MonoBehaviour
     }
 
     public void DeactivateSelectionModePhase2() {
-        _cubicControl.SetCubicInteractable(true);
+        CubicControl.Instance.SetCubicInteractable(true);
         BoostersControl.Instance.EnableAllButtons();
         RestoreCamera();
     }

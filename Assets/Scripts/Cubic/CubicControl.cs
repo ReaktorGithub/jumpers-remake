@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class CubicControl : MonoBehaviour
 {
+    public static CubicControl Instance { get; private set; }
     private Button _cubicButton;
     private Animator _anim;
     private IEnumerator _coroutine, _coroutinePulse;
@@ -18,6 +19,7 @@ public class CubicControl : MonoBehaviour
     private PopupMagnet _popupMagnet;
 
     private void Awake() {
+        Instance = this;
         _anim = transform.Find("CubicImage").GetComponent<Animator>();
         _cubicButton = transform.Find("CubicButton").GetComponent<Button>();
         _statusText = transform.Find("StatusText").GetComponent<TextMeshProUGUI>();

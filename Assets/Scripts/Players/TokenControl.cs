@@ -7,7 +7,6 @@ using UnityEngine.Splines;
 
 public class TokenControl : MonoBehaviour
 {
-    [SerializeField] private float moveTime = 2f;
     [SerializeField] private float pedestalMoveTime = 4f;
     [SerializeField] private float squeezeTime = 0.8f;
     [SerializeField] private float squeezeMaxValue = 5.2f;
@@ -56,7 +55,7 @@ public class TokenControl : MonoBehaviour
         return _currentCell.GetComponent<CellControl>();
     }
 
-    public void SetToNextCell(Action callback = null) {
+    public void SetToNextCell(float moveTime, Action callback = null) {
         ClearCoroutine();
         if (_currentCell == null) {
             Debug.Log("Current cell not found");
@@ -74,10 +73,10 @@ public class TokenControl : MonoBehaviour
         StartCoroutine(_coroutine);
     }
 
-    public void SetToSpecifiedCell(CellControl nextCellControl, GameObject nextCell, Action callback = null) {
+    public void SetToSpecifiedCell(GameObject nextCell, float moveTime, Action callback = null) {
         ClearCoroutine();
         _currentCell = nextCell;
-        _coroutine = Utils.MoveTo(transform.gameObject, nextCellControl.transform.position, moveTime, callback);
+        _coroutine = Utils.MoveTo(transform.gameObject, nextCell.transform.position, moveTime, callback);
         StartCoroutine(_coroutine);
     }
 

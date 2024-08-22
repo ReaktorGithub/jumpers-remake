@@ -9,7 +9,6 @@ public class PopupMagnet : MonoBehaviour
     private Button _confirmButton;
     private int _selectedScore = 0;
     private List<CubicButton> _cubicButtons = new();
-    private CubicControl _cubicControl;
     private TextMeshProUGUI _headText, _descriptionText;
     private Image _icon;
     private bool _isSuper = false;
@@ -24,7 +23,6 @@ public class PopupMagnet : MonoBehaviour
         foreach (CubicButton button in allButtons) {
             _cubicButtons.Add(button);
         }
-        _cubicControl = GameObject.Find("Cubic").GetComponent<CubicControl>();
         _headText = Utils.FindChildByName(popupMagnet, "HeadText").GetComponent<TextMeshProUGUI>();
         _descriptionText = Utils.FindChildByName(popupMagnet, "Description").GetComponent<TextMeshProUGUI>();
         _icon = Utils.FindChildByName(popupMagnet, "Image").GetComponent<Image>();
@@ -41,7 +39,7 @@ public class PopupMagnet : MonoBehaviour
 
     public void OnOpenWindow() {
         _confirmButton.interactable = false;
-        _cubicControl.SetCubicInteractable(false);
+        CubicControl.Instance.SetCubicInteractable(false);
         _popup.OpenWindow();
     }
 
@@ -50,7 +48,7 @@ public class PopupMagnet : MonoBehaviour
         _popup.CloseWindow(() => {
             BoostersControl.Instance.EnableAllButtons();
             BoostersControl.Instance.TryToEnableAllEffectButtons();
-            _cubicControl.SetCubicInteractable(true);
+            CubicControl.Instance.SetCubicInteractable(true);
         });
     }
 
@@ -126,7 +124,7 @@ public class PopupMagnet : MonoBehaviour
         System.Random random = new();
         int magnetIndex = random.Next(0, scores.Count);
         int magnetScore = scores[magnetIndex];
-        _cubicControl.Throw(magnetScore, true);
+        CubicControl.Instance.Throw(magnetScore, true);
 
         // пересчет ресурсов
 

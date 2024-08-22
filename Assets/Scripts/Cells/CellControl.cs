@@ -10,22 +10,28 @@ public class CellControl : MonoBehaviour
     [SerializeField] private GameObject previousCell;
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
-    private GameObject _container;
-    private SpriteRenderer _spriteRenderer;
-    private float[] cellScale = new float[2];
+    private GameObject _container, _glow;
+    private SpriteRenderer _spriteRenderer, _glowSpriteRenderer;
+    private float[] _cellScale = new float[2];
     private List<string> _currentTokens = new();
-    private bool _isEffectPlacementMode = false;
+    private bool _isEffectPlacementMode, _isLassoMode = false;
     private TextMeshPro _text;
     private bool _isChanging = false;
     private IEnumerator _changingCoroutine;
     private Sprite _oldSprite, _newSprite;
     private Color _oldTextColor, _newTextColor;
+    private IEnumerator _coroutine;
+    private float pulseTime = 1.2f;
+    private float pulseMinAlpha = 0.2f;
 
     private void Awake() {
         _container = transform.Find("container").gameObject;
         _spriteRenderer = _container.transform.Find("cell").gameObject.GetComponent<SpriteRenderer>();
-        cellScale[0] = 1;
-        cellScale[1] = 1.15f;
+        _glow = _container.transform.Find("glow").gameObject;
+        _glowSpriteRenderer = _glow.GetComponent<SpriteRenderer>();
+        _glow.SetActive(false);
+        _cellScale[0] = 1;
+        _cellScale[1] = 1.15f;
         Transform number = _container.transform.Find("number");
         if (number != null) {
             _text = number.GetComponent<TextMeshPro>();
@@ -77,6 +83,10 @@ public class CellControl : MonoBehaviour
 
     public string GetCellText() {
         return _text.text;
+    }
+
+    public bool IsSelectionMode() {
+        return _isEffectPlacementMode || _isLassoMode;
     }
 
     // Перераспределить позиции фишек на клетке
@@ -137,23 +147,6 @@ public class CellControl : MonoBehaviour
         }
     }
 
-    // вывести в дебаг клетки, где есть фишки
-
-    public void ShowTokensAtCells() {
-        GameObject[] allCells = GameObject.FindGameObjectsWithTag("cell");
-        foreach(GameObject obj in allCells) {
-            CellControl cell = obj.GetComponent<CellControl>();
-            if (cell._currentTokens.Count == 0) {
-                continue;
-            }
-            string message = "Tokens at " + cell.name + ": ";
-            foreach(string token in cell._currentTokens) {
-                message = message + token + " ";
-            }
-            Debug.Log(message);
-        }
-    }
-
     // выбор клетки игроком
 
     public void TurnOnEffectPlacementMode() {
@@ -165,35 +158,57 @@ public class CellControl : MonoBehaviour
         _isEffectPlacementMode = false;
     }
 
+    public void TurnOnLassoMode() {
+        _isLassoMode = true;
+        _glow.SetActive(true);
+        if (_coroutine != null) {
+            StopCoroutine(_coroutine);
+        }
+        _coroutine = Utils.StartPulse(_glowSpriteRenderer, pulseTime, pulseMinAlpha);
+        StartCoroutine(_coroutine);
+    }
+
+    public void TurnOffLassoMode() {
+        DownscaleCell();
+        _isLassoMode = false;
+        if (_coroutine != null) {
+            StopCoroutine(_coroutine);
+        }
+        _glow.SetActive(false);
+    }
+
     public void UpscaleCell() {
-        if (!_isEffectPlacementMode) {
+        if (!IsSelectionMode()) {
             return;
         }
-        _spriteRenderer.sortingOrder = 1;
+        _spriteRenderer.sortingOrder = 2;
+        _glowSpriteRenderer.sortingOrder = 3;
         _container.transform.localScale = new Vector3(
-            cellScale[1],
-            cellScale[1],
+            _cellScale[1],
+            _cellScale[1],
             _container.transform.localScale.z
         );
     }
 
     public void DownscaleCell() {
-        if (!_isEffectPlacementMode) {
+        if (!IsSelectionMode()) {
             return;
         }
         _spriteRenderer.sortingOrder = 0;
+        _glowSpriteRenderer.sortingOrder = 1;
         _container.transform.localScale = new Vector3(
-            cellScale[0],
-            cellScale[0],
+            _cellScale[0],
+            _cellScale[0],
             _container.transform.localScale.z
         );
     }
 
     public void OnClick() {
-        if (!_isEffectPlacementMode) {
-            return;
+        if (_isEffectPlacementMode) {
+            EffectsControl.Instance.OnConfirmChangeEffect(this);
+        } else if (_isLassoMode) {
+            BoostersControl.Instance.ExecuteLasso(this);
         }
-        EffectsControl.Instance.OnConfirmChangeEffect(this);
     }
 
     // установка нового эффекта на эту клетку

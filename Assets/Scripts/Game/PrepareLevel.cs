@@ -31,5 +31,6 @@ public class PrepareLevel : MonoBehaviour
         startCellControl.AddToken("token_4");
         PlayersControl.Instance.UpdateTokensCurrentCell(startCell);
         startCellControl.AlignTokens(moveToStartTime);
+        // CellsControl.Instance.ShowTokensAtCells();
     }
 }

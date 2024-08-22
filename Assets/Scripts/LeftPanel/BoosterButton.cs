@@ -49,6 +49,10 @@ public class BoosterButton : MonoBehaviour
                 _booster.sprite = BoostersControl.Instance.MagnetSuperSprite;
                 break;
             }
+            case EBoosters.Lasso: {
+                _booster.sprite = BoostersControl.Instance.LassoSprite;
+                break;
+            }
             default: {
                 _booster.sprite = null;
                 break;

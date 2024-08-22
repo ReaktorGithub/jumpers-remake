@@ -137,12 +137,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveTime: 12
+  lassoTime: 6
   pedestalMoveTime: 4
   squeezeTime: 1.8
   squeezeMaxValue: 5.2
   squeezeMinValue: 4.6
   squeezeDefaultValue: 4.6
   tokenScale: 0.7
+  arrowMovingTime: 1.5
+  _currentCell: {fileID: 0}
 --- !u!210 &9155227978669411130
 SortingGroup:
   m_ObjectHideFlags: 0
