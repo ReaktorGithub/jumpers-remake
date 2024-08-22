@@ -13,6 +13,7 @@ public class PopupMagnet : MonoBehaviour
     private TextMeshProUGUI _headText, _descriptionText;
     private Image _icon;
     private bool _isSuper = false;
+    private ModifiersControl _modifiersControl;
 
     private void Awake() {
         GameObject popupMagnet = GameObject.Find("PopupMagnet");
@@ -27,6 +28,7 @@ public class PopupMagnet : MonoBehaviour
         _headText = Utils.FindChildByName(popupMagnet, "HeadText").GetComponent<TextMeshProUGUI>();
         _descriptionText = Utils.FindChildByName(popupMagnet, "Description").GetComponent<TextMeshProUGUI>();
         _icon = Utils.FindChildByName(popupMagnet, "Image").GetComponent<Image>();
+        _modifiersControl = GameObject.Find("Modifiers").GetComponent<ModifiersControl>();
     }
 
     public int SelectedScore {
@@ -99,6 +101,8 @@ public class PopupMagnet : MonoBehaviour
     public void ThrowCubic() {
         string message = "Ход " + Utils.Wrap(_isSuper ? "супер-магнитом" : "магнитом", UIColors.Blue);
         Messages.Instance.AddMessage(message);
+        _modifiersControl.ShowModifierMagnet(_isSuper);
+
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
         int max = player.CubicMaxScore;
         List<int> scores = new();

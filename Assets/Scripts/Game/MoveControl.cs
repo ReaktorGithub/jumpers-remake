@@ -20,6 +20,7 @@ public class MoveControl : MonoBehaviour
     private ModalLose _modalLose;
     private CameraControl _camera;
     private TopPanel _topPanel;
+    private ModifiersControl _modifiersControl;
 
     private void Awake() {
         Instance = this;
@@ -29,6 +30,7 @@ public class MoveControl : MonoBehaviour
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
+        _modifiersControl = GameObject.Find("Modifiers").GetComponent<ModifiersControl>();
     }
 
     public PlayerControl CurrentPlayer {
@@ -111,8 +113,7 @@ public class MoveControl : MonoBehaviour
                     if (_currentPlayer.MovesSkip == 0) {
                         _movesLeft = 1;
                         string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " ходит";
-                        string cubicMessage = Utils.Wrap("ваш ход!", UIColors.Green);
-                        PreparePlayerForMove(cubicMessage, message);
+                        PreparePlayerForMove(null, message);
                     } else {
                         StartCoroutine(SkipMoveDefer());
                     }
@@ -121,9 +122,11 @@ public class MoveControl : MonoBehaviour
         }
     }
 
-    private void PreparePlayerForMove(string cubicMessage, string messengerMessage = null) {
+    private void PreparePlayerForMove(string cubicMessage = null, string messengerMessage = null) {
         _cubicControl.SetCubicInteractable(true);
-        _cubicControl.WriteStatus(cubicMessage);
+        if (cubicMessage != null) {
+            _cubicControl.WriteStatus(cubicMessage);
+        }
         if (messengerMessage != null) {
             Messages.Instance.AddMessage(messengerMessage);
         }
@@ -230,6 +233,8 @@ public class MoveControl : MonoBehaviour
     }
 
     public void EndMove() {
+        _modifiersControl.HideModifierMagnet();
+
         // проверка на окончание гонки
 
         bool isRaceOver = IsRaceOver();

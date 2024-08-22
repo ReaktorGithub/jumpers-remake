@@ -64,7 +64,6 @@ public class CubicControl : MonoBehaviour
         SetCubicInteractable(false);
         EffectsControl.Instance.DisableAllButtons(true);
         BoostersControl.Instance.DisableAllButtons();
-        _statusText.text = "";
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
         }
@@ -103,6 +102,16 @@ public class CubicControl : MonoBehaviour
             SpriteRenderer sprite = borderSelectSprite;
             sprite.color = new Color(1f, 1f, 1f, 1f);
         }
+
+        string message;
+
+        if (value) {
+            message = Utils.Wrap("ваш ход!", UIColors.Green);
+        } else {
+            message = "";
+        }
+
+        WriteStatus(message);
     }
 
     public void WriteStatus(string text) {
