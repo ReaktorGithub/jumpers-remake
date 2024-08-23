@@ -13,6 +13,9 @@ public class PlayerControl : MonoBehaviour
     private int _placeAfterFinish;
     private bool _isFinished = false;
     private int _movesSkip = 0;
+    [SerializeField] private int _armor = 0;
+    [SerializeField] private bool _isIronArmor = false;
+    [SerializeField] private BoosterButton _selectedShieldButton;
     
     private List<EAttackTypes> _availableAttackTypes = new();
     private ModalWarning _modalWarning;
@@ -40,6 +43,8 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private int boosterMagnet = 0;
     [SerializeField] private int boosterSuperMagnet = 0;
     [SerializeField] private int boosterLasso = 0;
+    [SerializeField] private int boosterShield = 0;
+    [SerializeField] private int boosterShieldIron = 0;
 
     // Кубик
     [SerializeField] private int cubicMaxScore = 6;
@@ -51,6 +56,8 @@ public class PlayerControl : MonoBehaviour
         _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
     }
+
+    // Изменение свойств напрямую
 
     public int MoveOrder {
         get { return moveOrder; }
@@ -171,50 +178,37 @@ public class PlayerControl : MonoBehaviour
         set { boosterLasso = value; }
     }
 
+    public int BoosterShield {
+        get { return boosterShield; }
+        set { boosterShield = value; }
+    }
+
+    public int BoosterShieldIron {
+        get { return boosterShieldIron; }
+        set { boosterShieldIron = value; }
+    }
+
     public int CubicMaxScore {
         get { return cubicMaxScore; }
         set { cubicMaxScore = value; }
     }
 
-    public void SkipMoveIncrease(TokenControl token) {
-        _movesSkip++;
-        token.UpdateSkips(_movesSkip);
+    public int Armor {
+        get { return _armor; }
+        set { _armor = value; }
     }
 
-    public void SkipMoveDecrease(TokenControl token) {
-        _movesSkip--;
-        token.UpdateSkips(_movesSkip);
+    public bool IsIronArmor {
+        get { return _isIronArmor; }
+        set { _isIronArmor = value; }
     }
 
-    public TokenControl GetTokenControl() {
-        return GameObject.Find(tokenName).GetComponent<TokenControl>();
+    public BoosterButton SelectedShieldButton {
+        get { return _selectedShieldButton; }
+        set { _selectedShieldButton = value; }
     }
 
-    public void OpenPowerWarningModal(Action callback = null) {
-        _modalWarning.SetHeadingText("Предупреждение");
-        _modalWarning.SetBodyText("Силы на нуле. Красная или чёрная клетки приведут к поражению!");
-        _modalWarning.SetCallback(callback);
-        _modalWarning.OpenWindow();
-    }
-
-    public void ConfirmLose() {
-        _modalLose.OpenWindow();
-        _isFinished = true;
-        int place = _pedestal.SetPlayerToMinPlace(this);
-        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ВЫЛЕТАЕТ С ТРАССЫ!", UIColors.Red);
-        Messages.Instance.AddMessage(message);
-
-        TokenControl tokenControl = GetTokenControl();
-        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(PlayersControl.Instance.LoseDelay, () => {
-            _pedestal.SetTokenToPedestal(this, place);
-            CellControl cellControl = tokenControl.GetCurrentCellControl();
-            cellControl.RemoveToken(tokenName);
-            StartCoroutine(MoveControl.Instance.EndMoveDefer());
-        });
-        StartCoroutine(coroutine);
-    }
-
-    // изменение ресурсов
+    // Изменение ресурсов с помощью инкремента или декремента
 
     public void AddCoins(int value) {
         coins += value;
@@ -262,6 +256,24 @@ public class PlayerControl : MonoBehaviour
 
     public void AddLasso(int value) {
         boosterLasso += value;
+    }
+
+    public void AddShield(int value) {
+        boosterShield += value;
+    }
+
+    public void AddShieldIron(int value) {
+        boosterShieldIron += value;
+    }
+
+    public void SkipMoveIncrease(TokenControl token) {
+        _movesSkip++;
+        token.UpdateSkips(_movesSkip);
+    }
+
+    public void SkipMoveDecrease(TokenControl token) {
+        _movesSkip--;
+        token.UpdateSkips(_movesSkip);
     }
 
     // атака
@@ -407,7 +419,32 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
-    // разное
+    public void SpendArmor() {
+        if (_armor == 0) {
+            return;
+        }
+
+        TokenControl token = GetTokenControl();
+        _armor--;
+
+        if (_isIronArmor) {
+            if (_armor == 0) {
+                token.UpdateShield(EBoosters.None);
+                AddShieldIron(-1);
+                BoostersControl.Instance.DeactivateArmorButtons();
+            } else {
+                BoostersControl.Instance.UpdatePlayersArmorButtons(this);
+            }
+        } else {
+            if (_armor == 0) {
+                token.UpdateShield(EBoosters.None);
+                AddShield(-1);
+                BoostersControl.Instance.DeactivateArmorButtons();
+            }
+        }
+    }
+
+    // Разное
 
     public bool IsEnoughEffects(EControllableEffects effect) {
         switch(effect) {
@@ -425,5 +462,33 @@ public class PlayerControl : MonoBehaviour
             }
             default: return false;
         }
+    }
+
+    public TokenControl GetTokenControl() {
+        return GameObject.Find(tokenName).GetComponent<TokenControl>();
+    }
+
+    public void OpenPowerWarningModal(Action callback = null) {
+        _modalWarning.SetHeadingText("Предупреждение");
+        _modalWarning.SetBodyText("Силы на нуле. Красная или чёрная клетки приведут к поражению!");
+        _modalWarning.SetCallback(callback);
+        _modalWarning.OpenWindow();
+    }
+
+    public void ConfirmLose() {
+        _modalLose.OpenWindow();
+        _isFinished = true;
+        int place = _pedestal.SetPlayerToMinPlace(this);
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ВЫЛЕТАЕТ С ТРАССЫ!", UIColors.Red);
+        Messages.Instance.AddMessage(message);
+
+        TokenControl tokenControl = GetTokenControl();
+        IEnumerator coroutine = tokenControl.MoveToPedestalDefer(PlayersControl.Instance.LoseDelay, () => {
+            _pedestal.SetTokenToPedestal(this, place);
+            CellControl cellControl = tokenControl.GetCurrentCellControl();
+            cellControl.RemoveToken(tokenName);
+            StartCoroutine(MoveControl.Instance.EndMoveDefer());
+        });
+        StartCoroutine(coroutine);
     }
 }

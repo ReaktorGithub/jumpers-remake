@@ -126,6 +126,7 @@ public class MoveControl : MonoBehaviour
                     PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
                     EffectsControl.Instance.UpdateQuantityText(_currentPlayer);
                     EffectsControl.Instance.UpdateEffectEmptiness(_currentPlayer);
+                    _currentPlayer.SpendArmor();
                     BoostersControl.Instance.UpdateBoostersFromPlayer(_currentPlayer);
                     if (_currentPlayer.MovesSkip == 0) {
                         _movesLeft = 1;

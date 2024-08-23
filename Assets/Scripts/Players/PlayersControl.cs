@@ -89,7 +89,7 @@ public class PlayersControl : MonoBehaviour
     public void BindTokensToPlayers() {
         foreach(PlayerControl player in _players) {
             GameObject token = GameObject.Find(player.TokenName);
-            Sprite sprite = token.transform.Find("TokenImage").GetComponent<SpriteRenderer>().sprite;
+            Sprite sprite = Utils.FindChildByName(token, "TokenImage").GetComponent<SpriteRenderer>().sprite;
             player.TokenImage = sprite;
 
             TokenControl tokenControl = token.GetComponent<TokenControl>();

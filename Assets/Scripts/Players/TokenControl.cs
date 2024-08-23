@@ -12,24 +12,28 @@ public class TokenControl : MonoBehaviour
     [SerializeField] private float squeezeMaxValue = 5.2f;
     [SerializeField] private float squeezeMinValue = 4.6f;
     [SerializeField] private float squeezeDefaultValue = 4.6f;
-    [SerializeField] private float tokenScale = 0.7f;
+    // [SerializeField] private float tokenScale = 0.7f;
     [SerializeField] private float arrowMovingTime = 1.5f;
     private IEnumerator _coroutine, _squeezeCoroutine;
     [SerializeField] private GameObject _currentCell;
-    private GameObject _tokenImage, _playerName, _playerNameBg, _skip1, _skip2, _skip3;
+    private GameObject _tokenImage, _playerName, _playerNameBg, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
     private SortingGroup _sortingGroup;
     private bool _isSqueeze = false;
     private Vector3 _pedestalPosition;
     private SplineAnimate _splineAnimate;
 
     private void Awake() {
-        _tokenImage = transform.Find("TokenImage").gameObject;
+        _squeezable = transform.Find("Squeezable").gameObject;
+        _tokenImage = _squeezable.transform.Find("TokenImage").gameObject;
         _playerName = transform.Find("PlayerName").gameObject;
         _playerNameBg = transform.Find("token-text-bg").gameObject;
-        _skip1 = transform.Find("skip1").gameObject;
-        _skip2 = transform.Find("skip2").gameObject;
-        _skip3 = transform.Find("skip3").gameObject;
+        _skip1 = _squeezable.transform.Find("skip1").gameObject;
+        _skip2 = _squeezable.transform.Find("skip2").gameObject;
+        _skip3 = _squeezable.transform.Find("skip3").gameObject;
+        _armor = _squeezable.transform.Find("armor").gameObject;
+        _armorIron = _squeezable.transform.Find("armor-iron").gameObject;
         UpdateSkips(0);
+        UpdateShield(EBoosters.None);
         _sortingGroup = GetComponent<SortingGroup>();
         _pedestalPosition = GameObject.Find("Pedestal").transform.position;
         _splineAnimate = GetComponent<SplineAnimate>();
@@ -102,11 +106,11 @@ public class TokenControl : MonoBehaviour
         callback?.Invoke();
     }
 
-    public void ResetView() {
-        _playerName.SetActive(true);
-        _playerNameBg.SetActive(true);
-        transform.localScale = new Vector3(tokenScale, tokenScale, tokenScale);
-    }
+    // public void ResetView() {
+    //     _playerName.SetActive(true);
+    //     _playerNameBg.SetActive(true);
+    //     transform.localScale = new Vector3(tokenScale, tokenScale, tokenScale);
+    // }
 
     // Слои
 
@@ -132,29 +136,29 @@ public class TokenControl : MonoBehaviour
         if (_squeezeCoroutine != null) {
             StopCoroutine(_squeezeCoroutine);
             _isSqueeze = false;
-            _tokenImage.transform.localScale = new Vector3(
+            _squeezable.transform.localScale = new Vector3(
                 squeezeDefaultValue,
                 squeezeDefaultValue,
-                _tokenImage.transform.localScale.z);
+                _squeezable.transform.localScale.z);
         }
     }
 
     private IEnumerator Squeeze() {
         bool isIn = true;
         while (true) {
-            while (isIn && _tokenImage.transform.localScale.y > squeezeMinValue) {
-                _tokenImage.transform.localScale = new Vector3(
+            while (isIn && _squeezable.transform.localScale.y > squeezeMinValue) {
+                _squeezable.transform.localScale = new Vector3(
                     squeezeMaxValue,
-                    _tokenImage.transform.localScale.y - (squeezeTime * Time.deltaTime),
-                    _tokenImage.transform.localScale.z);
+                    _squeezable.transform.localScale.y - (squeezeTime * Time.deltaTime),
+                    _squeezable.transform.localScale.z);
                 yield return null;
             }
             isIn = false;
-            while (!isIn && _tokenImage.transform.localScale.y < squeezeMaxValue) {
-                _tokenImage.transform.localScale = new Vector3(
+            while (!isIn && _squeezable.transform.localScale.y < squeezeMaxValue) {
+                _squeezable.transform.localScale = new Vector3(
                     squeezeMaxValue,
-                    _tokenImage.transform.localScale.y + (squeezeTime * Time.deltaTime),
-                    _tokenImage.transform.localScale.z);
+                    _squeezable.transform.localScale.y + (squeezeTime * Time.deltaTime),
+                    _squeezable.transform.localScale.z);
                 yield return null;
             }
             isIn = true;
@@ -173,6 +177,28 @@ public class TokenControl : MonoBehaviour
         _skip1.SetActive(skips == 1);
         _skip2.SetActive(skips == 2);
         _skip3.SetActive(skips > 2);
+    }
+
+    // Броня
+
+    public void UpdateShield(EBoosters booster) {
+        switch(booster) {
+            case EBoosters.Shield: {
+                _armor.SetActive(true);
+                _armorIron.SetActive(false);
+                break;
+            }
+            case EBoosters.ShieldIron: {
+                _armor.SetActive(false);
+                _armorIron.SetActive(true);
+                break;
+            }
+            default: {
+                _armor.SetActive(false);
+                _armorIron.SetActive(false);
+                break;
+            }
+        }
     }
 
     // перемещения по стрелкам
