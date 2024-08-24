@@ -32,6 +32,8 @@ public class BoostersRow : MonoBehaviour
             }
         }
     }
+    
+    // Щиты
 
     // Апдейт происходит из любого состояния (не зависит от предыдущих состояний)
     // selectedButton - сохраненная игроком кнопка, с помощью которой он активировал щит
@@ -47,12 +49,20 @@ public class BoostersRow : MonoBehaviour
         foreach(BoosterButton button in _list) {
             button.SetDisabled(true);
             button.IsArmorMode = true;
-        }
 
-        if (isIron) {
-            selectedButton.ArmorIron = armor;
-        } else {
-            selectedButton.Armor = true;
+            // У кнопки, выбранной игроком, отображается эффект брони
+            // У остальных кнопок этот эффект снимается
+
+            if (button == selectedButton) {
+                if (isIron) {
+                    button.ArmorIron = armor;
+                } else {
+                    button.Armor = true;
+                }
+            } else {
+                button.Armor = false;
+                button.ArmorIron = 0;
+            }
         }
     }
 

@@ -115,28 +115,52 @@ public class MoveControl : MonoBehaviour
         for (int i = 0; i < playerControls.Length; i++) {
             if (playerControls[i].MoveOrder == _currentPlayerIndex) {
                 if (playerControls[i].IsFinished) {
-                    SetNextPlayerIndex();
+                    SetNextPlayerIndex(); // ОСТОРОЖНО! рекурсия
                     break;
                 } else {
+                    // инициация текущего игрока
                     _currentPlayer = playerControls[i];
                     _currentToken = playerControls[i].GetTokenControl();
                     _currentCell = _currentToken.GetCurrentCellControl();
+
+                    // апдейт состояния фишек
                     PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
                     PlayersControl.Instance.UpdateSqueezeAnimation(_currentPlayerIndex);
-                    PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
-                    EffectsControl.Instance.UpdateQuantityText(_currentPlayer);
-                    EffectsControl.Instance.UpdateEffectEmptiness(_currentPlayer);
-                    _currentPlayer.SpendArmor();
-                    BoostersControl.Instance.UpdateBoostersFromPlayer(_currentPlayer);
-                    if (_currentPlayer.MovesSkip == 0) {
-                        _movesLeft = 1;
-                        string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " ходит";
-                        PreparePlayerForMove(null, message);
-                    } else {
-                        StartCoroutine(SkipMoveDefer());
+
+                    // применение сайд-эффектов и продолжение переключения игрока
+                    bool check = ExecuteSideEffects();
+                    if (check) {
+                        ContinueSwitchPlayer();
                     }
                 }
             }
+        }
+    }
+
+    // Активация разных эффектов после смены игрока (трата щитов, взрыв бумки и.т.д)
+    // Если требует прерывания, то возвращает false
+
+    private bool ExecuteSideEffects() {
+        _currentPlayer.SpendArmor();
+        return true;
+    }
+
+    // Вторая часть метода по переключению игроков
+
+    private void ContinueSwitchPlayer() {
+        // апдейт панели управления
+        PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
+        EffectsControl.Instance.UpdateQuantityText(_currentPlayer);
+        EffectsControl.Instance.UpdateEffectEmptiness(_currentPlayer);
+        BoostersControl.Instance.UpdateBoostersFromPlayer(_currentPlayer);
+
+        // проверка текущего игрока на пропуск хода
+        if (_currentPlayer.MovesSkip == 0) {
+            _movesLeft = 1;
+            string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " ходит";
+            PreparePlayerForMove(null, message);
+        } else {
+            StartCoroutine(SkipMoveDefer());
         }
     }
 

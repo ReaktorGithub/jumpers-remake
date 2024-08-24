@@ -306,6 +306,13 @@ public class PlayerControl : MonoBehaviour
     // исполнение эффектов
 
     public void ExecuteBlackEffect(CellControl cellControl, TokenControl tokenControl, int currentPlayerIndex) {
+        if (_armor > 0 && _isIronArmor) {
+            OpenSavedByShieldModal(() => {
+                CellChecker.Instance.CheckCellArrows(cellControl, this, tokenControl);
+            });
+            return;
+        }
+
         AddPower(-1);
         PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("ЧЁРНЫЙ", UIColors.Black) + " эффект! Минус 1 сила";
@@ -313,7 +320,7 @@ public class PlayerControl : MonoBehaviour
 
         if (power == 0) {
             OpenPowerWarningModal(() => {
-                CellChecker.Instance.CheckCellRivals(cellControl, this);
+                CellChecker.Instance.CheckCellArrows(cellControl, this, tokenControl);
             });
             return;
         }
@@ -327,9 +334,18 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void ExecuteRedEffect(int currentPlayerIndex) {
+        if (_armor > 0 && _isIronArmor) {
+            OpenSavedByShieldModal(() => {
+                string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Возврат на чекпойнт";
+                Messages.Instance.AddMessage(message);
+                RedEffectTokenMove();
+            });
+            return;
+        }
+
         AddPower(-1);
         PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
-        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Минус 1 сила";
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Минус 1 сила. Возврат на чекпойнт";
         Messages.Instance.AddMessage(message);
 
         if (power == 0) {
@@ -419,6 +435,8 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
+    // Исполнение щитов
+
     public void SpendArmor() {
         if (_armor == 0) {
             return;
@@ -432,6 +450,8 @@ public class PlayerControl : MonoBehaviour
                 token.UpdateShield(EBoosters.None);
                 AddShieldIron(-1);
                 BoostersControl.Instance.DeactivateArmorButtons();
+                string message = Utils.Wrap("Железный щит ", UIColors.ArmorIron) + Utils.Wrap(PlayerName, UIColors.Yellow) + " пришел в негодность";
+                Messages.Instance.AddMessage(message);
             } else {
                 BoostersControl.Instance.UpdatePlayersArmorButtons(this);
             }
@@ -440,8 +460,19 @@ public class PlayerControl : MonoBehaviour
                 token.UpdateShield(EBoosters.None);
                 AddShield(-1);
                 BoostersControl.Instance.DeactivateArmorButtons();
+                string message = Utils.Wrap("Щит ", UIColors.Armor) + Utils.Wrap(PlayerName, UIColors.Yellow) + " пришел в негодность";
+                Messages.Instance.AddMessage(message);
             }
         }
+    }
+
+    public void HarvestShieldBonus(List<PlayerControl> rivals) {
+        foreach(PlayerControl rival in rivals) {
+            int coinBonus = rival.IsIronArmor ? 250 : 80;
+            AddCoins(-coinBonus);
+            rival.AddCoins(coinBonus);
+        }
+        PlayersControl.Instance.UpdatePlayersInfo(MoveControl.Instance.CurrentPlayerIndex);
     }
 
     // Разное
@@ -471,6 +502,13 @@ public class PlayerControl : MonoBehaviour
     public void OpenPowerWarningModal(Action callback = null) {
         _modalWarning.SetHeadingText("Предупреждение");
         _modalWarning.SetBodyText("Силы на нуле. Красная или чёрная клетки приведут к поражению!");
+        _modalWarning.SetCallback(callback);
+        _modalWarning.OpenWindow();
+    }
+
+    public void OpenSavedByShieldModal(Action callback = null) {
+        _modalWarning.SetHeadingText("Железный щит");
+        _modalWarning.SetBodyText("Благодаря <b>железному щиту</b> вы не теряете силу на этой клетке.");
         _modalWarning.SetCallback(callback);
         _modalWarning.OpenWindow();
     }

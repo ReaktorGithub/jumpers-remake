@@ -9,7 +9,7 @@ public class ModalReplaceEffect : MonoBehaviour
     private GameObject _modal;
     private ModalWindow _windowControl;
     private IEnumerator _coroutine;
-    [SerializeField] private GameObject iconExecute, iconCostEffect, iconResource, lowPower, answerButton;
+    [SerializeField] private GameObject iconExecute, iconCostEffect, iconResource, lowPower, answerButton, shieldInfo;
     [SerializeField] private TextMeshProUGUI descriptionText, effectCostName, resourceCost, resourceCostText, effectName;
     private TextMeshProUGUI _lowPowerText;
     private ReplaceAnswerButton answerButtonScript;
@@ -108,5 +108,9 @@ public class ModalReplaceEffect : MonoBehaviour
         answerButtonScript.Disabled = isNotEnough;
         iconResource.GetComponent<Image>().sprite = resourceManual.Sprite;
         resourceCostText.text = resourceManual.GetEntityName(true);
+
+        // Информация о наличии щита
+        bool isPowerDangerEffect = effect == EControllableEffects.Black || effect == EControllableEffects.Red;
+        shieldInfo.SetActive(isPowerDangerEffect && currentPlayer.Armor > 0 && currentPlayer.IsIronArmor);
     }
 }
