@@ -15,5 +15,7 @@ public class Jumpers : MonoBehaviour
         Instances.transform.Find("magnet").gameObject.SetActive(false);
         Instances.transform.Find("magnet-super").gameObject.SetActive(false);
         Instances.transform.Find("lasso").gameObject.SetActive(false);
+        Instances.transform.Find("shield").gameObject.SetActive(false);
+        Instances.transform.Find("shield-iron").gameObject.SetActive(false);
     }
 }

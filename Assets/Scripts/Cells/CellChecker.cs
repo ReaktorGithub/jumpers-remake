@@ -119,6 +119,7 @@ public class CellChecker : MonoBehaviour
     }
 
     public void CheckCellRivals(CellControl cellControl, PlayerControl currentPlayer) {
+        // на некоторых клетках атаки не проводятся
         if (_skipRivalCheckTypes.Contains(cellControl.CellType)) {
             StartCoroutine(MoveControl.Instance.EndMoveDefer());
             return;
@@ -126,18 +127,34 @@ public class CellChecker : MonoBehaviour
         
         List<string> tokens = cellControl.CurrentTokens;
 
+        // Для проверки на атаку должно быть больше 1 фишки на клетке
+        // Сортировать соперников на тех, что со щитами и без щитов
+        // Применить эффекты щитов
+        // Если еще остались соперники без щитов, то открыть диалоговое окно с атакой
+
         if (tokens.Count > 1) {
             List<PlayerControl> rivals = new();
+            List<PlayerControl> rivalsWithShields = new();
+
             foreach(PlayerControl player in PlayersControl.Instance.Players) {
                 if (tokens.Contains(player.TokenName) && currentPlayer.TokenName != player.TokenName) {
-                    rivals.Add(player);
+                    if (player.Armor > 0) {
+                        rivalsWithShields.Add(player);
+                    } else {
+                        rivals.Add(player);
+                    }
                 }
             }
-            
-            _popupAttack.BuildContent(currentPlayer, rivals);
-            _popupAttack.OnOpenWindow();
 
-            return;
+            if (rivalsWithShields.Count > 0) {
+                currentPlayer.HarvestShieldBonus(rivalsWithShields);
+            }
+
+            if (rivals.Count > 0) {
+                _popupAttack.BuildContent(currentPlayer, rivals);
+                _popupAttack.OnOpenWindow();
+                return;
+            }
         }
 
         // закончить ход, если нет соперников
