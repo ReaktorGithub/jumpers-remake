@@ -382,6 +382,13 @@ public class PlayerControl : MonoBehaviour
         });
     }
 
+    public void ExecuteStarEffect(int currentPlayerIndex) {
+        AddPower(1);
+        PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("звезду", UIColors.Red) + " и получает 1 силу";
+        Messages.Instance.AddMessage(message);
+    }
+
     public void ExecuteFinish() {
         _modalWin.OpenWindow();
         _isFinished = true;

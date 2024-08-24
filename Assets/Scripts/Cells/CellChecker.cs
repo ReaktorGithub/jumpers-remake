@@ -92,6 +92,10 @@ public class CellChecker : MonoBehaviour
             Messages.Instance.AddMessage(message);
         }
 
+        if (cellControl.Effect == EControllableEffects.Star) {
+            currentPlayer.ExecuteStarEffect(currentPlayerIndex);
+        }
+
         if (cellControl.Effect == EControllableEffects.Black) {
             currentPlayer.ExecuteBlackEffect(cellControl, tokenControl, currentPlayerIndex);
             return;
