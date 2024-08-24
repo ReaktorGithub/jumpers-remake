@@ -13,10 +13,10 @@ public class EffectsControl : MonoBehaviour
     private CameraControl _cameraControl;
     private TopPanel _topPanel;
     private List<EffectButton> _effectButtonsList = new();
-    private EffectButton _greenEffectButton, _yellowEffectButton, _redEffectButton, _blackEffectButton;
-    [SerializeField] private GameObject emptyCellSprite, greenCellSprite, yellowCellSprite, blackCellSprite, redCellSprite;
-    [SerializeField] private GameObject greenBrush, yellowBrush, redBrush, blackBrush;
-    private TextMeshProUGUI _greenQuantityText, _yellowQuantityText, _redQuantityText, _blackQuantityText;
+    private EffectButton _greenEffectButton, _yellowEffectButton, _redEffectButton, _blackEffectButton, _starEffectButton;
+    [SerializeField] private GameObject emptyCellSprite, greenCellSprite, yellowCellSprite, blackCellSprite, redCellSprite, starCellSprite;
+    [SerializeField] private GameObject yellowBrush, redBrush, blackBrush;
+    private TextMeshProUGUI _greenQuantityText, _yellowQuantityText, _redQuantityText, _blackQuantityText, _starQuantityText;
     private GameObject _cellsObject;
     [SerializeField] private float replaceTime = 1f;
     private IEnumerator _coroutine;
@@ -30,14 +30,17 @@ public class EffectsControl : MonoBehaviour
         _yellowQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityYellow").GetComponent<TextMeshProUGUI>();
         _redQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityRed").GetComponent<TextMeshProUGUI>();
         _blackQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityBlack").GetComponent<TextMeshProUGUI>();
+        _starQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityStar").GetComponent<TextMeshProUGUI>();
         _greenEffectButton = Utils.FindChildByName(transform.gameObject, "EffectButtonGreen").GetComponent<EffectButton>();
         _yellowEffectButton = Utils.FindChildByName(transform.gameObject, "EffectButtonYellow").GetComponent<EffectButton>();
         _redEffectButton = Utils.FindChildByName(transform.gameObject, "EffectButtonRed").GetComponent<EffectButton>();
         _blackEffectButton = Utils.FindChildByName(transform.gameObject, "EffectButtonBlack").GetComponent<EffectButton>();
+        _starEffectButton = Utils.FindChildByName(transform.gameObject, "EffectButtonStar").GetComponent<EffectButton>();
         _effectButtonsList.Add(_greenEffectButton);
         _effectButtonsList.Add(_yellowEffectButton);
         _effectButtonsList.Add(_redEffectButton);
         _effectButtonsList.Add(_blackEffectButton);
+        _effectButtonsList.Add(_starEffectButton);
         _cellsObject = GameObject.Find("Cells");
     }
 
@@ -47,10 +50,10 @@ public class EffectsControl : MonoBehaviour
         yellowCellSprite.SetActive(false);
         blackCellSprite.SetActive(false);
         redCellSprite.SetActive(false);
-        greenBrush.SetActive(false);
         redBrush.SetActive(false);
         yellowBrush.SetActive(false);
         blackBrush.SetActive(false);
+        starCellSprite.SetActive(false);
     }
 
     public EControllableEffects SelectedEffect {
@@ -198,6 +201,12 @@ public class EffectsControl : MonoBehaviour
                 effectName = "черный";
                 break;
             }
+            case EControllableEffects.Star: {
+                sprite = starCellSprite.GetComponent<SpriteRenderer>().sprite;
+                player.AddEffectStar(-1);
+                effectName = "звезда";
+                break;
+            }
             default: {
                 sprite = emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
                 break;
@@ -221,6 +230,7 @@ public class EffectsControl : MonoBehaviour
         _yellowEffectButton.SetIsEmpty(player.EffectsYellow == 0);
         _redEffectButton.SetIsEmpty(player.EffectsRed == 0);
         _blackEffectButton.SetIsEmpty(player.EffectsBlack == 0);
+        _starEffectButton.SetIsEmpty(player.EffectsStar == 0);
     }
 
     public void UpdateQuantityText(PlayerControl player) {
@@ -228,6 +238,7 @@ public class EffectsControl : MonoBehaviour
         _yellowQuantityText.text = "x " + player.EffectsYellow;
         _redQuantityText.text = "x " + player.EffectsRed;
         _blackQuantityText.text = "x " + player.EffectsBlack;
+        _starQuantityText.text = "x " + player.EffectsStar;
     }
 
     public void DisableAllButtons(bool value) {
@@ -261,12 +272,6 @@ public class EffectsControl : MonoBehaviour
         string effectName = "";
 
         switch(_selectedEffect) {
-            case EControllableEffects.Green: {
-                brushSprite = Instantiate(greenBrush);
-                newCellSprite = greenCellSprite.GetComponent<SpriteRenderer>().sprite;
-                effectName = "зеленый";
-                break;
-            }
             case EControllableEffects.Red: {
                 brushSprite = Instantiate(redBrush);
                 newCellSprite = redCellSprite.GetComponent<SpriteRenderer>().sprite;

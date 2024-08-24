@@ -3,12 +3,7 @@ using UnityEngine;
 public class Manual : MonoBehaviour
 {
     public static Manual Instance { get; private set; }
-    private ManualContent _power;
-    private ManualContent _greenEffect;
-    private ManualContent _yellowEffect;
-    private ManualContent _blackEffect;
-    private ManualContent _redEffect;
-    private ManualContent _coins;
+    private ManualContent _power, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect;
 
     private void Awake() {
         Instance = this;
@@ -18,6 +13,7 @@ public class Manual : MonoBehaviour
         _yellowEffect = transform.Find("YellowEffect").GetComponent<ManualContent>();
         _blackEffect = transform.Find("BlackEffect").GetComponent<ManualContent>();
         _redEffect = transform.Find("RedEffect").GetComponent<ManualContent>();
+        _starEffect = transform.Find("StarEffect").GetComponent<ManualContent>();
     }
 
     public ManualContent Power {
@@ -45,6 +41,11 @@ public class Manual : MonoBehaviour
         private set {}
     }
 
+    public ManualContent StarEffect {
+        get { return _starEffect; }
+        private set {}
+    }
+
     public ManualContent Coins {
         get { return _coins; }
         private set {}
@@ -61,8 +62,11 @@ public class Manual : MonoBehaviour
             case EControllableEffects.Black: {
                 return BlackEffect;
             }
-            default: {
+            case EControllableEffects.Red: {
                 return RedEffect;
+            }
+            default: {
+                return StarEffect;
             }
         }
     }
@@ -77,6 +81,9 @@ public class Manual : MonoBehaviour
             }
             case EControllableEffects.Black: {
                 return BlackEffect.Character;
+            }
+            case EControllableEffects.Star: {
+                return StarEffect.Character;
             }
             default: {
                 return RedEffect.Character;
