@@ -180,6 +180,11 @@ public class PopupAttack : MonoBehaviour
         }
     }
 
+    private void SetButtonAttackInteractable(bool value) {
+        _buttonAttack.interactable = value;
+        _buttonAttack.GetComponent<CursorManager>().Disabled = !value;
+    }
+
     public void SetButtonsInteractable(bool value) {
         if (!value) {
             foreach(AttackTypeButton button in _attackTypeButtons) {
@@ -189,7 +194,7 @@ public class PopupAttack : MonoBehaviour
         foreach(TokenAttackButton tokenButton in _tokenAttackButtons) {
             tokenButton.GetComponent<Button>().interactable = value;
         }
-        _buttonAttack.interactable = value;
+        SetButtonAttackInteractable(value);
         _buttonCancel.interactable = value;
     }
 
@@ -221,13 +226,13 @@ public class PopupAttack : MonoBehaviour
 
     private void UpdateAttackButtonStatus() {
         if (_selectedPlayer == null) {
-            _buttonAttack.interactable = false;
+            SetButtonAttackInteractable(false);
             _warningText.text = "Выберите соперника";
         } else if (_powerInitial - _powerNeed < 0) {
-            _buttonAttack.interactable = false;
+            SetButtonAttackInteractable(false);
             _warningText.text = "Мало сил";
         } else {
-            _buttonAttack.interactable = true;
+            SetButtonAttackInteractable(true);
             _warningText.text = "";
         }
     }

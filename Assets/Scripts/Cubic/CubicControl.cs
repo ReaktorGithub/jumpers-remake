@@ -7,6 +7,7 @@ public class CubicControl : MonoBehaviour
 {
     public static CubicControl Instance { get; private set; }
     private Button _cubicButton;
+    private CursorManager _cursorManager;
     private Animator _anim;
     private IEnumerator _coroutine, _coroutinePulse;
     private TextMeshProUGUI _statusText;
@@ -27,6 +28,7 @@ public class CubicControl : MonoBehaviour
         _border = transform.Find("cubic_border").gameObject;
         _borderSelect = transform.Find("cubic_border_select").gameObject;
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
+        _cursorManager = _cubicButton.GetComponent<CursorManager>();
     }
 
     private void Start() {
@@ -93,6 +95,7 @@ public class CubicControl : MonoBehaviour
 
     public void SetCubicInteractable(bool value) {
         _cubicButton.interactable = value;
+        _cursorManager.Disabled = !value;
         _border.SetActive(!value);
         _borderSelect.SetActive(value);
         SpriteRenderer borderSelectSprite = _borderSelect.GetComponent<SpriteRenderer>();
@@ -114,6 +117,8 @@ public class CubicControl : MonoBehaviour
         }
 
         WriteStatus(message);
+
+
     }
 
     public void WriteStatus(string text) {
