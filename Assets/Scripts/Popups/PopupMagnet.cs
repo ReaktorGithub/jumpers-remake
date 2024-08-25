@@ -13,6 +13,7 @@ public class PopupMagnet : MonoBehaviour
     private Image _icon;
     private bool _isSuper = false;
     private ModifiersControl _modifiersControl;
+    private GameObject _playerCell;
 
     private void Awake() {
         GameObject popupMagnet = GameObject.Find("PopupMagnet");
@@ -50,6 +51,8 @@ public class PopupMagnet : MonoBehaviour
 
     public void OnCloseWindow() {
         SetConfirmButtonInteractable(false);
+        _selectedScore = 0;
+        UpdateCellHint();
         _popup.CloseWindow(() => {
             BoostersControl.Instance.EnableAllButtons();
             BoostersControl.Instance.TryToEnableAllEffectButtons();
@@ -63,7 +66,7 @@ public class PopupMagnet : MonoBehaviour
         _popup.CloseWindow();
     }
 
-    public void BuildContent(PlayerControl player, bool isSuper) {
+    public void BuildContent(PlayerControl player, CellControl playerCell, bool isSuper) {
         _isSuper = isSuper;
         _headText.text = isSuper ? "Ход супер-магнитом" : "Ход магнитом";
         _descriptionText.text = isSuper ? "Выберите желаемое число очков на кубике. Вероятность выпадения этого числа будет увеличена <b>в 3 раза.</b>" : "Выберите желаемое число очков на кубике. Вероятность выпадения этого числа будет увеличена <b>в 2 раза.</b>";
@@ -73,11 +76,28 @@ public class PopupMagnet : MonoBehaviour
             button.gameObject.SetActive(player.CubicMaxScore >= button.Score);
         }
         _selectedScore = 0;
+        _playerCell = playerCell.gameObject;
     }
 
     public void UpdateButonsSelection() {
         foreach (CubicButton button in _cubicButtons) {
             button.SetSelected(button.Score == _selectedScore);
+        }
+    }
+
+    public void UpdateCellHint() {
+        List<GameObject> cellObjects = CellsControl.Instance.FindTargetCells(_playerCell, true, _selectedScore);
+        List<CellControl> cellControls = new();
+        foreach(GameObject cell in cellObjects) {
+            cellControls.Add(cell.GetComponent<CellControl>());
+        }
+
+        foreach(CellControl cell in CellsControl.Instance.AllCellsControls) {
+            if (cellControls.Contains(cell)) {
+                cell.UpscaleCell(true);
+            } else {
+                cell.DownscaleCell(true);
+            }
         }
     }
 

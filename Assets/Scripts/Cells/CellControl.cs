@@ -197,8 +197,10 @@ public class CellControl : MonoBehaviour
         _glow.SetActive(false);
     }
 
-    public void UpscaleCell() {
-        if (!IsSelectionMode()) {
+    // Флаг force принудительно меняет размер клетки, даже если мы не находимся в режиме выбора
+
+    public void UpscaleCell(bool force = false) {
+        if (!force && !IsSelectionMode()) {
             return;
         }
         _spriteRenderer.sortingOrder = 2;
@@ -210,8 +212,8 @@ public class CellControl : MonoBehaviour
         );
     }
 
-    public void DownscaleCell() {
-        if (!IsSelectionMode()) {
+    public void DownscaleCell(bool force = false) {
+        if (!force && !IsSelectionMode()) {
             return;
         }
         _spriteRenderer.sortingOrder = 0;
