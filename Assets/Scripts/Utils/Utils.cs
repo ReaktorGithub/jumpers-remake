@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public static class Utils 
 {
@@ -52,5 +54,21 @@ public static class Utils
         }
         objectToMove.transform.localPosition = position;
         callback?.Invoke();
+    }
+
+    // Вернет true, если курсор находится в области GameObject
+
+    public static bool RaycastPointer(GameObject objectToCompare) {
+        PointerEventData eventData = new(EventSystem.current) {
+            position = Input.mousePosition
+        };
+        List<RaycastResult> raysastResults = new();
+        EventSystem.current.RaycastAll(eventData, raysastResults);
+        for (int i = 0; i < raysastResults.Count; i++) {
+            if (raysastResults[i].gameObject == objectToCompare) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -12,6 +12,8 @@ public class BoosterButton : MonoBehaviour
     private bool _isArmorMode = false;
     private bool _armor = false;
     private int _armorIron = 0;
+    private CursorManager _cursorManager;
+    
 
     private void Awake() {
         _button = GetComponent<Button>();
@@ -19,6 +21,7 @@ public class BoosterButton : MonoBehaviour
         _selected = transform.Find("booster-selected").gameObject;
         _armorOverlay = transform.Find("armor").gameObject;
         _armorOverlayImage = _armorOverlay.GetComponent<Image>();
+        _cursorManager = GetComponent<CursorManager>();
     }
 
     public EBoosters BoosterType {
@@ -130,5 +133,6 @@ public class BoosterButton : MonoBehaviour
         _button.interactable = !value;
         Color color = new(1f, 1f, 1f, value ? 0.3f : 1f);
         _booster.color = color;
+        _cursorManager.Disabled = value;
     }
 }

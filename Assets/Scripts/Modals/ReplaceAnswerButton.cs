@@ -6,10 +6,12 @@ public class ReplaceAnswerButton : MonoBehaviour
     private bool _disabled = false;
     [SerializeField] private bool isReplaceAction;
     private ModalReplaceEffect _modalControl;
+    private CursorManager _cursorManager;
 
     private void Awake() {
         _hover = transform.Find("Hover").gameObject;
         _modalControl = GameObject.Find("GameScripts").GetComponent<ModalReplaceEffect>();
+        _cursorManager = GetComponent<CursorManager>();
     }
 
     private void Start() {
@@ -43,6 +45,7 @@ public class ReplaceAnswerButton : MonoBehaviour
         set { 
             _disabled = value;
             _hover.SetActive(!value);
+            _cursorManager.Disabled = value;
         }
     }
 }

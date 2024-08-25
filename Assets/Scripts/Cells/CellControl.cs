@@ -23,6 +23,7 @@ public class CellControl : MonoBehaviour
     private IEnumerator _coroutine;
     private float pulseTime = 1.2f;
     private float pulseMinAlpha = 0.2f;
+    private CursorManager _cursorManager;
 
     private void Awake() {
         _container = transform.Find("container").gameObject;
@@ -35,6 +36,20 @@ public class CellControl : MonoBehaviour
         Transform number = _container.transform.Find("number");
         if (number != null) {
             _text = number.GetComponent<TextMeshPro>();
+        }
+        Transform button = transform.Find("button");
+        if (button != null) {
+            _cursorManager = button.GetComponent<CursorManager>();
+        }
+    }
+
+    private void Start() {
+        SetCursorDisabled(true);
+    }
+
+    private void SetCursorDisabled(bool value) {
+        if (_cursorManager != null) {
+            _cursorManager.Disabled = value;
         }
     }
 
@@ -150,16 +165,20 @@ public class CellControl : MonoBehaviour
     // выбор клетки игроком
 
     public void TurnOnEffectPlacementMode() {
-        _isEffectPlacementMode = cellType == ECellTypes.None && effect == EControllableEffects.None && IsNoTokens();
+        bool newValue = cellType == ECellTypes.None && effect == EControllableEffects.None && IsNoTokens();
+        _isEffectPlacementMode = newValue;
+        SetCursorDisabled(!newValue);
     }
 
     public void TurnOffEffectPlacementMode() {
         DownscaleCell();
         _isEffectPlacementMode = false;
+        SetCursorDisabled(true);
     }
 
     public void TurnOnLassoMode() {
         _isLassoMode = true;
+        SetCursorDisabled(false);
         _glow.SetActive(true);
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
@@ -171,6 +190,7 @@ public class CellControl : MonoBehaviour
     public void TurnOffLassoMode() {
         DownscaleCell();
         _isLassoMode = false;
+        SetCursorDisabled(true);
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
         }

@@ -33,18 +33,23 @@ public class PopupMagnet : MonoBehaviour
         get { return _selectedScore; }
         set {
             _selectedScore = value;
-            _confirmButton.interactable = value > 0;
+            SetConfirmButtonInteractable(value > 0);
         }
     }
 
+    private void SetConfirmButtonInteractable(bool value) {
+        _confirmButton.interactable = value;
+        _confirmButton.GetComponent<CursorManager>().Disabled = !value;
+    }
+
     public void OnOpenWindow() {
-        _confirmButton.interactable = false;
+        SetConfirmButtonInteractable(false);
         CubicControl.Instance.SetCubicInteractable(false);
         _popup.OpenWindow();
     }
 
     public void OnCloseWindow() {
-        _confirmButton.interactable = false;
+        SetConfirmButtonInteractable(false);
         _popup.CloseWindow(() => {
             BoostersControl.Instance.EnableAllButtons();
             BoostersControl.Instance.TryToEnableAllEffectButtons();
@@ -53,7 +58,7 @@ public class PopupMagnet : MonoBehaviour
     }
 
     public void OnConfirm() {
-        _confirmButton.interactable = false;
+        SetConfirmButtonInteractable(false);
         BoostersControl.Instance.UnselectAllButtons();
         _popup.CloseWindow();
     }

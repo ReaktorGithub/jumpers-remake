@@ -13,6 +13,7 @@ public class ModalReplaceEffect : MonoBehaviour
     [SerializeField] private TextMeshProUGUI descriptionText, effectCostName, resourceCost, resourceCostText, effectName;
     private TextMeshProUGUI _lowPowerText;
     private ReplaceAnswerButton answerButtonScript;
+    private CursorManager answerButtonCursorManager;
 
     private void Awake() {
         _modal = GameObject.Find("ModalReplaceEffect");

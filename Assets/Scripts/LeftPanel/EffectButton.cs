@@ -11,6 +11,7 @@ public class EffectButton : MonoBehaviour
     private bool _isEmpty = false;
     [SerializeField] GameObject _quantityTextObject;
     private TextMeshProUGUI _quantityText;
+    private CursorManager _cursorManager;
     [SerializeField] private EControllableEffects effectType;
 
     private void Awake() {
@@ -19,6 +20,7 @@ public class EffectButton : MonoBehaviour
         _button = GetComponent<Button>();
         _effectRenderer = _effect.GetComponent<SpriteRenderer>();
         _quantityText = _quantityTextObject.GetComponent<TextMeshProUGUI>();
+        _cursorManager = GetComponent<CursorManager>();
     }
 
     public EControllableEffects EffectType {
@@ -52,5 +54,6 @@ public class EffectButton : MonoBehaviour
         Color color = new(1f, 1f, 1f, value ? 0.2f : 1f);
         _effectRenderer.color = color;
         _quantityText.color = color;
+        _cursorManager.Disabled = value;
     }
 }
