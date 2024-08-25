@@ -148,12 +148,12 @@ public class BoostersControl : MonoBehaviour
     public void ActivateBooster(EBoosters booster) {
         switch(booster) {
             case EBoosters.Magnet: {
-                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, false);
+                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, MoveControl.Instance.CurrentCell, false);
                 _popupMagnet.OnOpenWindow();
                 break;
             }
             case EBoosters.MagnetSuper: {
-                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, true);
+                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, MoveControl.Instance.CurrentCell, true);
                 _popupMagnet.OnOpenWindow();
                 break;
             }
@@ -161,7 +161,7 @@ public class BoostersControl : MonoBehaviour
                 CubicControl.Instance.SetCubicInteractable(false);
                 _topPanel.SetText("Подвиньте свою фишку в пределах 3 шагов"); // todo зависит от уровня лассо
                 _topPanel.OpenWindow();
-                List<GameObject> collected = CellsControl.Instance.GetNearCellsDeepTwoSide(MoveControl.Instance.CurrentCell, 3);
+                List<GameObject> collected = CellsControl.Instance.FindNearCellsDeepTwoSide(MoveControl.Instance.CurrentCell, 3);
                 foreach(GameObject cell in collected) {
                     cell.GetComponent<CellControl>().TurnOnLassoMode();
                 }

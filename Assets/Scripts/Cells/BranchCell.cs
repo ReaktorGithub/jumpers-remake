@@ -1,9 +1,15 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(CellControl))]
 public class BranchCell : MonoBehaviour
 {
     [SerializeField] private GameObject branchObject;
+    private BranchControl _branchControl;
+
+    private void Awake() {
+        _branchControl = branchObject.GetComponent<BranchControl>();
+    }
 
     public GameObject BranchObject {
         get { return branchObject; }
@@ -11,6 +17,10 @@ public class BranchCell : MonoBehaviour
     }
 
     public bool IsReverse() {
-        return branchObject.GetComponent<BranchControl>().IsReverse;
+        return _branchControl.IsReverse;
+    }
+
+    public List<GameObject> GetAllNextCells() {
+        return _branchControl.GetAllNextCells();
     }
 }

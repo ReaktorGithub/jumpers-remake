@@ -130,8 +130,7 @@ public class CellsControl : MonoBehaviour
                 string checkResult = isBranchList[list.IndexOf(cell)];
                 if (checkResult == "reverse") {
                     BranchCell branchCell = cell.GetComponent<BranchCell>();
-                    BranchControl branchControl = branchCell.BranchObject.GetComponent<BranchControl>();
-                    List<GameObject> cellsForCheck = branchControl.GetAllNextCells();
+                    List<GameObject> cellsForCheck = branchCell.GetAllNextCells();
                     foreach(GameObject obj in cellsForCheck) {
                         newList.Add(obj);
                     }
@@ -156,10 +155,10 @@ public class CellsControl : MonoBehaviour
         }
     }
 
+    // Находит ближайших чекпойнт или старт (нужно для красной клетки)
+
     public GameObject FindNearestCheckpoint(GameObject startCell) {
-        List<GameObject> list = new() {
-            startCell
-        };
+        List<GameObject> list = new() { startCell };
         
         return FindNearestCheckpointRecursive(list);
     }
@@ -176,7 +175,7 @@ public class CellsControl : MonoBehaviour
         Текущая клетка не кладется в результирующий список!
     */
 
-    public List<GameObject> GetNearCells(CellControl currentCell, bool isForward) {
+    public List<GameObject> FindNearCells(CellControl currentCell, bool isForward) {
         List<GameObject> result = new();
         bool isBranch = currentCell.TryGetComponent(out BranchCell branchCell);
 
@@ -188,8 +187,7 @@ public class CellsControl : MonoBehaviour
                         result.Add(newCell);
                     }
                 } else {
-                    BranchControl branchControl = branchCell.BranchObject.GetComponent<BranchControl>();
-                    List<GameObject> newCells = branchControl.GetAllNextCells();
+                    List<GameObject> newCells = branchCell.GetAllNextCells();
                     foreach(GameObject obj in newCells) {
                         result.Add(obj);
                     }
@@ -203,8 +201,7 @@ public class CellsControl : MonoBehaviour
         } else {
             if (isBranch) {
                 if (branchCell.IsReverse()) {
-                    BranchControl branchControl = branchCell.BranchObject.GetComponent<BranchControl>();
-                    List<GameObject> newCells = branchControl.GetAllNextCells();
+                    List<GameObject> newCells = branchCell.GetAllNextCells();
                     foreach(GameObject obj in newCells) {
                         result.Add(obj);
                     }
@@ -225,20 +222,18 @@ public class CellsControl : MonoBehaviour
         return result;
     }
 
-    // Делает тоже самое, что GetNearCells, но на несколько шагов
+    // Делает тоже самое, что FindNearCells, но на несколько шагов
 
-    public List<GameObject> GetNearCellsDeep(CellControl currentCell, bool isForward, int howDeep) {
+    public List<GameObject> FindNearCellsDeep(CellControl currentCell, bool isForward, int howDeep) {
         List<GameObject> result = new();
 
-        List<GameObject> resultCurrentStep = new() {
-            currentCell.gameObject
-        };
+        List<GameObject> resultCurrentStep = new() { currentCell.gameObject };
 
         for (int i = 0; i < howDeep; i++) {
             List<GameObject> temp = new();
             foreach(GameObject tempCell in resultCurrentStep) {
                 CellControl tempControl = tempCell.GetComponent<CellControl>();
-                List<GameObject> tempResult = GetNearCells(tempControl, isForward);
+                List<GameObject> tempResult = FindNearCells(tempControl, isForward);
                 foreach(GameObject obj in tempResult) {
                     temp.Add(obj);
                 }
@@ -259,13 +254,13 @@ public class CellsControl : MonoBehaviour
         return result;
     }
 
-    // Делает тоже самое, что GetNearCellsDeep, но в обе стороны
+    // Делает тоже самое, что FindNearCellsDeep, но в обе стороны
 
-    public List<GameObject> GetNearCellsDeepTwoSide(CellControl currentCell, int howDeep) {
+    public List<GameObject> FindNearCellsDeepTwoSide(CellControl currentCell, int howDeep) {
         List<GameObject> result = new();
 
-        List<GameObject> forwardResult = GetNearCellsDeep(currentCell, true, howDeep);
-        List<GameObject> backwardResult = GetNearCellsDeep(currentCell, false, howDeep);
+        List<GameObject> forwardResult = FindNearCellsDeep(currentCell, true, howDeep);
+        List<GameObject> backwardResult = FindNearCellsDeep(currentCell, false, howDeep);
 
         foreach(GameObject obj in forwardResult) {
             result.Add(obj);
@@ -273,6 +268,78 @@ public class CellsControl : MonoBehaviour
         
         foreach(GameObject obj in backwardResult) {
             result.Add(obj);
+        }
+
+        return result;
+    }
+
+    /*
+        На каждом шагу:
+        - Сделать проверку на бранч текущей клетки
+        - Если это бранч, то достать все следующие клетки, учитывая направление
+        - Добавить все эти клетки в список для анализа
+        - Если это не бранч, то попробовать перейти к следующей клетке, учитывая направление
+        - Если клетка не существует, то добавить текущую клетку в результат
+        - Если клетка существует, добавить ее в список для дальнейшего анализа
+        - Если это последний шаг, то добавить клетки из списка для аналазиа в результат и выдать результат
+        - Если шаг не последний, то на следующем шагу продолжить обрабатывать клетки их списка для анализа
+    */
+
+    // Возвращает коллекцию клеток, на которые игрок может приземлиться, сделав N шагов вперед или назад
+
+    public List<GameObject> FindTargetCells(GameObject startCell, bool isForward, int steps) {
+        List<GameObject> result = new();
+
+        if (steps < 1) {
+            return result;
+        }
+        
+        List<GameObject> forAnalyseList = new() { startCell };
+        List<GameObject> tempList = new();
+
+        for (int i = 0; i < steps; i++) {
+            foreach(GameObject cell in forAnalyseList) {
+                bool isBranch = cell.TryGetComponent(out BranchCell branchCell);
+                bool needAnalyse = true;
+                
+                if (isBranch) {
+                    if (branchCell.IsReverse() && !isForward || !branchCell.IsReverse() && isForward) {
+                        List<GameObject> cellsForCheck = branchCell.GetAllNextCells();
+                        foreach(GameObject obj in cellsForCheck) {
+                            tempList.Add(obj);
+                        }
+                        needAnalyse = false;
+                    }
+                }
+
+                if (needAnalyse) {
+                    GameObject nextCell;
+                    if (isForward) {
+                        nextCell = cell.GetComponent<CellControl>().NextCell;
+                    } else {
+                        nextCell = cell.GetComponent<CellControl>().PreviousCell;
+                    }
+                    if (nextCell == null) {
+                        result.Add(cell);
+                    } else {
+                        tempList.Add(nextCell);
+                    }
+                }
+            }
+
+            bool isLastStep = i == steps - 1;
+
+            if (isLastStep) {
+                foreach(GameObject obj in tempList) {
+                    result.Add(obj);
+                }
+            } else {
+                forAnalyseList.Clear();
+                foreach(GameObject obj in tempList) {
+                    forAnalyseList.Add(obj);
+                }
+                tempList.Clear();
+            }
         }
 
         return result;
