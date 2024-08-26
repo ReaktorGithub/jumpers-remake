@@ -113,7 +113,7 @@ public class CellChecker : MonoBehaviour
 
     public void CheckCellArrows(CellControl cellControl, PlayerControl currentPlayer, TokenControl tokenControl) {
         if (cellControl.transform.TryGetComponent(out ArrowCell arrowCell)) {
-            tokenControl.PutTokenToArrowSpline(arrowCell.ArrowSpline);
+            tokenControl.ExecuteArrowMove(arrowCell.ArrowSpline);
             string message = Utils.Wrap(currentPlayer.PlayerName, UIColors.Yellow) + " перемещается по стрелке";
             Messages.Instance.AddMessage(message);
             return;

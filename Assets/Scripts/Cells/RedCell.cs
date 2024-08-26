@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(CellControl))]
@@ -6,11 +7,12 @@ public class RedCell : MonoBehaviour
     [SerializeField] private GameObject _penaltyCell;
 
     private void Start() {
-        _penaltyCell = CellsControl.Instance.FindNearestCheckpoint(transform.gameObject);
+        List<ECellTypes> findCells = new() { ECellTypes.Start, ECellTypes.Checkpoint };
+        _penaltyCell = CellsControl.Instance.FindNearestCell(transform.gameObject, false, findCells);
     }
 
     public GameObject PenaltyCell {
         get { return _penaltyCell; }
-        set {}
+        set { _penaltyCell = value; }
     }
 }

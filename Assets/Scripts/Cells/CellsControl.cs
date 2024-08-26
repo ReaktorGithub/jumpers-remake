@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class CellsControl : MonoBehaviour
@@ -56,111 +55,66 @@ public class CellsControl : MonoBehaviour
         }
     }
 
-    public void PlaceEffect(GameObject cell, EControllableEffects effect) {
-        
-    }
+    // Находит ближайшую клетку по условию
+    // startCell - начальная клетка
+    // isForward - искать впереди
+    // cellTypesToFind - список типов клеток, которые мы ищем
 
-    // Синхронно сравнивает клетки по признаку: чекпойнт / старт или нет
+    public GameObject FindNearestCell(GameObject startCell, bool isForward, List<ECellTypes> cellTypesToFind) {
+        GameObject result = null;
+        List<GameObject> forAnalyseList = new() { startCell };
+        List<GameObject> tempList = new();
 
-    private List<bool> IsCheckpointCells(List<GameObject> cells) {
-        List<bool> result = new();
-        foreach(GameObject cell in cells) {
-            if (cell == null) {
-                result.Add(false);
-            } else {
-               CellControl control = cell.GetComponent<CellControl>();
-                if (control.CellType == ECellTypes.Checkpoint || control.CellType == ECellTypes.Start) {
-                    result.Add(true);
-                } else {
-                    result.Add(false);
-                } 
-            }
-        }
-        return result;
-    }
-
-    // Синхронно сравнивает клетки по признакам: бранч обычный / реверс / не бранч
-
-    private List<string> IsBranchReverseCells(List<GameObject> cells) {
-        List<string> result = new();
-        foreach(GameObject cell in cells) {
-            if (cell == null) {
-                result.Add("empty");
-            } else {
-                if (cell.TryGetComponent(out BranchCell branchCell)) {
-                    if (branchCell.IsReverse()) {
-                        result.Add("reverse");
-                    } else {
-                        result.Add("normal");
-                    }
-                } else {
-                    result.Add("empty");
-                }
-            }
-        }
-        return result;
-    }
-
-    /*
-        1 получить список клеток для проверок
-        2 проверить, являются ли клетки чекпойнтом или бранчем
-        3 запустить цикл проверок
-        4 если найден хотя бы 1 чекпойнт, то прервать весь цикл и вернуть клетку
-        5 если клетка - это реверс бранч, то собрать все заключенные в него клетки и добавить их в новый список
-        6 если клетка - это обычный бранч, то оставить в новом списке предыдущую клетку (весь остальной список очистить и прервать цикл проверок)
-        7 если клетка не бранч, то добавить в список предыдущую клетку
-        8 анализ нового списка: если в нем что-то есть, то рекурсивно запустить новую проверку (начать с шага 1)
-        9 если список пуст, то вернуть null
-    */
-
-    private GameObject FindNearestCheckpointRecursive(List<GameObject> list) {
-        List<bool> isFoundList = IsCheckpointCells(list);
-        List<string> isBranchList = IsBranchReverseCells(list);
-
-        List<GameObject> newList = new();
         bool stop = false;
 
-        foreach(GameObject cell in list) {
-            if (stop) {
-                break;
-            }
-            if (isFoundList[list.IndexOf(cell)]) {
-                return cell;
-            } else {
-                string checkResult = isBranchList[list.IndexOf(cell)];
-                if (checkResult == "reverse") {
-                    BranchCell branchCell = cell.GetComponent<BranchCell>();
-                    List<GameObject> cellsForCheck = branchCell.GetAllNextCells();
-                    foreach(GameObject obj in cellsForCheck) {
-                        newList.Add(obj);
-                    }
-                } else if (checkResult == "normal") {
-                    GameObject prevCell = cell.GetComponent<CellControl>().PreviousCell;
-                    newList.Clear();
-                    newList.Add(prevCell);
+        do {
+            for (int i = 0; i < forAnalyseList.Count; i++) {
+                GameObject cell = forAnalyseList[i];
+                CellControl cellControl = cell.GetComponent<CellControl>();
+
+                if (cellTypesToFind.Contains(cellControl.CellType)) {
                     stop = true;
-                } else {
-                    GameObject prevCell = cell.GetComponent<CellControl>().PreviousCell;
-                    if (prevCell != null) {
-                        newList.Add(prevCell);
+                    result = cell;
+                    break;
+                }
+
+                bool isBranch = cell.TryGetComponent(out BranchCell branchCell);
+                bool needAnalyse = true;
+                
+                if (isBranch) {
+                    if (branchCell.IsReverse() && !isForward || !branchCell.IsReverse() && isForward) {
+                        List<GameObject> cellsForCheck = branchCell.GetAllNextCells();
+                        foreach(GameObject obj in cellsForCheck) {
+                            tempList.Add(obj);
+                        }
+                        needAnalyse = false;
+                    }
+                }
+
+                if (needAnalyse) {
+                    GameObject nextCell;
+                    if (isForward) {
+                        nextCell = cell.GetComponent<CellControl>().NextCell;
+                    } else {
+                        nextCell = cell.GetComponent<CellControl>().PreviousCell;
+                    }
+                    if (nextCell == null) {
+                        stop = true;
+                        Debug.Log("Target cell by type not found");
+                    } else {
+                        tempList.Add(nextCell);
                     }
                 }
             }
-        }
 
-        if (newList.Any()) {
-            return FindNearestCheckpointRecursive(newList);
-        } else {
-            return null;
-        }
-    }
+            forAnalyseList.Clear();
+            foreach(GameObject obj in tempList) {
+                forAnalyseList.Add(obj);
+            }
+            tempList.Clear();
+        } while (!stop);
 
-    // Находит ближайших чекпойнт или старт (нужно для красной клетки)
-
-    public GameObject FindNearestCheckpoint(GameObject startCell) {
-        List<GameObject> list = new() { startCell };
-        
-        return FindNearestCheckpointRecursive(list);
+        return result;
     }
 
     /*
@@ -222,7 +176,8 @@ public class CellsControl : MonoBehaviour
         return result;
     }
 
-    // Делает тоже самое, что FindNearCells, но на несколько шагов
+    // Метод возвращает коллекцию из ближайших клеток, делая отсчет с текущей
+    // Может заглядывать глубже, чем на 1 клетку вперед
 
     public List<GameObject> FindNearCellsDeep(CellControl currentCell, bool isForward, int howDeep) {
         List<GameObject> result = new();
@@ -254,7 +209,9 @@ public class CellsControl : MonoBehaviour
         return result;
     }
 
-    // Делает тоже самое, что FindNearCellsDeep, но в обе стороны
+    // Метод возвращает коллекцию из ближайших клеток, делая отсчет с текущей
+    // Может заглядывать глубже, чем на 1 клетку вперед
+    // Работает сразу в обе стороны
 
     public List<GameObject> FindNearCellsDeepTwoSide(CellControl currentCell, int howDeep) {
         List<GameObject> result = new();

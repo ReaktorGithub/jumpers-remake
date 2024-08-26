@@ -12,11 +12,10 @@ public class TokenControl : MonoBehaviour
     [SerializeField] private float squeezeMaxValue = 5.2f;
     [SerializeField] private float squeezeMinValue = 4.6f;
     [SerializeField] private float squeezeDefaultValue = 4.6f;
-    // [SerializeField] private float tokenScale = 0.7f;
     [SerializeField] private float arrowMovingTime = 1.5f;
     private IEnumerator _coroutine, _squeezeCoroutine;
-    [SerializeField] private GameObject _currentCell;
-    private GameObject _tokenImage, _playerName, _playerNameBg, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
+    [SerializeField] private GameObject _currentCell, _playerName, _indicators;
+    private GameObject _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
     private SortingGroup _sortingGroup;
     private bool _isSqueeze = false;
     private Vector3 _pedestalPosition;
@@ -25,8 +24,6 @@ public class TokenControl : MonoBehaviour
     private void Awake() {
         _squeezable = transform.Find("Squeezable").gameObject;
         _tokenImage = _squeezable.transform.Find("TokenImage").gameObject;
-        _playerName = transform.Find("PlayerName").gameObject;
-        _playerNameBg = transform.Find("token-text-bg").gameObject;
         _skip1 = _squeezable.transform.Find("skip1").gameObject;
         _skip2 = _squeezable.transform.Find("skip2").gameObject;
         _skip3 = _squeezable.transform.Find("skip3").gameObject;
@@ -59,6 +56,10 @@ public class TokenControl : MonoBehaviour
         return _currentCell.GetComponent<CellControl>();
     }
 
+    public void DisableIndicators(bool value) {
+        _indicators.SetActive(!value);
+    }
+
     public void SetToNextCell(float moveTime, Action callback = null) {
         ClearCoroutine();
         if (_currentCell == null) {
@@ -87,8 +88,7 @@ public class TokenControl : MonoBehaviour
     // Пьедестал
 
     public IEnumerator MoveToPedestalDefer(float delay, Action callback = null) {
-        _playerName.SetActive(false);
-        _playerNameBg.SetActive(false);
+        DisableIndicators(true);
         yield return new WaitForSeconds(delay);
         StopSqueeze();
         ClearCoroutine();
@@ -105,12 +105,6 @@ public class TokenControl : MonoBehaviour
         }
         callback?.Invoke();
     }
-
-    // public void ResetView() {
-    //     _playerName.SetActive(true);
-    //     _playerNameBg.SetActive(true);
-    //     transform.localScale = new Vector3(tokenScale, tokenScale, tokenScale);
-    // }
 
     // Слои
 
@@ -203,7 +197,8 @@ public class TokenControl : MonoBehaviour
 
     // перемещения по стрелкам
 
-    public void PutTokenToArrowSpline(SplineContainer spline) {
+    public void ExecuteArrowMove(SplineContainer spline) {
+        DisableIndicators(true);
         _splineAnimate.Container = spline;
         _splineAnimate.Restart(false);
         _splineAnimate.Play();
@@ -222,6 +217,7 @@ public class TokenControl : MonoBehaviour
         currentCellControl.RemoveToken(transform.name);
         _currentCell = currentCellControl.transform.GetComponent<ArrowCell>().ArrowToCell;
         transform.SetLocalPositionAndRotation(_currentCell.transform.localPosition, Quaternion.Euler(new Vector3(0,0,0)));
+        DisableIndicators(false);
         MoveControl.Instance.ConfirmNewPosition();
     }
 }

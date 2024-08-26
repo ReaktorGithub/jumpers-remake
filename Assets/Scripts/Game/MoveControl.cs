@@ -148,6 +148,9 @@ public class MoveControl : MonoBehaviour
     // Вторая часть метода по переключению игроков
 
     private void ContinueSwitchPlayer() {
+        // апдейт камеры
+        _camera.FollowObject(_currentToken.gameObject.transform);
+
         // апдейт панели управления
         PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
         EffectsControl.Instance.UpdateQuantityText(_currentPlayer);
@@ -172,7 +175,6 @@ public class MoveControl : MonoBehaviour
         if (messengerMessage != null) {
             Messages.Instance.AddMessage(messengerMessage);
         }
-        _camera.FollowObject(_currentToken.gameObject.transform);
         _currentPlayer.IsEffectPlaced = false;
         EffectsControl.Instance.DisableAllButtons(false);
         BoostersControl.Instance.EnableAllButtons();
