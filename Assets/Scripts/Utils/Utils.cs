@@ -71,15 +71,4 @@ public static class Utils
         }
         return false;
     }
-
-    // Найти индекс последнего элемента списка, который не равняется 0
-
-    public static int FindLastValidIndex(List<int> list) {
-        for (int i = list.Count - 1; i >= 0; i--) {
-            if (list[i] != 0) {
-                return i;
-            }
-        }
-        return -1;
-    }
 }
