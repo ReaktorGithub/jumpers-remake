@@ -9,6 +9,7 @@ public static class UIColors
     public static string Red = "#FF0000";
     public static string Black = "#000000";
     public static string Blue = "#5197FF";
+    public static string DarkBlue = "#1136FF";
     public static string Orange = "#FF8100";
     public static string Armor = "#29A3F6";
     public static string ArmorIron = "#B100FF";

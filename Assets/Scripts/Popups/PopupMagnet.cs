@@ -51,8 +51,7 @@ public class PopupMagnet : MonoBehaviour
 
     public void OnCloseWindow() {
         SetConfirmButtonInteractable(false);
-        _selectedScore = 0;
-        UpdateCellHint();
+        CellsControl.Instance.ResetCellMagnetHint();
         _popup.CloseWindow(() => {
             BoostersControl.Instance.EnableAllButtons();
             BoostersControl.Instance.TryToEnableAllEffectButtons();
@@ -85,20 +84,8 @@ public class PopupMagnet : MonoBehaviour
         }
     }
 
-    public void UpdateCellHint() {
-        List<GameObject> cellObjects = CellsControl.Instance.FindTargetCells(_playerCell, true, _selectedScore);
-        List<CellControl> cellControls = new();
-        foreach(GameObject cell in cellObjects) {
-            cellControls.Add(cell.GetComponent<CellControl>());
-        }
-
-        foreach(CellControl cell in CellsControl.Instance.AllCellsControls) {
-            if (cellControls.Contains(cell)) {
-                cell.UpscaleCell(true);
-            } else {
-                cell.DownscaleCell(true);
-            }
-        }
+    public void UpdateCellMagnetHint() {
+        CellsControl.Instance.UpdateCellMagnetHint(_playerCell, _selectedScore);
     }
 
     // Дублирует заданный элемент массива в случайный индекс

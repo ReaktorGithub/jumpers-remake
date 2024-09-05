@@ -302,6 +302,30 @@ public class CellsControl : MonoBehaviour
         return result;
     }
 
+    // Подсказки для магнита
+
+    public void UpdateCellMagnetHint(GameObject currentCell, int selectedScore) {
+        List<GameObject> cellObjects = FindTargetCells(currentCell, true, selectedScore);
+        List<CellControl> cellControls = new();
+        foreach(GameObject cell in cellObjects) {
+            cellControls.Add(cell.GetComponent<CellControl>());
+        }
+
+        foreach(CellControl cell in _allCellControls) {
+            if (cellControls.Contains(cell)) {
+                cell.UpscaleCell(true);
+            } else {
+                cell.DownscaleCell(true);
+            }
+        }
+    }
+
+    public void ResetCellMagnetHint() {
+        foreach(CellControl cell in _allCellControls) {
+            cell.DownscaleCell(true);
+        }
+    }
+
     // Дебаг
 
     public void ShowTokensAtCells() {
