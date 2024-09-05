@@ -160,6 +160,8 @@ public class MoveControl : MonoBehaviour
         // проверка текущего игрока на пропуск хода
         if (_currentPlayer.MovesSkip == 0) {
             _movesLeft = 1;
+            string cubicMessage = Utils.Wrap("ваш ход!", UIColors.Green);
+            PreparePlayerForMove(cubicMessage);
         } else {
             StartCoroutine(SkipMoveDefer());
         }
@@ -286,7 +288,10 @@ public class MoveControl : MonoBehaviour
 
     public void EndMove() {
         // CellsControl.Instance.ShowTokensAtCells();
+
+        // сброс параметров
         _modifiersControl.HideModifierMagnet();
+        CellsControl.Instance.ResetCellMagnetHint();
 
         // проверка на окончание гонки
 

@@ -35,6 +35,6 @@ public class CubicButton : MonoBehaviour
     public void OnClick() {
         _popupMagnet.SelectedScore = score;
         _popupMagnet.UpdateButonsSelection();
-        _popupMagnet.UpdateCellHint();
+        _popupMagnet.UpdateCellMagnetHint();
     }
 }

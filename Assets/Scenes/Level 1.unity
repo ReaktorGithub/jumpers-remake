@@ -4434,6 +4434,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ff1e6137e3d07a438a1aedf9d1d1b8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  waitAfterClose: 0.4
 --- !u!114 &209808283
 MonoBehaviour:
   m_ObjectHideFlags: 0

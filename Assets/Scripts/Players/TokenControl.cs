@@ -18,7 +18,7 @@ public class TokenControl : MonoBehaviour
     private GameObject _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
     private SortingGroup _sortingGroup;
     private bool _isSqueeze = false;
-    private Vector3 _pedestalPosition;
+    private GameObject _pedestal;
     private SplineAnimate _splineAnimate;
 
     private void Awake() {
@@ -32,7 +32,7 @@ public class TokenControl : MonoBehaviour
         UpdateSkips(0);
         UpdateShield(EBoosters.None);
         _sortingGroup = GetComponent<SortingGroup>();
-        _pedestalPosition = GameObject.Find("Pedestal").transform.position;
+        _pedestal = GameObject.Find("Pedestal");
         _splineAnimate = GetComponent<SplineAnimate>();
     }
 
@@ -98,6 +98,7 @@ public class TokenControl : MonoBehaviour
 
     public IEnumerator MoveToPedestal(Action callback = null) {
         Vector3 goalScale = new(0f, 0f, 0f);
+        Vector3 _pedestalPosition = _pedestal.transform.position;
         while (Vector3.Distance(transform.localPosition, _pedestalPosition) > 4) {
             transform.localPosition = Vector3.Lerp(transform.localPosition, _pedestalPosition, pedestalMoveTime * Time.deltaTime);
             transform.localScale = Vector3.Lerp(transform.localScale, goalScale, pedestalMoveTime * Time.deltaTime);
