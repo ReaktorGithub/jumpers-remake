@@ -160,20 +160,15 @@ public class MoveControl : MonoBehaviour
         // проверка текущего игрока на пропуск хода
         if (_currentPlayer.MovesSkip == 0) {
             _movesLeft = 1;
-            string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " ходит";
-            PreparePlayerForMove(null, message);
         } else {
             StartCoroutine(SkipMoveDefer());
         }
     }
 
-    private void PreparePlayerForMove(string cubicMessage = null, string messengerMessage = null) {
+    private void PreparePlayerForMove(string cubicMessage = null) {
         CubicControl.Instance.SetCubicInteractable(true);
         if (cubicMessage != null) {
             CubicControl.Instance.WriteStatus(cubicMessage);
-        }
-        if (messengerMessage != null) {
-            Messages.Instance.AddMessage(messengerMessage);
         }
         _currentPlayer.IsEffectPlaced = false;
         EffectsControl.Instance.DisableAllButtons(false);
