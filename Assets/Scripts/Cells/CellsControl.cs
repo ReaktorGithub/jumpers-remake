@@ -314,8 +314,10 @@ public class CellsControl : MonoBehaviour
         foreach(CellControl cell in _allCellControls) {
             if (cellControls.Contains(cell)) {
                 cell.UpscaleCell(true);
+                cell.TurnOnGlow();
             } else {
                 cell.DownscaleCell(true);
+                cell.TurnOffGlow();
             }
         }
     }
@@ -323,6 +325,7 @@ public class CellsControl : MonoBehaviour
     public void ResetCellMagnetHint() {
         foreach(CellControl cell in _allCellControls) {
             cell.DownscaleCell(true);
+            cell.TurnOffGlow();
         }
     }
 

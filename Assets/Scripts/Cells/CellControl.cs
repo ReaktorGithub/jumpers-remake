@@ -177,9 +177,7 @@ public class CellControl : MonoBehaviour
         SetCursorDisabled(true);
     }
 
-    public void TurnOnLassoMode() {
-        _isLassoMode = true;
-        SetCursorDisabled(false);
+    public void TurnOnGlow() {
         _glow.SetActive(true);
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
@@ -188,14 +186,24 @@ public class CellControl : MonoBehaviour
         StartCoroutine(_coroutine);
     }
 
-    public void TurnOffLassoMode() {
-        DownscaleCell();
-        _isLassoMode = false;
-        SetCursorDisabled(true);
+    public void TurnOffGlow() {
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
         }
         _glow.SetActive(false);
+    }
+
+    public void TurnOnLassoMode() {
+        _isLassoMode = true;
+        SetCursorDisabled(false);
+        TurnOnGlow();
+    }
+
+    public void TurnOffLassoMode() {
+        DownscaleCell();
+        _isLassoMode = false;
+        SetCursorDisabled(true);
+        TurnOffGlow();
     }
 
     // Флаг force принудительно меняет размер клетки, даже если мы не находимся в режиме выбора
