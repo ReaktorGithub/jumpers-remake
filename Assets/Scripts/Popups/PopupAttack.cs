@@ -16,7 +16,7 @@ public class PopupAttack : MonoBehaviour
     private Button _buttonAttack, _buttonCancel;
     private int _powerInitial = 0;
     private int _powerNeed = 0;
-    [SerializeField] private float attackDelay = 0.7f;
+    [SerializeField] private float _attackDelay = 0.7f;
 
     private void Awake() {
         _attack = GameObject.Find("PopupAttack");
@@ -83,6 +83,7 @@ public class PopupAttack : MonoBehaviour
             _selectedPlayer = rivals[0];
         } else {
             _optionalSectionTokens.SetActive(true);
+            _selectedPlayer = null;
             _tokenName.text = "";
             int index = 0;
             foreach(TokenAttackButton button in _tokenAttackButtons) {
@@ -238,7 +239,7 @@ public class PopupAttack : MonoBehaviour
     }
 
     private IEnumerator ConfirmAttackDefer() {
-        yield return new WaitForSeconds(attackDelay);
+        yield return new WaitForSeconds(_attackDelay);
         if (_selectedAttackType == EAttackTypes.Usual) {
             int currentPlayerIndex = MoveControl.Instance.CurrentPlayerIndex;
             MoveControl.Instance.CurrentPlayer.ExecuteAttackUsual(_selectedPlayer, currentPlayerIndex);
@@ -248,7 +249,7 @@ public class PopupAttack : MonoBehaviour
     }
 
     private IEnumerator CancelAttackDefer() {
-        yield return new WaitForSeconds(attackDelay);
+        yield return new WaitForSeconds(_attackDelay);
         ResetContent();
         string message = Utils.Wrap(MoveControl.Instance.CurrentPlayer.PlayerName, UIColors.Yellow) + " отказался от атаки";
         Messages.Instance.AddMessage(message);

@@ -5,8 +5,8 @@ public class Messages : MonoBehaviour
 {
     public static Messages Instance { get; private set; }
     private GameObject _gameMessagePrefab;
-    private int count = 0;
-    [SerializeField] private int maxMessages = 3;
+    private int _count = 0;
+    [SerializeField] private int _maxMessages = 3;
 
     private void Awake() {
         Instance = this;
@@ -16,10 +16,10 @@ public class Messages : MonoBehaviour
 
     public void AddMessage(string message) {
         // если превышен лимит, удалить последнее сообщение
-        if (count == maxMessages) {
+        if (_count == _maxMessages) {
             Destroy(transform.GetChild(1).gameObject);
         } else {
-            count++;
+            _count++;
         }
 
         GameObject newMessageObject = Instantiate(_gameMessagePrefab, transform);

@@ -5,9 +5,9 @@ public class PlayersControl : MonoBehaviour
 {
     public static PlayersControl Instance { get; private set; }
     private PlayerControl[] _players = new PlayerControl[4];
-    [SerializeField] private float finishDelay = 0.5f;
-    [SerializeField] private float loseDelay = 2f;
-    [SerializeField] private float redEffectDelay = 1f;
+    [SerializeField] private float _finishDelay = 0.5f;
+    [SerializeField] private float _loseDelay = 2f;
+    [SerializeField] private float _redEffectDelay = 1f;
     private Pedestal _pedestal;
     private LevelData _levelData;
 
@@ -23,17 +23,17 @@ public class PlayersControl : MonoBehaviour
     }
 
     public float FinishDelay {
-        get { return finishDelay; }
+        get { return _finishDelay; }
         private set {}
     }
 
     public float LoseDelay {
-        get { return loseDelay; }
+        get { return _loseDelay; }
         private set {}
     }
 
     public float RedEffectDelay {
-        get { return redEffectDelay; }
+        get { return _redEffectDelay; }
         private set {}
     }
 
@@ -47,10 +47,10 @@ public class PlayersControl : MonoBehaviour
         PlayerControl _playerControl2 = GameObject.Find("player_2").GetComponent<PlayerControl>();
         PlayerControl _playerControl3 = GameObject.Find("player_3").GetComponent<PlayerControl>();
         PlayerControl _playerControl4 = GameObject.Find("player_4").GetComponent<PlayerControl>();
-        _playerControl1.TokenName = "token_1";
-        _playerControl2.TokenName = "token_2";
-        _playerControl3.TokenName = "token_3";
-        _playerControl4.TokenName = "token_4";
+        _playerControl1.TokenObject = GameObject.Find("token_1");
+        _playerControl2.TokenObject = GameObject.Find("token_2");
+        _playerControl3.TokenObject = GameObject.Find("token_3");
+        _playerControl4.TokenObject = GameObject.Find("token_4");
         _playerControl1.PlayerName = "Игрок A";
         _playerControl2.PlayerName = "Игрок B";
         _playerControl3.PlayerName = "Игрок C";
@@ -74,10 +74,10 @@ public class PlayersControl : MonoBehaviour
         return null;
     }
 
-    public string GetTokenNameByMoveOrder(int order) {
+    public GameObject GetTokenByMoveOrder(int order) {
         foreach(PlayerControl player in _players) {
             if (player.MoveOrder == order) {
-                return player.TokenName;
+                return player.TokenObject;
             }
         }
         return null;
@@ -88,11 +88,10 @@ public class PlayersControl : MonoBehaviour
 
     public void BindTokensToPlayers() {
         foreach(PlayerControl player in _players) {
-            GameObject token = GameObject.Find(player.TokenName);
-            Sprite sprite = Utils.FindChildByName(token, "TokenImage").GetComponent<SpriteRenderer>().sprite;
+            Sprite sprite = Utils.FindChildByName(player.TokenObject, "TokenImage").GetComponent<SpriteRenderer>().sprite;
             player.TokenImage = sprite;
 
-            TokenControl tokenControl = token.GetComponent<TokenControl>();
+            TokenControl tokenControl = player.TokenObject.GetComponent<TokenControl>();
             tokenControl.SetPlayerName(player.PlayerName);
         }
     }
@@ -127,8 +126,7 @@ public class PlayersControl : MonoBehaviour
 
     public void UpdateTokenLayerOrder(int currentPlayerIndex) {
         foreach(PlayerControl player in _players) {
-            string tokenName = GetTokenNameByMoveOrder(player.MoveOrder);
-            GameObject token = GameObject.Find(tokenName);
+            GameObject token = GetTokenByMoveOrder(player.MoveOrder);
             if (token == null) {
                 continue;
             }
@@ -143,11 +141,10 @@ public class PlayersControl : MonoBehaviour
 
     public void UpdateSqueezeAnimation(int currentPlayerIndex) {
         foreach(PlayerControl player in _players) {
-            GameObject token = GameObject.Find(player.TokenName);
-            if (token == null) {
+            if (player.TokenObject == null) {
                 continue;
             }
-            TokenControl tokenControl = token.GetComponent<TokenControl>();
+            TokenControl tokenControl = player.TokenObject.GetComponent<TokenControl>();
             if (player.MoveOrder == currentPlayerIndex) {
                 tokenControl.StartSqueeze();
             } else {

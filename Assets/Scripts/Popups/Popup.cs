@@ -5,12 +5,12 @@ using UnityEngine;
 public class Popup : MonoBehaviour
 {
     private float _shift;
-    [SerializeField] float shiftBy = 70;
-    [SerializeField] private float fadeTime = 0.7f;
+    [SerializeField] float _shiftBy = 70;
+    [SerializeField] private float _fadeTime = 0.7f;
     private IEnumerator _coroutine;
 
     private void Awake() {
-        _shift = GetComponent<RectTransform>().rect.width + shiftBy;
+        _shift = GetComponent<RectTransform>().rect.width + _shiftBy;
         transform.localPosition = new(transform.localPosition.x - _shift, transform.localPosition.y, transform.localPosition.z);
     }
 
@@ -52,8 +52,8 @@ public class Popup : MonoBehaviour
         float startTime = Time.time;
         float velocity = 0f;
         // Time.time - startTime < fadeTime
-        while (fadeTime - (Time.time - startTime) > 0.1f) {
-            float progress = (Time.time - startTime) / fadeTime;
+        while (_fadeTime - (Time.time - startTime) > 0.1f) {
+            float progress = (Time.time - startTime) / _fadeTime;
             float x = Mathf.SmoothDamp(startX, endX, ref velocity, 0.1f, Mathf.Infinity, progress); 
             transform.localPosition = new Vector3(x, transform.localPosition.y, transform.localPosition.z);
             yield return null;

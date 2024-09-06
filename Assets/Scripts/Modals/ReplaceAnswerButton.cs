@@ -4,7 +4,7 @@ public class ReplaceAnswerButton : MonoBehaviour
 {
     private GameObject _hover;
     private bool _disabled = false;
-    [SerializeField] private bool isReplaceAction;
+    [SerializeField] private bool _isReplaceAction;
     private ModalReplaceEffect _modalControl;
     private CursorManager _cursorManager;
 
@@ -29,7 +29,7 @@ public class ReplaceAnswerButton : MonoBehaviour
     }
 
     public void OnClick() {
-        if (isReplaceAction) {
+        if (_isReplaceAction) {
             if (!_disabled) {
                 _modalControl.CloseWindow();
                 EffectsControl.Instance.ActivateSelectionMode(true);

@@ -3,80 +3,80 @@ using UnityEngine;
 
 public class LevelData : MonoBehaviour
 {
-    [SerializeField] private int[] prizeCoins = new int[4];
-    [SerializeField] private int[] prizeMallows = new int[4];
-    [SerializeField] private int[] prizeRubies = new int[4];
-    [SerializeField] private float[] levelCenterPosition = new float[2];
-    [SerializeField] private float levelCenterCameraZoom;
-    [SerializeField] private int effectsGreen = 0;
-    [SerializeField] private int effectsYellow = 0;
-    [SerializeField] private int effectsBlack = 0;
-    [SerializeField] private int effectsRed = 0;
-    [SerializeField] private int effectsStar = 0;
+    [SerializeField] private int[] _prizeCoins = new int[4];
+    [SerializeField] private int[] _prizeMallows = new int[4];
+    [SerializeField] private int[] _prizeRubies = new int[4];
+    [SerializeField] private float[] _levelCenterPosition = new float[2];
+    [SerializeField] private float _levelCenterCameraZoom;
+    [SerializeField] private int _effectsGreen = 0;
+    [SerializeField] private int _effectsYellow = 0;
+    [SerializeField] private int _effectsBlack = 0;
+    [SerializeField] private int _effectsRed = 0;
+    [SerializeField] private int _effectsStar = 0;
 
     public int[] PrizeCoins {
-        get { return prizeCoins; }
+        get { return _prizeCoins; }
         private set {}
     }
 
     public int[] PrizeMallows {
-        get { return prizeMallows; }
+        get { return _prizeMallows; }
         private set {}
     }
 
     public int[] PrizeRubies {
-        get { return prizeRubies; }
+        get { return _prizeRubies; }
         private set {}
     }
 
     public float[] LevelCenterPosition {
-        get { return levelCenterPosition; }
+        get { return _levelCenterPosition; }
         private set {}
     }
 
     public float LevelCenterCameraZoom {
-        get { return levelCenterCameraZoom; }
+        get { return _levelCenterCameraZoom; }
         private set {}
     }
 
     public int EffectsGreen {
-        get { return effectsGreen; }
+        get { return _effectsGreen; }
         private set {}
     }
 
     public int EffectsYellow {
-        get { return effectsYellow; }
+        get { return _effectsYellow; }
         private set {}
     }
 
     public int EffectsRed {
-        get { return effectsRed; }
+        get { return _effectsRed; }
         private set {}
     }
 
     public int EffectsBlack {
-        get { return effectsBlack; }
+        get { return _effectsBlack; }
         private set {}
     }
 
     public int EffectsStar {
-        get { return effectsStar; }
+        get { return _effectsStar; }
         private set {}
     }
 
     private void Awake() {
         GameObject list = GameObject.Find("PrizeList");
-        list.transform.Find("coins1").GetComponent<TextMeshProUGUI>().text = prizeCoins[0].ToString();
-        list.transform.Find("coins2").GetComponent<TextMeshProUGUI>().text = prizeCoins[1].ToString();
-        list.transform.Find("coins3").GetComponent<TextMeshProUGUI>().text = prizeCoins[2].ToString();
-        list.transform.Find("coins4").GetComponent<TextMeshProUGUI>().text = prizeCoins[3].ToString();
-        list.transform.Find("mm1").GetComponent<TextMeshProUGUI>().text = prizeMallows[0].ToString();
-        list.transform.Find("mm2").GetComponent<TextMeshProUGUI>().text = prizeMallows[1].ToString();
-        list.transform.Find("mm3").GetComponent<TextMeshProUGUI>().text = prizeMallows[2].ToString();
-        list.transform.Find("mm4").GetComponent<TextMeshProUGUI>().text = prizeMallows[3].ToString();
-        list.transform.Find("ruby1").GetComponent<TextMeshProUGUI>().text = prizeRubies[0].ToString();
-        list.transform.Find("ruby2").GetComponent<TextMeshProUGUI>().text = prizeRubies[1].ToString();
-        list.transform.Find("ruby3").GetComponent<TextMeshProUGUI>().text = prizeRubies[2].ToString();
-        list.transform.Find("ruby4").GetComponent<TextMeshProUGUI>().text = prizeRubies[3].ToString();
+        list.transform.Find("coins1").GetComponent<TextMeshProUGUI>().text = _prizeCoins[0].ToString();
+        list.transform.Find("coins2").GetComponent<TextMeshProUGUI>().text = _prizeCoins[1].ToString();
+        list.transform.Find("coins3").GetComponent<TextMeshProUGUI>().text = _prizeCoins[2].ToString();
+        list.transform.Find("coins4").GetComponent<TextMeshProUGUI>().text = _prizeCoins[3].ToString();
+        list.transform.Find("mm1").GetComponent<TextMeshProUGUI>().text = _prizeMallows[0].ToString();
+        list.transform.Find("mm2").GetComponent<TextMeshProUGUI>().text = _prizeMallows[1].ToString();
+        list.transform.Find("mm3").GetComponent<TextMeshProUGUI>().text = _prizeMallows[2].ToString();
+        list.transform.Find("mm4").GetComponent<TextMeshProUGUI>().text = _prizeMallows[3].ToString();
+        list.transform.Find("ruby1").GetComponent<TextMeshProUGUI>().text = _prizeRubies[0].ToString();
+        list.transform.Find("ruby2").GetComponent<TextMeshProUGUI>().text = _prizeRubies[1].ToString();
+        list.transform.Find("ruby3").GetComponent<TextMeshProUGUI>().text = _prizeRubies[2].ToString();
+        list.transform.Find("ruby4").GetComponent<TextMeshProUGUI>().text = _prizeRubies[3].ToString();
     }
 }

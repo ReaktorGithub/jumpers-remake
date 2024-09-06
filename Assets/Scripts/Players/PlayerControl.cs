@@ -5,14 +5,16 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
 {
-    [SerializeField] private string playerName;
+    [SerializeField] private string _playerName;
 
-    [SerializeField] private string tokenName;
-    [SerializeField] private int moveOrder;
-    [SerializeField] private bool isReverseMove;
+    [SerializeField] private GameObject _tokenObject;
+    [SerializeField] private int _moveOrder;
+    [SerializeField] private bool _isReverseMove;
     private int _placeAfterFinish;
     private bool _isFinished = false;
-    private int _movesSkip = 0;
+    private int _movesSkip = 0; // пропуски хода
+    private int _movesToDo = 0; // сколько нужно сделать ходов с броском кубика
+    private int _stepsLeft = 0; // сколько шагов фишкой осталось сделать
     [SerializeField] private int _armor = 0;
     [SerializeField] private bool _isIronArmor = false;
     [SerializeField] private BoosterButton _selectedShieldButton;
@@ -60,10 +62,10 @@ public class PlayerControl : MonoBehaviour
     // Изменение свойств напрямую
 
     public int MoveOrder {
-        get { return moveOrder; }
+        get { return _moveOrder; }
         set {
             if (value >= 1 && value <= 4) {
-                moveOrder = value;
+                _moveOrder = value;
             }
         }
     }
@@ -73,14 +75,24 @@ public class PlayerControl : MonoBehaviour
         private set {}
     }
 
+    public int MovesToDo {
+        get { return _movesToDo; }
+        set { _movesToDo = value; }
+    }
+
+    public int StepsLeft {
+        get { return _stepsLeft; }
+        set { _stepsLeft = value; }
+    }
+
     public bool IsReverseMove {
-        get { return isReverseMove; }
+        get { return _isReverseMove; }
         set {}
     }
 
-    public string TokenName {
-        get { return tokenName; }
-        set { tokenName = value; }
+    public GameObject TokenObject {
+        get { return _tokenObject; }
+        set { _tokenObject = value; }
     }
 
     public int PlaceAfterFinish {
@@ -103,12 +115,12 @@ public class PlayerControl : MonoBehaviour
     }
 
     public string PlayerName {
-        get { return playerName; }
+        get { return _playerName; }
         set {
             if (value.Length < 15) {
-                playerName = value;
+                _playerName = value;
             } else {
-                playerName = value[..14];
+                _playerName = value[..14];
             }
         }
     }
@@ -208,6 +220,26 @@ public class PlayerControl : MonoBehaviour
         set { _selectedShieldButton = value; }
     }
 
+    // Изменение параметров движения с помощью инкремента или декремента
+
+    public void AddMovesToDo(int count) {
+        _movesToDo += count;
+    }
+
+    public void AddStepsLeft(int count) {
+        _stepsLeft += count;
+    }
+
+    public void SkipMoveIncrease(TokenControl token) {
+        _movesSkip++;
+        token.UpdateSkips(_movesSkip);
+    }
+
+    public void SkipMoveDecrease(TokenControl token) {
+        _movesSkip--;
+        token.UpdateSkips(_movesSkip);
+    }
+
     // Изменение ресурсов с помощью инкремента или декремента
 
     public void AddCoins(int value) {
@@ -266,16 +298,6 @@ public class PlayerControl : MonoBehaviour
         boosterShieldIron += value;
     }
 
-    public void SkipMoveIncrease(TokenControl token) {
-        _movesSkip++;
-        token.UpdateSkips(_movesSkip);
-    }
-
-    public void SkipMoveDecrease(TokenControl token) {
-        _movesSkip--;
-        token.UpdateSkips(_movesSkip);
-    }
-
     // атака
 
     public List<EAttackTypes> AvailableAttackTypes {
@@ -285,7 +307,7 @@ public class PlayerControl : MonoBehaviour
 
     public void ExecuteAttackUsual(PlayerControl rival, int currentPlayerIndex) {
         AddPower(-1);
-        MoveControl.Instance.AddMovesLeft(1);
+        _movesToDo++;
         rival.SkipMoveIncrease(rival.GetTokenControl());
         PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
         string message1 = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" АТАКУЕТ ", UIColors.Red) + Utils.Wrap(rival.PlayerName, UIColors.Yellow) + "!";
@@ -377,7 +399,7 @@ public class PlayerControl : MonoBehaviour
         }
         float moveTime = MoveControl.Instance.SpecifiedMoveTime;
         tokenControl.SetToSpecifiedCell(redCell.PenaltyCell, moveTime, () => {
-            cellControl.RemoveToken(TokenName);
+            cellControl.RemoveToken(_tokenObject);
             MoveControl.Instance.ConfirmNewPosition();
         });
     }
@@ -503,7 +525,7 @@ public class PlayerControl : MonoBehaviour
     }
 
     public TokenControl GetTokenControl() {
-        return GameObject.Find(tokenName).GetComponent<TokenControl>();
+        return _tokenObject.GetComponent<TokenControl>();
     }
 
     public void OpenPowerWarningModal(Action callback = null) {
@@ -531,7 +553,7 @@ public class PlayerControl : MonoBehaviour
         IEnumerator coroutine = tokenControl.MoveToPedestalDefer(PlayersControl.Instance.LoseDelay, () => {
             _pedestal.SetTokenToPedestal(this, place);
             CellControl cellControl = tokenControl.GetCurrentCellControl();
-            cellControl.RemoveToken(tokenName);
+            cellControl.RemoveToken(_tokenObject);
             StartCoroutine(MoveControl.Instance.EndMoveDefer());
         });
         StartCoroutine(coroutine);

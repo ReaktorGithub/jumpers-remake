@@ -4,7 +4,7 @@ using UnityEngine;
 public class BranchControl : MonoBehaviour
 {
     private List<GameObject> _branchButtonsList = new();
-    [SerializeField] private bool isReverse = false;
+    [SerializeField] private bool _isReverse = false;
 
     private void Awake() {
         Transform[] children = GetComponentsInChildren<Transform>();
@@ -34,7 +34,7 @@ public class BranchControl : MonoBehaviour
     }
 
     public bool IsReverse {
-        get { return isReverse; }
+        get { return _isReverse; }
         private set {}
     }
 

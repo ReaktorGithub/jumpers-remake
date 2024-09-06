@@ -18,7 +18,7 @@ public class CellChecker : MonoBehaviour
         _modalReplace = GameObject.Find("GameScripts").GetComponent<ModalReplaceEffect>();
     }
 
-    public bool CheckBranch(CellControl currentCellControl, int stepsLeft, PlayerControl player) {
+    public bool CheckBranch(CellControl currentCellControl, PlayerControl player) {
         if (currentCellControl.TryGetComponent(out BranchCell branchCell)) {
             BranchControl branch = branchCell.BranchObject.GetComponent<BranchControl>();
             if (branch.IsReverse != player.IsReverseMove) {
@@ -31,7 +31,7 @@ public class CellChecker : MonoBehaviour
             _topPanel.OpenWindow();
             string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " выбирает направление";
             Messages.Instance.AddMessage(message);
-            string cubicStatus = Utils.Wrap("Остаток: " + stepsLeft, UIColors.Green);
+            string cubicStatus = Utils.Wrap("Остаток: " + player.StepsLeft, UIColors.Green);
             CubicControl.Instance.WriteStatus(cubicStatus);
             return false;
         }
@@ -81,7 +81,7 @@ public class CellChecker : MonoBehaviour
 
     public void CheckCellEffects(CellControl cellControl, PlayerControl currentPlayer, TokenControl tokenControl, int currentPlayerIndex) {
         if (cellControl.Effect == EControllableEffects.Green) {
-            MoveControl.Instance.AddMovesLeft(1);
+            currentPlayer.AddMovesToDo(1);
             string message = Utils.Wrap(currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("зелёный", UIColors.Green) + " эффект и ходит ещё раз";
             Messages.Instance.AddMessage(message);
         }
@@ -102,8 +102,8 @@ public class CellChecker : MonoBehaviour
         }
 
         if (cellControl.Effect == EControllableEffects.Red) {
-            MoveControl.Instance.MovesLeft = 0;
-            MoveControl.Instance.StepsLeft = 0;
+            currentPlayer.MovesToDo = 0;
+            currentPlayer.StepsLeft = 0;
             currentPlayer.ExecuteRedEffect(currentPlayerIndex);
             return;
         }
@@ -129,7 +129,7 @@ public class CellChecker : MonoBehaviour
             return;
         }
         
-        List<string> tokens = cellControl.CurrentTokens;
+        List<GameObject> tokens = cellControl.CurrentTokens;
 
         // Для проверки на атаку должно быть больше 1 фишки на клетке
         // Сортировать соперников на тех, что со щитами и без щитов
@@ -141,7 +141,7 @@ public class CellChecker : MonoBehaviour
             List<PlayerControl> rivalsWithShields = new();
 
             foreach(PlayerControl player in PlayersControl.Instance.Players) {
-                if (tokens.Contains(player.TokenName) && currentPlayer.TokenName != player.TokenName) {
+                if (tokens.Contains(player.TokenObject) && currentPlayer.TokenObject != player.TokenObject) {
                     if (player.Armor > 0) {
                         rivalsWithShields.Add(player);
                     } else {

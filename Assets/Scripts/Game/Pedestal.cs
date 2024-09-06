@@ -52,7 +52,6 @@ public class Pedestal : MonoBehaviour
     }
 
     public void SetTokenToPedestal(PlayerControl player, int place) {
-        GameObject token = GameObject.Find(player.TokenName);
         Sprite tokenSprite = player.TokenImage;
         switch (place) {
             case 1:
@@ -72,7 +71,7 @@ public class Pedestal : MonoBehaviour
             _name4.text = player.PlayerName;
             break;
         }
-        token.SetActive(false); 
+        player.TokenObject.SetActive(false); 
     }
 
     public void CleanPedestal() {

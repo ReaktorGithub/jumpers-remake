@@ -8,32 +8,32 @@ public class CameraControl : MonoBehaviour
     private CinemachineVirtualCamera _cinemachineCamera;
     private LevelData _levelData;
     private Transform _savedObjectToFollow = null;
-    [SerializeField] private bool isFollow = true;
+    [SerializeField] private bool _isFollow = true;
     
     // zoom
-    [SerializeField] private float zoomSpeed = 100f;
-    [SerializeField] private float minZoom = 38f;
-    [SerializeField] private float maxZoom = 64f;
-    [SerializeField] private float defaultZoom = 64f;
-    [SerializeField] private bool isZoom = true;
+    [SerializeField] private float _zoomSpeed = 100f;
+    [SerializeField] private float _minZoom = 38f;
+    [SerializeField] private float _maxZoom = 64f;
+    [SerializeField] private float _defaultZoom = 64f;
+    [SerializeField] private bool _isZoom = true;
     private float _zoom;
     private float _savedZoom = 0;
     private float _scroll;
-    [SerializeField] private float zoomSmoothTime = 0.2f;
+    [SerializeField] private float _zoomSmoothTime = 0.2f;
     private float _velocity = 0f;
 
     // wasd
 
-    [SerializeField] private float panSpeed = 100f;
-    [SerializeField] private Vector2 minPanBound = new(-130,-60);
-    [SerializeField] private Vector2 maxPanBound = new(130,60);
+    [SerializeField] private float _panSpeed = 100f;
+    [SerializeField] private Vector2 _minPanBound = new(-130,-60);
+    [SerializeField] private Vector2 _maxPanBound = new(130,60);
     private GameObject _cameraTarget;
 
     private void Awake() {
         _cinemachineCamera = GetComponent<CinemachineVirtualCamera>();
         _cameraTarget = GameObject.Find("CameraTarget");
         _levelData = GameObject.Find("LevelScripts").GetComponent<LevelData>();
-        _zoom = defaultZoom;
+        _zoom = _defaultZoom;
     }
 
     private void FixedUpdate() {
@@ -43,16 +43,16 @@ public class CameraControl : MonoBehaviour
     }
 
     private void ZoomLogic() {
-        if (isZoom) {
+        if (_isZoom) {
             _scroll = Input.mouseScrollDelta.y;
         }
-        _zoom -= _scroll * zoomSpeed * Time.deltaTime;
-        _zoom = Mathf.Clamp(_zoom, minZoom, maxZoom);
+        _zoom -= _scroll * _zoomSpeed * Time.deltaTime;
+        _zoom = Mathf.Clamp(_zoom, _minZoom, _maxZoom);
         _cinemachineCamera.m_Lens.OrthographicSize = Mathf.SmoothDamp(
             _cinemachineCamera.m_Lens.OrthographicSize,
             _zoom,
             ref _velocity,
-            zoomSmoothTime
+            _zoomSmoothTime
         );
     }
 
@@ -61,28 +61,28 @@ public class CameraControl : MonoBehaviour
         float verticalInput = Input.GetAxis("Vertical");
         Vector3 moveDirection = new(horizontalInput, verticalInput, 0);
         Vector3 newPosition = _cameraTarget.transform.position;
-        newPosition += panSpeed * Time.deltaTime * moveDirection;
-        newPosition.x = Mathf.Clamp(newPosition.x, minPanBound.x, maxPanBound.x);
-        newPosition.y = Mathf.Clamp(newPosition.y, minPanBound.y, maxPanBound.y);
+        newPosition += _panSpeed * Time.deltaTime * moveDirection;
+        newPosition.x = Mathf.Clamp(newPosition.x, _minPanBound.x, _maxPanBound.x);
+        newPosition.y = Mathf.Clamp(newPosition.y, _minPanBound.y, _maxPanBound.y);
         _cameraTarget.transform.position = newPosition;
     }
 
     public void FollowObject(Transform objectToFollow) {
         _savedObjectToFollow = objectToFollow;
-        if (!isFollow || !_savedObjectToFollow) {
+        if (!_isFollow || !_savedObjectToFollow) {
             return;
         }
         _cinemachineCamera.Follow = objectToFollow;
     }
 
     public void FollowOn() {
-        isFollow = true;
-        _zoom = defaultZoom;
+        _isFollow = true;
+        _zoom = _defaultZoom;
         FollowObject(_savedObjectToFollow);
     }
 
     public void FollowOff() {
-        isFollow = false;
+        _isFollow = false;
         if (_savedObjectToFollow != null) {
             _cameraTarget.transform.position = _savedObjectToFollow.transform.position;
         }
@@ -90,13 +90,13 @@ public class CameraControl : MonoBehaviour
     }
 
     public void ClearFollow() {
-        if (isFollow) {
+        if (_isFollow) {
             _cinemachineCamera.Follow = null;
         }
     }
 
     public void SetIsZoom(bool value) {
-        isZoom = value;
+        _isZoom = value;
     }
 
     private void RaycastPointerAndLockZoom() {

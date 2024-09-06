@@ -11,8 +11,8 @@ public class TopPanel : MonoBehaviour
     private TextMeshProUGUI _text;
     private GameObject _cancelButton;
     private Action _cancelCallback;
-    [SerializeField] private float fadeInTime = 0.4f;
-    [SerializeField] private float fadeOutTime = 0.1f;
+    [SerializeField] private float _fadeInTime = 0.4f;
+    [SerializeField] private float _fadeOutTime = 0.1f;
     
     private void Awake() {
         _topPanel = GameObject.Find("TopPanel");
@@ -37,7 +37,7 @@ public class TopPanel : MonoBehaviour
             StopCoroutine(_coroutine);
         }
         _topPanel.SetActive(true);
-        _coroutine = FadeInOut(_shift * -1, fadeInTime);
+        _coroutine = FadeInOut(_shift * -1, _fadeInTime);
         StartCoroutine(_coroutine);
     }
 
@@ -48,7 +48,7 @@ public class TopPanel : MonoBehaviour
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
         }
-        _coroutine = FadeInOut(_shift, fadeOutTime, () => {
+        _coroutine = FadeInOut(_shift, _fadeOutTime, () => {
             _topPanel.SetActive(false);
         });
         StartCoroutine(_coroutine);

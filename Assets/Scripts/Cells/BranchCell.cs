@@ -4,15 +4,15 @@ using UnityEngine;
 [RequireComponent(typeof(CellControl))]
 public class BranchCell : MonoBehaviour
 {
-    [SerializeField] private GameObject branchObject;
+    [SerializeField] private GameObject _branchObject;
     private BranchControl _branchControl;
 
     private void Awake() {
-        _branchControl = branchObject.GetComponent<BranchControl>();
+        _branchControl = _branchObject.GetComponent<BranchControl>();
     }
 
     public GameObject BranchObject {
-        get { return branchObject; }
+        get { return _branchObject; }
         private set {}
     }
 

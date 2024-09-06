@@ -9,21 +9,20 @@ public class ModalReplaceEffect : MonoBehaviour
     private GameObject _modal;
     private ModalWindow _windowControl;
     private IEnumerator _coroutine;
-    [SerializeField] private GameObject iconExecute, iconCostEffect, iconResource, lowPower, answerButton, shieldInfo;
-    [SerializeField] private TextMeshProUGUI descriptionText, effectCostName, resourceCost, resourceCostText, effectName;
+    [SerializeField] private GameObject _iconExecute, _iconCostEffect, _iconResource, _lowPower, _answerButton, _shieldInfo;
+    [SerializeField] private TextMeshProUGUI _descriptionText, _effectCostName, _resourceCost, _resourceCostText, _effectName;
     private TextMeshProUGUI _lowPowerText;
-    private ReplaceAnswerButton answerButtonScript;
-    private CursorManager answerButtonCursorManager;
+    private ReplaceAnswerButton _answerButtonScript;
 
     private void Awake() {
         _modal = GameObject.Find("ModalReplaceEffect");
         _windowControl = _modal.transform.Find("WindowReplaceEffect").GetComponent<ModalWindow>();
-        _lowPowerText = lowPower.GetComponent<TextMeshProUGUI>();
-        answerButtonScript = answerButton.GetComponent<ReplaceAnswerButton>();
+        _lowPowerText = _lowPower.GetComponent<TextMeshProUGUI>();
+        _answerButtonScript = _answerButton.GetComponent<ReplaceAnswerButton>();
     }
 
     private void Start() {
-        lowPower.SetActive(false);
+        _lowPower.SetActive(false);
         _modal.SetActive(false);
 
         // EffectsControl.Instance.SelectedEffect = EControllableEffects.Black;
@@ -51,8 +50,8 @@ public class ModalReplaceEffect : MonoBehaviour
     }
 
     private void SetNewEffectIcon(Sprite sprite) {
-        iconExecute.GetComponent<Image>().sprite = sprite;
-        iconCostEffect.GetComponent<Image>().sprite = sprite;
+        _iconExecute.GetComponent<Image>().sprite = sprite;
+        _iconCostEffect.GetComponent<Image>().sprite = sprite;
     }
 
     public void BuildContent(PlayerControl currentPlayer) {
@@ -68,7 +67,7 @@ public class ModalReplaceEffect : MonoBehaviour
 
         // имя эффекта
 
-        effectName.text = manual.GetEntityNameWithLevel(effectLevel);
+        _effectName.text = manual.GetEntityNameWithLevel(effectLevel);
 
         // описание
 
@@ -80,16 +79,16 @@ public class ModalReplaceEffect : MonoBehaviour
             result += myText;
             count++;
         }
-        descriptionText.text = result;
+        _descriptionText.text = result;
 
         // название эффекта
 
-        effectCostName.text = manual.GetEntityName(true);
+        _effectCostName.text = manual.GetEntityName(true);
 
         // ресурс, который тратится для совершения действия
 
         int cost = manual.GetCostToReplaceEffect(effectLevel);
-        resourceCost.text = cost.ToString();
+        _resourceCost.text = cost.ToString();
         EResourceTypes resourceType = manual.ReplaceEffectResourceType;
         ManualContent resourceManual = Manual.Instance.Power;
         bool isNotEnough;
@@ -105,13 +104,13 @@ public class ModalReplaceEffect : MonoBehaviour
             isNotEnough = cost > currentPlayer.Coins;
         }
 
-        lowPower.SetActive(isNotEnough);
-        answerButtonScript.Disabled = isNotEnough;
-        iconResource.GetComponent<Image>().sprite = resourceManual.Sprite;
-        resourceCostText.text = resourceManual.GetEntityName(true);
+        _lowPower.SetActive(isNotEnough);
+        _answerButtonScript.Disabled = isNotEnough;
+        _iconResource.GetComponent<Image>().sprite = resourceManual.Sprite;
+        _resourceCostText.text = resourceManual.GetEntityName(true);
 
         // Информация о наличии щита
         bool isPowerDangerEffect = effect == EControllableEffects.Black || effect == EControllableEffects.Red;
-        shieldInfo.SetActive(isPowerDangerEffect && currentPlayer.Armor > 0 && currentPlayer.IsIronArmor);
+        _shieldInfo.SetActive(isPowerDangerEffect && currentPlayer.Armor > 0 && currentPlayer.IsIronArmor);
     }
 }

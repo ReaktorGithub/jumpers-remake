@@ -5,9 +5,9 @@ public class CellsControl : MonoBehaviour
 {
     public static CellsControl Instance { get; private set; }
     private List<CellControl> _allCellControls = new();
-    [SerializeField] private float changingEffectTime = 0.5f;
-    [SerializeField] private float changingEffectDuration = 3.25f;
-    [SerializeField] private float changingEffectDelay = 1.85f;
+    [SerializeField] private float _changingEffectTime = 0.5f;
+    [SerializeField] private float _changingEffectDuration = 3.25f;
+    [SerializeField] private float _changingEffectDelay = 1.85f;
 
     private void Awake() {
         Instance = this;
@@ -29,17 +29,17 @@ public class CellsControl : MonoBehaviour
     }
 
     public float ChangingEffectTime {
-        get { return changingEffectTime; }
+        get { return _changingEffectTime; }
         private set {}
     }
 
     public float ChangingEffectDuration {
-        get { return changingEffectDuration; }
+        get { return _changingEffectDuration; }
         private set {}
     }
 
     public float ChangingEffectDelay {
-        get { return changingEffectDelay; }
+        get { return _changingEffectDelay; }
         private set {}
     }
 
@@ -336,8 +336,8 @@ public class CellsControl : MonoBehaviour
                 continue;
             }
             string message = "Tokens at " + cell.name + ": ";
-            foreach(string token in cell.CurrentTokens) {
-                message = message + token + " ";
+            foreach(GameObject token in cell.CurrentTokens) {
+                message = message + token.name + " ";
             }
             Debug.Log(message);
         }

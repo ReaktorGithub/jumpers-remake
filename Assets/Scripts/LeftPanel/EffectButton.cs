@@ -12,7 +12,7 @@ public class EffectButton : MonoBehaviour
     [SerializeField] GameObject _quantityTextObject;
     private TextMeshProUGUI _quantityText;
     private CursorManager _cursorManager;
-    [SerializeField] private EControllableEffects effectType;
+    [SerializeField] private EControllableEffects _effectType;
 
     private void Awake() {
         _effect = transform.Find("effect").gameObject;
@@ -24,12 +24,12 @@ public class EffectButton : MonoBehaviour
     }
 
     public EControllableEffects EffectType {
-        get { return effectType; }
+        get { return _effectType; }
         private set {}
     }
 
     public void OnSelect() {
-        EffectsControl.Instance.SelectedEffect = effectType;
+        EffectsControl.Instance.SelectedEffect = _effectType;
         EffectsControl.Instance.UpdateButtonsSelection();
         EffectsControl.Instance.ActivateSelectionMode();
     }
