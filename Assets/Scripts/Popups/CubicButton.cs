@@ -5,7 +5,7 @@ public class CubicButton : MonoBehaviour
     private GameObject _selected, _hover;
     private PopupMagnet _popupMagnet;
     
-    [SerializeField] private int score = 1;
+    [SerializeField] private int _score = 1;
 
     private void Awake() {
         _selected = transform.Find("SelectedImage").gameObject;
@@ -16,7 +16,7 @@ public class CubicButton : MonoBehaviour
     }
 
     public int Score {
-        get { return score; }
+        get { return _score; }
         private set {}
     }
 
@@ -33,7 +33,7 @@ public class CubicButton : MonoBehaviour
     }
 
     public void OnClick() {
-        _popupMagnet.SelectedScore = score;
+        _popupMagnet.SelectedScore = _score;
         _popupMagnet.UpdateButonsSelection();
         _popupMagnet.UpdateCellMagnetHint();
     }

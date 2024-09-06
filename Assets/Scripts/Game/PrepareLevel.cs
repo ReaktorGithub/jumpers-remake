@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class PrepareLevel : MonoBehaviour
 {
-    [SerializeField] private float moveToStartTime = 3.3f;
-    [SerializeField] private GameObject startCell;
+    [SerializeField] private float _moveToStartTime = 3.3f;
+    [SerializeField] private GameObject _startCell;
 
     private void Start() {
         // порядок важен
@@ -24,13 +24,12 @@ public class PrepareLevel : MonoBehaviour
     }
 
     public void MoveTokensToStart() {
-        CellControl startCellControl = startCell.GetComponent<CellControl>();
-        startCellControl.AddToken("token_1");
-        startCellControl.AddToken("token_2");
-        startCellControl.AddToken("token_3");
-        startCellControl.AddToken("token_4");
-        PlayersControl.Instance.UpdateTokensCurrentCell(startCell);
-        startCellControl.AlignTokens(moveToStartTime);
+        CellControl startCellControl = _startCell.GetComponent<CellControl>();
+        foreach(PlayerControl player in PlayersControl.Instance.Players) {
+            startCellControl.AddToken(player.TokenObject);
+        }
+        PlayersControl.Instance.UpdateTokensCurrentCell(_startCell);
+        startCellControl.AlignTokens(_moveToStartTime);
         // CellsControl.Instance.ShowTokensAtCells();
     }
 }

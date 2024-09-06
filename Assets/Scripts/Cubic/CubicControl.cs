@@ -11,11 +11,11 @@ public class CubicControl : MonoBehaviour
     private Animator _anim;
     private IEnumerator _coroutine, _coroutinePulse;
     private TextMeshProUGUI _statusText;
-    [SerializeField] private float rotateTime = 1.4f;
-    [SerializeField] private float holdTime = 1f;
-    [SerializeField] private float pulseTime = 0.5f;
-    [SerializeField] private float pulseMinAlpha = 0.2f;
-    private int finalScore;
+    [SerializeField] private float _rotateTime = 1.4f;
+    [SerializeField] private float _holdTime = 1f;
+    [SerializeField] private float _pulseTime = 0.5f;
+    [SerializeField] private float _pulseMinAlpha = 0.2f;
+    private int _finalScore;
     private GameObject _border, _borderSelect;
     private PopupMagnet _popupMagnet;
 
@@ -50,8 +50,8 @@ public class CubicControl : MonoBehaviour
             System.Random random = new();
             score = random.Next(1, max);
         }
-        finalScore = score;
-        _anim.SetInteger("score", finalScore);
+        _finalScore = score;
+        _anim.SetInteger("score", _finalScore);
         _anim.SetBool("isRotate", false);
         _coroutine = MakeMoveDefer();
         StartCoroutine(_coroutine);
@@ -78,7 +78,7 @@ public class CubicControl : MonoBehaviour
     }
 
     private IEnumerator SetScoreDefer(int specifiedScore = 0, bool isMagnet = false) {
-        yield return new WaitForSeconds(rotateTime);
+        yield return new WaitForSeconds(_rotateTime);
         if (isMagnet) {
             bool isSuccess = specifiedScore == _popupMagnet.SelectedScore;
             string text1 = isSuccess ? Utils.Wrap("Магнит сработал! ", UIColors.Green) : Utils.Wrap("Магнит не сработал! ", UIColors.Red);
@@ -89,8 +89,8 @@ public class CubicControl : MonoBehaviour
     }
 
     private IEnumerator MakeMoveDefer() {
-        yield return new WaitForSeconds(holdTime);
-        MoveControl.Instance.MakeMove(finalScore);
+        yield return new WaitForSeconds(_holdTime);
+        MoveControl.Instance.MakeMove(_finalScore);
     }
 
     public void SetCubicInteractable(bool value) {
@@ -100,7 +100,7 @@ public class CubicControl : MonoBehaviour
         _borderSelect.SetActive(value);
         SpriteRenderer borderSelectSprite = _borderSelect.GetComponent<SpriteRenderer>();
         if (value) {
-            _coroutinePulse = Utils.StartPulse(borderSelectSprite, pulseTime, pulseMinAlpha);
+            _coroutinePulse = Utils.StartPulse(borderSelectSprite, _pulseTime, _pulseMinAlpha);
             StartCoroutine(_coroutinePulse);
         } else if (_coroutinePulse != null) {
             StopCoroutine(_coroutinePulse);

@@ -4,11 +4,11 @@ using UnityEngine;
 public class BranchButton : MonoBehaviour
 {
     private IEnumerator _coroutine;
-    [SerializeField] private float pulseTime = 0.8f;
-    [SerializeField] private float pulseMaxValue = 0.6f;
-    [SerializeField] private float pulseMinValue = 0.4f;
-    [SerializeField] private float pulseDefaultValue = 0.6f;
-    [SerializeField] private GameObject nextCell;
+    [SerializeField] private float _pulseTime = 0.8f;
+    [SerializeField] private float _pulseMaxValue = 0.6f;
+    [SerializeField] private float _pulseMinValue = 0.4f;
+    [SerializeField] private float _pulseDefaultValue = 0.6f;
+    [SerializeField] private GameObject _nextCell;
     private float _currentX;
     private bool _pausePulse = false;
     
@@ -17,7 +17,7 @@ public class BranchButton : MonoBehaviour
     }
 
     public GameObject NextCell {
-        get { return nextCell; }
+        get { return _nextCell; }
         private set {}
     }
 
@@ -37,16 +37,16 @@ public class BranchButton : MonoBehaviour
             StopCoroutine(_coroutine);
         }
         transform.localScale = new Vector3(
-            pulseDefaultValue,
-            pulseDefaultValue,
+            _pulseDefaultValue,
+            _pulseDefaultValue,
             transform.localScale.z);
     }
 
     public void PausePulse() {
         _pausePulse = true;
         transform.localScale = new Vector3(
-            pulseDefaultValue,
-            pulseDefaultValue,
+            _pulseDefaultValue,
+            _pulseDefaultValue,
             transform.localScale.z);
     }
 
@@ -57,8 +57,8 @@ public class BranchButton : MonoBehaviour
     private IEnumerator PulseAnimation() {
         bool isIn = true;
         while (true) {
-            while (isIn && _currentX > pulseMinValue) {
-                float scale = _currentX - (pulseTime * Time.deltaTime);
+            while (isIn && _currentX > _pulseMinValue) {
+                float scale = _currentX - (_pulseTime * Time.deltaTime);
                 _currentX = scale;
                 if (!_pausePulse) {
                     transform.localScale = new Vector3(
@@ -69,8 +69,8 @@ public class BranchButton : MonoBehaviour
                 yield return null;
             }
             isIn = false;
-            while (!isIn && _currentX < pulseMaxValue) {
-                float scale = _currentX + (pulseTime * Time.deltaTime);
+            while (!isIn && _currentX < _pulseMaxValue) {
+                float scale = _currentX + (_pulseTime * Time.deltaTime);
                 _currentX = scale;
                 if(!_pausePulse) {
                     transform.localScale = new Vector3(
@@ -85,6 +85,6 @@ public class BranchButton : MonoBehaviour
     }
 
     public void ConfirmNewDirection() {
-        MoveControl.Instance.SwitchBranch(nextCell);
+        MoveControl.Instance.SwitchBranch(_nextCell);
     }
 }

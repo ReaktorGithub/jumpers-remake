@@ -14,11 +14,11 @@ public class EffectsControl : MonoBehaviour
     private TopPanel _topPanel;
     private List<EffectButton> _effectButtonsList = new();
     private EffectButton _greenEffectButton, _yellowEffectButton, _redEffectButton, _blackEffectButton, _starEffectButton;
-    [SerializeField] private GameObject emptyCellSprite, greenCellSprite, yellowCellSprite, blackCellSprite, redCellSprite, starCellSprite;
-    [SerializeField] private GameObject yellowBrush, redBrush, blackBrush;
+    [SerializeField] private GameObject _emptyCellSprite, _greenCellSprite, _yellowCellSprite, _blackCellSprite, _redCellSprite, _starCellSprite;
+    [SerializeField] private GameObject _yellowBrush, _redBrush, _blackBrush;
     private TextMeshProUGUI _greenQuantityText, _yellowQuantityText, _redQuantityText, _blackQuantityText, _starQuantityText;
     private GameObject _cellsObject;
-    [SerializeField] private float replaceTime = 1f;
+    [SerializeField] private float _replaceTime = 1f;
     private IEnumerator _coroutine;
 
     private void Awake() {
@@ -45,15 +45,15 @@ public class EffectsControl : MonoBehaviour
     }
 
     private void Start() {
-        emptyCellSprite.SetActive(false);
-        greenCellSprite.SetActive(false);
-        yellowCellSprite.SetActive(false);
-        blackCellSprite.SetActive(false);
-        redCellSprite.SetActive(false);
-        redBrush.SetActive(false);
-        yellowBrush.SetActive(false);
-        blackBrush.SetActive(false);
-        starCellSprite.SetActive(false);
+        _emptyCellSprite.SetActive(false);
+        _greenCellSprite.SetActive(false);
+        _yellowCellSprite.SetActive(false);
+        _blackCellSprite.SetActive(false);
+        _redCellSprite.SetActive(false);
+        _redBrush.SetActive(false);
+        _yellowBrush.SetActive(false);
+        _blackBrush.SetActive(false);
+        _starCellSprite.SetActive(false);
     }
 
     public EControllableEffects SelectedEffect {
@@ -178,37 +178,37 @@ public class EffectsControl : MonoBehaviour
 
         switch(_selectedEffect) {
             case EControllableEffects.Green: {
-                sprite = greenCellSprite.GetComponent<SpriteRenderer>().sprite;
+                sprite = _greenCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectGreen(-1);
                 effectName = "зеленый";
                 break;
             }
             case EControllableEffects.Red: {
-                sprite = redCellSprite.GetComponent<SpriteRenderer>().sprite;
+                sprite = _redCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectRed(-1);
                 effectName = "красный";
                 break;
             }
             case EControllableEffects.Yellow: {
-                sprite = yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
+                sprite = _yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectYellow(-1);
                 effectName = "желтый";
                 break;
             }
             case EControllableEffects.Black: {
-                sprite = blackCellSprite.GetComponent<SpriteRenderer>().sprite;
+                sprite = _blackCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectBlack(-1);
                 effectName = "черный";
                 break;
             }
             case EControllableEffects.Star: {
-                sprite = starCellSprite.GetComponent<SpriteRenderer>().sprite;
+                sprite = _starCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.AddEffectStar(-1);
                 effectName = "звезда";
                 break;
             }
             default: {
-                sprite = emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
+                sprite = _emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
                 break;
             }
         }
@@ -262,7 +262,7 @@ public class EffectsControl : MonoBehaviour
         // удалить эффект на текущей клетке
 
         CellControl oldCell = MoveControl.Instance.CurrentCell;
-        Sprite sprite = emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
+        Sprite sprite = _emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
         oldCell.ChangeEffect(EControllableEffects.None, sprite);
         Sprite newCellSprite;
 
@@ -273,26 +273,26 @@ public class EffectsControl : MonoBehaviour
 
         switch(_selectedEffect) {
             case EControllableEffects.Red: {
-                brushSprite = Instantiate(redBrush);
-                newCellSprite = redCellSprite.GetComponent<SpriteRenderer>().sprite;
+                brushSprite = Instantiate(_redBrush);
+                newCellSprite = _redCellSprite.GetComponent<SpriteRenderer>().sprite;
                 effectName = "красный";
                 break;
             }
             case EControllableEffects.Yellow: {
-                brushSprite = Instantiate(yellowBrush);
-                newCellSprite = yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
+                brushSprite = Instantiate(_yellowBrush);
+                newCellSprite = _yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
                 effectName = "желтый";
                 break;
             }
             case EControllableEffects.Black: {
-                brushSprite = Instantiate(blackBrush);
-                newCellSprite = blackCellSprite.GetComponent<SpriteRenderer>().sprite;
+                brushSprite = Instantiate(_blackBrush);
+                newCellSprite = _blackCellSprite.GetComponent<SpriteRenderer>().sprite;
                 effectName = "черный";
                 break;
             }
             default: {
-                brushSprite = emptyCellSprite;
-                newCellSprite = emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
+                brushSprite = _emptyCellSprite;
+                newCellSprite = _emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
                 break;
             }
         }
@@ -310,7 +310,7 @@ public class EffectsControl : MonoBehaviour
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
         }
-        _coroutine = Utils.MoveTo(brushSprite, newCell.transform.position, replaceTime, () => {
+        _coroutine = Utils.MoveTo(brushSprite, newCell.transform.position, _replaceTime, () => {
             // по окончании анимации удалить спрайт
 
             Destroy(brushSprite);

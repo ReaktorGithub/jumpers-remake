@@ -8,8 +8,8 @@ public class AttackTypeButton : MonoBehaviour
     private Image _sprite, _ownImage;
     private Button _button;
     private TextMeshProUGUI _attackNameUI;
-    [SerializeField] private EAttackTypes attackType = EAttackTypes.None;
-    [SerializeField] private string attackNameText = "";
+    [SerializeField] private EAttackTypes _attackType = EAttackTypes.None;
+    [SerializeField] private string _attackNameText = "";
 
     private void Awake() {
         _selected = transform.Find("SelectedImage").gameObject;
@@ -35,12 +35,12 @@ public class AttackTypeButton : MonoBehaviour
     }
 
     public EAttackTypes AttackType {
-        get { return attackType; }
+        get { return _attackType; }
         private set {}
     }
 
     public string AttackNameText {
-        get { return attackNameText; }
+        get { return _attackNameText; }
         set {
             _attackNameUI.text = value;
         }
@@ -57,7 +57,7 @@ public class AttackTypeButton : MonoBehaviour
     public void SetAsEnabled() {
         _sprite.color = new Color(1f, 1f, 1f, 1f);
         _attackNameUI.alpha = 1f;
-        AttackNameText = attackNameText;
+        AttackNameText = _attackNameText;
         _ownImage.raycastTarget = true;
         _button.interactable = true;
     }

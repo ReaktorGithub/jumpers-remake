@@ -4,16 +4,16 @@ using UnityEngine.Splines;
 [RequireComponent(typeof(CellControl))]
 public class ArrowCell : MonoBehaviour
 {
-    [SerializeField] private GameObject arrowSpline;
-    [SerializeField] private GameObject arrowToCell;
+    [SerializeField] private GameObject _arrowSpline;
+    [SerializeField] private GameObject _arrowToCell;
 
     public GameObject ArrowToCell {
-        get { return arrowToCell; }
+        get { return _arrowToCell; }
         private set {}
     }
 
     public SplineContainer ArrowSpline {
-        get { return arrowSpline.GetComponent<SplineContainer>(); }
+        get { return _arrowSpline.GetComponent<SplineContainer>(); }
         private set {}
     }
 }

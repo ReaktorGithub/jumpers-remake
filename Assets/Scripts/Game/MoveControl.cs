@@ -5,14 +5,12 @@ public class MoveControl : MonoBehaviour
 {
     public static MoveControl Instance { get; private set; }
     private int _currentPlayerIndex = 1;
-    private int _stepsLeft;
-    private int _movesLeft = 1;
-    [SerializeField] private float moveTime = 12f;
-    [SerializeField] private float specifiedMoveTime = 6f;
-    [SerializeField] private float stepDelay = 0.3f;
-    [SerializeField] private float endMoveDelay = 0.5f;
-    [SerializeField] private float skipMoveDelay = 1.5f;
-    [SerializeField] private float alignTime = 5f;
+    [SerializeField] private float _moveTime = 12f;
+    [SerializeField] private float _specifiedMoveTime = 6f;
+    [SerializeField] private float _stepDelay = 0.3f;
+    [SerializeField] private float _endMoveDelay = 0.5f;
+    [SerializeField] private float _skipMoveDelay = 1.5f;
+    [SerializeField] private float _alignTime = 5f;
     private TokenControl _currentToken;
     private PlayerControl _currentPlayer;
     private CellControl _currentCell;
@@ -45,27 +43,13 @@ public class MoveControl : MonoBehaviour
     }
 
     public float MoveTime {
-        get { return moveTime; }
+        get { return _moveTime; }
         private set {}
     }
 
     public float SpecifiedMoveTime {
-        get { return specifiedMoveTime; }
+        get { return _specifiedMoveTime; }
         private set {}
-    }
-
-    public int MovesLeft {
-        get { return _movesLeft; }
-        set { _movesLeft = value; }
-    }
-
-    public void AddMovesLeft(int count) {
-        _movesLeft += count;
-    }
-
-    public int StepsLeft {
-        get { return _stepsLeft; }
-        set { _stepsLeft = value; }
     }
 
     public bool IsLassoMode {
@@ -159,7 +143,7 @@ public class MoveControl : MonoBehaviour
 
         // проверка текущего игрока на пропуск хода
         if (_currentPlayer.MovesSkip == 0) {
-            _movesLeft = 1;
+            _currentPlayer.MovesToDo = 1;
             string cubicMessage = Utils.Wrap("ваш ход!", UIColors.Green);
             PreparePlayerForMove(cubicMessage);
         } else {
@@ -178,20 +162,20 @@ public class MoveControl : MonoBehaviour
     }
 
     private void StartCellCheckBeforeStep() {
-        bool check = CellChecker.Instance.CheckBranch(_currentCell, _stepsLeft, _currentPlayer);
+        bool check = CellChecker.Instance.CheckBranch(_currentCell, _currentPlayer);
         if (check) {
             StartCoroutine(MakeStepDefer());
         }
     }
 
     public IEnumerator MakeStepDefer() {
-        yield return new WaitForSeconds(stepDelay);
+        yield return new WaitForSeconds(_stepDelay);
         MakeStep();
     }
 
     private void MakeStep() {
-        _stepsLeft--;
-        _currentToken.SetToNextCell(moveTime, AfterStep);
+        _currentPlayer.AddStepsLeft(-1);
+        _currentToken.SetToNextCell(_moveTime, AfterStep);
     }
 
     private void AfterStep() {
@@ -206,7 +190,7 @@ public class MoveControl : MonoBehaviour
         }
 
         // если тип клетки не прерывает движение, то проверяем условие выхода из цикла шагов
-        if (_stepsLeft > 0) {
+        if (_currentPlayer.StepsLeft > 0) {
             StartCellCheckBeforeStep();
         } else {
             StartCoroutine(ConfirmNewPositionDefer());
@@ -215,25 +199,25 @@ public class MoveControl : MonoBehaviour
 
     public void MakeMove(int score) {
         _isLassoMode = false;
-        _stepsLeft = score;
+        _currentPlayer.StepsLeft = score;
         _currentCell = _currentToken.GetCurrentCellControl();
-        _currentCell.RemoveToken(_currentPlayer.TokenName);
-        _currentCell.AlignTokens(alignTime);
+        _currentCell.RemoveToken(_currentPlayer.TokenObject);
+        _currentCell.AlignTokens(_alignTime);
         StartCellCheckBeforeStep();
     }
 
     public void MakeLassoMove(CellControl targetCell) {
         _isLassoMode = true;
-        _stepsLeft = 0;
-        _movesLeft++;
+        _currentPlayer.StepsLeft = 0;
+        _currentPlayer.AddMovesToDo(1);
         _currentCell = _currentToken.GetCurrentCellControl();
-        _currentCell.RemoveToken(_currentPlayer.TokenName);
-        _currentCell.AlignTokens(alignTime);
-        _currentToken.SetToSpecifiedCell(targetCell.gameObject, specifiedMoveTime, AfterStep);
+        _currentCell.RemoveToken(_currentPlayer.TokenObject);
+        _currentCell.AlignTokens(_alignTime);
+        _currentToken.SetToSpecifiedCell(targetCell.gameObject, _specifiedMoveTime, AfterStep);
     }
 
     private IEnumerator ConfirmNewPositionDefer() {
-        yield return new WaitForSeconds(stepDelay);
+        yield return new WaitForSeconds(_stepDelay);
         ConfirmNewPosition();
     }
 
@@ -241,8 +225,8 @@ public class MoveControl : MonoBehaviour
 
     public void ConfirmNewPosition() {
         _currentCell = _currentToken.GetCurrentCellControl();
-        _currentCell.AddToken(_currentPlayer.TokenName);
-        _currentCell.AlignTokens(alignTime, () => {
+        _currentCell.AddToken(_currentPlayer.TokenObject);
+        _currentCell.AlignTokens(_alignTime, () => {
             CellChecker.Instance.CheckCellCharacter(_currentCell, _currentPlayer, _currentToken, _currentPlayerIndex);
         });
     }
@@ -272,7 +256,7 @@ public class MoveControl : MonoBehaviour
     }
 
     public IEnumerator EndMoveDefer() {
-        yield return new WaitForSeconds(endMoveDelay);
+        yield return new WaitForSeconds(_endMoveDelay);
         EndMove();
     }
 
@@ -281,7 +265,7 @@ public class MoveControl : MonoBehaviour
         Messages.Instance.AddMessage(message);
         message = Utils.Wrap("пропуск", UIColors.Yellow);
         CubicControl.Instance.WriteStatus(message);
-        yield return new WaitForSeconds(skipMoveDelay);
+        yield return new WaitForSeconds(_skipMoveDelay);
         _currentPlayer.SkipMoveDecrease(_currentToken);
         EndMove();
     }
@@ -299,7 +283,7 @@ public class MoveControl : MonoBehaviour
 
         if (isRaceOver) {
             PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
-            PlayersControl.Instance.MoveAllTokensToPedestal(_currentPlayerIndex, endMoveDelay);
+            PlayersControl.Instance.MoveAllTokensToPedestal(_currentPlayerIndex, _endMoveDelay);
             StartCoroutine(RaceOverDefer());
             return;
         }
@@ -313,9 +297,9 @@ public class MoveControl : MonoBehaviour
 
         // проверка на бонусные ходы
 
-        _movesLeft--;
+        _currentPlayer.AddMovesToDo(-1);
 
-        if (_movesLeft <= 0) {
+        if (_currentPlayer.MovesToDo <= 0) {
             SetNextPlayerIndex();
             return;
         }
@@ -334,7 +318,7 @@ public class MoveControl : MonoBehaviour
     }
 
     public IEnumerator RaceOverDefer() {
-        yield return new WaitForSeconds(endMoveDelay);
+        yield return new WaitForSeconds(_endMoveDelay);
         RaceOver();
     }
 
@@ -358,8 +342,8 @@ public class MoveControl : MonoBehaviour
 
     public void DebugStatus() {
         Debug.Log("_currentPlayerIndex " + _currentPlayerIndex);
-        Debug.Log("_stepsLeft " + _stepsLeft);
-        Debug.Log("_movesLeft " + _movesLeft);
+        Debug.Log("_stepsLeft " + _currentPlayer.StepsLeft);
+        Debug.Log("_movesToDo " + _currentPlayer.MovesToDo);
         Debug.Log("CurrentCell " + _currentToken.CurrentCell);
         Debug.Log("_currentPlayer " + _currentPlayer.PlayerName);
         Debug.Log("Cerrent cell control name " + _currentCell.transform.name);

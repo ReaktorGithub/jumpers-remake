@@ -134,6 +134,10 @@ PrefabInstance:
       propertyPath: score
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
+      propertyPath: _score
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6149342515386043707, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
       propertyPath: m_Name
       value: CubicButton2
@@ -375,6 +379,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
       propertyPath: score
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
+      propertyPath: _score
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6149342515386043707, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
@@ -649,20 +657,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97320000574e3bc4184148e711e1bb0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityName: "\u0416\u0435\u043B\u0442\u044B\u0439 \u044D\u0444\u0444\u0435\u043A\u0442"
-  shortDescriptionLevel1:
+  _entityName: "\u0416\u0451\u043B\u0442\u0430\u044F \u043A\u043B\u0435\u0442\u043A\u0430"
+  _shortDescriptionLevel1:
   - "\u041F\u0440\u043E\u043F\u0443\u0441\u043A \u0445\u043E\u0434\u0430."
-  shortDescriptionLevel2:
+  _shortDescriptionLevel2:
   - "\u041F\u0440\u043E\u043F\u0443\u0441\u043A \u0445\u043E\u0434\u0430."
-  - "- 50 \u043C\u043E\u043D\u0435\u0442."
-  shortDescriptionLevel3:
+  - "- 50 \u043C\u043E\u043D\u0435\u0442"
+  _shortDescriptionLevel3:
   - "\u041F\u0440\u043E\u043F\u0443\u0441\u043A \u0445\u043E\u0434\u0430."
-  - "- 50 \u043C\u043E\u043D\u0435\u0442."
+  - "- 50 \u043C\u043E\u043D\u0435\u0442"
   - "- 1 \u0441\u0438\u043B\u0430 \u0437\u0430 \u043A\u0430\u0436\u0434\u044B\u0439
     \u0434\u043E\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439
     \u043F\u0440\u043E\u043F\u0443\u0441\u043A \u0445\u043E\u0434\u0430 \u043D\u0430
     \u044D\u0442\u043E\u0439 \u043A\u043B\u0435\u0442\u043A\u0435."
-  additionalInfo:
+  _additionalInfo:
   - "\u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u0440\u0430\u0437\u043C\u0435\u0441\u0442\u0438\u0442\u044C
     \u044D\u0442\u043E\u0442 \u044D\u0444\u0444\u0435\u043A\u0442 \u043D\u0430 \u0442\u0440\u0430\u0441\u0441\u0435,
     \u043B\u0438\u0431\u043E \u0438\u0437\u0431\u0435\u0436\u0430\u0442\u044C \u0435\u0433\u043E
@@ -678,9 +686,9 @@ MonoBehaviour:
     \u043B\u0438\u0431\u043E \u0438\u0437\u0431\u0435\u0436\u0430\u0442\u044C \u0435\u0433\u043E
     \u0432\u043E\u0437\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044F \u0446\u0435\u043D\u043E\u0439
     1 \u0441\u0438\u043B\u044B."
-  costToReplaceEffect: 010000000100000001000000
-  replaceEffectResourceType: 1
-  character: 2
+  _costToReplaceEffect: 010000000100000001000000
+  _replaceEffectResourceType: 1
+  _character: 2
 --- !u!1 &36816324
 GameObject:
   m_ObjectHideFlags: 0
@@ -830,7 +838,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09187b8388068654886cd535d8802df5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeInTime: 0.3
 --- !u!222 &42128693
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1052,6 +1059,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
       propertyPath: nextCell
+      value: 
+      objectReference: {fileID: 574186605}
+    - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
+      propertyPath: _nextCell
       value: 
       objectReference: {fileID: 574186605}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
@@ -1297,6 +1308,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
       propertyPath: effectType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
+      propertyPath: _effectType
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
@@ -4362,12 +4377,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ff6aca866cb6934db1cadb0b0fcd0e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveTime: 12
-  specifiedMoveTime: 6
-  stepDelay: 0.1
-  endMoveDelay: 0.5
-  skipMoveDelay: 1.5
-  alignTime: 12
+  _moveTime: 12
+  _specifiedMoveTime: 6
+  _stepDelay: 0.1
+  _endMoveDelay: 0.5
+  _skipMoveDelay: 1.5
+  _alignTime: 12
 --- !u!4 &209808278
 Transform:
   m_ObjectHideFlags: 0
@@ -4395,8 +4410,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9d8e74c10da7fe4f94033df294aac33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveToStartTime: 5
-  startCell: {fileID: 1879388406}
+  _moveToStartTime: 5
+  _startCell: {fileID: 1879388406}
 --- !u!114 &209808280
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4421,7 +4436,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa42761729572f042b08444d1fa48f10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackDelay: 0.3
+  _attackDelay: 0.3
 --- !u!114 &209808282
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4434,7 +4449,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ff1e6137e3d07a438a1aedf9d1d1b8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waitAfterClose: 0.4
+  _waitAfterClose: 0.4
 --- !u!114 &209808283
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4508,17 +4523,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27ac9ffa33753aa4196aa8a787834d33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  iconExecute: {fileID: 1294627357}
-  iconCostEffect: {fileID: 111990250}
-  iconResource: {fileID: 734610730}
-  lowPower: {fileID: 166079724}
-  answerButton: {fileID: 1043683578}
-  shieldInfo: {fileID: 482894587}
-  descriptionText: {fileID: 2134311580}
-  effectCostName: {fileID: 1080369465}
-  resourceCost: {fileID: 2019357600}
-  resourceCostText: {fileID: 1439853478}
-  effectName: {fileID: 1802728575}
+  _iconExecute: {fileID: 1294627357}
+  _iconCostEffect: {fileID: 111990250}
+  _iconResource: {fileID: 734610730}
+  _lowPower: {fileID: 166079724}
+  _answerButton: {fileID: 1043683578}
+  _shieldInfo: {fileID: 482894587}
+  _descriptionText: {fileID: 2134311580}
+  _effectCostName: {fileID: 1080369465}
+  _resourceCost: {fileID: 2019357600}
+  _resourceCostText: {fileID: 1439853478}
+  _effectName: {fileID: 1802728575}
 --- !u!114 &209808290
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4630,10 +4645,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dd5cd4216e0ed4408dfb99f3e5834a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  magnetsRow: {fileID: 1196647305}
-  lassoRow: {fileID: 1172255587}
-  shieldsRow: {fileID: 1943259274}
-  boostersList:
+  _magnetsRow: {fileID: 1196647305}
+  _lassoRow: {fileID: 1172255587}
+  _shieldsRow: {fileID: 1943259274}
+  _boostersList:
   - {fileID: 1651965662}
   - {fileID: 279931749}
   - {fileID: 892818445}
@@ -5074,8 +5089,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdd8dbdf823c08469f9821f5fb89dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpline: {fileID: 89363014}
-  arrowToCell: {fileID: 1457933108}
+  _arrowSpline: {fileID: 89363014}
+  _arrowToCell: {fileID: 1457933108}
 --- !u!1001 &246290312
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5429,6 +5444,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
+      propertyPath: _effectType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
       propertyPath: _quantityTextObject
       value: 
       objectReference: {fileID: 197299009}
@@ -5777,8 +5796,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdd8dbdf823c08469f9821f5fb89dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpline: {fileID: 1281532534}
-  arrowToCell: {fileID: 2106803949}
+  _arrowSpline: {fileID: 1281532534}
+  _arrowToCell: {fileID: 2106803949}
 --- !u!1 &308913491
 GameObject:
   m_ObjectHideFlags: 0
@@ -5926,10 +5945,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d93a5abc978e26943a7babfaee6ab935, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerName: "\u0418\u0433\u0440\u043E\u043A D"
-  tokenName: 
-  moveOrder: 0
-  isReverseMove: 0
+  _playerName: "\u0418\u0433\u0440\u043E\u043A D"
+  _tokenObject: {fileID: 0}
+  _moveOrder: 0
+  _isReverseMove: 0
   _armor: 0
   _isIronArmor: 0
   _selectedShieldButton: {fileID: 0}
@@ -6962,23 +6981,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97320000574e3bc4184148e711e1bb0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityName: "\u0421\u0438\u043B\u0430"
-  shortDescriptionLevel1:
+  _entityName: "\u0421\u0438\u043B\u0430"
+  _shortDescriptionLevel1:
   - "\u0412\u0430\u0448\u0430 \u0444\u0438\u0448\u043A\u0430 \u043C\u043E\u0436\u0435\u0442
     \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u044C \u0441\u0438\u043B\u0443
     \u0434\u043B\u044F \u0430\u0442\u0430\u043A\u0438 \u043D\u0430 \u0441\u043E\u043F\u0435\u0440\u043D\u0438\u043A\u043E\u0432."
-  shortDescriptionLevel2: []
-  shortDescriptionLevel3: []
-  additionalInfo:
+  _shortDescriptionLevel2: []
+  _shortDescriptionLevel3: []
+  _additionalInfo:
   - "\u0422\u0430\u043A\u0436\u0435 \u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F
     \u0437\u0434\u043E\u0440\u043E\u0432\u044C\u0435\u043C \u0444\u0438\u0448\u043A\u0438.
     \u0415\u0441\u043B\u0438 \u0441\u0438\u043B\u0430 \u043E\u043F\u0443\u0441\u043A\u0430\u0435\u0442\u0441\u044F
     \u043D\u0438\u0436\u0435 0, \u0442\u043E \u0432\u044B \u0437\u0430\u043D\u0438\u043C\u0430\u0435\u0442\u0435
     \u043F\u043E\u0441\u043B\u0435\u0434\u043D\u0435\u0435 \u0432\u043E\u0437\u043C\u043E\u0436\u043D\u043E\u0435
     \u043C\u0435\u0441\u0442\u043E \u0432 \u0433\u043E\u043D\u043A\u0435."
-  costToReplaceEffect: 
-  replaceEffectResourceType: 0
-  character: 0
+  _costToReplaceEffect: 
+  _replaceEffectResourceType: 0
+  _character: 0
 --- !u!1 &374368288
 GameObject:
   m_ObjectHideFlags: 0
@@ -7024,17 +7043,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97320000574e3bc4184148e711e1bb0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityName: "\u041C\u043E\u043D\u0435\u0442\u044B"
-  shortDescriptionLevel1:
+  _entityName: "\u041C\u043E\u043D\u0435\u0442\u044B"
+  _shortDescriptionLevel1:
   - "\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u044E\u0442\u0441\u044F \u0434\u043B\u044F
-    \u043F\u043E\u043A\u0443\u043F\u043A\u0438 \u043D\u043E\u0432\u044B\u0445 \u0444\u0438\u0448\u0435\u043A
-    \u0438 \u0443\u0441\u0438\u043B\u0438\u0442\u0435\u043B\u0435\u0439"
-  shortDescriptionLevel2: []
-  shortDescriptionLevel3: []
-  additionalInfo: []
-  costToReplaceEffect: 
-  replaceEffectResourceType: 0
-  character: 0
+    \u043F\u043E\u043A\u0443\u043F\u043A\u0438 \u0443\u0441\u0438\u043B\u0438\u0442\u0435\u043B\u0435\u0439."
+  _shortDescriptionLevel2: []
+  _shortDescriptionLevel3: []
+  _additionalInfo: []
+  _costToReplaceEffect: 
+  _replaceEffectResourceType: 0
+  _character: 0
 --- !u!212 &374368291
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -7711,10 +7729,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1356ee784f655e4ea9678a0d7032e23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateTime: 0.5
-  holdTime: 0.5
-  pulseTime: 1.2
-  pulseMinAlpha: 0.2
+  _rotateTime: 0.5
+  _holdTime: 0.5
+  _pulseTime: 1.2
+  _pulseMinAlpha: 0.2
 --- !u!1 &421547700
 GameObject:
   m_ObjectHideFlags: 0
@@ -8397,7 +8415,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1e5437c81b2931458b4b12cb87204a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modifierMagnet: {fileID: 1327853842}
+  _modifierMagnet: {fileID: 1327853842}
 --- !u!114 &434678342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8481,7 +8499,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09187b8388068654886cd535d8802df5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeInTime: 0.3
 --- !u!222 &435981275
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8913,7 +8930,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09187b8388068654886cd535d8802df5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeInTime: 0.3
 --- !u!222 &455788744
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9687,8 +9703,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d62d219033eb74b4ea2fe15f460be406, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shiftBy: 70
-  fadeTime: 0.7
+  _shiftBy: 70
+  _fadeTime: 0.7
 --- !u!1 &500352525
 GameObject:
   m_ObjectHideFlags: 0
@@ -10010,7 +10026,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09187b8388068654886cd535d8802df5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeInTime: 0.3
 --- !u!222 &514408819
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10312,8 +10327,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa2ced9528aa7774897065770fe17e7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeInTime: 0.5
-  fadeOutTime: 0.2
+  _fadeInTime: 0.5
+  _fadeOutTime: 0.2
 --- !u!1 &526724681
 GameObject:
   m_ObjectHideFlags: 0
@@ -10937,6 +10952,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
       propertyPath: effectType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
+      propertyPath: _effectType
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
@@ -11640,7 +11659,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2d3fe5676da6304baaf1ba09d61531b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxMessages: 30
+  _maxMessages: 30
 --- !u!1 &574186605 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2324068203896962674, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
@@ -11787,10 +11806,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d93a5abc978e26943a7babfaee6ab935, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerName: "\u0418\u0433\u0440\u043E\u043A C"
-  tokenName: 
-  moveOrder: 0
-  isReverseMove: 0
+  _playerName: "\u0418\u0433\u0440\u043E\u043A \u0421"
+  _tokenObject: {fileID: 0}
+  _moveOrder: 0
+  _isReverseMove: 0
   _armor: 0
   _isIronArmor: 0
   _selectedShieldButton: {fileID: 0}
@@ -12292,7 +12311,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 446001015d83a9347b1e3844f61ddf88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isReverse: 0
+  _isReverse: 0
 --- !u!1001 &626430698
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13232,9 +13251,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bec6d229aee09543b42a952b98ec055, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  changingEffectTime: 0.2
-  changingEffectDuration: 2.7
-  changingEffectDelay: 1.5
+  _changingEffectTime: 0.2
+  _changingEffectDuration: 2.7
+  _changingEffectDelay: 1.5
 --- !u!1 &659996225 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 962209491290485435, guid: 90f222e8e5cb7ea4fbcf162378460109, type: 3}
@@ -13284,10 +13303,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d93a5abc978e26943a7babfaee6ab935, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerName: "\u0418\u0433\u0440\u043E\u043A B"
-  tokenName: 
-  moveOrder: 0
-  isReverseMove: 0
+  _playerName: "\u0418\u0433\u0440\u043E\u043A \u0411"
+  _tokenObject: {fileID: 0}
+  _moveOrder: 0
+  _isReverseMove: 0
   _armor: 0
   _isIronArmor: 0
   _selectedShieldButton: {fileID: 0}
@@ -13623,6 +13642,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 617719912}
     m_Modifications:
+    - target: {fileID: 5819299414306575501, guid: 324731b6ec6302c4f85f99dd1d59e47c, type: 3}
+      propertyPath: _infoOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6195226306998218727, guid: 324731b6ec6302c4f85f99dd1d59e47c, type: 3}
       propertyPath: m_Name
       value: PlayerInfo2
@@ -15190,6 +15213,10 @@ PrefabInstance:
       propertyPath: infoOrder
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 5819299414306575501, guid: 324731b6ec6302c4f85f99dd1d59e47c, type: 3}
+      propertyPath: _infoOrder
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6195226306998218727, guid: 324731b6ec6302c4f85f99dd1d59e47c, type: 3}
       propertyPath: m_Name
       value: PlayerInfo3
@@ -15301,8 +15328,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdd8dbdf823c08469f9821f5fb89dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpline: {fileID: 1552569332}
-  arrowToCell: {fileID: 1674911735}
+  _arrowSpline: {fileID: 1552569332}
+  _arrowToCell: {fileID: 1674911735}
 --- !u!4 &745660537 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4806785923858378738, guid: 250f801206cd2e4439f5e8f09257bb1e, type: 3}
@@ -15352,10 +15379,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d93a5abc978e26943a7babfaee6ab935, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerName: "\u0418\u0433\u0440\u043E\u043A A"
-  tokenName: 
-  moveOrder: 0
-  isReverseMove: 0
+  _playerName: "\u0418\u0433\u0440\u043E\u043A \u0410"
+  _tokenObject: {fileID: 0}
+  _moveOrder: 0
+  _isReverseMove: 0
   _armor: 0
   _isIronArmor: 0
   _selectedShieldButton: {fileID: 0}
@@ -15703,6 +15730,10 @@ PrefabInstance:
       propertyPath: nextCell
       value: 
       objectReference: {fileID: 1485803351}
+    - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
+      propertyPath: _nextCell
+      value: 
+      objectReference: {fileID: 1485803351}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
       propertyPath: m_Name
       value: BranchButton
@@ -15890,7 +15921,15 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4718146849246448550, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
+      propertyPath: _attackType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4718146849246448550, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
       propertyPath: attackNameText
+      value: "\u041D\u043E\u043A\u0430\u0443\u0442"
+      objectReference: {fileID: 0}
+    - target: {fileID: 4718146849246448550, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
+      propertyPath: _attackNameText
       value: "\u041D\u043E\u043A\u0430\u0443\u0442"
       objectReference: {fileID: 0}
     - target: {fileID: 6992871456754625632, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
@@ -16509,7 +16548,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fad0f35038f87e041a1b6e68d8cf4d26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  branchObject: {fileID: 617815618}
+  _branchObject: {fileID: 617815618}
 --- !u!1 &864798083
 GameObject:
   m_ObjectHideFlags: 0
@@ -18394,8 +18433,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d62d219033eb74b4ea2fe15f460be406, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shiftBy: 70
-  fadeTime: 0.7
+  _shiftBy: 70
+  _fadeTime: 0.7
 --- !u!1001 &950631874
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18486,6 +18525,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
       propertyPath: nextCell
+      value: 
+      objectReference: {fileID: 126166605}
+    - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
+      propertyPath: _nextCell
       value: 
       objectReference: {fileID: 126166605}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
@@ -18605,8 +18648,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdd8dbdf823c08469f9821f5fb89dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpline: {fileID: 705090064}
-  arrowToCell: {fileID: 549636389}
+  _arrowSpline: {fileID: 705090064}
+  _arrowToCell: {fileID: 549636389}
 --- !u!1 &962891898 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 962209491290485435, guid: 90f222e8e5cb7ea4fbcf162378460109, type: 3}
@@ -18720,18 +18763,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97320000574e3bc4184148e711e1bb0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityName: "\u0427\u0435\u0440\u043D\u044B\u0439 \u044D\u0444\u0444\u0435\u043A\u0442"
-  shortDescriptionLevel1:
+  _entityName: "\u0427\u0451\u0440\u043D\u044B\u0439 \u044D\u0444\u0444\u0435\u043A\u0442"
+  _shortDescriptionLevel1:
   - "- 1 \u0441\u0438\u043B\u0430."
-  shortDescriptionLevel2:
+  _shortDescriptionLevel2:
   - "- 1 \u0441\u0438\u043B\u0430."
-  shortDescriptionLevel3:
+  _shortDescriptionLevel3:
   - "- 1 \u0441\u0438\u043B\u0430."
   - "\u0421\u0432\u043E\u0439\u0441\u0442\u0432\u043E \xAB\u0421\u0442\u0435\u043D\u0430\xBB
     (\u044D\u0444\u0444\u0435\u043A\u0442 \u0430\u043A\u0442\u0438\u0432\u0438\u0440\u0443\u0435\u0442\u0441\u044F
     \u0432\u043E \u0432\u0440\u0435\u043C\u044F \u0434\u0432\u0438\u0436\u0435\u043D\u0438\u044F
     \u0444\u0438\u0448\u043A\u0438)."
-  additionalInfo:
+  _additionalInfo:
   - "\u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u0440\u0430\u0437\u043C\u0435\u0441\u0442\u0438\u0442\u044C
     \u044D\u0442\u043E\u0442 \u044D\u0444\u0444\u0435\u043A\u0442 \u043D\u0430 \u0442\u0440\u0430\u0441\u0441\u0435,
     \u043B\u0438\u0431\u043E \u0438\u0437\u0431\u0435\u0436\u0430\u0442\u044C \u0435\u0433\u043E
@@ -18747,9 +18790,9 @@ MonoBehaviour:
     \u043B\u0438\u0431\u043E \u0438\u0437\u0431\u0435\u0436\u0430\u0442\u044C \u0435\u0433\u043E
     \u0432\u043E\u0437\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044F \u0446\u0435\u043D\u043E\u0439
     300 \u043C\u043E\u043D\u0435\u0442."
-  costToReplaceEffect: 640000002c0100002c010000
-  replaceEffectResourceType: 0
-  character: 2
+  _costToReplaceEffect: 640000002c0100002c010000
+  _replaceEffectResourceType: 0
+  _character: 2
 --- !u!1 &994440476
 GameObject:
   m_ObjectHideFlags: 0
@@ -18796,7 +18839,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 446001015d83a9347b1e3844f61ddf88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isReverse: 1
+  _isReverse: 1
 --- !u!1001 &995405028
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18807,6 +18850,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
       propertyPath: score
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
+      propertyPath: _score
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6149342515386043707, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
@@ -19196,7 +19243,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fad0f35038f87e041a1b6e68d8cf4d26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  branchObject: {fileID: 1616085664}
+  _branchObject: {fileID: 1616085664}
 --- !u!1 &1013567445
 GameObject:
   m_ObjectHideFlags: 0
@@ -19421,6 +19468,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
       propertyPath: nextCell
+      value: 
+      objectReference: {fileID: 2061735310}
+    - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
+      propertyPath: _nextCell
       value: 
       objectReference: {fileID: 2061735310}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
@@ -20305,6 +20356,10 @@ PrefabInstance:
       propertyPath: infoOrder
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 5819299414306575501, guid: 324731b6ec6302c4f85f99dd1d59e47c, type: 3}
+      propertyPath: _infoOrder
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 6195226306998218727, guid: 324731b6ec6302c4f85f99dd1d59e47c, type: 3}
       propertyPath: m_Name
       value: PlayerInfo4
@@ -20914,7 +20969,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b10c5f49ba386f44b8a01e611e71349a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextLevel: Level 2
+  _nextLevel: Level 2
 --- !u!114 &1090841123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21134,8 +21189,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdd8dbdf823c08469f9821f5fb89dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpline: {fileID: 194987285}
-  arrowToCell: {fileID: 1086090272}
+  _arrowSpline: {fileID: 194987285}
+  _arrowToCell: {fileID: 1086090272}
 --- !u!1 &1110870825 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2324068203896962674, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
@@ -22684,7 +22739,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09187b8388068654886cd535d8802df5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeInTime: 0.3
 --- !u!222 &1194630295
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -23361,6 +23415,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
       propertyPath: nextCell
+      value: 
+      objectReference: {fileID: 2127421774}
+    - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
+      propertyPath: _nextCell
       value: 
       objectReference: {fileID: 2127421774}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
@@ -25034,6 +25092,10 @@ PrefabInstance:
       propertyPath: score
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
+      propertyPath: _score
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 6149342515386043707, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
       propertyPath: m_Name
       value: CubicButton8
@@ -26039,16 +26101,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10c9ce6c6a78ee84ab0dbf7b124cec15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  emptyCellSprite: {fileID: 423996755}
-  greenCellSprite: {fileID: 1351629946}
-  yellowCellSprite: {fileID: 2141144104}
-  blackCellSprite: {fileID: 1686846478}
-  redCellSprite: {fileID: 760382438}
-  starCellSprite: {fileID: 594004884}
-  yellowBrush: {fileID: 364887124}
-  redBrush: {fileID: 1186686002}
-  blackBrush: {fileID: 1069323864}
-  replaceTime: 6
+  _emptyCellSprite: {fileID: 423996755}
+  _greenCellSprite: {fileID: 1351629946}
+  _yellowCellSprite: {fileID: 2141144104}
+  _blackCellSprite: {fileID: 1686846478}
+  _redCellSprite: {fileID: 760382438}
+  _starCellSprite: {fileID: 594004884}
+  _yellowBrush: {fileID: 364887124}
+  _redBrush: {fileID: 1186686002}
+  _blackBrush: {fileID: 1069323864}
+  _replaceTime: 6
 --- !u!1 &1351629946
 GameObject:
   m_ObjectHideFlags: 0
@@ -26496,7 +26558,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fad0f35038f87e041a1b6e68d8cf4d26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  branchObject: {fileID: 1805713252}
+  _branchObject: {fileID: 1805713252}
 --- !u!1 &1378875492
 GameObject:
   m_ObjectHideFlags: 0
@@ -26542,27 +26604,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97320000574e3bc4184148e711e1bb0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityName: "\u0417\u0432\u0435\u0437\u0434\u0430"
-  shortDescriptionLevel1:
+  _entityName: "\u0417\u0432\u0435\u0437\u0434\u0430"
+  _shortDescriptionLevel1:
   - "+ 1 \u0441\u0438\u043B\u0430."
-  shortDescriptionLevel2:
+  _shortDescriptionLevel2:
   - "+ 2 \u0441\u0438\u043B\u044B."
-  shortDescriptionLevel3:
+  _shortDescriptionLevel3:
   - "+ 2 \u0441\u0438\u043B\u044B."
   - "\u0421\u0432\u043E\u0439\u0441\u0442\u0432\u043E \xAB\u0421\u0447\u0430\u0441\u0442\u043B\u0438\u0432\u0430\u044F
     \u0437\u0432\u0435\u0437\u0434\u0430\xBB (\u0437\u0430\u0449\u0438\u0442\u0430
     \u043E\u0442 \u0447\u0435\u0440\u043D\u044B\u0445 \u043A\u043B\u0435\u0442\u043E\u043A
     \u0434\u043E \u043A\u043E\u043D\u0446\u0430 \u0442\u0440\u0430\u0441\u0441\u044B)."
-  additionalInfo:
+  _additionalInfo:
   - "\u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u0440\u0430\u0437\u043C\u0435\u0441\u0442\u0438\u0442\u044C
     \u044D\u0442\u043E\u0442 \u044D\u0444\u0444\u0435\u043A\u0442 \u043D\u0430 \u0442\u0440\u0430\u0441\u0441\u0435."
   - "\u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u0440\u0430\u0437\u043C\u0435\u0441\u0442\u0438\u0442\u044C
     \u044D\u0442\u043E\u0442 \u044D\u0444\u0444\u0435\u043A\u0442 \u043D\u0430 \u0442\u0440\u0430\u0441\u0441\u0435."
   - "\u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u0440\u0430\u0437\u043C\u0435\u0441\u0442\u0438\u0442\u044C
     \u044D\u0442\u043E\u0442 \u044D\u0444\u0444\u0435\u043A\u0442 \u043D\u0430 \u0442\u0440\u0430\u0441\u0441\u0435."
-  costToReplaceEffect: 
-  replaceEffectResourceType: 0
-  character: 1
+  _costToReplaceEffect: 
+  _replaceEffectResourceType: 0
+  _character: 1
 --- !u!212 &1378875495
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -26624,6 +26686,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1379113176}
+  - component: {fileID: 1379113177}
   m_Layer: 0
   m_Name: Tokens
   m_TagString: Untagged
@@ -26650,6 +26713,24 @@ Transform:
   - {fileID: 1714863069}
   m_Father: {fileID: 75496289}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1379113177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1379113175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 340ad4eeee119bb4886165b30bbbfc92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pedestalMoveTime: 4
+  _squeezeTime: 0.4
+  _squeezeMaxValue: 1.13
+  _squeezeMinValue: 1
+  _squeezeDefaultValue: 1
+  _arrowMovingTime: 1.5
 --- !u!224 &1410296768 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3188923569174307679, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
@@ -26983,18 +27064,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17bcc09fe7ab0034bad0d992b0ed8289, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prizeCoins: 2c010000c80000009600000064000000
-  prizeMallows: 02000000010000000100000000000000
-  prizeRubies: 03000000020000000100000000000000
-  levelCenterPosition:
+  _prizeCoins: 2c010000c80000009600000064000000
+  _prizeMallows: 02000000010000000100000000000000
+  _prizeRubies: 03000000020000000100000000000000
+  _levelCenterPosition:
   - 6.3
   - 13
-  levelCenterCameraZoom: 60
-  effectsGreen: 3
-  effectsYellow: 2
-  effectsBlack: 2
-  effectsRed: 2
-  effectsStar: 2
+  _levelCenterCameraZoom: 60
+  _effectsGreen: 2
+  _effectsYellow: 2
+  _effectsBlack: 1
+  _effectsRed: 1
+  _effectsStar: 1
 --- !u!4 &1427459173
 Transform:
   m_ObjectHideFlags: 0
@@ -28353,8 +28434,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdd8dbdf823c08469f9821f5fb89dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpline: {fileID: 671561139}
-  arrowToCell: {fileID: 1045207596}
+  _arrowSpline: {fileID: 671561139}
+  _arrowToCell: {fileID: 1045207596}
 --- !u!1 &1513473902
 GameObject:
   m_ObjectHideFlags: 0
@@ -29139,16 +29220,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75477f58b231ad646912f549f8523bfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isFollow: 1
-  zoomSpeed: 200
-  minZoom: 30
-  maxZoom: 64
-  defaultZoom: 40
-  isZoom: 1
-  zoomSmoothTime: 0.2
-  panSpeed: 100
-  minPanBound: {x: -130, y: -60}
-  maxPanBound: {x: 130, y: 60}
+  _isFollow: 1
+  _zoomSpeed: 200
+  _minZoom: 30
+  _maxZoom: 64
+  _defaultZoom: 40
+  _isZoom: 1
+  _zoomSmoothTime: 0.2
+  _panSpeed: 100
+  _minPanBound: {x: -130, y: -60}
+  _maxPanBound: {x: 130, y: 60}
 --- !u!114 &1538840760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30169,7 +30250,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 446001015d83a9347b1e3844f61ddf88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isReverse: 0
+  _isReverse: 0
 --- !u!1001 &1629354748
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30551,6 +30632,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
       propertyPath: score
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
+      propertyPath: _score
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6149342515386043707, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
@@ -31755,8 +31840,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdd8dbdf823c08469f9821f5fb89dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpline: {fileID: 5304487308731891129}
-  arrowToCell: {fileID: 164722339}
+  _arrowSpline: {fileID: 5304487308731891129}
+  _arrowToCell: {fileID: 164722339}
 --- !u!1 &1691103499
 GameObject:
   m_ObjectHideFlags: 0
@@ -31922,8 +32007,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdd8dbdf823c08469f9821f5fb89dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpline: {fileID: 1674011419}
-  arrowToCell: {fileID: 293582564}
+  _arrowSpline: {fileID: 1674011419}
+  _arrowToCell: {fileID: 293582564}
 --- !u!1001 &1698489942
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32036,6 +32121,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
       propertyPath: score
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
+      propertyPath: _score
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6149342515386043707, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
@@ -32863,6 +32952,10 @@ PrefabInstance:
       propertyPath: nextCell
       value: 
       objectReference: {fileID: 126166605}
+    - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
+      propertyPath: _nextCell
+      value: 
+      objectReference: {fileID: 126166605}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
       propertyPath: m_Name
       value: BranchButton
@@ -33587,7 +33680,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 446001015d83a9347b1e3844f61ddf88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isReverse: 1
+  _isReverse: 1
 --- !u!1 &1806436256
 GameObject:
   m_ObjectHideFlags: 0
@@ -33637,9 +33730,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a54a524008612ea45b21341e9ff3d844, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  finishDelay: 0.5
-  loseDelay: 2
-  redEffectDelay: 0.8
+  _finishDelay: 0.5
+  _loseDelay: 2
+  _redEffectDelay: 0.8
 --- !u!114 &1806436259
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34254,6 +34347,10 @@ PrefabInstance:
       propertyPath: score
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
+      propertyPath: _score
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 6149342515386043707, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
       propertyPath: m_Name
       value: CubicButton9
@@ -34743,16 +34840,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97320000574e3bc4184148e711e1bb0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityName: "\u041A\u0440\u0430\u0441\u043D\u044B\u0439 \u044D\u0444\u0444\u0435\u043A\u0442"
-  shortDescriptionLevel1:
+  _entityName: "\u041A\u0440\u0430\u0441\u043D\u044B\u0439 \u044D\u0444\u0444\u0435\u043A\u0442"
+  _shortDescriptionLevel1:
   - "\u0412\u043E\u0437\u0432\u0440\u0430\u0442 \u043A \u0431\u043B\u0438\u0436\u0430\u0439\u0448\u0435\u043C\u0443
     \u0447\u0435\u043A\u043F\u043E\u0439\u043D\u0442\u0443."
   - "- 1 \u0441\u0438\u043B\u0430."
-  shortDescriptionLevel2:
+  _shortDescriptionLevel2:
   - "\u0412\u043E\u0437\u0432\u0440\u0430\u0442 \u043A \u0431\u043B\u0438\u0436\u0430\u0439\u0448\u0435\u043C\u0443
     \u0447\u0435\u043A\u043F\u043E\u0439\u043D\u0442\u0443."
   - "- 2 \u0441\u0438\u043B\u044B."
-  shortDescriptionLevel3:
+  _shortDescriptionLevel3:
   - "\u0412\u043E\u0437\u0432\u0440\u0430\u0442 \u043A \u0431\u043B\u0438\u0436\u0430\u0439\u0448\u0435\u043C\u0443
     \u0447\u0435\u043A\u043F\u043E\u0439\u043D\u0442\u0443."
   - "- 2 \u0441\u0438\u043B\u044B."
@@ -34760,7 +34857,7 @@ MonoBehaviour:
     (\u044D\u0444\u0444\u0435\u043A\u0442 \u0430\u043A\u0442\u0438\u0432\u0438\u0440\u0443\u0435\u0442\u0441\u044F
     \u0432\u043E \u0432\u0440\u0435\u043C\u044F \u0434\u0432\u0438\u0436\u0435\u043D\u0438\u044F
     \u0444\u0438\u0448\u043A\u0438)."
-  additionalInfo:
+  _additionalInfo:
   - "\u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u0440\u0430\u0437\u043C\u0435\u0441\u0442\u0438\u0442\u044C
     \u044D\u0442\u043E\u0442 \u044D\u0444\u0444\u0435\u043A\u0442 \u043D\u0430 \u0442\u0440\u0430\u0441\u0441\u0435,
     \u043B\u0438\u0431\u043E \u0438\u0437\u0431\u0435\u0436\u0430\u0442\u044C \u0435\u0433\u043E
@@ -34776,9 +34873,9 @@ MonoBehaviour:
     \u043B\u0438\u0431\u043E \u0438\u0437\u0431\u0435\u0436\u0430\u0442\u044C \u0435\u0433\u043E
     \u0432\u043E\u0437\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044F \u0446\u0435\u043D\u043E\u0439
     4 \u0441\u0438\u043B\u044B."
-  costToReplaceEffect: 030000000300000004000000
-  replaceEffectResourceType: 1
-  character: 2
+  _costToReplaceEffect: 030000000300000004000000
+  _replaceEffectResourceType: 1
+  _character: 2
 --- !u!1 &1879388406 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7000465700868913193, guid: 250f801206cd2e4439f5e8f09257bb1e, type: 3}
@@ -35086,7 +35183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fad0f35038f87e041a1b6e68d8cf4d26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  branchObject: {fileID: 994440476}
+  _branchObject: {fileID: 994440476}
 --- !u!1 &1903409843 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2324068203896962674, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
@@ -35268,7 +35365,15 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4718146849246448550, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
+      propertyPath: _attackType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4718146849246448550, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
       propertyPath: attackNameText
+      value: "\u0412\u043E\u043B\u0448\u0435\u0431\u043D\u044B\u0439 \u043F\u0438\u043D\u043E\u043A"
+      objectReference: {fileID: 0}
+    - target: {fileID: 4718146849246448550, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
+      propertyPath: _attackNameText
       value: "\u0412\u043E\u043B\u0448\u0435\u0431\u043D\u044B\u0439 \u043F\u0438\u043D\u043E\u043A"
       objectReference: {fileID: 0}
     - target: {fileID: 6992871456754625632, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
@@ -35969,6 +36074,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
       propertyPath: score
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2248453522141743026, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
+      propertyPath: _score
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6149342515386043707, guid: 4c002d44b42778e45a9fc4cc1a30d412, type: 3}
@@ -37062,8 +37171,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdd8dbdf823c08469f9821f5fb89dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpline: {fileID: 1940832015}
-  arrowToCell: {fileID: 1485803351}
+  _arrowSpline: {fileID: 1940832015}
+  _arrowToCell: {fileID: 1485803351}
 --- !u!1001 &1981863530
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37385,8 +37494,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdd8dbdf823c08469f9821f5fb89dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpline: {fileID: 1420717014}
-  arrowToCell: {fileID: 680780518}
+  _arrowSpline: {fileID: 1420717014}
+  _arrowToCell: {fileID: 680780518}
 --- !u!1001 &2012239029
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37397,6 +37506,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
       propertyPath: effectType
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
+      propertyPath: _effectType
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
@@ -37517,8 +37630,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdd8dbdf823c08469f9821f5fb89dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpline: {fileID: 1429915664}
-  arrowToCell: {fileID: 408557072}
+  _arrowSpline: {fileID: 1429915664}
+  _arrowToCell: {fileID: 408557072}
 --- !u!1001 &2016337957
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38633,6 +38746,10 @@ PrefabInstance:
       propertyPath: nextCell
       value: 
       objectReference: {fileID: 582773570}
+    - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
+      propertyPath: _nextCell
+      value: 
+      objectReference: {fileID: 582773570}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
       propertyPath: m_Name
       value: BranchButton
@@ -39626,6 +39743,10 @@ PrefabInstance:
       propertyPath: isReplaceAction
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7049924143283341559, guid: 352a4e088a5250c4fb5d37a39744390a, type: 3}
+      propertyPath: _isReplaceAction
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7356041114705036594, guid: 352a4e088a5250c4fb5d37a39744390a, type: 3}
       propertyPath: m_Name
       value: ReplaceAnswerButton (1)
@@ -39784,27 +39905,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97320000574e3bc4184148e711e1bb0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityName: "\u0417\u0435\u043B\u0435\u043D\u044B\u0439 \u044D\u0444\u0444\u0435\u043A\u0442"
-  shortDescriptionLevel1:
+  _entityName: "\u0417\u0435\u043B\u0451\u043D\u044B\u0439 \u044D\u0444\u0444\u0435\u043A\u0442"
+  _shortDescriptionLevel1:
   - "\u0414\u043E\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439
     \u0445\u043E\u0434 \u043D\u0435\u043C\u0435\u0434\u043B\u0435\u043D\u043D\u043E."
-  shortDescriptionLevel2:
+  _shortDescriptionLevel2:
   - "\u0414\u0432\u0430 \u0434\u043E\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0445
     \u0445\u043E\u0434\u0430 \u043D\u0435\u043C\u0435\u0434\u043B\u0435\u043D\u043D\u043E."
-  shortDescriptionLevel3:
+  _shortDescriptionLevel3:
   - "\u0414\u0432\u0430 \u0434\u043E\u043F\u043E\u043B\u043D\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0445
     \u0445\u043E\u0434\u0430 \u043D\u0435\u043C\u0435\u0434\u043B\u0435\u043D\u043D\u043E."
   - "+ 50 \u043C\u043E\u043D\u0435\u0442."
-  additionalInfo:
+  _additionalInfo:
   - "\u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u0440\u0430\u0437\u043C\u0435\u0441\u0442\u0438\u0442\u044C
     \u044D\u0442\u043E\u0442 \u044D\u0444\u0444\u0435\u043A\u0442 \u043D\u0430 \u0442\u0440\u0430\u0441\u0441\u0435."
   - "\u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u0440\u0430\u0437\u043C\u0435\u0441\u0442\u0438\u0442\u044C
     \u044D\u0442\u043E\u0442 \u044D\u0444\u0444\u0435\u043A\u0442 \u043D\u0430 \u0442\u0440\u0430\u0441\u0441\u0435."
   - "\u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u0440\u0430\u0437\u043C\u0435\u0441\u0442\u0438\u0442\u044C
     \u044D\u0442\u043E\u0442 \u044D\u0444\u0444\u0435\u043A\u0442 \u043D\u0430 \u0442\u0440\u0430\u0441\u0441\u0435."
-  costToReplaceEffect: 
-  replaceEffectResourceType: 1
-  character: 1
+  _costToReplaceEffect: 
+  _replaceEffectResourceType: 1
+  _character: 1
 --- !u!212 &2111148843
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -40433,7 +40554,15 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4718146849246448550, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
+      propertyPath: _attackType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4718146849246448550, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
       propertyPath: attackNameText
+      value: "\u0412\u0430\u043C\u043F\u0438\u0440"
+      objectReference: {fileID: 0}
+    - target: {fileID: 4718146849246448550, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
+      propertyPath: _attackNameText
       value: "\u0412\u0430\u043C\u043F\u0438\u0440"
       objectReference: {fileID: 0}
     - target: {fileID: 6992871456754625632, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
@@ -41236,6 +41365,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 901313488}
     m_Modifications:
     - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
+      propertyPath: _effectType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103107934251943049, guid: 75ae767a8a55150468c75941a3b45291, type: 3}
       propertyPath: _quantityTextObject
       value: 
       objectReference: {fileID: 2019381212}
@@ -41827,7 +41960,15 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4718146849246448550, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
+      propertyPath: _attackType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4718146849246448550, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
       propertyPath: attackNameText
+      value: "\u041E\u0431\u044B\u0447\u043D\u0430\u044F \u0430\u0442\u0430\u043A\u0430"
+      objectReference: {fileID: 0}
+    - target: {fileID: 4718146849246448550, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
+      propertyPath: _attackNameText
       value: "\u041E\u0431\u044B\u0447\u043D\u0430\u044F \u0430\u0442\u0430\u043A\u0430"
       objectReference: {fileID: 0}
     - target: {fileID: 6992871456754625632, guid: 6f2ca381a1c4a8c42b7164708c22cc20, type: 3}
@@ -41873,6 +42014,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5819299414306575501, guid: 324731b6ec6302c4f85f99dd1d59e47c, type: 3}
       propertyPath: infoOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5819299414306575501, guid: 324731b6ec6302c4f85f99dd1d59e47c, type: 3}
+      propertyPath: _infoOrder
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6195226306998218727, guid: 324731b6ec6302c4f85f99dd1d59e47c, type: 3}
@@ -42582,7 +42727,7 @@ PrefabInstance:
       value: -90.036
       objectReference: {fileID: 0}
     - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
-      propertyPath: nextCell
+      propertyPath: _nextCell
       value: 
       objectReference: {fileID: 278670334}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
@@ -43105,7 +43250,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09187b8388068654886cd535d8802df5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeInTime: 0.3
 --- !u!114 &7399300488502707413
 MonoBehaviour:
   m_ObjectHideFlags: 0

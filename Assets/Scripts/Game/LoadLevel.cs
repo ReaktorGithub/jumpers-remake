@@ -3,9 +3,9 @@ using UnityEngine.SceneManagement;
 
 public class LoadLevel : MonoBehaviour
 {
-    [SerializeField] private string nextLevel;
+    [SerializeField] private string _nextLevel;
 
     public void OnLoadLevel() {
-        SceneManager.LoadScene(nextLevel);
+        SceneManager.LoadScene(_nextLevel);
     }
 }

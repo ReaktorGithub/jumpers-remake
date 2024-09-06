@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class CellControl : MonoBehaviour
 {
+    // todo добавить _ перед переделыванием уровня
     [SerializeField] private GameObject nextCell;
     [SerializeField] private GameObject previousCell;
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
@@ -13,7 +14,7 @@ public class CellControl : MonoBehaviour
     private GameObject _container, _glow;
     private SpriteRenderer _spriteRenderer, _glowSpriteRenderer;
     private float[] _cellScale = new float[2];
-    private List<string> _currentTokens = new();
+    private List<GameObject> _currentTokens = new();
     private bool _isEffectPlacementMode, _isLassoMode = false;
     private TextMeshPro _text;
     private bool _isChanging = false;
@@ -21,8 +22,8 @@ public class CellControl : MonoBehaviour
     private Sprite _oldSprite, _newSprite;
     private Color _oldTextColor, _newTextColor;
     private IEnumerator _coroutine;
-    private float pulseTime = 1.2f;
-    private float pulseMinAlpha = 0.2f;
+    private float _pulseTime = 1.2f;
+    private float _pulseMinAlpha = 0.2f;
     private CursorManager _cursorManager;
 
     private void Awake() {
@@ -73,26 +74,26 @@ public class CellControl : MonoBehaviour
         set {}
     }
 
-    public List<string> CurrentTokens {
+    public List<GameObject> CurrentTokens {
         get { return _currentTokens; }
         set { _currentTokens = value; }
     }
 
-    public bool HasToken(string tokenName) {
-        return _currentTokens.Contains(tokenName);
+    public bool HasToken(GameObject tokenObject) {
+        return _currentTokens.Contains(tokenObject);
     }
 
     public bool IsNoTokens() {
         return _currentTokens.Count == 0;
     }
 
-    public void AddToken(string tokenName) {
-        _currentTokens.Add(tokenName);
+    public void AddToken(GameObject tokenObject) {
+        _currentTokens.Add(tokenObject);
     }
 
-    public void RemoveToken(string tokenName) {
-        if (HasToken(tokenName)) {
-            _currentTokens.Remove(tokenName);
+    public void RemoveToken(GameObject tokenObject) {
+        if (HasToken(tokenObject)) {
+            _currentTokens.Remove(tokenObject);
         }
     }
 
@@ -110,12 +111,12 @@ public class CellControl : MonoBehaviour
         int done = 0;
         int coroutinesCompleted = 0;
 
-        foreach(string tokenName in _currentTokens) {
-            if (tokenName == null) {
+        foreach(GameObject tokenObject in _currentTokens) {
+            if (tokenObject == null) {
                 coroutinesCompleted++;
                 continue;
             }
-            TokenControl tokenControl = GameObject.Find(tokenName).GetComponent<TokenControl>();
+            TokenControl tokenControl = tokenObject.GetComponent<TokenControl>();
             Vector3 pos;
             switch(_currentTokens.Count) {
                 case 2:
@@ -183,7 +184,7 @@ public class CellControl : MonoBehaviour
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
         }
-        _coroutine = Utils.StartPulse(_glowSpriteRenderer, pulseTime, pulseMinAlpha);
+        _coroutine = Utils.StartPulse(_glowSpriteRenderer, _pulseTime, _pulseMinAlpha);
         StartCoroutine(_coroutine);
     }
 

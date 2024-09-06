@@ -5,10 +5,10 @@ public class BoostersControl : MonoBehaviour
 {
     public static BoostersControl Instance { get; private set; }
     private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite;
-    [SerializeField] private GameObject magnetsRow, lassoRow, shieldsRow;
+    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow;
     private BoostersRow _magnetsRowScript, _lassoRowScript, _shieldsRowScript;
     private PopupMagnet _popupMagnet;
-    [SerializeField] private List<GameObject> boostersList;
+    [SerializeField] private List<GameObject> _boostersList;
     private List<BoosterButton> _boosterButtonsList = new();
     private TopPanel _topPanel;
 
@@ -22,18 +22,18 @@ public class BoostersControl : MonoBehaviour
         _shieldIronSprite = Instances.transform.Find("shield-iron").GetComponent<SpriteRenderer>().sprite;
         _lassoSprite = Instances.transform.Find("lasso").GetComponent<SpriteRenderer>().sprite;
 
-        if (magnetsRow != null) {
-            _magnetsRowScript = magnetsRow.GetComponent<BoostersRow>();
+        if (_magnetsRow != null) {
+            _magnetsRowScript = _magnetsRow.GetComponent<BoostersRow>();
         }
-        if (lassoRow != null) {
-            _lassoRowScript = lassoRow.GetComponent<BoostersRow>();
+        if (_lassoRow != null) {
+            _lassoRowScript = _lassoRow.GetComponent<BoostersRow>();
         }
-        if (shieldsRow != null) {
-            _shieldsRowScript = shieldsRow.GetComponent<BoostersRow>();
+        if (_shieldsRow != null) {
+            _shieldsRowScript = _shieldsRow.GetComponent<BoostersRow>();
         }
 
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
-        foreach(GameObject button in boostersList) {
+        foreach(GameObject button in _boostersList) {
             _boosterButtonsList.Add(button.GetComponent<BoosterButton>());
         }
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();

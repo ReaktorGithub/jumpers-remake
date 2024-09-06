@@ -10,7 +10,7 @@ public class ModalWarning : MonoBehaviour
     private TextMeshProUGUI _headingText, _bodyText;
     private IEnumerator _coroutine;
     private Action _callback;
-    [SerializeField] private float waitAfterClose = 0.4f;
+    [SerializeField] private float _waitAfterClose = 0.4f;
 
     private void Awake() {
         _modal = GameObject.Find("ModalWarning");
@@ -41,7 +41,7 @@ public class ModalWarning : MonoBehaviour
     }
 
     private IEnumerator CallbackDefer() {
-        yield return new WaitForSeconds(waitAfterClose);
+        yield return new WaitForSeconds(_waitAfterClose);
         _callback?.Invoke();
     }
 

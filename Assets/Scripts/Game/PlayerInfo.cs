@@ -12,7 +12,7 @@ public class PlayerInfo : MonoBehaviour
     private GameObject _powerCells, _powerOn, _powerOff, _place, _finish, _hover, _active;
     private SpriteRenderer[] _powerOffImages = new SpriteRenderer[20];
     private SpriteRenderer[] _symbolImages = new SpriteRenderer[4];
-    [SerializeField] private int infoOrder;
+    [SerializeField] private int _infoOrder; // todo sort
 
     private void Awake() {
         _hover = transform.Find("hover_player").gameObject;

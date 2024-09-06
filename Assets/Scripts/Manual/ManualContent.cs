@@ -3,15 +3,15 @@ using UnityEngine;
 
 public class ManualContent : MonoBehaviour
 {
-    [SerializeField] private string entityName;
+    [SerializeField] private string _entityName;
     private Sprite _sprite;
-    [SerializeField] private List<string> shortDescriptionLevel1 = new();
-    [SerializeField] private List<string> shortDescriptionLevel2 = new();
-    [SerializeField] private List<string> shortDescriptionLevel3 = new();
-    [SerializeField] private List<string> additionalInfo = new();
-    [SerializeField] private List<int> costToReplaceEffect = new();
-    [SerializeField] private EResourceTypes replaceEffectResourceType;
-    [SerializeField] private EResourceCharacters character;
+    [SerializeField] private List<string> _shortDescriptionLevel1 = new();
+    [SerializeField] private List<string> _shortDescriptionLevel2 = new();
+    [SerializeField] private List<string> _shortDescriptionLevel3 = new();
+    [SerializeField] private List<string> _additionalInfo = new();
+    [SerializeField] private List<int> _costToReplaceEffect = new();
+    [SerializeField] private EResourceTypes _replaceEffectResourceType;
+    [SerializeField] private EResourceCharacters _character;
 
     private void Awake() {
         _sprite = GetComponent<SpriteRenderer>().sprite;
@@ -27,17 +27,17 @@ public class ManualContent : MonoBehaviour
     }
 
     public EResourceTypes ReplaceEffectResourceType {
-        get { return replaceEffectResourceType; }
+        get { return _replaceEffectResourceType; }
         private set {}
     }
 
     public EResourceCharacters Character {
-        get { return character; }
+        get { return _character; }
         private set {}
     }
 
     public string GetEntityName(bool lowercase = false) {
-        return lowercase && entityName != null ? entityName.ToLower() : entityName;
+        return lowercase && _entityName != null ? _entityName.ToLower() : _entityName;
     }
     
     public string GetEntityNameWithLevel(int level, bool lowercase = false) {
@@ -49,22 +49,22 @@ public class ManualContent : MonoBehaviour
     public List<string> GetShortDescription(int level = 1) {
         switch(level) {
             case 1: {
-                return shortDescriptionLevel1;
+                return _shortDescriptionLevel1;
             }
             case 2: {
-                return shortDescriptionLevel2;
+                return _shortDescriptionLevel2;
             }
             default: {
-                return shortDescriptionLevel3;
+                return _shortDescriptionLevel3;
             }
         }
     }
 
     public string GetAdditionalInfo(int level = 1) {
-        return additionalInfo[level - 1];
+        return _additionalInfo[level - 1];
     }
 
     public int GetCostToReplaceEffect(int level = 1) {
-        return costToReplaceEffect[level - 1];
+        return _costToReplaceEffect[level - 1];
     }
 }

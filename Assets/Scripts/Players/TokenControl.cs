@@ -7,12 +7,6 @@ using UnityEngine.Splines;
 
 public class TokenControl : MonoBehaviour
 {
-    [SerializeField] private float pedestalMoveTime = 4f;
-    [SerializeField] private float squeezeTime = 0.8f;
-    [SerializeField] private float squeezeMaxValue = 5.2f;
-    [SerializeField] private float squeezeMinValue = 4.6f;
-    [SerializeField] private float squeezeDefaultValue = 4.6f;
-    [SerializeField] private float arrowMovingTime = 1.5f;
     private IEnumerator _coroutine, _squeezeCoroutine;
     [SerializeField] private GameObject _currentCell, _playerName, _indicators;
     private GameObject _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
@@ -98,12 +92,15 @@ public class TokenControl : MonoBehaviour
 
     public IEnumerator MoveToPedestal(Action callback = null) {
         Vector3 goalScale = new(0f, 0f, 0f);
-        Vector3 _pedestalPosition = _pedestal.transform.position;
-        while (Vector3.Distance(transform.localPosition, _pedestalPosition) > 4) {
-            transform.localPosition = Vector3.Lerp(transform.localPosition, _pedestalPosition, pedestalMoveTime * Time.deltaTime);
+        Vector3 pedestalPosition = _pedestal.transform.position;
+        float pedestalMoveTime = TokensControl.Instance.PedestalMoveTime;
+
+        while (Vector3.Distance(transform.localPosition, pedestalPosition) > 4) {
+            transform.localPosition = Vector3.Lerp(transform.localPosition, pedestalPosition, pedestalMoveTime * Time.deltaTime);
             transform.localScale = Vector3.Lerp(transform.localScale, goalScale, pedestalMoveTime * Time.deltaTime);
             yield return null;
         }
+
         callback?.Invoke();
     }
 
@@ -132,8 +129,8 @@ public class TokenControl : MonoBehaviour
             StopCoroutine(_squeezeCoroutine);
             _isSqueeze = false;
             _squeezable.transform.localScale = new Vector3(
-                squeezeDefaultValue,
-                squeezeDefaultValue,
+                TokensControl.Instance.SqueezeDefaultValue,
+                TokensControl.Instance.SqueezeDefaultValue,
                 _squeezable.transform.localScale.z);
         }
     }
@@ -141,18 +138,18 @@ public class TokenControl : MonoBehaviour
     private IEnumerator Squeeze() {
         bool isIn = true;
         while (true) {
-            while (isIn && _squeezable.transform.localScale.y > squeezeMinValue) {
+            while (isIn && _squeezable.transform.localScale.y > TokensControl.Instance.SqueezeMinValue) {
                 _squeezable.transform.localScale = new Vector3(
-                    squeezeMaxValue,
-                    _squeezable.transform.localScale.y - (squeezeTime * Time.deltaTime),
+                    TokensControl.Instance.SqueezeMaxValue,
+                    _squeezable.transform.localScale.y - (TokensControl.Instance.SqueezeTime * Time.deltaTime),
                     _squeezable.transform.localScale.z);
                 yield return null;
             }
             isIn = false;
-            while (!isIn && _squeezable.transform.localScale.y < squeezeMaxValue) {
+            while (!isIn && _squeezable.transform.localScale.y < TokensControl.Instance.SqueezeMaxValue) {
                 _squeezable.transform.localScale = new Vector3(
-                    squeezeMaxValue,
-                    _squeezable.transform.localScale.y + (squeezeTime * Time.deltaTime),
+                    TokensControl.Instance.SqueezeMaxValue,
+                    _squeezable.transform.localScale.y + (TokensControl.Instance.SqueezeTime * Time.deltaTime),
                     _squeezable.transform.localScale.z);
                 yield return null;
             }
@@ -207,7 +204,7 @@ public class TokenControl : MonoBehaviour
     }
 
     public IEnumerator ConfirmNewArrowPositionDefer() {
-        yield return new WaitForSeconds(arrowMovingTime);
+        yield return new WaitForSeconds(TokensControl.Instance.ArrowMovingTime);
         ConfirmNewArrowPosition();
     }
 
@@ -215,7 +212,7 @@ public class TokenControl : MonoBehaviour
         _splineAnimate.StopAllCoroutines();
         _splineAnimate.Container = null;
         CellControl currentCellControl = GetCurrentCellControl();
-        currentCellControl.RemoveToken(transform.name);
+        currentCellControl.RemoveToken(transform.gameObject);
         _currentCell = currentCellControl.transform.GetComponent<ArrowCell>().ArrowToCell;
         transform.SetLocalPositionAndRotation(_currentCell.transform.localPosition, Quaternion.Euler(new Vector3(0,0,0)));
         DisableIndicators(false);

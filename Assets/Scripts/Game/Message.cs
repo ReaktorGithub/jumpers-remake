@@ -6,7 +6,7 @@ using UnityEngine;
 public class Message : MonoBehaviour
 {
     private TextMeshProUGUI _message;
-    [SerializeField] private float fadeInTime = 0.4f;
+    [SerializeField] private float _fadeInTime = 0.4f;
 
     private void Awake() {
         _message = GetComponent<TextMeshProUGUI>();
@@ -19,8 +19,8 @@ public class Message : MonoBehaviour
 
     private IEnumerator FadeIn() {
         float startTime = Time.time;
-        while (Time.time - startTime < fadeInTime) {
-            float progress = (Time.time - startTime) / fadeInTime;
+        while (Time.time - startTime < _fadeInTime) {
+            float progress = (Time.time - startTime) / _fadeInTime;
             float alpha = Mathf.Lerp(0f, 1f, progress);
             _message.color = new Color(1f, 1f, 1f, alpha);
             yield return null;
