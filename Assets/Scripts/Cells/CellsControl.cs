@@ -59,13 +59,15 @@ public class CellsControl : MonoBehaviour
     // startCell - начальная клетка
     // isForward - искать впереди
     // cellTypesToFind - список типов клеток, которые мы ищем
+    // Возвращает клетку и дистанцию до нее
 
-    public GameObject FindNearestCell(GameObject startCell, bool isForward, List<ECellTypes> cellTypesToFind) {
+    public (GameObject, int) FindNearestCell(GameObject startCell, bool isForward, List<ECellTypes> cellTypesToFind) {
         GameObject result = null;
         List<GameObject> forAnalyseList = new() { startCell };
         List<GameObject> tempList = new();
 
         bool stop = false;
+        int distance = 0;
 
         do {
             for (int i = 0; i < forAnalyseList.Count; i++) {
@@ -112,9 +114,12 @@ public class CellsControl : MonoBehaviour
                 forAnalyseList.Add(obj);
             }
             tempList.Clear();
+            if (!stop) {
+               distance++; 
+            }
         } while (!stop);
 
-        return result;
+        return (result, distance);
     }
 
     /*
@@ -300,6 +305,14 @@ public class CellsControl : MonoBehaviour
         }
 
         return result;
+    }
+
+    // Возвращает количество шагов до финиша - ближайший маршрут
+
+    public int GetStepsToFinish(GameObject currentCell) {
+        List<ECellTypes> findCells = new() { ECellTypes.Finish };
+        (GameObject _, int distance) = FindNearestCell(currentCell, true, findCells);
+        return distance;
     }
 
     // Подсказки для магнита

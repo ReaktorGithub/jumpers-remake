@@ -4347,6 +4347,7 @@ GameObject:
   m_Component:
   - component: {fileID: 209808278}
   - component: {fileID: 209808286}
+  - component: {fileID: 209808291}
   - component: {fileID: 209808279}
   - component: {fileID: 209808277}
   - component: {fileID: 209808288}
@@ -4546,6 +4547,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1853ac0e0ca17b64690eaced11606cf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &209808291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 209808276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e99db1453732b440b14571de9f3806d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cubicThrowDelay: 1.5
+  _thinkingDelay: 1.8
 --- !u!1 &213087342
 GameObject:
   m_ObjectHideFlags: 0
@@ -5946,6 +5961,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerName: "\u0418\u0433\u0440\u043E\u043A D"
+  _type: 1
+  _aiType: 0
   _tokenObject: {fileID: 0}
   _moveOrder: 0
   _isReverseMove: 0
@@ -11807,13 +11824,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerName: "\u0418\u0433\u0440\u043E\u043A \u0421"
+  _type: 1
+  _aiType: 0
   _tokenObject: {fileID: 0}
   _moveOrder: 0
   _isReverseMove: 0
   _armor: 0
   _isIronArmor: 0
   _selectedShieldButton: {fileID: 0}
-  _coins: 400
+  _coins: 600
   _mallows: 0
   _rubies: 0
   _power: 4
@@ -13304,6 +13323,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerName: "\u0418\u0433\u0440\u043E\u043A \u0411"
+  _type: 1
+  _aiType: 0
   _tokenObject: {fileID: 0}
   _moveOrder: 0
   _isReverseMove: 0
@@ -13312,7 +13333,7 @@ MonoBehaviour:
   _selectedShieldButton: {fileID: 0}
   _coins: 400
   _mallows: 0
-  _rubies: 0
+  _rubies: 1
   _power: 4
   _effectsGreen: 0
   _effectsYellow: 0
@@ -15380,6 +15401,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerName: "\u0418\u0433\u0440\u043E\u043A \u0410"
+  _type: 0
+  _aiType: 0
   _tokenObject: {fileID: 0}
   _moveOrder: 0
   _isReverseMove: 0
@@ -15389,7 +15412,7 @@ MonoBehaviour:
   _coins: 400
   _mallows: 0
   _rubies: 0
-  _power: 4
+  _power: 5
   _effectsGreen: 0
   _effectsYellow: 0
   _effectsBlack: 0
@@ -28609,8 +28632,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -26.3, y: 94.4}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: -56.46401, y: 94.4}
+  m_SizeDelta: {x: 260.33, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1520417556
 MonoBehaviour:

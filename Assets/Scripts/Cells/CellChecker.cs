@@ -155,8 +155,12 @@ public class CellChecker : MonoBehaviour
             }
 
             if (rivals.Count > 0) {
-                _popupAttack.BuildContent(currentPlayer, rivals);
-                _popupAttack.OnOpenWindow();
+                if (currentPlayer.IsAi()) {
+                    AiControl.Instance.AiAttackPlayer(currentPlayer, cellControl, rivals);
+                } else {
+                    _popupAttack.BuildContent(currentPlayer, rivals);
+                    _popupAttack.OnOpenWindow();
+                }
                 return;
             }
         }

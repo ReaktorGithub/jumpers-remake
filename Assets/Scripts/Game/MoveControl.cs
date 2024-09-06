@@ -94,28 +94,28 @@ public class MoveControl : MonoBehaviour
     // ОСТОРОЖНО! рекурсия
     
     public void SwitchPlayer() {
-        PlayerControl[] playerControls = PlayersControl.Instance.Players;
+        foreach(PlayerControl player in PlayersControl.Instance.Players) {
+            if (player.MoveOrder != _currentPlayerIndex) {
+                continue;
+            }
 
-        for (int i = 0; i < playerControls.Length; i++) {
-            if (playerControls[i].MoveOrder == _currentPlayerIndex) {
-                if (playerControls[i].IsFinished) {
-                    SetNextPlayerIndex(); // ОСТОРОЖНО! рекурсия
-                    break;
-                } else {
-                    // инициация текущего игрока
-                    _currentPlayer = playerControls[i];
-                    _currentToken = playerControls[i].GetTokenControl();
-                    _currentCell = _currentToken.GetCurrentCellControl();
+            if (player.IsFinished) {
+                SetNextPlayerIndex(); // ОСТОРОЖНО! рекурсия
+                break;
+            } else {
+                // инициация текущего игрока
+                _currentPlayer = player;
+                _currentToken = player.GetTokenControl();
+                _currentCell = _currentToken.GetCurrentCellControl();
 
-                    // апдейт состояния фишек
-                    PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
-                    PlayersControl.Instance.UpdateSqueezeAnimation(_currentPlayerIndex);
+                // апдейт состояния фишек
+                PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
+                PlayersControl.Instance.UpdateSqueezeAnimation(_currentPlayerIndex);
 
-                    // применение сайд-эффектов и продолжение переключения игрока
-                    bool check = ExecuteSideEffects();
-                    if (check) {
-                        ContinueSwitchPlayer();
-                    }
+                // применение сайд-эффектов и продолжение переключения игрока
+                bool check = ExecuteSideEffects();
+                if (check) {
+                    ContinueSwitchPlayer();
                 }
             }
         }
@@ -137,14 +137,35 @@ public class MoveControl : MonoBehaviour
 
         // апдейт панели управления
         PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
-        EffectsControl.Instance.UpdateQuantityText(_currentPlayer);
-        EffectsControl.Instance.UpdateEffectEmptiness(_currentPlayer);
-        BoostersControl.Instance.UpdateBoostersFromPlayer(_currentPlayer);
+        if (_currentPlayer.IsMe()) {
+            EffectsControl.Instance.UpdateQuantityText(_currentPlayer);
+            EffectsControl.Instance.UpdateEffectEmptiness(_currentPlayer);
+            BoostersControl.Instance.UpdateBoostersFromPlayer(_currentPlayer);
+        }
 
         // проверка текущего игрока на пропуск хода
         if (_currentPlayer.MovesSkip == 0) {
             _currentPlayer.MovesToDo = 1;
-            string cubicMessage = Utils.Wrap("ваш ход!", UIColors.Green);
+        
+            string cubicMessage;
+            switch (_currentPlayer.Type) {
+                case EPlayerTypes.Me: {
+                    cubicMessage = Utils.Wrap("ваш ход!", UIColors.Green);
+                    break;
+                }
+                case EPlayerTypes.Ai: {
+                    cubicMessage = Utils.Wrap("ход компьютера", UIColors.Grey);
+                    break;
+                }
+                case EPlayerTypes.Web: {
+                    cubicMessage = Utils.Wrap("ход соперника", UIColors.Grey);
+                    break;
+                }
+                default: {
+                    cubicMessage = Utils.Wrap("ход черепа", UIColors.Red);
+                    break;
+                }
+            }
             PreparePlayerForMove(cubicMessage);
         } else {
             StartCoroutine(SkipMoveDefer());
@@ -152,13 +173,18 @@ public class MoveControl : MonoBehaviour
     }
 
     private void PreparePlayerForMove(string cubicMessage = null) {
-        CubicControl.Instance.SetCubicInteractable(true);
         if (cubicMessage != null) {
             CubicControl.Instance.WriteStatus(cubicMessage);
         }
         _currentPlayer.IsEffectPlaced = false;
-        EffectsControl.Instance.DisableAllButtons(false);
-        BoostersControl.Instance.EnableAllButtons();
+        bool isMe = _currentPlayer.IsMe();
+        if (isMe) {
+            EffectsControl.Instance.DisableAllButtons(false);
+            CubicControl.Instance.SetCubicInteractable(true);
+        } else if (_currentPlayer.Type == EPlayerTypes.Ai) {
+            StartCoroutine(AiControl.Instance.AiThrowCubic());
+        }
+        BoostersControl.Instance.EnableAllButtons(!isMe);
     }
 
     private void StartCellCheckBeforeStep() {

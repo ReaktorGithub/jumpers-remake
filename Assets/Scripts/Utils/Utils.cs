@@ -71,4 +71,10 @@ public static class Utils
         }
         return false;
     }
+
+    public static bool GetRandomDecision() {
+        System.Random random = new();
+        int result = random.Next(0, 1);
+        return result == 1;
+    }
 }

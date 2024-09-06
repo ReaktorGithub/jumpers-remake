@@ -6,7 +6,8 @@ using UnityEngine;
 public class PlayerControl : MonoBehaviour
 {
     [SerializeField] private string _playerName;
-
+    [SerializeField] private EPlayerTypes _type = EPlayerTypes.Me;
+    [SerializeField] private EAiTypes _aiType = EAiTypes.Normal;
     [SerializeField] private GameObject _tokenObject;
     [SerializeField] private int _moveOrder;
     [SerializeField] private bool _isReverseMove;
@@ -68,6 +69,24 @@ public class PlayerControl : MonoBehaviour
                 _moveOrder = value;
             }
         }
+    }
+
+    public EPlayerTypes Type {
+        get { return _type; }
+        set { _type = value; }
+    }
+
+    public bool IsMe() {
+        return _type == EPlayerTypes.Me;
+    }
+
+    public bool IsAi() {
+        return _type == EPlayerTypes.Ai;
+    }
+
+    public EAiTypes AiType {
+        get { return _aiType; }
+        set { _aiType = value; }
     }
 
     public int MovesSkip {
