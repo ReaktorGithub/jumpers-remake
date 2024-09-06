@@ -15,7 +15,7 @@ public class PlayerControl : MonoBehaviour
     private int _movesSkip = 0; // пропуски хода
     private int _movesToDo = 0; // сколько нужно сделать ходов с броском кубика
     private int _stepsLeft = 0; // сколько шагов фишкой осталось сделать
-    [SerializeField] private int _armor = 0;
+    [SerializeField] private int _armor = 0; // сколько ходов осталось со щитом (включая ходы соперников)
     [SerializeField] private bool _isIronArmor = false;
     [SerializeField] private BoosterButton _selectedShieldButton;
     
@@ -28,28 +28,28 @@ public class PlayerControl : MonoBehaviour
     private Sprite _tokenImage;
 
     // Ресурсы игрока
-    [SerializeField] private int coins = 0;
-    [SerializeField] private int mallows = 0;
-    [SerializeField] private int rubies = 0;
-    [SerializeField] private int power = 2;
+    [SerializeField] private int _coins = 0;
+    [SerializeField] private int _mallows = 0;
+    [SerializeField] private int _rubies = 0;
+    [SerializeField] private int _power = 2;
 
     // Эффекты
-    [SerializeField] private int effectsGreen = 0;
-    [SerializeField] private int effectsYellow = 0;
-    [SerializeField] private int effectsBlack = 0;
-    [SerializeField] private int effectsRed = 0;
-    [SerializeField] private int effectsStar = 0;
+    [SerializeField] private int _effectsGreen = 0;
+    [SerializeField] private int _effectsYellow = 0;
+    [SerializeField] private int _effectsBlack = 0;
+    [SerializeField] private int _effectsRed = 0;
+    [SerializeField] private int _effectsStar = 0;
     private bool _isEffectPlaced;
 
     // Усилители
-    [SerializeField] private int boosterMagnet = 0;
-    [SerializeField] private int boosterSuperMagnet = 0;
-    [SerializeField] private int boosterLasso = 0;
-    [SerializeField] private int boosterShield = 0;
-    [SerializeField] private int boosterShieldIron = 0;
+    [SerializeField] private int _boosterMagnet = 0;
+    [SerializeField] private int _boosterSuperMagnet = 0;
+    [SerializeField] private int _boosterLasso = 0;
+    [SerializeField] private int _boosterShield = 0;
+    [SerializeField] private int _boosterShieldIron = 0;
 
     // Кубик
-    [SerializeField] private int cubicMaxScore = 6;
+    [SerializeField] private int _cubicMaxScore = 6;
 
     private void Awake() {
         _availableAttackTypes.Add(EAttackTypes.Usual);
@@ -126,48 +126,48 @@ public class PlayerControl : MonoBehaviour
     }
 
     public int Coins {
-        get { return coins; }
+        get { return _coins; }
         private set {}
     }
 
     public int Mallows {
-        get { return mallows; }
+        get { return _mallows; }
         private set {}
     }
 
     public int Rubies {
-        get { return rubies; }
+        get { return _rubies; }
         private set {}
     }
 
     public int Power {
-        get { return power; }
+        get { return _power; }
         private set {}
     }
 
     public int EffectsGreen {
-        get { return effectsGreen; }
-        set { effectsGreen = value; }
+        get { return _effectsGreen; }
+        set { _effectsGreen = value; }
     }
 
     public int EffectsYellow {
-        get { return effectsYellow; }
-        set { effectsYellow = value; }
+        get { return _effectsYellow; }
+        set { _effectsYellow = value; }
     }
 
     public int EffectsRed {
-        get { return effectsRed; }
-        set { effectsRed = value; }
+        get { return _effectsRed; }
+        set { _effectsRed = value; }
     }
 
     public int EffectsBlack {
-        get { return effectsBlack; }
-        set { effectsBlack = value; }
+        get { return _effectsBlack; }
+        set { _effectsBlack = value; }
     }
 
     public int EffectsStar {
-        get { return effectsStar; }
-        set { effectsStar = value; }
+        get { return _effectsStar; }
+        set { _effectsStar = value; }
     }
 
     public bool IsEffectPlaced {
@@ -176,33 +176,33 @@ public class PlayerControl : MonoBehaviour
     }
 
     public int BoosterMagnet {
-        get { return boosterMagnet; }
-        set { boosterMagnet = value; }
+        get { return _boosterMagnet; }
+        set { _boosterMagnet = value; }
     }
 
     public int BoosterSuperMagnet {
-        get { return boosterSuperMagnet; }
-        set { boosterSuperMagnet = value; }
+        get { return _boosterSuperMagnet; }
+        set { _boosterSuperMagnet = value; }
     }
 
     public int BoosterLasso {
-        get { return boosterLasso; }
-        set { boosterLasso = value; }
+        get { return _boosterLasso; }
+        set { _boosterLasso = value; }
     }
 
     public int BoosterShield {
-        get { return boosterShield; }
-        set { boosterShield = value; }
+        get { return _boosterShield; }
+        set { _boosterShield = value; }
     }
 
     public int BoosterShieldIron {
-        get { return boosterShieldIron; }
-        set { boosterShieldIron = value; }
+        get { return _boosterShieldIron; }
+        set { _boosterShieldIron = value; }
     }
 
     public int CubicMaxScore {
-        get { return cubicMaxScore; }
-        set { cubicMaxScore = value; }
+        get { return _cubicMaxScore; }
+        set { _cubicMaxScore = value; }
     }
 
     public int Armor {
@@ -243,59 +243,63 @@ public class PlayerControl : MonoBehaviour
     // Изменение ресурсов с помощью инкремента или декремента
 
     public void AddCoins(int value) {
-        coins += value;
+        _coins += value;
     }
 
     public void AddPower(int value) {
-        power += value;
+        _power += value;
     }
 
     public void AddMallows(int value) {
-        mallows += value;
+        _mallows += value;
     }
 
     public void AddRubies(int value) {
-        rubies += value;
+        _rubies += value;
     }
 
     public void AddEffectGreen(int value) {
-        effectsGreen += value;
+        _effectsGreen += value;
     }
 
     public void AddEffectYellow(int value) {
-        effectsYellow += value;
+        _effectsYellow += value;
     }
 
     public void AddEffectBlack(int value) {
-        effectsBlack += value;
+        _effectsBlack += value;
     }
 
     public void AddEffectRed(int value) {
-        effectsRed += value;
+        _effectsRed += value;
     }
 
     public void AddEffectStar(int value) {
-        effectsStar += value;
+        _effectsStar += value;
     }
 
     public void AddMagnets(int value) {
-        boosterMagnet += value;
+        _boosterMagnet += value;
     }
 
     public void AddMagnetsSuper(int value) {
-        boosterSuperMagnet += value;
+        _boosterSuperMagnet += value;
     }
 
     public void AddLasso(int value) {
-        boosterLasso += value;
+        _boosterLasso += value;
     }
 
     public void AddShield(int value) {
-        boosterShield += value;
+        _boosterShield += value;
     }
 
     public void AddShieldIron(int value) {
-        boosterShieldIron += value;
+        _boosterShieldIron += value;
+    }
+
+    public void AddArmor(int value) {
+        _armor += value;
     }
 
     // атака
@@ -315,7 +319,7 @@ public class PlayerControl : MonoBehaviour
         string message2 = Utils.Wrap(rival.PlayerName, UIColors.Yellow) + " пропустит ход, а " + Utils.Wrap(PlayerName, UIColors.Yellow) + " ходит ещё раз";
         Messages.Instance.AddMessage(message2);
 
-        if (power == 0) {
+        if (_power == 0) {
             OpenPowerWarningModal(() => {
                 StartCoroutine(MoveControl.Instance.EndMoveDefer());
             });
@@ -340,14 +344,14 @@ public class PlayerControl : MonoBehaviour
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("ЧЁРНЫЙ", UIColors.Black) + " эффект! Минус 1 сила";
         Messages.Instance.AddMessage(message);
 
-        if (power == 0) {
+        if (_power == 0) {
             OpenPowerWarningModal(() => {
                 CellChecker.Instance.CheckCellArrows(cellControl, this, tokenControl);
             });
             return;
         }
 
-        if (power < 0) {
+        if (_power < 0) {
             ConfirmLose();
             return;
         }
@@ -370,14 +374,14 @@ public class PlayerControl : MonoBehaviour
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Минус 1 сила. Возврат на чекпойнт";
         Messages.Instance.AddMessage(message);
 
-        if (power == 0) {
+        if (_power == 0) {
             OpenPowerWarningModal(() => {
                 RedEffectTokenMove();
             });
             return;
         }
 
-        if (power < 0) {
+        if (_power < 0) {
             ConfirmLose();
             return;
         }
@@ -459,7 +463,7 @@ public class PlayerControl : MonoBehaviour
             }
         }
 
-        if (power == 0) {
+        if (_power == 0) {
             OpenPowerWarningModal();
         }
     }
@@ -472,23 +476,28 @@ public class PlayerControl : MonoBehaviour
         }
 
         TokenControl token = GetTokenControl();
+        bool isCurrentPlayer = MoveControl.Instance.CurrentPlayer == this;
         _armor--;
 
         if (_isIronArmor) {
             if (_armor == 0) {
                 token.UpdateShield(EBoosters.None);
                 AddShieldIron(-1);
-                BoostersControl.Instance.DeactivateArmorButtons();
+                if (isCurrentPlayer) {
+                   BoostersControl.Instance.DeactivateArmorButtons(); 
+                }
                 string message = Utils.Wrap("Железный щит ", UIColors.ArmorIron) + Utils.Wrap(PlayerName, UIColors.Yellow) + " пришел в негодность";
                 Messages.Instance.AddMessage(message);
-            } else {
+            } else if (isCurrentPlayer) {
                 BoostersControl.Instance.UpdatePlayersArmorButtons(this);
             }
         } else {
             if (_armor == 0) {
                 token.UpdateShield(EBoosters.None);
                 AddShield(-1);
-                BoostersControl.Instance.DeactivateArmorButtons();
+                if (isCurrentPlayer) {
+                    BoostersControl.Instance.DeactivateArmorButtons();
+                }
                 string message = Utils.Wrap("Щит ", UIColors.Armor) + Utils.Wrap(PlayerName, UIColors.Yellow) + " пришел в негодность";
                 Messages.Instance.AddMessage(message);
             }
@@ -509,16 +518,16 @@ public class PlayerControl : MonoBehaviour
     public bool IsEnoughEffects(EControllableEffects effect) {
         switch(effect) {
             case EControllableEffects.Green: {
-                return effectsGreen > 0;
+                return _effectsGreen > 0;
             }
             case EControllableEffects.Yellow: {
-                return effectsYellow > 0;
+                return _effectsYellow > 0;
             }
             case EControllableEffects.Black: {
-                return effectsBlack > 0;
+                return _effectsBlack > 0;
             }
             case EControllableEffects.Red: {
-                return effectsRed > 0;
+                return _effectsRed > 0;
             }
             default: return false;
         }

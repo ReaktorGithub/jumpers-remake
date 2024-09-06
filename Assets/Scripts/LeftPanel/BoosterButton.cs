@@ -10,7 +10,7 @@ public class BoosterButton : MonoBehaviour
     private bool _disabled = false;
     private EBoosters _boosterType = EBoosters.None;
     private bool _isArmorMode = false;
-    private bool _armor = false;
+    private int _armor = 0;
     private int _armorIron = 0;
     private CursorManager _cursorManager;
     
@@ -36,7 +36,7 @@ public class BoosterButton : MonoBehaviour
         set { _isArmorMode = value; }
     }
 
-    public bool Armor {
+    public int Armor {
         get { return _armor; }
         set {
             UpdateShield(value);
@@ -50,15 +50,16 @@ public class BoosterButton : MonoBehaviour
         }
     }
 
-    private void UpdateShield(bool isArmor) {
+    private void UpdateShield(int armor) {
         _armorOverlayImage.color = new Color32(41, 163, 246, 80);
-        _armorOverlay.transform.localScale = new Vector3(1f, 1f, 1f);
-        _armorOverlay.SetActive(isArmor);
+        float newScale = 1f / 4f * armor;
+        _armorOverlay.transform.localScale = new Vector3(1f, newScale, 1f);
+        _armorOverlay.SetActive(armor > 0);
     }
 
     private void UpdateShieldIron(int armor) {
         _armorOverlayImage.color = new Color32(177, 0, 255, 80);
-        float newScale = 0.33f * armor;
+        float newScale = 1f / 12f * armor;
         _armorOverlay.transform.localScale = new Vector3(1f, newScale, 1f);
         _armorOverlay.SetActive(armor > 0);
     }
