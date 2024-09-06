@@ -202,12 +202,12 @@ public class BoostersControl : MonoBehaviour
 
         if (_isIron) {
             player.IsIronArmor = true;
-            player.Armor = 3;
+            player.Armor = 12;
             token.UpdateShield(EBoosters.ShieldIron);
             shieldText = Utils.Wrap("железный щит", UIColors.ArmorIron);
         } else {
             player.IsIronArmor = false;
-            player.Armor = 1;
+            player.Armor = 4;
             token.UpdateShield(EBoosters.Shield);
             shieldText = Utils.Wrap("щит", UIColors.Armor);
         }

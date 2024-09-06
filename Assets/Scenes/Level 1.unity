@@ -5952,21 +5952,21 @@ MonoBehaviour:
   _armor: 0
   _isIronArmor: 0
   _selectedShieldButton: {fileID: 0}
-  coins: 400
-  mallows: 0
-  rubies: 0
-  power: 4
-  effectsGreen: 0
-  effectsYellow: 0
-  effectsBlack: 0
-  effectsRed: 0
-  effectsStar: 0
-  boosterMagnet: 0
-  boosterSuperMagnet: 1
-  boosterLasso: 3
-  boosterShield: 0
-  boosterShieldIron: 0
-  cubicMaxScore: 6
+  _coins: 400
+  _mallows: 0
+  _rubies: 0
+  _power: 4
+  _effectsGreen: 0
+  _effectsYellow: 0
+  _effectsBlack: 0
+  _effectsRed: 0
+  _effectsStar: 0
+  _boosterMagnet: 0
+  _boosterSuperMagnet: 3
+  _boosterLasso: 1
+  _boosterShield: 0
+  _boosterShieldIron: 3
+  _cubicMaxScore: 6
 --- !u!1001 &316762049
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11813,21 +11813,21 @@ MonoBehaviour:
   _armor: 0
   _isIronArmor: 0
   _selectedShieldButton: {fileID: 0}
-  coins: 400
-  mallows: 0
-  rubies: 0
-  power: 4
-  effectsGreen: 0
-  effectsYellow: 0
-  effectsBlack: 0
-  effectsRed: 0
-  effectsStar: 0
-  boosterMagnet: 1
-  boosterSuperMagnet: 0
-  boosterLasso: 0
-  boosterShield: 0
-  boosterShieldIron: 3
-  cubicMaxScore: 6
+  _coins: 400
+  _mallows: 0
+  _rubies: 0
+  _power: 4
+  _effectsGreen: 0
+  _effectsYellow: 0
+  _effectsBlack: 0
+  _effectsRed: 0
+  _effectsStar: 0
+  _boosterMagnet: 1
+  _boosterSuperMagnet: 2
+  _boosterLasso: 3
+  _boosterShield: 2
+  _boosterShieldIron: 1
+  _cubicMaxScore: 6
 --- !u!1 &578218781
 GameObject:
   m_ObjectHideFlags: 0
@@ -13310,21 +13310,21 @@ MonoBehaviour:
   _armor: 0
   _isIronArmor: 0
   _selectedShieldButton: {fileID: 0}
-  coins: 400
-  mallows: 0
-  rubies: 0
-  power: 4
-  effectsGreen: 0
-  effectsYellow: 0
-  effectsBlack: 0
-  effectsRed: 0
-  effectsStar: 0
-  boosterMagnet: 1
-  boosterSuperMagnet: 2
-  boosterLasso: 1
-  boosterShield: 1
-  boosterShieldIron: 2
-  cubicMaxScore: 6
+  _coins: 400
+  _mallows: 0
+  _rubies: 0
+  _power: 4
+  _effectsGreen: 0
+  _effectsYellow: 0
+  _effectsBlack: 0
+  _effectsRed: 0
+  _effectsStar: 0
+  _boosterMagnet: 0
+  _boosterSuperMagnet: 1
+  _boosterLasso: 0
+  _boosterShield: 1
+  _boosterShieldIron: 0
+  _cubicMaxScore: 6
 --- !u!1 &670553072 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2324068203896962674, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
@@ -15386,21 +15386,21 @@ MonoBehaviour:
   _armor: 0
   _isIronArmor: 0
   _selectedShieldButton: {fileID: 0}
-  coins: 400
-  mallows: 0
-  rubies: 0
-  power: 4
-  effectsGreen: 0
-  effectsYellow: 0
-  effectsBlack: 0
-  effectsRed: 0
-  effectsStar: 0
-  boosterMagnet: 1
-  boosterSuperMagnet: 1
-  boosterLasso: 2
-  boosterShield: 1
-  boosterShieldIron: 1
-  cubicMaxScore: 6
+  _coins: 400
+  _mallows: 0
+  _rubies: 0
+  _power: 4
+  _effectsGreen: 0
+  _effectsYellow: 0
+  _effectsBlack: 0
+  _effectsRed: 0
+  _effectsStar: 0
+  _boosterMagnet: 2
+  _boosterSuperMagnet: 2
+  _boosterLasso: 2
+  _boosterShield: 2
+  _boosterShieldIron: 2
+  _cubicMaxScore: 6
 --- !u!1 &760382438
 GameObject:
   m_ObjectHideFlags: 0

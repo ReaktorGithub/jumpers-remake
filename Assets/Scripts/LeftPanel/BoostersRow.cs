@@ -57,10 +57,10 @@ public class BoostersRow : MonoBehaviour
                 if (isIron) {
                     button.ArmorIron = armor;
                 } else {
-                    button.Armor = true;
+                    button.Armor = armor;
                 }
             } else {
-                button.Armor = false;
+                button.Armor = 0;
                 button.ArmorIron = 0;
             }
         }
@@ -71,7 +71,7 @@ public class BoostersRow : MonoBehaviour
     public void DeactivateShieldMode() {
         foreach(BoosterButton button in _list) {
             button.IsArmorMode = false;
-            button.Armor = false;
+            button.Armor = 0;
             button.ArmorIron = 0;
         }
     }

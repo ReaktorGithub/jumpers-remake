@@ -125,7 +125,7 @@ public class MoveControl : MonoBehaviour
     // Если требует прерывания, то возвращает false
 
     private bool ExecuteSideEffects() {
-        _currentPlayer.SpendArmor();
+        PlayersControl.Instance.SpendPlayersArmor();
         return true;
     }
 
@@ -347,5 +347,10 @@ public class MoveControl : MonoBehaviour
         Debug.Log("CurrentCell " + _currentToken.CurrentCell);
         Debug.Log("_currentPlayer " + _currentPlayer.PlayerName);
         Debug.Log("Cerrent cell control name " + _currentCell.transform.name);
+        foreach(PlayerControl player in PlayersControl.Instance.Players) {
+            if (player.Armor > 0) {
+                Debug.Log(player.PlayerName + " " + player.Armor);
+            }
+        }
     }
 }

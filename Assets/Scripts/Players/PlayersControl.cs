@@ -210,4 +210,10 @@ public class PlayersControl : MonoBehaviour
             player.AddRubies(rubiesEarned);
         }
     }
+
+    public void SpendPlayersArmor() {
+        foreach(PlayerControl player in _players) {
+            player.SpendArmor();
+        }
+    }
 }
