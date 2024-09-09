@@ -11825,7 +11825,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerName: "\u0418\u0433\u0440\u043E\u043A \u0421"
   _type: 1
-  _aiType: 0
+  _aiType: 2
   _tokenObject: {fileID: 0}
   _moveOrder: 0
   _isReverseMove: 0
@@ -13324,7 +13324,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerName: "\u0418\u0433\u0440\u043E\u043A \u0411"
   _type: 1
-  _aiType: 0
+  _aiType: 1
   _tokenObject: {fileID: 0}
   _moveOrder: 0
   _isReverseMove: 0
@@ -15757,6 +15757,10 @@ PrefabInstance:
       propertyPath: _nextCell
       value: 
       objectReference: {fileID: 1485803351}
+    - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
+      propertyPath: _aiBranchType
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
       propertyPath: m_Name
       value: BranchButton
@@ -18554,6 +18558,10 @@ PrefabInstance:
       propertyPath: _nextCell
       value: 
       objectReference: {fileID: 126166605}
+    - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
+      propertyPath: _aiBranchType
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
       propertyPath: m_Name
       value: BranchButton
@@ -19497,6 +19505,10 @@ PrefabInstance:
       propertyPath: _nextCell
       value: 
       objectReference: {fileID: 2061735310}
+    - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
+      propertyPath: _aiBranchType
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
       propertyPath: m_Name
       value: BranchButton
@@ -32979,6 +32991,10 @@ PrefabInstance:
       propertyPath: _nextCell
       value: 
       objectReference: {fileID: 126166605}
+    - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
+      propertyPath: _aiBranchType
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
       propertyPath: m_Name
       value: BranchButton
@@ -42753,6 +42769,10 @@ PrefabInstance:
       propertyPath: _nextCell
       value: 
       objectReference: {fileID: 278670334}
+    - target: {fileID: 4559831839299846602, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
+      propertyPath: _aiBranchType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8936923745227052019, guid: 8ade61c743e5a16449d3da3521d09be5, type: 3}
       propertyPath: m_Name
       value: BranchButton

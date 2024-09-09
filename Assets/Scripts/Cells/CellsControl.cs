@@ -307,6 +307,36 @@ public class CellsControl : MonoBehaviour
         return result;
     }
 
+    // Возвращает клетку, на которую должен попасть игрок, ступивший на бранч
+    // Если на пути анализа попался еще один бранч, то вернет null
+
+    public GameObject FindBranchTargetCell(GameObject startCell, bool isForward, int steps) {
+        GameObject forAnalyse = startCell;
+
+        for (int i = 0; i < steps; i++) {
+            bool isBranch = forAnalyse.TryGetComponent(out BranchCell _);
+            if (isBranch) {
+                return null;
+            } else {
+                bool isLastStep = i == steps - 1;
+                if (isLastStep) {
+                    return forAnalyse;
+                } else {
+                    if (isForward) {
+                        forAnalyse = forAnalyse.GetComponent<CellControl>().NextCell;
+                    } else {
+                        forAnalyse = forAnalyse.GetComponent<CellControl>().PreviousCell;
+                    }
+                    if (forAnalyse == null) {
+                        return null;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     // Возвращает количество шагов до финиша - ближайший маршрут
 
     public int GetStepsToFinish(GameObject currentCell) {

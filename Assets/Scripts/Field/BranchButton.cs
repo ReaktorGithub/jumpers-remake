@@ -9,6 +9,7 @@ public class BranchButton : MonoBehaviour
     [SerializeField] private float _pulseMinValue = 0.4f;
     [SerializeField] private float _pulseDefaultValue = 0.6f;
     [SerializeField] private GameObject _nextCell;
+    [SerializeField] private EAiBranchTypes _aiBranchType = EAiBranchTypes.Normal;
     private float _currentX;
     private bool _pausePulse = false;
     
@@ -18,6 +19,11 @@ public class BranchButton : MonoBehaviour
 
     public GameObject NextCell {
         get { return _nextCell; }
+        private set {}
+    }
+
+    public EAiBranchTypes AiBranchType {
+        get { return _aiBranchType; }
         private set {}
     }
 
