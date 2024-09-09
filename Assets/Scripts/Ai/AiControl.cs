@@ -74,6 +74,7 @@ public class AiControl : MonoBehaviour
             } else {
                 _popupAttack.CancelAttack();
             }
+            Debug.Log("Отчет Ai о решении атаки: Ai type: " + player.AiType + "; " + "Points: " + points + "; Trigger by: 10");
         }));
     }
 
@@ -113,7 +114,7 @@ public class AiControl : MonoBehaviour
         foreach((BranchButton, int) variant in variants) {
             message += "Branch cell: " + variant.Item1.NextCell.name + ", Points: " + variant.Item2 + "; ";
         }
-        Debug.Log("Отчет Ai о решении: " + message);
+        Debug.Log("Отчет Ai о решении бранча: " + message);
 
         // выбрать лучший вариант
 
@@ -149,7 +150,8 @@ public class AiControl : MonoBehaviour
             }
         }
 
-        if (cell.CellType == ECellTypes.Lightning || cell.CellType == ECellTypes.Moneybox || cell.CellType == ECellTypes.Surprise || cell.Effect == EControllableEffects.Green || cell.Effect == EControllableEffects.Star) points += 8;
+        if (cell.CellType == ECellTypes.Lightning || cell.CellType == ECellTypes.Moneybox || cell.CellType == ECellTypes.Surprise || cell.Effect == EControllableEffects.Green) points += 8;
+        if (cell.Effect == EControllableEffects.Star) points += 12;
         if (player.Power > 2 && cell.CurrentTokens.Count > 0) points += 8;
         if (cell.Effect == EControllableEffects.Yellow) points -= 8;
 
