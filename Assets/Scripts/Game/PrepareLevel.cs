@@ -8,14 +8,12 @@ public class PrepareLevel : MonoBehaviour
     private void Start() {
         // порядок важен
         PlayersControl.Instance.PrepareTokenLayerOrder();
-
-        int currentPlayerIndex = MoveControl.Instance.CurrentPlayerIndex;
-        PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
-        PlayersControl.Instance.GiveEffectsBeforeRace(currentPlayerIndex);
+        PlayersControl.Instance.UpdatePlayersInfo();
+        PlayersControl.Instance.GiveEffectsBeforeRace();
 
         MoveTokensToStart();
         
-        PlayersControl.Instance.UpdateSqueezeAnimation(currentPlayerIndex);
+        PlayersControl.Instance.UpdateSqueezeAnimation();
 
         MoveControl.Instance.SwitchPlayer();
         

@@ -11,9 +11,7 @@ public class MoveControl : MonoBehaviour
     [SerializeField] private float _endMoveDelay = 0.5f;
     [SerializeField] private float _skipMoveDelay = 1.5f;
     [SerializeField] private float _alignTime = 5f;
-    private TokenControl _currentToken;
     private PlayerControl _currentPlayer;
-    private CellControl _currentCell;
     private ModalResults _modalResults;
     private ModalWin _modalWin;
     private ModalLose _modalLose;
@@ -34,11 +32,6 @@ public class MoveControl : MonoBehaviour
 
     public PlayerControl CurrentPlayer {
         get { return _currentPlayer; }
-        private set {}
-    }
-
-    public CellControl CurrentCell {
-        get { return _currentCell; }
         private set {}
     }
 
@@ -103,14 +96,12 @@ public class MoveControl : MonoBehaviour
                 SetNextPlayerIndex(); // ОСТОРОЖНО! рекурсия
                 break;
             } else {
-                // инициация текущего игрока
+                // сохранение ссылки на текущего игрока
                 _currentPlayer = player;
-                _currentToken = player.GetTokenControl();
-                _currentCell = _currentToken.GetCurrentCellControl();
 
                 // апдейт состояния фишек
-                PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
-                PlayersControl.Instance.UpdateSqueezeAnimation(_currentPlayerIndex);
+                PlayersControl.Instance.UpdateTokenLayerOrder();
+                PlayersControl.Instance.UpdateSqueezeAnimation();
 
                 // применение сайд-эффектов и продолжение переключения игрока
                 bool check = ExecuteSideEffects();
@@ -133,10 +124,10 @@ public class MoveControl : MonoBehaviour
 
     private void ContinueSwitchPlayer() {
         // апдейт камеры
-        _camera.FollowObject(_currentToken.gameObject.transform);
+        _camera.FollowObject(_currentPlayer.GetTokenControl().gameObject.transform);
 
         // апдейт панели управления
-        PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
+        PlayersControl.Instance.UpdatePlayersInfo();
         if (_currentPlayer.IsMe()) {
             EffectsControl.Instance.UpdateQuantityText(_currentPlayer);
             EffectsControl.Instance.UpdateEffectEmptiness(_currentPlayer);
@@ -188,7 +179,7 @@ public class MoveControl : MonoBehaviour
     }
 
     private void StartCellCheckBeforeStep() {
-        bool check = CellChecker.Instance.CheckBranch(_currentCell, _currentPlayer);
+        bool check = CellChecker.Instance.CheckBranch(_currentPlayer);
         if (check) {
             StartCoroutine(MakeStepDefer());
         }
@@ -201,16 +192,14 @@ public class MoveControl : MonoBehaviour
 
     private void MakeStep() {
         _currentPlayer.AddStepsLeft(-1);
-        _currentToken.SetToNextCell(_moveTime, AfterStep);
+        _currentPlayer.GetTokenControl().SetToNextCell(_moveTime, AfterStep);
     }
 
     private void AfterStep() {
         // проверяем тип клетки, на которой сейчас находимся
         // некоторые типы прерывают движение, либо вызывают код во время движения
 
-        _currentCell = _currentToken.GetCurrentCellControl();
-
-        bool check = CellChecker.Instance.CheckCellAfterStep(_currentCell.CellType, _currentPlayer);
+        bool check = CellChecker.Instance.CheckCellAfterStep(_currentPlayer.GetCurrentCell().CellType, _currentPlayer);
         if (!check) {
             return;
         }
@@ -226,9 +215,9 @@ public class MoveControl : MonoBehaviour
     public void MakeMove(int score) {
         _isLassoMode = false;
         _currentPlayer.StepsLeft = score;
-        _currentCell = _currentToken.GetCurrentCellControl();
-        _currentCell.RemoveToken(_currentPlayer.TokenObject);
-        _currentCell.AlignTokens(_alignTime);
+        CellControl cell = _currentPlayer.GetCurrentCell();
+        cell.RemoveToken(_currentPlayer.TokenObject);
+        cell.AlignTokens(_alignTime);
         StartCellCheckBeforeStep();
     }
 
@@ -236,10 +225,10 @@ public class MoveControl : MonoBehaviour
         _isLassoMode = true;
         _currentPlayer.StepsLeft = 0;
         _currentPlayer.AddMovesToDo(1);
-        _currentCell = _currentToken.GetCurrentCellControl();
-        _currentCell.RemoveToken(_currentPlayer.TokenObject);
-        _currentCell.AlignTokens(_alignTime);
-        _currentToken.SetToSpecifiedCell(targetCell.gameObject, _specifiedMoveTime, AfterStep);
+        CellControl cell = _currentPlayer.GetCurrentCell();
+        cell.RemoveToken(_currentPlayer.TokenObject);
+        cell.AlignTokens(_alignTime);
+        _currentPlayer.GetTokenControl().SetToSpecifiedCell(targetCell.gameObject, _specifiedMoveTime, AfterStep);
     }
 
     private IEnumerator ConfirmNewPositionDefer() {
@@ -250,21 +239,23 @@ public class MoveControl : MonoBehaviour
     // подтверждение новой позиции по окончании движения
 
     public void ConfirmNewPosition() {
-        _currentCell = _currentToken.GetCurrentCellControl();
-        _currentCell.AddToken(_currentPlayer.TokenObject);
-        _currentCell.AlignTokens(_alignTime, () => {
-            CellChecker.Instance.CheckCellCharacter(_currentCell, _currentPlayer, _currentToken, _currentPlayerIndex);
+        CellControl cell = _currentPlayer.GetCurrentCell();
+        cell.AddToken(_currentPlayer.TokenObject);
+        cell.AlignTokens(_alignTime, () => {
+            CellChecker.Instance.CheckCellCharacter(_currentPlayer);
         });
     }
 
     public void CheckCellEffects() {
-        CellChecker.Instance.CheckCellEffects(_currentCell, _currentPlayer, _currentToken, _currentPlayerIndex);
+        CellChecker.Instance.CheckCellEffects(_currentPlayer);
     }
 
     // смена направления
 
     public void SwitchBranch(GameObject nextCell) {
-        if (!_currentCell.TryGetComponent(out BranchCell branchCell)) {
+        CellControl cell = _currentPlayer.GetCurrentCell();
+
+        if (!cell.TryGetComponent(out BranchCell branchCell)) {
             Debug.Log("Error while switching branch");
             return;
         }
@@ -273,9 +264,9 @@ public class MoveControl : MonoBehaviour
         branch.HideAllBranches();
         _topPanel.CloseWindow();
         if (CurrentPlayer.IsReverseMove) {
-            _currentCell.PreviousCell = nextCell;
+            cell.PreviousCell = nextCell;
         } else {
-            _currentCell.NextCell = nextCell;
+            cell.NextCell = nextCell;
         }
         CubicControl.Instance.WriteStatus("");
         StartCoroutine(MakeStepDefer());
@@ -292,7 +283,8 @@ public class MoveControl : MonoBehaviour
         message = Utils.Wrap("пропуск", UIColors.Yellow);
         CubicControl.Instance.WriteStatus(message);
         yield return new WaitForSeconds(_skipMoveDelay);
-        _currentPlayer.SkipMoveDecrease(_currentToken);
+        TokenControl token = _currentPlayer.GetTokenControl();
+        _currentPlayer.SkipMoveDecrease(token);
         EndMove();
     }
 
@@ -308,8 +300,8 @@ public class MoveControl : MonoBehaviour
         bool isRaceOver = IsRaceOver();
 
         if (isRaceOver) {
-            PlayersControl.Instance.UpdatePlayersInfo(_currentPlayerIndex);
-            PlayersControl.Instance.MoveAllTokensToPedestal(_currentPlayerIndex, _endMoveDelay);
+            PlayersControl.Instance.UpdatePlayersInfo();
+            PlayersControl.Instance.MoveAllTokensToPedestal(_endMoveDelay);
             StartCoroutine(RaceOverDefer());
             return;
         }
@@ -370,9 +362,9 @@ public class MoveControl : MonoBehaviour
         Debug.Log("_currentPlayerIndex " + _currentPlayerIndex);
         Debug.Log("_stepsLeft " + _currentPlayer.StepsLeft);
         Debug.Log("_movesToDo " + _currentPlayer.MovesToDo);
-        Debug.Log("CurrentCell " + _currentToken.CurrentCell);
+        Debug.Log("CurrentCell " + _currentPlayer.GetTokenControl().CurrentCell);
         Debug.Log("_currentPlayer " + _currentPlayer.PlayerName);
-        Debug.Log("Cerrent cell control name " + _currentCell.transform.name);
+        Debug.Log("Cerrent cell control name " + _currentPlayer.GetCurrentCell().transform.name);
         foreach(PlayerControl player in PlayersControl.Instance.Players) {
             if (player.Armor > 0) {
                 Debug.Log(player.PlayerName + " " + player.Armor);

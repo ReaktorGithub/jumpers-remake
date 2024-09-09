@@ -248,11 +248,11 @@ public class PopupAttack : MonoBehaviour
 
         switch(_selectedAttackType) {
             case EAttackTypes.MagicKick: {
-                MoveControl.Instance.CurrentPlayer.ExecuteAttackMagicKick(_selectedPlayer, MoveControl.Instance.CurrentPlayerIndex);
+                MoveControl.Instance.CurrentPlayer.ExecuteAttackMagicKick(_selectedPlayer);
                 break;
             }
             default: {
-                MoveControl.Instance.CurrentPlayer.ExecuteAttackUsual(_selectedPlayer, MoveControl.Instance.CurrentPlayerIndex);
+                MoveControl.Instance.CurrentPlayer.ExecuteAttackUsual(_selectedPlayer);
                 break;
             }
         }

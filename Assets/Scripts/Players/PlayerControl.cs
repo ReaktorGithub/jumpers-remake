@@ -332,11 +332,11 @@ public class PlayerControl : MonoBehaviour
         private set {}
     }
 
-    public void ExecuteAttackUsual(PlayerControl rival, int currentPlayerIndex) {
+    public void ExecuteAttackUsual(PlayerControl rival) {
         AddPower(-1);
         _movesToDo++;
         rival.SkipMoveIncrease(rival.GetTokenControl());
-        PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
+        PlayersControl.Instance.UpdatePlayersInfo();
         string message1 = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" АТАКУЕТ ", UIColors.Red) + Utils.Wrap(rival.PlayerName, UIColors.Yellow) + "!";
         Messages.Instance.AddMessage(message1);
         string message2 = Utils.Wrap(rival.PlayerName, UIColors.Yellow) + " пропустит ход, а " + Utils.Wrap(PlayerName, UIColors.Yellow) + " ходит ещё раз";
@@ -352,28 +352,31 @@ public class PlayerControl : MonoBehaviour
         StartCoroutine(MoveControl.Instance.EndMoveDefer());
     }
 
-    public void ExecuteAttackMagicKick(PlayerControl rival, int currentPlayerIndex) {
+    public void ExecuteAttackMagicKick(PlayerControl rival) {
         // todo
     }
 
     // исполнение эффектов
 
-    public void ExecuteBlackEffect(CellControl cellControl, TokenControl tokenControl, int currentPlayerIndex) {
+    public void ExecuteBlackEffect() {
+        CellControl cell = GetCurrentCell();
+        TokenControl token = GetTokenControl();
+
         if (_armor > 0 && _isIronArmor) {
             OpenSavedByShieldModal(() => {
-                CellChecker.Instance.CheckCellArrows(cellControl, this, tokenControl);
+                CellChecker.Instance.CheckCellArrows(this);
             });
             return;
         }
 
         AddPower(-1);
-        PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
+        PlayersControl.Instance.UpdatePlayersInfo();
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("ЧЁРНЫЙ", UIColors.Black) + " эффект! Минус 1 сила";
         Messages.Instance.AddMessage(message);
 
         if (_power == 0) {
             OpenPowerWarningModal(() => {
-                CellChecker.Instance.CheckCellArrows(cellControl, this, tokenControl);
+                CellChecker.Instance.CheckCellArrows(this);
             });
             return;
         }
@@ -383,10 +386,10 @@ public class PlayerControl : MonoBehaviour
             return;
         }
 
-        CellChecker.Instance.CheckCellArrows(cellControl, this, tokenControl);
+        CellChecker.Instance.CheckCellArrows(this);
     }
 
-    public void ExecuteRedEffect(int currentPlayerIndex) {
+    public void ExecuteRedEffect() {
         if (_armor > 0 && _isIronArmor) {
             OpenSavedByShieldModal(() => {
                 string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Возврат на чекпойнт";
@@ -397,7 +400,7 @@ public class PlayerControl : MonoBehaviour
         }
 
         AddPower(-1);
-        PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
+        PlayersControl.Instance.UpdatePlayersInfo();
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Минус 1 сила. Возврат на чекпойнт";
         Messages.Instance.AddMessage(message);
 
@@ -435,9 +438,9 @@ public class PlayerControl : MonoBehaviour
         });
     }
 
-    public void ExecuteStarEffect(int currentPlayerIndex) {
+    public void ExecuteStarEffect() {
         AddPower(1);
-        PlayersControl.Instance.UpdatePlayersInfo(currentPlayerIndex);
+        PlayersControl.Instance.UpdatePlayersInfo();
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("звезду", UIColors.DarkBlue) + " и получает 1 силу";
         Messages.Instance.AddMessage(message);
     }
@@ -457,7 +460,7 @@ public class PlayerControl : MonoBehaviour
         StartCoroutine(coroutine);
     }
 
-    public void ExecuteReplaceEffect(EControllableEffects effect, int playerIndex) {
+    public void ExecuteReplaceEffect(EControllableEffects effect) {
         ManualContent manual = Manual.Instance.GetEffectManual(effect);
 
         // todo уровень эффекта должен вычисляться из PlayerControl
@@ -469,7 +472,7 @@ public class PlayerControl : MonoBehaviour
         } else {
             AddCoins(-cost);
         }
-        PlayersControl.Instance.UpdatePlayersInfo(playerIndex);
+        PlayersControl.Instance.UpdatePlayersInfo();
 
         switch(effect) {
             case EControllableEffects.Green: {
@@ -537,7 +540,7 @@ public class PlayerControl : MonoBehaviour
             AddCoins(-coinBonus);
             rival.AddCoins(coinBonus);
         }
-        PlayersControl.Instance.UpdatePlayersInfo(MoveControl.Instance.CurrentPlayerIndex);
+        PlayersControl.Instance.UpdatePlayersInfo();
     }
 
     // Разное
@@ -562,6 +565,10 @@ public class PlayerControl : MonoBehaviour
 
     public TokenControl GetTokenControl() {
         return _tokenObject.GetComponent<TokenControl>();
+    }
+
+    public CellControl GetCurrentCell() {
+        return GetTokenControl().GetCurrentCellControl();
     }
 
     public void OpenPowerWarningModal(Action callback = null) {

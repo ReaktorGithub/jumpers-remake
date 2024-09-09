@@ -156,14 +156,16 @@ public class BoostersControl : MonoBehaviour
     // Открытие разных усилителей при нажатиях на кнопки в левой панели
 
     public void ActivateBooster(EBoosters booster) {
+        CellControl cell = MoveControl.Instance.CurrentPlayer.GetCurrentCell();
+
         switch(booster) {
             case EBoosters.Magnet: {
-                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, MoveControl.Instance.CurrentCell, false);
+                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, cell, false);
                 _popupMagnet.OnOpenWindow();
                 break;
             }
             case EBoosters.MagnetSuper: {
-                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, MoveControl.Instance.CurrentCell, true);
+                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, cell, true);
                 _popupMagnet.OnOpenWindow();
                 break;
             }
@@ -171,14 +173,14 @@ public class BoostersControl : MonoBehaviour
                 CubicControl.Instance.SetCubicInteractable(false);
                 _topPanel.SetText("Подвиньте свою фишку в пределах 3 шагов"); // todo зависит от уровня лассо
                 _topPanel.OpenWindow();
-                List<GameObject> collected = CellsControl.Instance.FindNearCellsDeepTwoSide(MoveControl.Instance.CurrentCell, 3);
-                foreach(GameObject cell in collected) {
-                    cell.GetComponent<CellControl>().TurnOnLassoMode();
+                List<GameObject> collected = CellsControl.Instance.FindNearCellsDeepTwoSide(cell, 3);
+                foreach(GameObject cellFound in collected) {
+                    cellFound.GetComponent<CellControl>().TurnOnLassoMode();
                 }
                 _topPanel.SetCancelButtonActive(true, () => {
                     _topPanel.CloseWindow();
-                    foreach(GameObject cell in collected) {
-                        cell.GetComponent<CellControl>().TurnOffLassoMode();
+                    foreach(GameObject cellFound in collected) {
+                        cellFound.GetComponent<CellControl>().TurnOffLassoMode();
                     }
                     TryToEnableAllEffectButtons();
                     EnableAllButtons();

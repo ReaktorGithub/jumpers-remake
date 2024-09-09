@@ -255,13 +255,13 @@ public class EffectsControl : MonoBehaviour
         // изменить ресурсы игрока
 
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
-        player.ExecuteReplaceEffect(_selectedEffect, MoveControl.Instance.CurrentPlayerIndex);
+        player.ExecuteReplaceEffect(_selectedEffect);
         UpdateQuantityText(player);
         UpdateEffectEmptiness(player);
 
         // удалить эффект на текущей клетке
 
-        CellControl oldCell = MoveControl.Instance.CurrentCell;
+        CellControl oldCell = player.GetCurrentCell();
         Sprite sprite = _emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
         oldCell.ChangeEffect(EControllableEffects.None, sprite);
         Sprite newCellSprite;
