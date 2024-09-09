@@ -8,7 +8,8 @@ public class RedCell : MonoBehaviour
 
     private void Start() {
         List<ECellTypes> findCells = new() { ECellTypes.Start, ECellTypes.Checkpoint };
-        _penaltyCell = CellsControl.Instance.FindNearestCell(transform.gameObject, false, findCells);
+        (GameObject cell, int _) = CellsControl.Instance.FindNearestCell(transform.gameObject, false, findCells);
+        _penaltyCell = cell;
     }
 
     public GameObject PenaltyCell {

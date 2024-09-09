@@ -59,13 +59,15 @@ public class CellsControl : MonoBehaviour
     // startCell - начальная клетка
     // isForward - искать впереди
     // cellTypesToFind - список типов клеток, которые мы ищем
+    // Возвращает клетку и дистанцию до нее
 
-    public GameObject FindNearestCell(GameObject startCell, bool isForward, List<ECellTypes> cellTypesToFind) {
+    public (GameObject, int) FindNearestCell(GameObject startCell, bool isForward, List<ECellTypes> cellTypesToFind) {
         GameObject result = null;
         List<GameObject> forAnalyseList = new() { startCell };
         List<GameObject> tempList = new();
 
         bool stop = false;
+        int distance = 0;
 
         do {
             for (int i = 0; i < forAnalyseList.Count; i++) {
@@ -112,9 +114,12 @@ public class CellsControl : MonoBehaviour
                 forAnalyseList.Add(obj);
             }
             tempList.Clear();
+            if (!stop) {
+               distance++; 
+            }
         } while (!stop);
 
-        return result;
+        return (result, distance);
     }
 
     /*
@@ -300,6 +305,44 @@ public class CellsControl : MonoBehaviour
         }
 
         return result;
+    }
+
+    // Возвращает клетку, на которую должен попасть игрок, ступивший на бранч
+    // Если на пути анализа попался еще один бранч, то вернет null
+
+    public GameObject FindBranchTargetCell(GameObject startCell, bool isForward, int steps) {
+        GameObject forAnalyse = startCell;
+
+        for (int i = 0; i < steps; i++) {
+            bool isBranch = forAnalyse.TryGetComponent(out BranchCell _);
+            if (isBranch) {
+                return null;
+            } else {
+                bool isLastStep = i == steps - 1;
+                if (isLastStep) {
+                    return forAnalyse;
+                } else {
+                    if (isForward) {
+                        forAnalyse = forAnalyse.GetComponent<CellControl>().NextCell;
+                    } else {
+                        forAnalyse = forAnalyse.GetComponent<CellControl>().PreviousCell;
+                    }
+                    if (forAnalyse == null) {
+                        return null;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // Возвращает количество шагов до финиша - ближайший маршрут
+
+    public int GetStepsToFinish(GameObject currentCell) {
+        List<ECellTypes> findCells = new() { ECellTypes.Finish };
+        (GameObject _, int distance) = FindNearestCell(currentCell, true, findCells);
+        return distance;
     }
 
     // Подсказки для магнита

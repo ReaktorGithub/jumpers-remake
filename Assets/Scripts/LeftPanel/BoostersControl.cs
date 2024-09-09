@@ -71,11 +71,21 @@ public class BoostersControl : MonoBehaviour
     }
 
     // Если у игрока активированы щиты, то кнопка проигнорирует SetDisabled
+    // filterShields - энейблить только щиты, все остальное оставить дисейбл
 
-    public void EnableAllButtons() {
-        foreach(BoosterButton button in _boosterButtonsList) {
-            button.SetDisabled(false);
-            button.SetSelected(false);
+    public void EnableAllButtons(bool filterShields = false) {
+        if (filterShields) {
+            foreach(BoosterButton button in _boosterButtonsList) {
+                if (button.IsShield()) {
+                    button.SetDisabled(false);
+                }
+                button.SetSelected(false);
+            }
+        } else {
+            foreach(BoosterButton button in _boosterButtonsList) {
+                button.SetDisabled(false);
+                button.SetSelected(false);
+            }
         }
     }
 
@@ -195,8 +205,7 @@ public class BoostersControl : MonoBehaviour
         MoveControl.Instance.MakeLassoMove(targetCell);
     }
 
-    public void ExecuteShield(bool _isIron) {
-        PlayerControl player = MoveControl.Instance.CurrentPlayer;
+    public void ExecuteShield(PlayerControl player, bool _isIron) {
         TokenControl token = player.GetTokenControl();
         string shieldText;
 

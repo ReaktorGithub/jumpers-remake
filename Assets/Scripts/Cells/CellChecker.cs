@@ -25,14 +25,22 @@ public class CellChecker : MonoBehaviour
                 // Если направление движения фишки не соответствует направлению бранча, то скипаем
                 return true;
             }
-            branch.ShowAllBranches();
-            _topPanel.SetText("Выберите направление");
-            _topPanel.SetCancelButtonActive(false);
-            _topPanel.OpenWindow();
             string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " выбирает направление";
             Messages.Instance.AddMessage(message);
-            string cubicStatus = Utils.Wrap("Остаток: " + player.StepsLeft, UIColors.Green);
-            CubicControl.Instance.WriteStatus(cubicStatus);
+
+            if (player.IsMe()) {
+                branch.ShowAllBranches();
+                _topPanel.SetText("Выберите направление");
+                _topPanel.SetCancelButtonActive(false);
+                _topPanel.OpenWindow();
+                string cubicStatus = Utils.Wrap("Остаток: " + player.StepsLeft, UIColors.Green);
+                CubicControl.Instance.WriteStatus(cubicStatus);
+            }
+
+            if (player.IsAi()) {
+                AiControl.Instance.AiSelectBranch(player, branch, player.StepsLeft);
+            }
+
             return false;
         }
 
@@ -62,7 +70,7 @@ public class CellChecker : MonoBehaviour
     // Проверка, может ли игрок избежать вредного эффекта
 
     public void CheckCellCharacter(CellControl cellControl, PlayerControl currentPlayer, TokenControl tokenControl, int currentPlayerIndex) {
-        if (cellControl.IsNegativeEffect() && currentPlayer.IsEnoughEffects(cellControl.Effect)) {
+        if (!currentPlayer.IsAi() && cellControl.IsNegativeEffect() && currentPlayer.IsEnoughEffects(cellControl.Effect)) {
             EffectsControl.Instance.SelectedEffect = cellControl.Effect;
             _modalReplace.BuildContent(currentPlayer);
             _modalReplace.OpenWindow();
@@ -155,8 +163,12 @@ public class CellChecker : MonoBehaviour
             }
 
             if (rivals.Count > 0) {
-                _popupAttack.BuildContent(currentPlayer, rivals);
-                _popupAttack.OnOpenWindow();
+                if (currentPlayer.IsAi()) {
+                    AiControl.Instance.AiAttackPlayer(currentPlayer, cellControl, rivals);
+                } else {
+                    _popupAttack.BuildContent(currentPlayer, rivals);
+                    _popupAttack.OnOpenWindow();
+                }
                 return;
             }
         }

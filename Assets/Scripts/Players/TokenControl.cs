@@ -8,8 +8,8 @@ using UnityEngine.Splines;
 public class TokenControl : MonoBehaviour
 {
     private IEnumerator _coroutine, _squeezeCoroutine;
-    [SerializeField] private GameObject _currentCell, _playerName, _indicators;
-    private GameObject _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
+    [SerializeField] private GameObject _playerName, _indicators, _aiThinking;
+    private GameObject _currentCell, _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
     private SortingGroup _sortingGroup;
     private bool _isSqueeze = false;
     private GameObject _pedestal;
@@ -25,6 +25,7 @@ public class TokenControl : MonoBehaviour
         _armorIron = _squeezable.transform.Find("armor-iron").gameObject;
         UpdateSkips(0);
         UpdateShield(EBoosters.None);
+        ShowAi(false);
         _sortingGroup = GetComponent<SortingGroup>();
         _pedestal = GameObject.Find("Pedestal");
         _splineAnimate = GetComponent<SplineAnimate>();
@@ -169,6 +170,12 @@ public class TokenControl : MonoBehaviour
         _skip1.SetActive(skips == 1);
         _skip2.SetActive(skips == 2);
         _skip3.SetActive(skips > 2);
+    }
+
+    // Разные иконки
+
+    public void ShowAi(bool value) {
+        _aiThinking.SetActive(value);
     }
 
     // Броня

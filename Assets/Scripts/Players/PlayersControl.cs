@@ -1,4 +1,7 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayersControl : MonoBehaviour
@@ -68,6 +71,15 @@ public class PlayersControl : MonoBehaviour
     public PlayerControl GetPlayer(int index) {
         foreach(PlayerControl player in _players) {
             if (player.MoveOrder == index) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    public PlayerControl GetMe() {
+        foreach(PlayerControl player in _players) {
+            if (player.IsMe()) {
                 return player;
             }
         }
@@ -215,5 +227,50 @@ public class PlayersControl : MonoBehaviour
         foreach(PlayerControl player in _players) {
             player.SpendArmor();
         }
+    }
+
+    // AI
+
+    // Определеяется по кол-ву рубинов, денег и силы (именно в таком порядке)
+    // Если 1 место == 2 месту, то выбрать случайного
+
+    public PlayerControl GetMostSuccessfulPlayer(List<PlayerControl> players) {
+        if (players.Count == 1) {
+            return players[0];
+        }
+        
+        List<PlayerControl> array = new();
+
+        foreach(PlayerControl player in players) {
+            array.Add(player);
+        }
+
+        array.Sort((a, b) => {
+            if (a.Rubies != b.Rubies) {
+                return b.Rubies - a.Rubies;
+            } else if (a.Coins != b.Coins) {
+                return b.Coins - a.Coins;
+            } else {
+                return b.Power - a.Power;
+            }
+        });
+
+        if (IsPlayerSuccessEqual(array[0], array[1])) {
+            return GetRandomPlayer(array);
+        }
+
+        return array[0];
+    }
+
+    // Сравнивает успешность двух игроков
+
+    private bool IsPlayerSuccessEqual(PlayerControl player1, PlayerControl player2) {
+        return player1.Rubies == player2.Rubies && player1.Coins == player2.Coins && player1.Power == player2.Power;
+    }
+
+    private PlayerControl GetRandomPlayer(List<PlayerControl> players) {
+        System.Random random = new();
+        int index = random.Next(0, players.Count);
+        return players[index];
     }
 }
