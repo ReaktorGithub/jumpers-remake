@@ -71,15 +71,7 @@ public class ModalReplaceEffect : MonoBehaviour
 
         // описание
 
-        List<string> textList = manual.GetShortDescription(effectLevel);
-        int count = 1;
-        string result = "";
-        foreach(string text in textList) {
-            string myText = textList.Count == count ? text : text + "<br>";
-            result += myText;
-            count++;
-        }
-        _descriptionText.text = result;
+        _descriptionText.text = manual.GetShortDescription(effectLevel);
 
         // название эффекта
 
@@ -87,9 +79,9 @@ public class ModalReplaceEffect : MonoBehaviour
 
         // ресурс, который тратится для совершения действия
 
-        int cost = manual.GetCostToReplaceEffect(effectLevel);
+        int cost = manual.GetCost(effectLevel);
         _resourceCost.text = cost.ToString();
-        EResourceTypes resourceType = manual.ReplaceEffectResourceType;
+        EResourceTypes resourceType = manual.CostResourceType;
         ManualContent resourceManual = Manual.Instance.Power;
         bool isNotEnough;
 

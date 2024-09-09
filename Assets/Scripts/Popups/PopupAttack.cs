@@ -147,26 +147,31 @@ public class PopupAttack : MonoBehaviour
         string[] result = new string[2];
 
         switch (_selectedAttackType) {
-            case EAttackTypes.Usual:
-            result[0] = "Обычная атака";
-            result[1] = "Атакуйте соперника ценой 1 силы и ходите еще раз.<br><br>Соперник пропустит ход.";
-            break;
-            case EAttackTypes.MagicKick:
-            result[0] = "Волшебный пинок (ур.1)";
-            result[1] = "Атакуйте соперника ценой 1 силы.<br><br>Он откатится на 2 клетки назад.";
-            break;
-            case EAttackTypes.Vampyre:
-            result[0] = "Вампирские клыки";
-            result[1] = "Соперник пропустит ход, вы ходите ещё раз.<br><br>Ваша сила увеличится на 1, а у соперника уменьшится на 1.";
-            break;
-            case EAttackTypes.Knockout:
-            result[0] = "Нокаут (ур.1)";
-            result[1] = "Выбросьте соперника с трассы ценой 5 силы и ходите еще раз.<br><br>Жертва займет последнее возможное место.";
-            break;
-            default:
-            result[0] = "";
-            result[1] = "";
-            break;
+            case EAttackTypes.Usual: {
+                result[0] = Manual.Instance.AttackUsual.GetEntityName();
+                result[1] = Manual.Instance.AttackUsual.GetShortDescription(1);
+                break;
+            }
+            case EAttackTypes.MagicKick: {
+                result[0] = Manual.Instance.AttackMagicKick.GetEntityNameWithLevel(1);
+                result[1] = Manual.Instance.AttackMagicKick.GetShortDescription(1);
+                break;
+            }
+            case EAttackTypes.Vampyre: {
+                result[0] = Manual.Instance.AttackVampyre.GetEntityName();
+                result[1] = Manual.Instance.AttackVampyre.GetShortDescription(1);
+                break;
+            }
+            case EAttackTypes.Knockout: {
+                result[0] = Manual.Instance.AttackMagicKick.GetEntityNameWithLevel(1);
+                result[1] = Manual.Instance.AttackMagicKick.GetShortDescription(1);
+                break;
+            }
+            default: {
+                result[0] = "";
+                result[1] = "";
+                break;
+            }
         }
 
         return result;
@@ -240,11 +245,16 @@ public class PopupAttack : MonoBehaviour
 
     private IEnumerator ConfirmAttackDefer() {
         yield return new WaitForSeconds(_attackDelay);
-        if (_selectedAttackType == EAttackTypes.Usual) {
-            int currentPlayerIndex = MoveControl.Instance.CurrentPlayerIndex;
-            MoveControl.Instance.CurrentPlayer.ExecuteAttackUsual(_selectedPlayer, currentPlayerIndex);
-        } else {
-            Debug.Log("ERROR: Attack type not found");
+
+        switch(_selectedAttackType) {
+            case EAttackTypes.MagicKick: {
+                MoveControl.Instance.CurrentPlayer.ExecuteAttackMagicKick(_selectedPlayer, MoveControl.Instance.CurrentPlayerIndex);
+                break;
+            }
+            default: {
+                MoveControl.Instance.CurrentPlayer.ExecuteAttackUsual(_selectedPlayer, MoveControl.Instance.CurrentPlayerIndex);
+                break;
+            }
         }
     }
 

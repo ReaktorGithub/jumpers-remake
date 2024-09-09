@@ -54,6 +54,7 @@ public class PlayerControl : MonoBehaviour
 
     private void Awake() {
         _availableAttackTypes.Add(EAttackTypes.Usual);
+        _availableAttackTypes.Add(EAttackTypes.MagicKick);
         _modalWarning = GameObject.Find("GameScripts").GetComponent<ModalWarning>();
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
         _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
@@ -77,10 +78,13 @@ public class PlayerControl : MonoBehaviour
     }
 
     public bool IsMe() {
-        return _type == EPlayerTypes.Me;
+        return _type == EPlayerTypes.Me || !AiControl.Instance.EnableAi;
     }
 
     public bool IsAi() {
+        if (!AiControl.Instance.EnableAi) {
+            return false;
+        }
         return _type == EPlayerTypes.Ai;
     }
 
@@ -348,6 +352,10 @@ public class PlayerControl : MonoBehaviour
         StartCoroutine(MoveControl.Instance.EndMoveDefer());
     }
 
+    public void ExecuteAttackMagicKick(PlayerControl rival, int currentPlayerIndex) {
+        // todo
+    }
+
     // исполнение эффектов
 
     public void ExecuteBlackEffect(CellControl cellControl, TokenControl tokenControl, int currentPlayerIndex) {
@@ -455,8 +463,8 @@ public class PlayerControl : MonoBehaviour
         // todo уровень эффекта должен вычисляться из PlayerControl
         int effectLevel = 1;
 
-        int cost = manual.GetCostToReplaceEffect(effectLevel);
-        if (manual.ReplaceEffectResourceType == EResourceTypes.Power) {
+        int cost = manual.GetCost(effectLevel);
+        if (manual.CostResourceType == EResourceTypes.Power) {
             AddPower(-cost);
         } else {
             AddCoins(-cost);

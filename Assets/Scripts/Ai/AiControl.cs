@@ -7,6 +7,7 @@ using UnityEngine;
 public class AiControl : MonoBehaviour
 {
     public static AiControl Instance { get; private set; }
+    [SerializeField] bool _enableAi = true;
     [SerializeField] float _cubicThrowDelay = 1f;
     [SerializeField] float _thinkingDelay = 2f;
     private PopupAttack _popupAttack;
@@ -14,6 +15,11 @@ public class AiControl : MonoBehaviour
     private void Awake() {
         Instance = this;
         _popupAttack = GameObject.Find("GameScripts").GetComponent<PopupAttack>();
+    }
+
+    public bool EnableAi {
+        get { return _enableAi; }
+        private set {}
     }
 
     private IEnumerator ImitateThinking(PlayerControl player, Action callback) {

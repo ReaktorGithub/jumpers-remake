@@ -9,9 +9,10 @@ public class ManualContent : MonoBehaviour
     [SerializeField] private List<string> _shortDescriptionLevel2 = new();
     [SerializeField] private List<string> _shortDescriptionLevel3 = new();
     [SerializeField] private List<string> _additionalInfo = new();
-    [SerializeField] private List<int> _costToReplaceEffect = new();
-    [SerializeField] private EResourceTypes _replaceEffectResourceType;
+    [SerializeField] private List<int> _cost = new();
+    [SerializeField] private EResourceTypes _costResourceType;
     [SerializeField] private EResourceCharacters _character;
+    [SerializeField] private List<int> _causeEffect = new();
 
     private void Awake() {
         _sprite = GetComponent<SpriteRenderer>().sprite;
@@ -26,8 +27,8 @@ public class ManualContent : MonoBehaviour
         private set {}
     }
 
-    public EResourceTypes ReplaceEffectResourceType {
-        get { return _replaceEffectResourceType; }
+    public EResourceTypes CostResourceType {
+        get { return _costResourceType; }
         private set {}
     }
 
@@ -41,30 +42,48 @@ public class ManualContent : MonoBehaviour
     }
     
     public string GetEntityNameWithLevel(int level, bool lowercase = false) {
-        string suffix = " (ур. " + level + ")";
+        string suffix = " (ур." + level + ")";
         string myEntityName = GetEntityName(lowercase);
         return myEntityName + suffix;
     }
 
-    public List<string> GetShortDescription(int level = 1) {
+    public string GetShortDescription(int level = 1) {
+        List<string> found;
+
         switch(level) {
             case 1: {
-                return _shortDescriptionLevel1;
+                found = _shortDescriptionLevel1;
+                break;
             }
             case 2: {
-                return _shortDescriptionLevel2;
+                found = _shortDescriptionLevel2;
+                break;
             }
             default: {
-                return _shortDescriptionLevel3;
+                found = _shortDescriptionLevel3;
+                break;
             }
         }
+
+        string result = "";
+
+        for (int i = 0; i < found.Count; i++) {
+            string myText = found.Count == i - 1 ? found[i] : found[i] + "<br>";
+            result += myText;
+        }
+
+        return result;
     }
 
     public string GetAdditionalInfo(int level = 1) {
         return _additionalInfo[level - 1];
     }
 
-    public int GetCostToReplaceEffect(int level = 1) {
-        return _costToReplaceEffect[level - 1];
+    public int GetCost(int level = 1) {
+        return _cost[level - 1];
+    }
+
+    public int GetCauseEffect(int level = 1) {
+        return _causeEffect[level - 1];
     }
 }
