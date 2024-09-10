@@ -102,7 +102,6 @@ public class CellChecker : MonoBehaviour
 
     public void CheckCellEffects(PlayerControl player) {
         CellControl cell = player.GetCurrentCell();
-        TokenControl token = player.GetTokenControl();
 
         if (cell.Effect == EControllableEffects.Green) {
             player.AddMovesToDo(1);
@@ -111,7 +110,7 @@ public class CellChecker : MonoBehaviour
         }
 
         if (cell.Effect == EControllableEffects.Yellow) {
-            player.SkipMoveIncrease(token);
+            player.SkipMoveIncrease();
             string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("жёлтый", UIColors.Yellow) + " эффект и пропустит ход";
             Messages.Instance.AddMessage(message);
         }

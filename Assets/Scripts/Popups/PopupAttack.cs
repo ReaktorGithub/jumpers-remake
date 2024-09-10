@@ -65,6 +65,12 @@ public class PopupAttack : MonoBehaviour
 
         // раздел с атаками
 
+        if (currentPlayer.BoosterVampire > 0) {
+            currentPlayer.AddAvailableAttackType(EAttackTypes.Vampire);
+        } else {
+            currentPlayer.RemoveAvailableAttackType(EAttackTypes.Vampire);
+        }
+
         foreach(AttackTypeButton button in _attackTypeButtons) {
             if (currentPlayer.AvailableAttackTypes.Contains(button.AttackType)) {
                 button.SetAsEnabled();
@@ -151,21 +157,21 @@ public class PopupAttack : MonoBehaviour
         switch (_selectedAttackType) {
             case EAttackTypes.Usual: {
                 result[0] = Manual.Instance.AttackUsual.GetEntityName();
-                result[1] = Manual.Instance.AttackUsual.GetShortDescription(1); // todo добывать уровень из current player
+                result[1] = Manual.Instance.AttackUsual.GetShortDescription(1);
                 break;
             }
             case EAttackTypes.MagicKick: {
-                result[0] = Manual.Instance.AttackMagicKick.GetEntityNameWithLevel(1);
+                result[0] = Manual.Instance.AttackMagicKick.GetEntityNameWithLevel(1); // todo добывать уровень из current player
                 result[1] = Manual.Instance.AttackMagicKick.GetShortDescription(1);
                 break;
             }
-            case EAttackTypes.Vampyre: {
-                result[0] = Manual.Instance.AttackVampyre.GetEntityName();
-                result[1] = Manual.Instance.AttackVampyre.GetShortDescription(1);
+            case EAttackTypes.Vampire: {
+                result[0] = Manual.Instance.AttackVampire.GetEntityName();
+                result[1] = Manual.Instance.AttackVampire.GetShortDescription(1);
                 break;
             }
             case EAttackTypes.Knockout: {
-                result[0] = Manual.Instance.AttackMagicKick.GetEntityNameWithLevel(1);
+                result[0] = Manual.Instance.AttackMagicKick.GetEntityNameWithLevel(1); // todo добывать уровень из current player
                 result[1] = Manual.Instance.AttackMagicKick.GetShortDescription(1);
                 break;
             }
@@ -214,7 +220,7 @@ public class PopupAttack : MonoBehaviour
             case EAttackTypes.MagicKick:
             powerNeed =+ 1;
             break;
-            case EAttackTypes.Vampyre:
+            case EAttackTypes.Vampire:
             powerNeed =- 1;
             break;
             case EAttackTypes.Knockout:
@@ -251,6 +257,10 @@ public class PopupAttack : MonoBehaviour
         switch(_selectedAttackType) {
             case EAttackTypes.MagicKick: {
                 MoveControl.Instance.CurrentPlayer.ExecuteAttackMagicKick(_selectedPlayer);
+                break;
+            }
+            case EAttackTypes.Vampire: {
+                MoveControl.Instance.CurrentPlayer.ExecuteAttackVampire(_selectedPlayer);
                 break;
             }
             default: {

@@ -17,5 +17,6 @@ public class Jumpers : MonoBehaviour
         Instances.transform.Find("lasso").gameObject.SetActive(false);
         Instances.transform.Find("shield").gameObject.SetActive(false);
         Instances.transform.Find("shield-iron").gameObject.SetActive(false);
+        Instances.transform.Find("vampire").gameObject.SetActive(false);
     }
 }

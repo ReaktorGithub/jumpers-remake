@@ -74,6 +74,12 @@ public class BoosterButton : MonoBehaviour
             }
             return;
         }
+
+        if (IsAttackOnly()) {
+            BoostersControl.Instance.ShowAttackOnlyWarning();
+            return;
+        }
+
         SetSelected(true);
         BoostersControl.Instance.DisableAllButtons(this);
         EffectsControl.Instance.DisableAllButtons(true);
@@ -90,6 +96,10 @@ public class BoosterButton : MonoBehaviour
 
     public bool IsShield() {
         return _boosterType == EBoosters.Shield || _boosterType == EBoosters.ShieldIron;
+    }
+
+    public bool IsAttackOnly() {
+        return _boosterType == EBoosters.Vampire || _boosterType == EBoosters.Slimer;
     }
 
     public void OnChangeBooster(EBoosters booster) {
@@ -114,6 +124,10 @@ public class BoosterButton : MonoBehaviour
             }
             case EBoosters.ShieldIron: {
                 _booster.sprite = BoostersControl.Instance.ShieldIronSprite;
+                break;
+            }
+            case EBoosters.Vampire: {
+                _booster.sprite = BoostersControl.Instance.VampireSprite;
                 break;
             }
             default: {

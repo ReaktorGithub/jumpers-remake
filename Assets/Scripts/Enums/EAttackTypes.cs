@@ -3,6 +3,6 @@ public enum EAttackTypes
     None,
     Usual,
     MagicKick,
-    Vampyre,
+    Vampire,
     Knockout,
 }

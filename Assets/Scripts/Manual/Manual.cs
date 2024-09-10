@@ -3,7 +3,7 @@ using UnityEngine;
 public class Manual : MonoBehaviour
 {
     public static Manual Instance { get; private set; }
-    private ManualContent _power, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect, _attackUsual, _attackMagicKick, _attackVampyre, _attackKnockout;
+    private ManualContent _power, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect, _attackUsual, _attackMagicKick, _attackVampire, _attackKnockout;
 
     private void Awake() {
         Instance = this;
@@ -16,7 +16,7 @@ public class Manual : MonoBehaviour
         _starEffect = transform.Find("StarEffect").GetComponent<ManualContent>();
         _attackUsual = transform.Find("AttackUsual").GetComponent<ManualContent>();
         _attackMagicKick = transform.Find("AttackMagicKick").GetComponent<ManualContent>();
-        _attackVampyre = transform.Find("AttackVampyre").GetComponent<ManualContent>();
+        _attackVampire = transform.Find("AttackVampire").GetComponent<ManualContent>();
         _attackKnockout = transform.Find("AttackKnockout").GetComponent<ManualContent>();
     }
 
@@ -65,8 +65,8 @@ public class Manual : MonoBehaviour
         private set {}
     }
 
-    public ManualContent AttackVampyre {
-        get { return _attackVampyre; }
+    public ManualContent AttackVampire {
+        get { return _attackVampire; }
         private set {}
     }
 
