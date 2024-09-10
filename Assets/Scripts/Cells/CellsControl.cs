@@ -307,34 +307,44 @@ public class CellsControl : MonoBehaviour
         return result;
     }
 
-    // Возвращает клетку, на которую должен попасть игрок, ступивший на бранч
-    // Если на пути анализа попался еще один бранч, то вернет null
+    // Смотрит вглубль на несколько клеток и возвращает клетку, до которой дошёл
+    // Если попалось разветвление или тупик, то возвращает последнюю найденную клетку
+    // Возвращает GameObject и количество непройденных шагов
 
-    public GameObject FindBranchTargetCell(GameObject startCell, bool isForward, int steps) {
+    public (GameObject, int) FindCellBySteps(GameObject startCell, bool isForward, int steps) {
         GameObject forAnalyse = startCell;
 
         for (int i = 0; i < steps; i++) {
-            bool isBranch = forAnalyse.TryGetComponent(out BranchCell _);
+            bool isBranch = forAnalyse.TryGetComponent(out BranchCell branchCell);
+            bool isFork = false;
             if (isBranch) {
-                return null;
+                isFork = branchCell.IsReverse() && !isForward || !branchCell.IsReverse() && isForward;
+            }
+            if (isFork) {
+                return (forAnalyse, steps - i);
             } else {
-                bool isLastStep = i == steps - 1;
-                if (isLastStep) {
-                    return forAnalyse;
+                GameObject newCell;
+                
+                if (isForward) {
+                    newCell = forAnalyse.GetComponent<CellControl>().NextCell;
                 } else {
-                    if (isForward) {
-                        forAnalyse = forAnalyse.GetComponent<CellControl>().NextCell;
+                    newCell = forAnalyse.GetComponent<CellControl>().PreviousCell;
+                }
+
+                if (newCell == null) {
+                    return (forAnalyse, steps - i);
+                } else {
+                    bool isLastStep = i == steps - 1;
+                    if (isLastStep) {
+                        return (newCell, steps - i - 1);
                     } else {
-                        forAnalyse = forAnalyse.GetComponent<CellControl>().PreviousCell;
-                    }
-                    if (forAnalyse == null) {
-                        return null;
+                        forAnalyse = newCell;
                     }
                 }
             }
         }
 
-        return null;
+        return (forAnalyse, steps);
     }
 
     // Возвращает количество шагов до финиша - ближайший маршрут

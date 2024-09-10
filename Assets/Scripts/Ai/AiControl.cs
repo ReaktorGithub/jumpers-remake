@@ -7,6 +7,7 @@ using UnityEngine;
 public class AiControl : MonoBehaviour
 {
     public static AiControl Instance { get; private set; }
+    [SerializeField] bool _enableAi = true;
     [SerializeField] float _cubicThrowDelay = 1f;
     [SerializeField] float _thinkingDelay = 2f;
     private PopupAttack _popupAttack;
@@ -14,6 +15,11 @@ public class AiControl : MonoBehaviour
     private void Awake() {
         Instance = this;
         _popupAttack = GameObject.Find("GameScripts").GetComponent<PopupAttack>();
+    }
+
+    public bool EnableAi {
+        get { return _enableAi; }
+        private set {}
     }
 
     private IEnumerator ImitateThinking(PlayerControl player, Action callback) {
@@ -30,7 +36,7 @@ public class AiControl : MonoBehaviour
     }
 
     /*
-        1. Выбрать вид атаки TODO
+        1. Выбрать вид атаки todo
         2. Атаковать или нет?
             - Учесть число шагов до финиша
             - Учесть силы в запасе
@@ -38,10 +44,12 @@ public class AiControl : MonoBehaviour
             - Выбрать наиболее сильного игрока
     */
 
-    public void AiAttackPlayer(PlayerControl player, CellControl currentCell, List<PlayerControl> rivals) {
+    public void AiAttackPlayer(PlayerControl player, List<PlayerControl> rivals) {
+        CellControl cell = player.GetCurrentCell();
+
         int points = 0; // trigger by 10
 
-        int distance = CellsControl.Instance.GetStepsToFinish(currentCell.gameObject);
+        int distance = CellsControl.Instance.GetStepsToFinish(cell.gameObject);
 
         switch(player.AiType) {
             case EAiTypes.Normal: {
@@ -99,8 +107,12 @@ public class AiControl : MonoBehaviour
 
         foreach(GameObject button in branch.BranchButtonsList) {
             BranchButton branchButton = button.GetComponent<BranchButton>();
-            GameObject targetCell = CellsControl.Instance.FindBranchTargetCell(branchButton.NextCell, !branch.IsReverse, rest);
+            (GameObject, int) cells = CellsControl.Instance.FindCellBySteps(branchButton.NextCell, !branch.IsReverse, rest);
+            GameObject targetCell = cells.Item1;
+            bool isBranch = targetCell.TryGetComponent(out BranchCell _);
             if (targetCell == null) {
+                variants.Add((branchButton, 0));
+            } else if (targetCell.TryGetComponent(out BranchCell _)) {
                 variants.Add((branchButton, 0));
             } else {
                 int points = GetBranchVariantPoints(player, branchButton, targetCell.GetComponent<CellControl>());

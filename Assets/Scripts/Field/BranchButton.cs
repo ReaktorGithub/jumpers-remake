@@ -91,6 +91,10 @@ public class BranchButton : MonoBehaviour
     }
 
     public void ConfirmNewDirection() {
-        MoveControl.Instance.SwitchBranch(_nextCell);
+        if (MoveControl.Instance.IsViolateMode) {
+            MoveControl.Instance.SwitchBranchViolate(_nextCell);
+        } else {
+            MoveControl.Instance.SwitchBranch(_nextCell);
+        }
     }
 }

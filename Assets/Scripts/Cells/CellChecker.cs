@@ -18,48 +18,54 @@ public class CellChecker : MonoBehaviour
         _modalReplace = GameObject.Find("GameScripts").GetComponent<ModalReplaceEffect>();
     }
 
-    public bool CheckBranch(CellControl currentCellControl, PlayerControl player) {
-        if (currentCellControl.TryGetComponent(out BranchCell branchCell)) {
-            BranchControl branch = branchCell.BranchObject.GetComponent<BranchControl>();
+    public bool CheckBranch(PlayerControl player) {
+        CellControl cell = player.GetCurrentCell();
+
+        if (cell.TryGetComponent(out BranchCell branchCell)) {
+            BranchControl branch = branchCell.BranchControl;
             if (branch.IsReverse != player.IsReverseMove) {
                 // Если направление движения фишки не соответствует направлению бранча, то скипаем
                 return true;
             }
-            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " выбирает направление";
-            Messages.Instance.AddMessage(message);
-
-            if (player.IsMe()) {
-                branch.ShowAllBranches();
-                _topPanel.SetText("Выберите направление");
-                _topPanel.SetCancelButtonActive(false);
-                _topPanel.OpenWindow();
-                string cubicStatus = Utils.Wrap("Остаток: " + player.StepsLeft, UIColors.Green);
-                CubicControl.Instance.WriteStatus(cubicStatus);
-            }
-
-            if (player.IsAi()) {
-                AiControl.Instance.AiSelectBranch(player, branch, player.StepsLeft);
-            }
-
+            
+            ActivateBranch(player, branch, player.StepsLeft);
             return false;
         }
 
         return true;
     }
 
-    public bool CheckCellAfterStep(ECellTypes cellType, PlayerControl currentPlayer) {
+    public void ActivateBranch(PlayerControl player, BranchControl branch, int rest) {
+        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " выбирает направление";
+        Messages.Instance.AddMessage(message);
+
+        if (player.IsMe()) {
+            branch.ShowAllBranches();
+            _topPanel.SetText("Выберите направление");
+            _topPanel.SetCancelButtonActive(false);
+            _topPanel.OpenWindow();
+            string cubicStatus = Utils.Wrap("Остаток: " + rest, UIColors.Green);
+            CubicControl.Instance.WriteStatus(cubicStatus);
+        }
+
+        if (player.IsAi()) {
+            AiControl.Instance.AiSelectBranch(player, branch, rest);
+        }
+    }
+
+    public bool CheckCellAfterStep(ECellTypes cellType, PlayerControl player) {
         if (cellType == ECellTypes.Checkpoint) {
-            string message = Utils.Wrap(currentPlayer.PlayerName, UIColors.Yellow) + " достигает " + Utils.Wrap("чекпойнта", UIColors.Blue);
+            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " достигает " + Utils.Wrap("чекпойнта", UIColors.Blue);
             Messages.Instance.AddMessage(message);
         }
 
         if (cellType == ECellTypes.Finish) {
-            currentPlayer.ExecuteFinish();
+            player.ExecuteFinish();
             _camera.ClearFollow();
             return false;
         }
 
-        if (cellType == ECellTypes.Start && currentPlayer.IsReverseMove) {
+        if (cellType == ECellTypes.Start && player.IsReverseMove) {
             _camera.ClearFollow();
             return false;
         }
@@ -69,15 +75,22 @@ public class CellChecker : MonoBehaviour
 
     // Проверка, может ли игрок избежать вредного эффекта
 
-    public void CheckCellCharacter(CellControl cellControl, PlayerControl currentPlayer, TokenControl tokenControl, int currentPlayerIndex) {
-        if (!currentPlayer.IsAi() && cellControl.IsNegativeEffect() && currentPlayer.IsEnoughEffects(cellControl.Effect)) {
-            EffectsControl.Instance.SelectedEffect = cellControl.Effect;
-            _modalReplace.BuildContent(currentPlayer);
+    public void CheckCellCharacter(PlayerControl player) {
+        CellControl cell = player.GetCurrentCell();
+        
+        if (cell.IsNegativeEffect() && player.IsEnoughEffects(cell.Effect)) {
+            if (player.IsAi()) {
+                // todo научить принимать решения
+                CheckCellEffects(player);
+                return;
+            }
+            EffectsControl.Instance.SelectedEffect = cell.Effect;
+            _modalReplace.BuildContent(player);
             _modalReplace.OpenWindow();
             return;
         }
 
-        CheckCellEffects(cellControl, currentPlayer, tokenControl, currentPlayerIndex);
+        CheckCellEffects(player);
     }
 
     // Необходимые действия перед завершением хода:
@@ -87,57 +100,65 @@ public class CellChecker : MonoBehaviour
     // 4.	Исполнение эффекта «стрелка», либо «синяя стрелка».
     // 5.	Атака на соперников.
 
-    public void CheckCellEffects(CellControl cellControl, PlayerControl currentPlayer, TokenControl tokenControl, int currentPlayerIndex) {
-        if (cellControl.Effect == EControllableEffects.Green) {
-            currentPlayer.AddMovesToDo(1);
-            string message = Utils.Wrap(currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("зелёный", UIColors.Green) + " эффект и ходит ещё раз";
+    public void CheckCellEffects(PlayerControl player) {
+        CellControl cell = player.GetCurrentCell();
+        TokenControl token = player.GetTokenControl();
+
+        if (cell.Effect == EControllableEffects.Green) {
+            player.AddMovesToDo(1);
+            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("зелёный", UIColors.Green) + " эффект и походит ещё раз";
             Messages.Instance.AddMessage(message);
         }
 
-        if (cellControl.Effect == EControllableEffects.Yellow) {
-            currentPlayer.SkipMoveIncrease(tokenControl);
-            string message = Utils.Wrap(currentPlayer.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("жёлтый", UIColors.Yellow) + " эффект и пропустит ход";
+        if (cell.Effect == EControllableEffects.Yellow) {
+            player.SkipMoveIncrease(token);
+            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("жёлтый", UIColors.Yellow) + " эффект и пропустит ход";
             Messages.Instance.AddMessage(message);
         }
 
-        if (cellControl.Effect == EControllableEffects.Star) {
-            currentPlayer.ExecuteStarEffect(currentPlayerIndex);
+        if (cell.Effect == EControllableEffects.Star) {
+            player.ExecuteStarEffect();
         }
 
-        if (cellControl.Effect == EControllableEffects.Black) {
-            currentPlayer.ExecuteBlackEffect(cellControl, tokenControl, currentPlayerIndex);
+        if (cell.Effect == EControllableEffects.Black) {
+            player.ExecuteBlackEffect();
             return;
         }
 
-        if (cellControl.Effect == EControllableEffects.Red) {
-            currentPlayer.MovesToDo = 0;
-            currentPlayer.StepsLeft = 0;
-            currentPlayer.ExecuteRedEffect(currentPlayerIndex);
+        if (cell.Effect == EControllableEffects.Red) {
+            player.MovesToDo = 0;
+            player.StepsLeft = 0;
+            player.ExecuteRedEffect();
             return;
         }
 
-        CheckCellArrows(cellControl, currentPlayer, tokenControl);
+        CheckCellArrows(player);
     }
 
-    public void CheckCellArrows(CellControl cellControl, PlayerControl currentPlayer, TokenControl tokenControl) {
-        if (cellControl.transform.TryGetComponent(out ArrowCell arrowCell)) {
-            tokenControl.ExecuteArrowMove(arrowCell.ArrowSpline);
-            string message = Utils.Wrap(currentPlayer.PlayerName, UIColors.Yellow) + " перемещается по стрелке";
+    public void CheckCellArrows(PlayerControl player) {
+        CellControl cell = player.GetCurrentCell();
+        TokenControl token = player.GetTokenControl();
+
+        if (cell.transform.TryGetComponent(out ArrowCell arrowCell)) {
+            token.ExecuteArrowMove(arrowCell.ArrowSpline);
+            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " перемещается по стрелке";
             Messages.Instance.AddMessage(message);
             return;
         }
 
-        CheckCellRivals(cellControl, currentPlayer);
+        CheckCellRivals(player);
     }
 
-    public void CheckCellRivals(CellControl cellControl, PlayerControl currentPlayer) {
+    public void CheckCellRivals(PlayerControl player) {
+        CellControl cell = player.GetCurrentCell();
+
         // на некоторых клетках атаки не проводятся
-        if (_skipRivalCheckTypes.Contains(cellControl.CellType)) {
+        if (_skipRivalCheckTypes.Contains(cell.CellType)) {
             StartCoroutine(MoveControl.Instance.EndMoveDefer());
             return;
         }
         
-        List<GameObject> tokens = cellControl.CurrentTokens;
+        List<GameObject> tokens = cell.CurrentTokens;
 
         // Для проверки на атаку должно быть больше 1 фишки на клетке
         // Сортировать соперников на тех, что со щитами и без щитов
@@ -148,25 +169,25 @@ public class CellChecker : MonoBehaviour
             List<PlayerControl> rivals = new();
             List<PlayerControl> rivalsWithShields = new();
 
-            foreach(PlayerControl player in PlayersControl.Instance.Players) {
-                if (tokens.Contains(player.TokenObject) && currentPlayer.TokenObject != player.TokenObject) {
-                    if (player.Armor > 0) {
-                        rivalsWithShields.Add(player);
+            foreach(PlayerControl playerForCheck in PlayersControl.Instance.Players) {
+                if (tokens.Contains(playerForCheck.TokenObject) && player.TokenObject != playerForCheck.TokenObject) {
+                    if (playerForCheck.Armor > 0) {
+                        rivalsWithShields.Add(playerForCheck);
                     } else {
-                        rivals.Add(player);
+                        rivals.Add(playerForCheck);
                     }
                 }
             }
 
             if (rivalsWithShields.Count > 0) {
-                currentPlayer.HarvestShieldBonus(rivalsWithShields);
+                player.HarvestShieldBonus(rivalsWithShields);
             }
 
             if (rivals.Count > 0) {
-                if (currentPlayer.IsAi()) {
-                    AiControl.Instance.AiAttackPlayer(currentPlayer, cellControl, rivals);
+                if (player.IsAi()) {
+                    AiControl.Instance.AiAttackPlayer(player, rivals);
                 } else {
-                    _popupAttack.BuildContent(currentPlayer, rivals);
+                    _popupAttack.BuildContent(player, rivals);
                     _popupAttack.OnOpenWindow();
                 }
                 return;

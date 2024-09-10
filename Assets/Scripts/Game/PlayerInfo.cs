@@ -47,7 +47,7 @@ public class PlayerInfo : MonoBehaviour
         }
     }
 
-    public void UpdatePlayerInfoDisplay(PlayerControl player, int currentPlayer) {
+    public void UpdatePlayerInfoDisplay(PlayerControl player) {
         _coinText.text = player.Coins.ToString();
         _rubyText.text = player.Rubies.ToString();
         _finish.SetActive(player.IsFinished);
@@ -64,7 +64,7 @@ public class PlayerInfo : MonoBehaviour
             }
             count++;
         }
-        _active.SetActive(player.MoveOrder == currentPlayer);
+        _active.SetActive(player.MoveOrder == MoveControl.Instance.CurrentPlayerIndex);
         _tokenImage.sprite = _symbolImages[player.MoveOrder - 1].sprite;
     }
 }

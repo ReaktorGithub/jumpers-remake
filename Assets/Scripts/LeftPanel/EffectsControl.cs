@@ -247,6 +247,14 @@ public class EffectsControl : MonoBehaviour
         }
     }
 
+    // Кнопки эффектов энейблятся, только если игрок их еще не использовал
+
+    public void TryToEnableAllEffectButtons() {
+        if (!MoveControl.Instance.CurrentPlayer.IsEffectPlaced) {
+            DisableAllButtons(false);
+        }
+    }
+
     // перемещение эффекта
 
     public void OnReplaceEffect(CellControl newCell) {
@@ -255,13 +263,13 @@ public class EffectsControl : MonoBehaviour
         // изменить ресурсы игрока
 
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
-        player.ExecuteReplaceEffect(_selectedEffect, MoveControl.Instance.CurrentPlayerIndex);
+        player.ExecuteReplaceEffect(_selectedEffect);
         UpdateQuantityText(player);
         UpdateEffectEmptiness(player);
 
         // удалить эффект на текущей клетке
 
-        CellControl oldCell = MoveControl.Instance.CurrentCell;
+        CellControl oldCell = player.GetCurrentCell();
         Sprite sprite = _emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
         oldCell.ChangeEffect(EControllableEffects.None, sprite);
         Sprite newCellSprite;

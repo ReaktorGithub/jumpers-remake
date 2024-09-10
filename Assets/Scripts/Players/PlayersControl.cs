@@ -95,8 +95,8 @@ public class PlayersControl : MonoBehaviour
         return null;
     }
 
-    // в игроке сохранить изображение фишки
-    // в фишке сохранить имя игрока
+    // в игроке сохранить изображение фишки и ссылку на фишку
+    // в фишке сохранить ссылку на игрока
 
     public void BindTokensToPlayers() {
         foreach(PlayerControl player in _players) {
@@ -136,14 +136,14 @@ public class PlayersControl : MonoBehaviour
         При смене игрока текущий порядок устанавливается на 3, все остальные -1
     */
 
-    public void UpdateTokenLayerOrder(int currentPlayerIndex) {
+    public void UpdateTokenLayerOrder() {
         foreach(PlayerControl player in _players) {
             GameObject token = GetTokenByMoveOrder(player.MoveOrder);
             if (token == null) {
                 continue;
             }
             TokenControl tokenControl = token.GetComponent<TokenControl>();
-            if (player.MoveOrder == currentPlayerIndex) {
+            if (player.MoveOrder == MoveControl.Instance.CurrentPlayerIndex) {
                 tokenControl.SetOrderInLayer(3);
             } else {
                 tokenControl.SetOrderInLayer(tokenControl.GetOrderInLayer() - 1);
@@ -151,13 +151,13 @@ public class PlayersControl : MonoBehaviour
         }
     }
 
-    public void UpdateSqueezeAnimation(int currentPlayerIndex) {
+    public void UpdateSqueezeAnimation() {
         foreach(PlayerControl player in _players) {
             if (player.TokenObject == null) {
                 continue;
             }
             TokenControl tokenControl = player.TokenObject.GetComponent<TokenControl>();
-            if (player.MoveOrder == currentPlayerIndex) {
+            if (player.MoveOrder == MoveControl.Instance.CurrentPlayerIndex) {
                 tokenControl.StartSqueeze();
             } else {
                 tokenControl.StopSqueeze();
@@ -165,14 +165,14 @@ public class PlayersControl : MonoBehaviour
         }
     }
 
-    public void MoveAllTokensToPedestal(int currentPlayerIndex, float delay) {
+    public void MoveAllTokensToPedestal(float delay) {
         foreach (PlayerControl player in _players) {
             if (!player.IsFinished) {
                 player.IsFinished = true;
                 int place = _pedestal.SetPlayerToMinPlace(player);
                 string name = "PlayerInfo" + player.MoveOrder;
                 PlayerInfo info = GameObject.Find(name).GetComponent<PlayerInfo>();
-                info.UpdatePlayerInfoDisplay(player, currentPlayerIndex);
+                info.UpdatePlayerInfoDisplay(player);
 
                 TokenControl tokenControl = player.GetTokenControl();
                 IEnumerator coroutine = tokenControl.MoveToPedestalDefer(delay, () => {
@@ -183,11 +183,11 @@ public class PlayersControl : MonoBehaviour
         }
     }
 
-    public void UpdatePlayersInfo(int currentPlayerIndex) {
+    public void UpdatePlayersInfo() {
         foreach(PlayerControl player in _players) {
             string name = "PlayerInfo" + player.MoveOrder;
             PlayerInfo info = GameObject.Find(name).GetComponent<PlayerInfo>();
-            info.UpdatePlayerInfoDisplay(player, currentPlayerIndex);
+            info.UpdatePlayerInfoDisplay(player);
         }
     }
 
@@ -199,7 +199,7 @@ public class PlayersControl : MonoBehaviour
 
     // ресурсы
 
-    public void GiveEffectsBeforeRace(int currentPlayerIndex) {
+    public void GiveEffectsBeforeRace() {
         foreach(PlayerControl player in _players) {
             player.EffectsGreen = _levelData.EffectsGreen;
             player.EffectsYellow = _levelData.EffectsYellow;
@@ -207,7 +207,7 @@ public class PlayersControl : MonoBehaviour
             player.EffectsRed = _levelData.EffectsRed;
             player.EffectsStar = _levelData.EffectsStar;
         }
-        PlayerControl currentPlayer = GetPlayer(currentPlayerIndex);
+        PlayerControl currentPlayer = GetPlayer(MoveControl.Instance.CurrentPlayerIndex);
         EffectsControl.Instance.UpdateQuantityText(currentPlayer);
         EffectsControl.Instance.UpdateEffectEmptiness(currentPlayer);
     }

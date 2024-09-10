@@ -95,14 +95,6 @@ public class BoostersControl : MonoBehaviour
         }
     }
 
-    // Кнопки эффектов энейблятся, только если игрок их еще не использовал
-
-    public void TryToEnableAllEffectButtons() {
-        if (!MoveControl.Instance.CurrentPlayer.IsEffectPlaced) {
-            EffectsControl.Instance.DisableAllButtons(false);
-        }
-    }
-
     // Обновление содержимого строки усилителей, в которых используются разные виды усилителей (магниты, щиты)
 
     private void UpdateBoostersRow(int booster1Count, int booster2Count, EBoosters booster1, EBoosters booster2, BoostersRow targetScript) {
@@ -156,14 +148,16 @@ public class BoostersControl : MonoBehaviour
     // Открытие разных усилителей при нажатиях на кнопки в левой панели
 
     public void ActivateBooster(EBoosters booster) {
+        CellControl cell = MoveControl.Instance.CurrentPlayer.GetCurrentCell();
+
         switch(booster) {
             case EBoosters.Magnet: {
-                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, MoveControl.Instance.CurrentCell, false);
+                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, cell, false);
                 _popupMagnet.OnOpenWindow();
                 break;
             }
             case EBoosters.MagnetSuper: {
-                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, MoveControl.Instance.CurrentCell, true);
+                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, cell, true);
                 _popupMagnet.OnOpenWindow();
                 break;
             }
@@ -171,16 +165,16 @@ public class BoostersControl : MonoBehaviour
                 CubicControl.Instance.SetCubicInteractable(false);
                 _topPanel.SetText("Подвиньте свою фишку в пределах 3 шагов"); // todo зависит от уровня лассо
                 _topPanel.OpenWindow();
-                List<GameObject> collected = CellsControl.Instance.FindNearCellsDeepTwoSide(MoveControl.Instance.CurrentCell, 3);
-                foreach(GameObject cell in collected) {
-                    cell.GetComponent<CellControl>().TurnOnLassoMode();
+                List<GameObject> collected = CellsControl.Instance.FindNearCellsDeepTwoSide(cell, 3);
+                foreach(GameObject cellFound in collected) {
+                    cellFound.GetComponent<CellControl>().TurnOnLassoMode();
                 }
                 _topPanel.SetCancelButtonActive(true, () => {
                     _topPanel.CloseWindow();
-                    foreach(GameObject cell in collected) {
-                        cell.GetComponent<CellControl>().TurnOffLassoMode();
+                    foreach(GameObject cellFound in collected) {
+                        cellFound.GetComponent<CellControl>().TurnOffLassoMode();
                     }
-                    TryToEnableAllEffectButtons();
+                    EffectsControl.Instance.TryToEnableAllEffectButtons();
                     EnableAllButtons();
                     CubicControl.Instance.SetCubicInteractable(true);
                 });

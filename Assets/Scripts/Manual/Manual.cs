@@ -3,7 +3,7 @@ using UnityEngine;
 public class Manual : MonoBehaviour
 {
     public static Manual Instance { get; private set; }
-    private ManualContent _power, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect;
+    private ManualContent _power, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect, _attackUsual, _attackMagicKick, _attackVampyre, _attackKnockout;
 
     private void Awake() {
         Instance = this;
@@ -14,6 +14,10 @@ public class Manual : MonoBehaviour
         _blackEffect = transform.Find("BlackEffect").GetComponent<ManualContent>();
         _redEffect = transform.Find("RedEffect").GetComponent<ManualContent>();
         _starEffect = transform.Find("StarEffect").GetComponent<ManualContent>();
+        _attackUsual = transform.Find("AttackUsual").GetComponent<ManualContent>();
+        _attackMagicKick = transform.Find("AttackMagicKick").GetComponent<ManualContent>();
+        _attackVampyre = transform.Find("AttackVampyre").GetComponent<ManualContent>();
+        _attackKnockout = transform.Find("AttackKnockout").GetComponent<ManualContent>();
     }
 
     public ManualContent Power {
@@ -48,6 +52,26 @@ public class Manual : MonoBehaviour
 
     public ManualContent Coins {
         get { return _coins; }
+        private set {}
+    }
+
+    public ManualContent AttackUsual {
+        get { return _attackUsual; }
+        private set {}
+    }
+
+    public ManualContent AttackMagicKick {
+        get { return _attackMagicKick; }
+        private set {}
+    }
+
+    public ManualContent AttackVampyre {
+        get { return _attackVampyre; }
+        private set {}
+    }
+
+    public ManualContent AttackKnockout {
+        get { return _attackKnockout; }
         private set {}
     }
 
