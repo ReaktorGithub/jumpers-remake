@@ -5847,7 +5847,7 @@ MonoBehaviour:
   _coins: 400
   _mallows: 0
   _rubies: 0
-  _power: 1
+  _power: 5
   _effectsGreen: 0
   _effectsYellow: 0
   _effectsBlack: 0
@@ -11713,7 +11713,7 @@ MonoBehaviour:
   _coins: 600
   _mallows: 0
   _rubies: 0
-  _power: 1
+  _power: 5
   _effectsGreen: 0
   _effectsYellow: 0
   _effectsBlack: 0
@@ -13354,7 +13354,7 @@ MonoBehaviour:
   _coins: 400
   _mallows: 0
   _rubies: 1
-  _power: 1
+  _power: 4
   _effectsGreen: 0
   _effectsYellow: 0
   _effectsBlack: 0

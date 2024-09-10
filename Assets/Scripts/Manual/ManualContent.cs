@@ -68,7 +68,7 @@ public class ManualContent : MonoBehaviour
         string result = "";
 
         for (int i = 0; i < found.Count; i++) {
-            string myText = found.Count == i - 1 ? found[i] : found[i] + "<br>";
+            string myText = found.Count == i - 1 ? found[i] : found[i] + "<br><br>";
             result += myText;
         }
 

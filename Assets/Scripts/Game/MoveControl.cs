@@ -307,6 +307,15 @@ public class MoveControl : MonoBehaviour
         });
     }
 
+    // Совершить действия после удаления проигравшей фишки на педестал
+
+    public void ConfirmLosePlayer(PlayerControl player) {
+        CellControl cellControl = player.GetCurrentCell();
+        cellControl.RemoveToken(player.TokenObject);
+        cellControl.AlignTokens(_alignTime);
+        StartCoroutine(EndMoveDefer());
+    }
+
     public void CheckCellEffects() {
         CellChecker.Instance.CheckCellEffects(_currentPlayer);
     }
