@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -48,6 +49,7 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private int _boosterLasso = 0;
     [SerializeField] private int _boosterShield = 0;
     [SerializeField] private int _boosterShieldIron = 0;
+    [SerializeField] private int _boosterVampire = 0;
 
     // Кубик
     [SerializeField] private int _cubicMaxScore = 6;
@@ -223,6 +225,11 @@ public class PlayerControl : MonoBehaviour
         set { _boosterShieldIron = value; }
     }
 
+    public int BoosterVampire {
+        get { return _boosterVampire; }
+        set { _boosterVampire = value; }
+    }
+
     public int CubicMaxScore {
         get { return _cubicMaxScore; }
         set { _cubicMaxScore = value; }
@@ -253,9 +260,9 @@ public class PlayerControl : MonoBehaviour
         _stepsLeft += count;
     }
 
-    public void SkipMoveIncrease(TokenControl token) {
+    public void SkipMoveIncrease() {
         _movesSkip++;
-        token.UpdateSkips(_movesSkip);
+        GetTokenControl().UpdateSkips(_movesSkip);
     }
 
     public void SkipMoveDecrease(TokenControl token) {
@@ -321,11 +328,27 @@ public class PlayerControl : MonoBehaviour
         _boosterShieldIron += value;
     }
 
+    public void AddVampire(int value) {
+        _boosterVampire += value;
+    }
+
     public void AddArmor(int value) {
         _armor += value;
     }
 
     // атака
+
+    public void AddAvailableAttackType(EAttackTypes type) {
+        if (!_availableAttackTypes.Contains(type)) {
+            _availableAttackTypes.Add(type);
+        }
+    }
+
+    public void RemoveAvailableAttackType(EAttackTypes type) {
+        if (_availableAttackTypes.Contains(type)) {
+            _availableAttackTypes.Remove(type);
+        }
+    }
 
     public List<EAttackTypes> AvailableAttackTypes {
         get { return _availableAttackTypes; }
@@ -334,22 +357,15 @@ public class PlayerControl : MonoBehaviour
 
     public void ExecuteAttackUsual(PlayerControl rival) {
         AddPower(-1);
-        _movesToDo++;
-        rival.SkipMoveIncrease(rival.GetTokenControl());
+        AddMovesToDo(1);
+        rival.SkipMoveIncrease();
         PlayersControl.Instance.UpdatePlayersInfo();
         string message1 = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" АТАКУЕТ ", UIColors.Red) + Utils.Wrap(rival.PlayerName, UIColors.Yellow) + "!";
         Messages.Instance.AddMessage(message1);
         string message2 = Utils.Wrap(rival.PlayerName, UIColors.Yellow) + " пропустит ход, а " + Utils.Wrap(PlayerName, UIColors.Yellow) + " ходит ещё раз";
         Messages.Instance.AddMessage(message2);
 
-        if (_power == 0 && IsMe()) {
-            OpenPowerWarningModal(() => {
-                StartCoroutine(MoveControl.Instance.EndMoveDefer());
-            });
-            return;
-        }
-
-        StartCoroutine(MoveControl.Instance.EndMoveDefer());
+        CheckIsPlayerOutOfPower(this, () => StartCoroutine(MoveControl.Instance.EndMoveDefer()));
     }
 
     public void ExecuteAttackMagicKick(PlayerControl rival) {
@@ -362,9 +378,21 @@ public class PlayerControl : MonoBehaviour
         int steps = Manual.Instance.AttackMagicKick.GetCauseEffect(2); // todo вычислять из уровня атаки
         MoveControl.Instance.MakeMagicKickMove(rival, rival.GetCurrentCell(), steps); 
 
-        if (_power == 0 && IsMe()) {
-            OpenPowerWarningModal();
-        }
+        CheckIsPlayerOutOfPower(this);
+    }
+
+    public void ExecuteAttackVampire(PlayerControl rival) {
+        AddPower(1);
+        AddVampire(-1);
+        AddMovesToDo(1);
+        rival.AddPower(-1);
+        rival.SkipMoveIncrease();
+        PlayersControl.Instance.UpdatePlayersInfo();
+        BoostersControl.Instance.UpdateBoostersFromPlayer(this);
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" КУСАЕТ ", UIColors.Red) + Utils.Wrap(rival.PlayerName, UIColors.Yellow) + " и забирает его силу!";
+        Messages.Instance.AddMessage(message);
+
+        CheckIsPlayerOutOfPower(rival, () => StartCoroutine(MoveControl.Instance.EndMoveDefer()));
     }
 
     // исполнение эффектов
@@ -385,19 +413,7 @@ public class PlayerControl : MonoBehaviour
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("ЧЁРНЫЙ", UIColors.Black) + " эффект! Минус 1 сила";
         Messages.Instance.AddMessage(message);
 
-        if (_power == 0 && IsMe()) {
-            OpenPowerWarningModal(() => {
-                CellChecker.Instance.CheckCellArrows(this);
-            });
-            return;
-        }
-
-        if (_power < 0) {
-            ConfirmLose();
-            return;
-        }
-
-        CellChecker.Instance.CheckCellArrows(this);
+        CheckIsPlayerOutOfPower(this, () => CellChecker.Instance.CheckCellArrows(this));
     }
 
     public void ExecuteRedEffect() {
@@ -415,19 +431,7 @@ public class PlayerControl : MonoBehaviour
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Минус 1 сила. Возврат на чекпойнт";
         Messages.Instance.AddMessage(message);
 
-        if (_power == 0 && IsMe()) {
-            OpenPowerWarningModal(() => {
-                RedEffectTokenMove();
-            });
-            return;
-        }
-
-        if (_power < 0) {
-            ConfirmLose();
-            return;
-        }
-
-        StartCoroutine(RedEffectTokenMoveDefer());
+        CheckIsPlayerOutOfPower(this, RedEffectTokenMove, () => StartCoroutine(RedEffectTokenMoveDefer()));
     }
 
     private IEnumerator RedEffectTokenMoveDefer() {
@@ -504,9 +508,7 @@ public class PlayerControl : MonoBehaviour
             }
         }
 
-        if (_power == 0) {
-            OpenPowerWarningModal();
-        }
+        CheckIsPlayerOutOfPower(this);
     }
 
     // Исполнение щитов
@@ -596,7 +598,7 @@ public class PlayerControl : MonoBehaviour
         _modalWarning.OpenWindow();
     }
 
-    public void ConfirmLose() {
+    private void ConfirmLose() {
         if (IsMe()) {
             _modalLose.OpenWindow();
         }
@@ -613,5 +615,25 @@ public class PlayerControl : MonoBehaviour
             StartCoroutine(MoveControl.Instance.EndMoveDefer());
         });
         StartCoroutine(coroutine);
+    }
+
+    private void CheckIsPlayerOutOfPower(PlayerControl player, Action callback1 = null, Action callback2 = null) {
+        if (player.Power == 0 && player.IsMe()) {
+            OpenPowerWarningModal(() => {
+                callback1?.Invoke();
+            });
+            return;
+        }
+
+        if (player.Power < 0) {
+            player.ConfirmLose();
+            return;
+        }
+
+        if (callback2 != null) {
+            callback2.Invoke();
+        } else {
+            callback1?.Invoke();
+        }
     }
 }

@@ -4,13 +4,15 @@ using UnityEngine;
 public class BoostersControl : MonoBehaviour
 {
     public static BoostersControl Instance { get; private set; }
-    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite;
-    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow;
+    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite;
+    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton;
     private BoostersRow _magnetsRowScript, _lassoRowScript, _shieldsRowScript;
+    private BoosterButton _vampireButtonScript;
     private PopupMagnet _popupMagnet;
     [SerializeField] private List<GameObject> _boostersList;
     private List<BoosterButton> _boosterButtonsList = new();
     private TopPanel _topPanel;
+    private ModalWarning _modalWarning;
 
     private void Awake() {
         Instance = this;
@@ -21,6 +23,7 @@ public class BoostersControl : MonoBehaviour
         _shieldSprite = Instances.transform.Find("shield").GetComponent<SpriteRenderer>().sprite;
         _shieldIronSprite = Instances.transform.Find("shield-iron").GetComponent<SpriteRenderer>().sprite;
         _lassoSprite = Instances.transform.Find("lasso").GetComponent<SpriteRenderer>().sprite;
+        _vampireSprite = Instances.transform.Find("vampire").GetComponent<SpriteRenderer>().sprite;
 
         if (_magnetsRow != null) {
             _magnetsRowScript = _magnetsRow.GetComponent<BoostersRow>();
@@ -31,12 +34,16 @@ public class BoostersControl : MonoBehaviour
         if (_shieldsRow != null) {
             _shieldsRowScript = _shieldsRow.GetComponent<BoostersRow>();
         }
+        if (_vampireButton != null) {
+            _vampireButtonScript = _vampireButton.GetComponent<BoosterButton>();
+        }
 
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
         foreach(GameObject button in _boostersList) {
             _boosterButtonsList.Add(button.GetComponent<BoosterButton>());
         }
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
+        _modalWarning = GameObject.Find("GameScripts").GetComponent<ModalWarning>();
     }
 
     public Sprite MagnetSprite {
@@ -61,6 +68,11 @@ public class BoostersControl : MonoBehaviour
 
     public Sprite ShieldIronSprite {
         get { return _shieldIronSprite; }
+        private set {}
+    }
+
+    public Sprite VampireSprite {
+        get { return _vampireSprite; }
         private set {}
     }
 
@@ -143,6 +155,10 @@ public class BoostersControl : MonoBehaviour
 
         UpdateBoostersRow(player.BoosterShield, player.BoosterShieldIron, EBoosters.Shield, EBoosters.ShieldIron, _shieldsRowScript);
         UpdatePlayersArmorButtons(player);
+
+        // Вампир
+
+        _vampireButtonScript.BoosterType = player.BoosterVampire > 0 ? EBoosters.Vampire : EBoosters.None;
     }
 
     // Открытие разных усилителей при нажатиях на кнопки в левой панели
@@ -231,5 +247,14 @@ public class BoostersControl : MonoBehaviour
             player.IsIronArmor,
             player.Armor
         );
+    }
+
+    // разное
+
+    public void ShowAttackOnlyWarning() {
+        _modalWarning.SetHeadingText("Недоступно");
+        _modalWarning.SetBodyText("Этот усилитель доступен только во время атаки на соперника.");
+        _modalWarning.SetCallback();
+        _modalWarning.OpenWindow();
     }
 }
