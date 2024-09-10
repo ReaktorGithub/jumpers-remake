@@ -171,8 +171,8 @@ public class PopupAttack : MonoBehaviour
                 break;
             }
             case EAttackTypes.Knockout: {
-                result[0] = Manual.Instance.AttackMagicKick.GetEntityNameWithLevel(1); // todo добывать уровень из current player
-                result[1] = Manual.Instance.AttackMagicKick.GetShortDescription(1);
+                result[0] = Manual.Instance.AttackKnockout.GetEntityNameWithLevel(3); // todo добывать уровень из current player
+                result[1] = Manual.Instance.AttackKnockout.GetShortDescription(3);
                 break;
             }
             default: {
@@ -214,17 +214,19 @@ public class PopupAttack : MonoBehaviour
 
     private void UpdatePower() {
         int powerNeed = 0;
+        int magicCost = Manual.Instance.AttackMagicKick.GetCost(1); // todo добывать в зависимости от уровня из currentPlayer
+        int knockoutCost = Manual.Instance.AttackKnockout.GetCost(3); // todo добывать в зависимости от уровня из currentPlayer
 
         switch (_selectedAttackType) {
             case EAttackTypes.Usual:
             case EAttackTypes.MagicKick:
-            powerNeed =+ 1;
+            powerNeed =+ magicCost;
             break;
             case EAttackTypes.Vampire:
             powerNeed =- 1;
             break;
             case EAttackTypes.Knockout:
-            powerNeed += 5;
+            powerNeed += knockoutCost;
             break;
         }
 
@@ -261,6 +263,10 @@ public class PopupAttack : MonoBehaviour
             }
             case EAttackTypes.Vampire: {
                 MoveControl.Instance.CurrentPlayer.ExecuteAttackVampire(_selectedPlayer);
+                break;
+            }
+            case EAttackTypes.Knockout: {
+                MoveControl.Instance.CurrentPlayer.ExecuteAttackKnockout(_selectedPlayer);
                 break;
             }
             default: {

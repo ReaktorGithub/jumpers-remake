@@ -57,6 +57,7 @@ public class PlayerControl : MonoBehaviour
     private void Awake() {
         _availableAttackTypes.Add(EAttackTypes.Usual);
         _availableAttackTypes.Add(EAttackTypes.MagicKick);
+        _availableAttackTypes.Add(EAttackTypes.Knockout);
         _modalWarning = GameObject.Find("GameScripts").GetComponent<ModalWarning>();
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
         _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
@@ -395,6 +396,22 @@ public class PlayerControl : MonoBehaviour
         CheckIsPlayerOutOfPower(rival, () => StartCoroutine(MoveControl.Instance.EndMoveDefer()));
     }
 
+    public void ExecuteAttackKnockout(PlayerControl rival) {
+        int powerSpend = Manual.Instance.AttackKnockout.GetCost(3); // todo вычислять из уровня атаки
+        int moneyBonus = Manual.Instance.AttackKnockout.GetCauseEffect(3); // todo вычислять из уровня атаки
+
+        AddPower(-powerSpend);
+        AddMovesToDo(1);
+        rival.AddCoins(-moneyBonus);
+        AddCoins(moneyBonus);
+        string message1 = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" НОКАУТИРУЕТ ", UIColors.Red) + Utils.Wrap(rival.PlayerName, UIColors.Yellow) + "!";
+        Messages.Instance.AddMessage(message1);
+        rival.ConfirmLose();
+        PlayersControl.Instance.UpdatePlayersInfo();
+
+        CheckIsPlayerOutOfPower(this);
+    }
+
     // исполнение эффектов
 
     public void ExecuteBlackEffect() {
@@ -610,9 +627,7 @@ public class PlayerControl : MonoBehaviour
         TokenControl tokenControl = GetTokenControl();
         IEnumerator coroutine = tokenControl.MoveToPedestalDefer(PlayersControl.Instance.LoseDelay, () => {
             _pedestal.SetTokenToPedestal(this, place);
-            CellControl cellControl = tokenControl.GetCurrentCellControl();
-            cellControl.RemoveToken(_tokenObject);
-            StartCoroutine(MoveControl.Instance.EndMoveDefer());
+            MoveControl.Instance.ConfirmLosePlayer(this);
         });
         StartCoroutine(coroutine);
     }
