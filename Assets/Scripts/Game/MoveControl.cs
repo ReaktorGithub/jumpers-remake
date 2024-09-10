@@ -19,6 +19,8 @@ public class MoveControl : MonoBehaviour
     private TopPanel _topPanel;
     private ModifiersControl _modifiersControl;
     private bool _isLassoMode = false;
+    private bool _isViolateMode = false; // в этом режиме текущий игрок является жертвой волшебного пинка или пылесоса
+    private int _restSteps = 0; // сохранение оставшихся шагов в режиме жертвы
 
     private void Awake() {
         Instance = this;
@@ -50,6 +52,11 @@ public class MoveControl : MonoBehaviour
         private set {}
     }
 
+    public bool IsViolateMode {
+        get { return _isViolateMode; }
+        private set {}
+    }
+
     public void SetNextPlayerIndex() {
         if (_currentPlayerIndex < 4) {
             _currentPlayerIndex += 1;
@@ -72,7 +79,7 @@ public class MoveControl : MonoBehaviour
         }
     }
 
-    public bool IsRaceOver() {
+    private bool IsRaceOver() {
         int count = 0;
         foreach(PlayerControl player in PlayersControl.Instance.Players) {
             if (!player.IsFinished) {
@@ -80,6 +87,10 @@ public class MoveControl : MonoBehaviour
             }
         }
         return count < 2;
+    }
+
+    private void FollowCameraToCurrentPlayer() {
+        _camera.FollowObject(_currentPlayer.GetTokenControl().gameObject.transform);
     }
 
     // сохраняем нового игрока как текущего
@@ -124,7 +135,7 @@ public class MoveControl : MonoBehaviour
 
     private void ContinueSwitchPlayer() {
         // апдейт камеры
-        _camera.FollowObject(_currentPlayer.GetTokenControl().gameObject.transform);
+        FollowCameraToCurrentPlayer();
 
         // апдейт панели управления
         PlayersControl.Instance.UpdatePlayersInfo();
@@ -136,41 +147,44 @@ public class MoveControl : MonoBehaviour
 
         // проверка текущего игрока на пропуск хода
         if (_currentPlayer.MovesSkip == 0) {
-            _currentPlayer.MovesToDo = 1;
-        
-            string cubicMessage;
-            switch (_currentPlayer.Type) {
-                case EPlayerTypes.Me: {
-                    cubicMessage = Utils.Wrap("ваш ход!", UIColors.Green);
-                    break;
-                }
-                case EPlayerTypes.Ai: {
-                    cubicMessage = Utils.Wrap("ход компьютера", UIColors.Grey);
-                    break;
-                }
-                case EPlayerTypes.Web: {
-                    cubicMessage = Utils.Wrap("ход соперника", UIColors.Grey);
-                    break;
-                }
-                default: {
-                    cubicMessage = Utils.Wrap("ход черепа", UIColors.Red);
-                    break;
-                }
-            }
-            PreparePlayerForMove(cubicMessage);
+            _currentPlayer.AddMovesToDo(1);
+            PreparePlayerForMove();
         } else {
             StartCoroutine(SkipMoveDefer());
         }
     }
 
-    private void PreparePlayerForMove(string cubicMessage = null) {
-        if (cubicMessage != null) {
-            CubicControl.Instance.WriteStatus(cubicMessage);
+    private void PreparePlayerForMove() {
+        string cubicMessage;
+        switch (_currentPlayer.Type) {
+            case EPlayerTypes.Me: {
+                cubicMessage = Utils.Wrap(_isLassoMode ? "ваш ход!" : "бонусный ход!", UIColors.Green);
+                break;
+            }
+            case EPlayerTypes.Ai: {
+                cubicMessage = Utils.Wrap("ход компьютера", UIColors.Grey);
+                break;
+            }
+            case EPlayerTypes.Web: {
+                cubicMessage = Utils.Wrap("ход соперника", UIColors.Grey);
+                break;
+            }
+            default: {
+                cubicMessage = Utils.Wrap("ход черепа", UIColors.Red);
+                break;
+            }
         }
-        _currentPlayer.IsEffectPlaced = false;
+        CubicControl.Instance.WriteStatus(cubicMessage);
+
+        // возможность применять эффекты должна восстанавливаться только если это новый ход, а не продолжение текущего хода
+        bool isNewMove = !_isLassoMode;
+        if (isNewMove) {
+           _currentPlayer.IsEffectPlaced = false;
+        }
+        
         bool isMe = _currentPlayer.IsMe();
         if (isMe) {
-            EffectsControl.Instance.DisableAllButtons(false);
+            EffectsControl.Instance.TryToEnableAllEffectButtons();
             CubicControl.Instance.SetCubicInteractable(true);
         } else if (_currentPlayer.Type == EPlayerTypes.Ai) {
             StartCoroutine(AiControl.Instance.AiThrowCubic());
@@ -231,6 +245,53 @@ public class MoveControl : MonoBehaviour
         _currentPlayer.GetTokenControl().SetToSpecifiedCell(targetCell.gameObject, _specifiedMoveTime, AfterStep);
     }
 
+    /*
+        1. Переместить соперника на новую клетку
+        2. После анимации совершить анимацию выравнивания фишек
+        3. После анимации выравнивания назначить жертву текущим игроком
+        4. Включить режим насилия и выполнить условия на клетке
+        5. Назначить текущего игрока в соответствии с currentPlayerIndex и передать ему ход
+
+        Если в процессе движения попался бранч, то алгоритм будет другой
+
+        2. Совершить анимацию выравнивания только у текущего игрока
+        3. После анимации выравнивания назначить жертву текущим игроком
+        4. Дать игроку выбрать направление
+        5. Повторять шаги 1-4, пока смещение не будет завершено
+        6. Продолжаем с п.4 предыдущего сценария
+    */
+
+    public void MakeMagicKickMove(PlayerControl victim, CellControl currentCell, int steps) {
+        (GameObject, int) cellResult = CellsControl.Instance.FindCellBySteps(currentCell.gameObject, false, steps);
+        Debug.Log("cellResult: " + cellResult.Item1 + ", rest steps: " + cellResult.Item2);
+
+        if (cellResult.Item1 == null) {
+            Debug.Log("Error while magic kick attack");
+            return;
+        }
+
+        CellControl targetCell = cellResult.Item1.GetComponent<CellControl>();
+        _restSteps = cellResult.Item2;
+        TokenControl victimToken = victim.GetTokenControl();
+        
+        victimToken.SetToSpecifiedCell(targetCell.gameObject, _specifiedMoveTime, () => {
+            currentCell.RemoveToken(victim.TokenObject);
+            currentCell.AlignTokens(_alignTime);
+
+            // жертва назначается текущим игроком
+            _currentPlayer = victim;
+            FollowCameraToCurrentPlayer();
+            _isViolateMode = true;
+
+            bool isBranch = targetCell.TryGetComponent(out BranchCell branchCell);
+            if (isBranch && _restSteps > 0) {
+                CellChecker.Instance.ActivateBranch(_currentPlayer, branchCell.BranchControl, _restSteps);
+            } else {
+                ConfirmNewPosition();
+            }
+        });
+    }
+
     private IEnumerator ConfirmNewPositionDefer() {
         yield return new WaitForSeconds(_stepDelay);
         ConfirmNewPosition();
@@ -260,8 +321,7 @@ public class MoveControl : MonoBehaviour
             return;
         }
         
-        BranchControl branch = branchCell.BranchObject.GetComponent<BranchControl>();
-        branch.HideAllBranches();
+        branchCell.BranchControl.HideAllBranches();
         _topPanel.CloseWindow();
         if (CurrentPlayer.IsReverseMove) {
             cell.PreviousCell = nextCell;
@@ -272,8 +332,28 @@ public class MoveControl : MonoBehaviour
         StartCoroutine(MakeStepDefer());
     }
 
+    public void SwitchBranchViolate(GameObject nextCell) {
+        CellControl cell = _currentPlayer.GetCurrentCell();
+
+        if (!cell.TryGetComponent(out BranchCell branchCell)) {
+            Debug.Log("Error while switching branch");
+            return;
+        }
+        
+        branchCell.BranchControl.HideAllBranches();
+        _topPanel.CloseWindow();
+        CubicControl.Instance.WriteStatus("");
+
+        CellControl nextCellControl = nextCell.GetComponent<CellControl>();
+        MakeMagicKickMove(_currentPlayer, nextCellControl, _restSteps - 1);
+    }
+
     public IEnumerator EndMoveDefer() {
         yield return new WaitForSeconds(_endMoveDelay);
+        if (_isViolateMode) {
+            _currentPlayer = PlayersControl.Instance.GetPlayer(_currentPlayerIndex);
+            _isViolateMode = false;
+        }
         EndMove();
     }
 
@@ -318,6 +398,7 @@ public class MoveControl : MonoBehaviour
         _currentPlayer.AddMovesToDo(-1);
 
         if (_currentPlayer.MovesToDo <= 0) {
+            _currentPlayer.MovesToDo = 0;
             SetNextPlayerIndex();
             return;
         }
@@ -330,9 +411,7 @@ public class MoveControl : MonoBehaviour
         }
 
         // текущий игрок продолжает ходить
-
-        string cubicMessage = Utils.Wrap(_isLassoMode ? "ваш ход!" : "бонусный ход!", UIColors.Green);
-        PreparePlayerForMove(cubicMessage);
+        PreparePlayerForMove();
     }
 
     public IEnumerator RaceOverDefer() {

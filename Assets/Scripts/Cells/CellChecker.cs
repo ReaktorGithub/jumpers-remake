@@ -22,31 +22,35 @@ public class CellChecker : MonoBehaviour
         CellControl cell = player.GetCurrentCell();
 
         if (cell.TryGetComponent(out BranchCell branchCell)) {
-            BranchControl branch = branchCell.BranchObject.GetComponent<BranchControl>();
+            BranchControl branch = branchCell.BranchControl;
             if (branch.IsReverse != player.IsReverseMove) {
                 // Если направление движения фишки не соответствует направлению бранча, то скипаем
                 return true;
             }
-            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " выбирает направление";
-            Messages.Instance.AddMessage(message);
-
-            if (player.IsMe()) {
-                branch.ShowAllBranches();
-                _topPanel.SetText("Выберите направление");
-                _topPanel.SetCancelButtonActive(false);
-                _topPanel.OpenWindow();
-                string cubicStatus = Utils.Wrap("Остаток: " + player.StepsLeft, UIColors.Green);
-                CubicControl.Instance.WriteStatus(cubicStatus);
-            }
-
-            if (player.IsAi()) {
-                AiControl.Instance.AiSelectBranch(player, branch, player.StepsLeft);
-            }
-
+            
+            ActivateBranch(player, branch, player.StepsLeft);
             return false;
         }
 
         return true;
+    }
+
+    public void ActivateBranch(PlayerControl player, BranchControl branch, int rest) {
+        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " выбирает направление";
+        Messages.Instance.AddMessage(message);
+
+        if (player.IsMe()) {
+            branch.ShowAllBranches();
+            _topPanel.SetText("Выберите направление");
+            _topPanel.SetCancelButtonActive(false);
+            _topPanel.OpenWindow();
+            string cubicStatus = Utils.Wrap("Остаток: " + rest, UIColors.Green);
+            CubicControl.Instance.WriteStatus(cubicStatus);
+        }
+
+        if (player.IsAi()) {
+            AiControl.Instance.AiSelectBranch(player, branch, rest);
+        }
     }
 
     public bool CheckCellAfterStep(ECellTypes cellType, PlayerControl player) {
@@ -102,7 +106,7 @@ public class CellChecker : MonoBehaviour
 
         if (cell.Effect == EControllableEffects.Green) {
             player.AddMovesToDo(1);
-            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("зелёный", UIColors.Green) + " эффект и ходит ещё раз";
+            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("зелёный", UIColors.Green) + " эффект и походит ещё раз";
             Messages.Instance.AddMessage(message);
         }
 

@@ -308,15 +308,19 @@ public class CellsControl : MonoBehaviour
     }
 
     // Смотрит вглубль на несколько клеток и возвращает клетку, до которой дошёл
-    // Если попался бранч или тупик, то возвращает последнюю найденную клетку
+    // Если попалось разветвление или тупик, то возвращает последнюю найденную клетку
     // Возвращает GameObject и количество непройденных шагов
 
     public (GameObject, int) FindCellBySteps(GameObject startCell, bool isForward, int steps) {
         GameObject forAnalyse = startCell;
 
         for (int i = 0; i < steps; i++) {
-            bool isBranch = forAnalyse.TryGetComponent(out BranchCell _);
+            bool isBranch = forAnalyse.TryGetComponent(out BranchCell branchCell);
+            bool isFork = false;
             if (isBranch) {
+                isFork = branchCell.IsReverse() && !isForward || !branchCell.IsReverse() && isForward;
+            }
+            if (isFork) {
                 return (forAnalyse, steps - i);
             } else {
                 GameObject newCell;
@@ -340,7 +344,7 @@ public class CellsControl : MonoBehaviour
             }
         }
 
-        return (null, steps);
+        return (forAnalyse, steps);
     }
 
     // Возвращает количество шагов до финиша - ближайший маршрут

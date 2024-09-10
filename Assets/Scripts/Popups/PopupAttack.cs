@@ -61,6 +61,8 @@ public class PopupAttack : MonoBehaviour
     }
 
     public void BuildContent(PlayerControl currentPlayer, List<PlayerControl> rivals) {
+        SetSelectedAttackType(EAttackTypes.Usual);
+
         // раздел с атаками
 
         foreach(AttackTypeButton button in _attackTypeButtons) {
@@ -149,7 +151,7 @@ public class PopupAttack : MonoBehaviour
         switch (_selectedAttackType) {
             case EAttackTypes.Usual: {
                 result[0] = Manual.Instance.AttackUsual.GetEntityName();
-                result[1] = Manual.Instance.AttackUsual.GetShortDescription(1);
+                result[1] = Manual.Instance.AttackUsual.GetShortDescription(1); // todo добывать уровень из current player
                 break;
             }
             case EAttackTypes.MagicKick: {

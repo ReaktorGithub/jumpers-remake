@@ -23,4 +23,9 @@ public class BranchCell : MonoBehaviour
     public List<GameObject> GetAllNextCells() {
         return _branchControl.GetAllNextCells();
     }
+
+    public BranchControl BranchControl {
+        get { return _branchControl; }
+        private set {}
+    }
 }

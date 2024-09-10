@@ -342,7 +342,7 @@ public class PlayerControl : MonoBehaviour
         string message2 = Utils.Wrap(rival.PlayerName, UIColors.Yellow) + " пропустит ход, а " + Utils.Wrap(PlayerName, UIColors.Yellow) + " ходит ещё раз";
         Messages.Instance.AddMessage(message2);
 
-        if (_power == 0) {
+        if (_power == 0 && IsMe()) {
             OpenPowerWarningModal(() => {
                 StartCoroutine(MoveControl.Instance.EndMoveDefer());
             });
@@ -353,7 +353,18 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void ExecuteAttackMagicKick(PlayerControl rival) {
-        // todo
+        int powerSpend = Manual.Instance.AttackMagicKick.GetCost(1); // todo вычислять из уровня атаки
+        AddPower(-powerSpend);
+        PlayersControl.Instance.UpdatePlayersInfo();
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ДАЁТ ПИНКА ", UIColors.Red) + Utils.Wrap(rival.PlayerName, UIColors.Yellow) + "!";
+        Messages.Instance.AddMessage(message);
+
+        int steps = Manual.Instance.AttackMagicKick.GetCauseEffect(2); // todo вычислять из уровня атаки
+        MoveControl.Instance.MakeMagicKickMove(rival, rival.GetCurrentCell(), steps); 
+
+        if (_power == 0 && IsMe()) {
+            OpenPowerWarningModal();
+        }
     }
 
     // исполнение эффектов
@@ -374,7 +385,7 @@ public class PlayerControl : MonoBehaviour
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("ЧЁРНЫЙ", UIColors.Black) + " эффект! Минус 1 сила";
         Messages.Instance.AddMessage(message);
 
-        if (_power == 0) {
+        if (_power == 0 && IsMe()) {
             OpenPowerWarningModal(() => {
                 CellChecker.Instance.CheckCellArrows(this);
             });
@@ -404,7 +415,7 @@ public class PlayerControl : MonoBehaviour
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Минус 1 сила. Возврат на чекпойнт";
         Messages.Instance.AddMessage(message);
 
-        if (_power == 0) {
+        if (_power == 0 && IsMe()) {
             OpenPowerWarningModal(() => {
                 RedEffectTokenMove();
             });
@@ -586,7 +597,9 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void ConfirmLose() {
-        _modalLose.OpenWindow();
+        if (IsMe()) {
+            _modalLose.OpenWindow();
+        }
         _isFinished = true;
         int place = _pedestal.SetPlayerToMinPlace(this);
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ВЫЛЕТАЕТ С ТРАССЫ!", UIColors.Red);

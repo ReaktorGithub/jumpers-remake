@@ -247,6 +247,14 @@ public class EffectsControl : MonoBehaviour
         }
     }
 
+    // Кнопки эффектов энейблятся, только если игрок их еще не использовал
+
+    public void TryToEnableAllEffectButtons() {
+        if (!MoveControl.Instance.CurrentPlayer.IsEffectPlaced) {
+            DisableAllButtons(false);
+        }
+    }
+
     // перемещение эффекта
 
     public void OnReplaceEffect(CellControl newCell) {

@@ -95,14 +95,6 @@ public class BoostersControl : MonoBehaviour
         }
     }
 
-    // Кнопки эффектов энейблятся, только если игрок их еще не использовал
-
-    public void TryToEnableAllEffectButtons() {
-        if (!MoveControl.Instance.CurrentPlayer.IsEffectPlaced) {
-            EffectsControl.Instance.DisableAllButtons(false);
-        }
-    }
-
     // Обновление содержимого строки усилителей, в которых используются разные виды усилителей (магниты, щиты)
 
     private void UpdateBoostersRow(int booster1Count, int booster2Count, EBoosters booster1, EBoosters booster2, BoostersRow targetScript) {
@@ -182,7 +174,7 @@ public class BoostersControl : MonoBehaviour
                     foreach(GameObject cellFound in collected) {
                         cellFound.GetComponent<CellControl>().TurnOffLassoMode();
                     }
-                    TryToEnableAllEffectButtons();
+                    EffectsControl.Instance.TryToEnableAllEffectButtons();
                     EnableAllButtons();
                     CubicControl.Instance.SetCubicInteractable(true);
                 });

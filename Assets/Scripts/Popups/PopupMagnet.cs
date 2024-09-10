@@ -54,7 +54,7 @@ public class PopupMagnet : MonoBehaviour
         CellsControl.Instance.ResetCellMagnetHint();
         _popup.CloseWindow(() => {
             BoostersControl.Instance.EnableAllButtons();
-            BoostersControl.Instance.TryToEnableAllEffectButtons();
+            EffectsControl.Instance.TryToEnableAllEffectButtons();
             CubicControl.Instance.SetCubicInteractable(true);
         });
     }
