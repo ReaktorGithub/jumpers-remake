@@ -10,6 +10,7 @@ public class TokenControl : MonoBehaviour
     private IEnumerator _coroutine, _squeezeCoroutine;
     [SerializeField] private GameObject _playerName, _indicators, _aiThinking;
     private GameObject _currentCell, _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
+    private PlayerControl _playerControl;
     private SortingGroup _sortingGroup;
     private bool _isSqueeze = false;
     private GameObject _pedestal;
@@ -39,6 +40,11 @@ public class TokenControl : MonoBehaviour
     public GameObject TokenImage {
         get { return _tokenImage; }
         private set {}
+    }
+
+    public PlayerControl PlayerControl {
+        get { return _playerControl; }
+        set { _playerControl = value; }
     }
 
     public void ClearCoroutine() {

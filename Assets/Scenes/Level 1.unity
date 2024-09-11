@@ -4430,9 +4430,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e99db1453732b440b14571de9f3806d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enableAi: 0
+  _enableAi: 1
   _cubicThrowDelay: 1.5
   _thinkingDelay: 1.8
+  _cubicScore: 0
 --- !u!1 &213087342
 GameObject:
   m_ObjectHideFlags: 0
@@ -4981,6 +4982,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrowSpline: {fileID: 89363014}
   _arrowToCell: {fileID: 1457933108}
+  _isForward: 1
 --- !u!1001 &246290312
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5688,6 +5690,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrowSpline: {fileID: 1281532534}
   _arrowToCell: {fileID: 2106803949}
+  _isForward: 0
 --- !u!1 &308913491
 GameObject:
   m_ObjectHideFlags: 0
@@ -5847,7 +5850,7 @@ MonoBehaviour:
   _coins: 400
   _mallows: 0
   _rubies: 0
-  _power: 5
+  _power: 0
   _effectsGreen: 0
   _effectsYellow: 0
   _effectsBlack: 0
@@ -15414,6 +15417,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrowSpline: {fileID: 1552569332}
   _arrowToCell: {fileID: 1674911735}
+  _isForward: 1
 --- !u!4 &745660537 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4806785923858378738, guid: 250f801206cd2e4439f5e8f09257bb1e, type: 3}
@@ -18745,6 +18749,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrowSpline: {fileID: 705090064}
   _arrowToCell: {fileID: 549636389}
+  _isForward: 0
 --- !u!1 &962891898 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 962209491290485435, guid: 90f222e8e5cb7ea4fbcf162378460109, type: 3}
@@ -21403,6 +21408,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrowSpline: {fileID: 194987285}
   _arrowToCell: {fileID: 1086090272}
+  _isForward: 0
 --- !u!1 &1110870825 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2324068203896962674, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
@@ -28779,6 +28785,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrowSpline: {fileID: 671561139}
   _arrowToCell: {fileID: 1045207596}
+  _isForward: 0
 --- !u!1 &1513473902
 GameObject:
   m_ObjectHideFlags: 0
@@ -32185,6 +32192,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrowSpline: {fileID: 5304487308731891129}
   _arrowToCell: {fileID: 164722339}
+  _isForward: 0
 --- !u!1 &1691103499
 GameObject:
   m_ObjectHideFlags: 0
@@ -32352,6 +32360,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrowSpline: {fileID: 1674011419}
   _arrowToCell: {fileID: 293582564}
+  _isForward: 1
 --- !u!1001 &1698489942
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37521,6 +37530,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrowSpline: {fileID: 1940832015}
   _arrowToCell: {fileID: 1485803351}
+  _isForward: 0
 --- !u!1001 &1981863530
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37907,6 +37917,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrowSpline: {fileID: 1420717014}
   _arrowToCell: {fileID: 680780518}
+  _isForward: 0
 --- !u!1001 &2012239029
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38043,6 +38054,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrowSpline: {fileID: 1429915664}
   _arrowToCell: {fileID: 408557072}
+  _isForward: 1
 --- !u!1001 &2016337957
 PrefabInstance:
   m_ObjectHideFlags: 0

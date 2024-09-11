@@ -255,33 +255,13 @@ public class PopupAttack : MonoBehaviour
 
     private IEnumerator ConfirmAttackDefer() {
         yield return new WaitForSeconds(_attackDelay);
-
-        switch(_selectedAttackType) {
-            case EAttackTypes.MagicKick: {
-                MoveControl.Instance.CurrentPlayer.ExecuteAttackMagicKick(_selectedPlayer);
-                break;
-            }
-            case EAttackTypes.Vampire: {
-                MoveControl.Instance.CurrentPlayer.ExecuteAttackVampire(_selectedPlayer);
-                break;
-            }
-            case EAttackTypes.Knockout: {
-                MoveControl.Instance.CurrentPlayer.ExecuteAttackKnockout(_selectedPlayer);
-                break;
-            }
-            default: {
-                MoveControl.Instance.CurrentPlayer.ExecuteAttackUsual(_selectedPlayer);
-                break;
-            }
-        }
+        MoveControl.Instance.CurrentPlayer.ExecuteAttack(_selectedAttackType, _selectedPlayer);
     }
 
     private IEnumerator CancelAttackDefer() {
         yield return new WaitForSeconds(_attackDelay);
         ResetContent();
-        string message = Utils.Wrap(MoveControl.Instance.CurrentPlayer.PlayerName, UIColors.Yellow) + " отказался от атаки";
-        Messages.Instance.AddMessage(message);
-        StartCoroutine(MoveControl.Instance.EndMoveDefer());
+        MoveControl.Instance.CurrentPlayer.ExecuteCancelAttack();
     }
 
     public void ConfirmAttack() {

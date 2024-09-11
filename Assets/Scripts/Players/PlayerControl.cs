@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -356,6 +355,27 @@ public class PlayerControl : MonoBehaviour
         private set {}
     }
 
+    public void ExecuteAttack(EAttackTypes type, PlayerControl selectedPlayer) {
+        switch(type) {
+            case EAttackTypes.MagicKick: {
+                ExecuteAttackMagicKick(selectedPlayer);
+                break;
+            }
+            case EAttackTypes.Vampire: {
+                ExecuteAttackVampire(selectedPlayer);
+                break;
+            }
+            case EAttackTypes.Knockout: {
+                ExecuteAttackKnockout(selectedPlayer);
+                break;
+            }
+            default: {
+                ExecuteAttackUsual(selectedPlayer);
+                break;
+            }
+        }
+    }
+
     public void ExecuteAttackUsual(PlayerControl rival) {
         AddPower(-1);
         AddMovesToDo(1);
@@ -410,6 +430,12 @@ public class PlayerControl : MonoBehaviour
         PlayersControl.Instance.UpdatePlayersInfo();
 
         CheckIsPlayerOutOfPower(this);
+    }
+
+    public void ExecuteCancelAttack() {
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " отказался от атаки";
+        Messages.Instance.AddMessage(message);
+        StartCoroutine(MoveControl.Instance.EndMoveDefer());
     }
 
     // исполнение эффектов
