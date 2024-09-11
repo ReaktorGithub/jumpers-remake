@@ -105,6 +105,7 @@ public class PlayersControl : MonoBehaviour
 
             TokenControl tokenControl = player.TokenObject.GetComponent<TokenControl>();
             tokenControl.SetPlayerName(player.PlayerName);
+            tokenControl.PlayerControl = player;
         }
     }
     

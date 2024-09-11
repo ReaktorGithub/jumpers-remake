@@ -25,6 +25,7 @@ public class CellControl : MonoBehaviour
     private float _pulseTime = 1.2f;
     private float _pulseMinAlpha = 0.2f;
     private CursorManager _cursorManager;
+    [SerializeField] private int _aiScore = 0; // чем выше число, тем больше эта клетка нравится ai
 
     private void Awake() {
         _container = transform.Find("container").gameObject;
@@ -46,6 +47,7 @@ public class CellControl : MonoBehaviour
 
     private void Start() {
         SetCursorDisabled(true);
+        UpdateAiScore();
     }
 
     private void SetCursorDisabled(bool value) {
@@ -69,9 +71,17 @@ public class CellControl : MonoBehaviour
         private set {}
     }
 
+    public int AiScore {
+        get { return _aiScore; }
+        private set {}
+    }
+
     public EControllableEffects Effect {
         get { return effect; }
-        set {}
+        set {
+            effect = value;
+            UpdateAiScore();
+        }
     }
 
     public List<GameObject> CurrentTokens {
@@ -103,6 +113,10 @@ public class CellControl : MonoBehaviour
 
     public bool IsSelectionMode() {
         return _isEffectPlacementMode || _isLassoMode;
+    }
+
+    public bool IsPenaltyEffect() {
+        return effect == EControllableEffects.Black || effect == EControllableEffects.Red;
     }
 
     // Перераспределить позиции фишек на клетке
@@ -245,7 +259,7 @@ public class CellControl : MonoBehaviour
     // установка нового эффекта на эту клетку
 
     public void ChangeEffect(EControllableEffects newEffect, Sprite newSprite) {
-        effect = newEffect;
+        Effect = newEffect;
 
         // Наложение спрайта и изменение цвета текста
 
@@ -340,5 +354,31 @@ public class CellControl : MonoBehaviour
 
     public bool IsNegativeEffect() {
         return Manual.Instance.GetEffectCharacter(effect) == EResourceCharacters.Negative;
+    }
+
+    private void UpdateAiScore() {
+        if (CellType == ECellTypes.Finish) {
+            _aiScore = 1000;
+            return;
+        }
+
+        if (effect == EControllableEffects.Red || effect == EControllableEffects.Black) {
+            _aiScore = -20;
+            return;
+        }
+
+        int points = 0;
+
+        if (CellType == ECellTypes.Lightning || CellType == ECellTypes.Moneybox || CellType == ECellTypes.Surprise || effect == EControllableEffects.Green) points += 8;
+        if (effect == EControllableEffects.Star) points += 12;
+        if (effect == EControllableEffects.Yellow) points -= 8;
+
+        bool isArrow = transform.TryGetComponent(out ArrowCell arrow);
+        if (isArrow) {
+            int add = arrow.IsForward ? 6 : -6;
+            points += add;
+        }
+
+        _aiScore = points;
     }
 }
