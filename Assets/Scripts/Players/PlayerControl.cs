@@ -396,7 +396,7 @@ public class PlayerControl : MonoBehaviour
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ДАЁТ ПИНКА ", UIColors.Red) + Utils.Wrap(rival.PlayerName, UIColors.Yellow) + "!";
         Messages.Instance.AddMessage(message);
 
-        int steps = Manual.Instance.AttackMagicKick.GetCauseEffect(2); // todo вычислять из уровня атаки
+        int steps = Manual.Instance.AttackMagicKick.GetCauseEffect(1); // todo вычислять из уровня атаки
         MoveControl.Instance.MakeMagicKickMove(rival, rival.GetCurrentCell(), steps); 
 
         CheckIsPlayerOutOfPower(this);
@@ -504,7 +504,9 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void ExecuteFinish() {
-        _modalWin.OpenWindow();
+        if (IsMe()) {
+            _modalWin.OpenWindow();
+        }
         _isFinished = true;
         int place = _pedestal.SetPlayerToMaxPlace(this);
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ФИНИШИРУЕТ ", UIColors.Green) + " на " + place + " месте!";
@@ -562,30 +564,32 @@ public class PlayerControl : MonoBehaviour
         }
 
         TokenControl token = GetTokenControl();
-        bool isCurrentPlayer = MoveControl.Instance.CurrentPlayer == this;
+        bool isMe = IsMe();
         _armor--;
 
         if (_isIronArmor) {
             if (_armor == 0) {
                 token.UpdateShield(EBoosters.None);
                 AddShieldIron(-1);
-                if (isCurrentPlayer) {
+                if (isMe) {
                    BoostersControl.Instance.DeactivateArmorButtons(); 
                 }
                 string message = Utils.Wrap("Железный щит ", UIColors.ArmorIron) + Utils.Wrap(PlayerName, UIColors.Yellow) + " пришел в негодность";
                 Messages.Instance.AddMessage(message);
-            } else if (isCurrentPlayer) {
+            } else if (isMe) {
                 BoostersControl.Instance.UpdatePlayersArmorButtons(this);
             }
         } else {
             if (_armor == 0) {
                 token.UpdateShield(EBoosters.None);
                 AddShield(-1);
-                if (isCurrentPlayer) {
+                if (isMe) {
                     BoostersControl.Instance.DeactivateArmorButtons();
                 }
                 string message = Utils.Wrap("Щит ", UIColors.Armor) + Utils.Wrap(PlayerName, UIColors.Yellow) + " пришел в негодность";
                 Messages.Instance.AddMessage(message);
+            } else if (isMe) {
+                BoostersControl.Instance.UpdatePlayersArmorButtons(this);
             }
         }
     }
@@ -637,6 +641,13 @@ public class PlayerControl : MonoBehaviour
     public void OpenSavedByShieldModal(Action callback = null) {
         _modalWarning.SetHeadingText("Железный щит");
         _modalWarning.SetBodyText("Благодаря <b>железному щиту</b> вы не теряете силу на этой клетке.");
+        _modalWarning.SetCallback(callback);
+        _modalWarning.OpenWindow();
+    }
+
+    public void OpenAttackShieldModal(Action callback = null) {
+        _modalWarning.SetHeadingText("Соперник защищён");
+        _modalWarning.SetBodyText("Вы не можете атаковать соперника со щитом.");
         _modalWarning.SetCallback(callback);
         _modalWarning.OpenWindow();
     }

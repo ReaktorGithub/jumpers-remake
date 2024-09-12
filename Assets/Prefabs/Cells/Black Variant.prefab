@@ -10,11 +10,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 275629510173075881, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -38.148907
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 275629510173075881, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 49.444954
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 275629510173075881, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_LocalPosition.z
@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2324068203896962674, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_Name
-      value: Cell Prefab Variant
+      value: Black Variant
       objectReference: {fileID: 0}
     - target: {fileID: 2656521992059027252, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_Sprite

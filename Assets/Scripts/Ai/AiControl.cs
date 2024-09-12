@@ -50,7 +50,7 @@ public class AiControl : MonoBehaviour
     public void AiAttackPlayer(PlayerControl player, List<PlayerControl> rivals) {
         int attackUsualPoints = AiLib.GetAttackUsualPoints(player);
         int attackMagicKickPoints = AiLib.GetAttackMagicKickPoints(player);
-        (PlayerControl preferedPlayer, int attackVampirePoints) = AiLib.GetAttackVampirePoints(player);
+        (PlayerControl preferedPlayer, int attackVampirePoints) = AiLib.GetAttackVampirePoints(player, rivals);
         int attackKnockout = AiLib.GetAttackKnockoutPoints(player);
 
         Debug.Log("Отчет Ai о решении атаки: Ai type: " + player.AiType + "; " + "Usual: " + attackUsualPoints + "; Magic kick: " + attackMagicKickPoints + "; Vampire: " + attackVampirePoints + "; Knockout: " + attackKnockout + "; Trigger by 10");

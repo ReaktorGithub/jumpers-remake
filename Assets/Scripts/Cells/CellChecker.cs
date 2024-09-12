@@ -165,15 +165,17 @@ public class CellChecker : MonoBehaviour
         // Если еще остались соперники без щитов, то открыть диалоговое окно с атакой
 
         if (tokens.Count > 1) {
-            List<PlayerControl> rivals = new();
+            List<PlayerControl> rivalsUnprotected = new();
             List<PlayerControl> rivalsWithShields = new();
+            List<PlayerControl> rivals = new();
 
             foreach(PlayerControl playerForCheck in PlayersControl.Instance.Players) {
                 if (tokens.Contains(playerForCheck.TokenObject) && player.TokenObject != playerForCheck.TokenObject) {
+                    rivals.Add(playerForCheck);
                     if (playerForCheck.Armor > 0) {
                         rivalsWithShields.Add(playerForCheck);
                     } else {
-                        rivals.Add(playerForCheck);
+                        rivalsUnprotected.Add(playerForCheck);
                     }
                 }
             }
@@ -182,9 +184,9 @@ public class CellChecker : MonoBehaviour
                 player.HarvestShieldBonus(rivalsWithShields);
             }
 
-            if (rivals.Count > 0) {
+            if (rivalsUnprotected.Count > 0) {
                 if (player.IsAi()) {
-                    AiControl.Instance.AiAttackPlayer(player, rivals);
+                    AiControl.Instance.AiAttackPlayer(player, rivalsUnprotected);
                 } else {
                     _popupAttack.BuildContent(player, rivals);
                     _popupAttack.OnOpenWindow();

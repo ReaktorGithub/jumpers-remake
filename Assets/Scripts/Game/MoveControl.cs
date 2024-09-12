@@ -4,7 +4,7 @@ using UnityEngine;
 public class MoveControl : MonoBehaviour
 {
     public static MoveControl Instance { get; private set; }
-    private int _currentPlayerIndex = 1;
+    [SerializeField] private int _currentPlayerIndex = 1;
     [SerializeField] private float _moveTime = 12f;
     [SerializeField] private float _specifiedMoveTime = 6f;
     [SerializeField] private float _stepDelay = 0.3f;
@@ -111,7 +111,7 @@ public class MoveControl : MonoBehaviour
                 _currentPlayer = player;
 
                 // апдейт состояния фишек
-                PlayersControl.Instance.UpdateTokenLayerOrder();
+                PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
                 PlayersControl.Instance.UpdateSqueezeAnimation();
 
                 // применение сайд-эффектов и продолжение переключения игрока
@@ -248,14 +248,14 @@ public class MoveControl : MonoBehaviour
     /*
         1. Переместить соперника на новую клетку
         2. После анимации совершить анимацию выравнивания фишек
-        3. После анимации выравнивания назначить жертву текущим игроком
+        3. После анимации выравнивания назначить жертву текущим игроком и повысить слой фишки
         4. Включить режим насилия и выполнить условия на клетке
-        5. Назначить текущего игрока в соответствии с currentPlayerIndex и передать ему ход
+        5. Назначить текущего игрока в соответствии с currentPlayerIndex, повысить слой его фишки и передать ему ход
 
         Если в процессе движения попался бранч, то алгоритм будет другой
 
         2. Совершить анимацию выравнивания только у текущего игрока
-        3. После анимации выравнивания назначить жертву текущим игроком
+        3. После анимации выравнивания назначить жертву текущим игроком и повысить слой фишки
         4. Дать игроку выбрать направление
         5. Повторять шаги 1-4, пока смещение не будет завершено
         6. Продолжаем с п.4 предыдущего сценария
@@ -280,6 +280,7 @@ public class MoveControl : MonoBehaviour
 
             // жертва назначается текущим игроком
             _currentPlayer = victim;
+            PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayer.MoveOrder);
             FollowCameraToCurrentPlayer();
             _isViolateMode = true;
 
@@ -361,6 +362,7 @@ public class MoveControl : MonoBehaviour
         yield return new WaitForSeconds(_endMoveDelay);
         if (_isViolateMode) {
             _currentPlayer = PlayersControl.Instance.GetPlayer(_currentPlayerIndex);
+            PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
             _isViolateMode = false;
         }
         EndMove();

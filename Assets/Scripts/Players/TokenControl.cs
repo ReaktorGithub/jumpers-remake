@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using TMPro;
 using UnityEngine.Splines;
+using UnityEngine.UI;
 
 public class TokenControl : MonoBehaviour
 {
@@ -45,6 +46,14 @@ public class TokenControl : MonoBehaviour
     public PlayerControl PlayerControl {
         get { return _playerControl; }
         set { _playerControl = value; }
+    }
+
+    public Sprite GetArmorSprite() {
+        return _armor.GetComponent<SpriteRenderer>().sprite;
+    }
+
+    public Sprite GetArmorIronSprite() {
+        return _armorIron.GetComponent<SpriteRenderer>().sprite;
     }
 
     public void ClearCoroutine() {
