@@ -1,27 +1,49 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TokenAttackButton : MonoBehaviour
 {
-    private GameObject _selected, _hover;
-    private Image _tokenImage;
+    private GameObject _selected, _hover, _shield;
+    private Image _tokenImage, _shieldImage;
     private PlayerControl _player;
+    private Button _button;
+    private bool _disabled = false;
 
     private void Awake() {
         _tokenImage = transform.Find("TokenImage").gameObject.GetComponent<Image>();
+        _shield = transform.Find("ShieldImage").gameObject;
+        _shieldImage = _shield.GetComponent<Image>();
         _selected = transform.Find("SelectedImage").gameObject;
         _hover = transform.Find("HoverImage").gameObject;
         _selected.SetActive(false);
         _hover.SetActive(false);
+        _button = GetComponent<Button>();
     }
 
     public void SetTokenImage(Sprite sprite) {
         _tokenImage.sprite = sprite;
     }
 
+    public void DisableShieldImage(bool value) {
+        _shield.SetActive(!value);
+    }
+
+    public void SetShieldImage(Sprite sprite) {
+        _shieldImage.sprite = sprite;
+    }
+
+    public void SetDisabled(bool value) {
+        _disabled = value;
+        if (value) {
+            OnHoverOut();
+            SetSelected(false);
+        }
+    }
+
     public void OnHoverIn() {
-        _hover.SetActive(true);
+        if (!_disabled) {
+            _hover.SetActive(true);
+        }
     }
 
     public void OnHoverOut() {
@@ -29,7 +51,9 @@ public class TokenAttackButton : MonoBehaviour
     }
 
     public void SetSelected(bool value) {
-        _selected.SetActive(value);
+        if (!_disabled) {
+           _selected.SetActive(value); 
+        }
     }
 
     public void BindPlayer(PlayerControl player) {

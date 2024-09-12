@@ -91,7 +91,7 @@ public static class AiLib
         Учесть силы в запасе и число шагов до финиша
     */
 
-    public static (PlayerControl, int) GetAttackVampirePoints(PlayerControl player) {
+    public static (PlayerControl, int) GetAttackVampirePoints(PlayerControl player, List<PlayerControl> rivals) {
         if (player.BoosterVampire < 1) {
             return (null, _exclude);
         }
@@ -120,19 +120,18 @@ public static class AiLib
 
         // Найти соперников с силой меньше 2 - они должны быть атакованы с большой вероятностью
 
-        List<PlayerControl> rivals = new();
+        List<PlayerControl> rivalsFilter = new();
 
-        foreach(GameObject token in cell.CurrentTokens) {
-            PlayerControl foundPlayer = token.GetComponent<TokenControl>().PlayerControl;
-            if (foundPlayer != player && foundPlayer.Power < 2) {
-                rivals.Add(foundPlayer);
+        foreach(PlayerControl foundPlayer in rivals) {
+            if (foundPlayer.Power < 2) {
+                rivalsFilter.Add(foundPlayer);
             }
         }
 
         PlayerControl selectedPlayer = null;
 
-        if (rivals.Count > 0) {
-            selectedPlayer = PlayersControl.Instance.GetMostSuccessfulPlayer(rivals);
+        if (rivalsFilter.Count > 0) {
+            selectedPlayer = PlayersControl.Instance.GetMostSuccessfulPlayer(rivalsFilter);
             int add = selectedPlayer.Power == 0 ? 20 : (selectedPlayer.Power == 1 ? 10 : 0);
             points += add;
         }

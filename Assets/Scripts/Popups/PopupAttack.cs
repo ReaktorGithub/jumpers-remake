@@ -96,13 +96,30 @@ public class PopupAttack : MonoBehaviour
             int index = 0;
             foreach(TokenAttackButton button in _tokenAttackButtons) {
                 if (index < rivals.Count) {
-                    Sprite sprite = rivals[index].TokenImage;
-                    button.SetTokenImage(sprite);
-                    button.BindPlayer(rivals[index]);
+                    PlayerControl rival = rivals[index];
+                    button.SetTokenImage(rival.TokenImage);
+                    button.BindPlayer(rival);
                     Button buttonComponent = button.gameObject.GetComponent<Button>();
-                    buttonComponent.onClick.AddListener(() => {
-                        SetSelectedPlayer(button.Player);
-                    });
+                    buttonComponent.onClick.RemoveAllListeners();
+
+                    if (rival.Armor > 0) {
+                        TokenControl token = rival.GetTokenControl();
+                        Sprite sprite = rival.IsIronArmor ? token.GetArmorIronSprite() : token.GetArmorSprite();
+                        button.SetShieldImage(sprite);
+                        button.DisableShieldImage(false);
+                        button.SetDisabled(true);
+                        buttonComponent.onClick.AddListener(() => {
+                            currentPlayer.OpenAttackShieldModal();
+                        });
+                    } else {
+                        button.SetShieldImage(null);
+                        button.DisableShieldImage(true);
+                        button.SetDisabled(false);
+                        buttonComponent.onClick.AddListener(() => {
+                            SetSelectedPlayer(button.Player);
+                        });
+                    }
+
                     button.gameObject.SetActive(true);
                 } else {
                     button.gameObject.SetActive(false);

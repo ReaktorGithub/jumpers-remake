@@ -506,6 +506,7 @@ MonoBehaviour:
   previousCell: {fileID: 0}
   cellType: 0
   effect: 0
+  _aiScore: 0
 --- !u!1 &5158167232564476152
 GameObject:
   m_ObjectHideFlags: 0

@@ -112,9 +112,9 @@ public class PlayersControl : MonoBehaviour
     /*
         Порядок слоев в начале заезда:
         order 1 = layer 3
-        order 2 = layer 0
-        order 3 = layer 1
-        order 4 = layer 2
+        order 2 = layer 1
+        order 3 = layer 2
+        order 4 = layer 3
     */
 
     public void PrepareTokenLayerOrder() {
@@ -123,7 +123,7 @@ public class PlayersControl : MonoBehaviour
             if (player.MoveOrder == 1) {
                 tokenControl.SetOrderInLayer(3);
             } else {
-                tokenControl.SetOrderInLayer(player.MoveOrder - 2);
+                tokenControl.SetOrderInLayer(player.MoveOrder - 1);
             }
         }
     }
@@ -137,14 +137,14 @@ public class PlayersControl : MonoBehaviour
         При смене игрока текущий порядок устанавливается на 3, все остальные -1
     */
 
-    public void UpdateTokenLayerOrder() {
+    public void UpdateTokenLayerOrder(int currentPlayerIndex) {
         foreach(PlayerControl player in _players) {
             GameObject token = GetTokenByMoveOrder(player.MoveOrder);
             if (token == null) {
                 continue;
             }
             TokenControl tokenControl = token.GetComponent<TokenControl>();
-            if (player.MoveOrder == MoveControl.Instance.CurrentPlayerIndex) {
+            if (player.MoveOrder == currentPlayerIndex) {
                 tokenControl.SetOrderInLayer(3);
             } else {
                 tokenControl.SetOrderInLayer(tokenControl.GetOrderInLayer() - 1);
