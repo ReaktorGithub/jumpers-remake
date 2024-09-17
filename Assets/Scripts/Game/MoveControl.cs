@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Splines;
 
 public class MoveControl : MonoBehaviour
 {
@@ -304,7 +305,7 @@ public class MoveControl : MonoBehaviour
         CellControl cell = _currentPlayer.GetCurrentCell();
         cell.AddToken(_currentPlayer.TokenObject);
         cell.AlignTokens(_alignTime, () => {
-            CellChecker.Instance.CheckCellCharacter(_currentPlayer);
+            CellChecker.Instance.CheckCellAfterMove(_currentPlayer);
         });
     }
 
@@ -357,6 +358,25 @@ public class MoveControl : MonoBehaviour
         CellControl nextCellControl = nextCell.GetComponent<CellControl>();
         MakeMagicKickMove(_currentPlayer, nextCellControl, _restSteps - 1);
     }
+
+    public void SwitchBranchHedgehog(GameObject nextCell, SplineContainer nextArrowSpline) {
+        CellControl cell = _currentPlayer.GetCurrentCell();
+
+        if (!cell.TryGetComponent(out BranchCell branchCell)) {
+            Debug.Log("Error while switching branch");
+            return;
+        }
+        
+        branchCell.BranchControl.HideAllBranches();
+        _topPanel.CloseWindow();
+
+        TokenControl token = _currentPlayer.GetTokenControl();
+        token.ExecuteArrowMove(nextArrowSpline, nextCell);
+        string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " перемещается по стрелке";
+        Messages.Instance.AddMessage(message);
+    }
+
+    // Конец хода
 
     public IEnumerator EndMoveDefer() {
         yield return new WaitForSeconds(_endMoveDelay);

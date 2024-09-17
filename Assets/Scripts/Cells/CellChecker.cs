@@ -44,14 +44,18 @@ public class CellChecker : MonoBehaviour
             _topPanel.SetText("Выберите направление");
             _topPanel.SetCancelButtonActive(false);
             _topPanel.OpenWindow();
-            string cubicStatus = Utils.Wrap("Остаток: " + rest, UIColors.Green);
-            CubicControl.Instance.WriteStatus(cubicStatus);
+            if (!branch.IsHedgehog()) {
+                string cubicStatus = Utils.Wrap("Остаток: " + rest, UIColors.Green);
+                CubicControl.Instance.WriteStatus(cubicStatus);
+            }
         }
 
         if (player.IsAi()) {
             AiControl.Instance.AiSelectBranch(player, branch, rest);
         }
     }
+
+    // Проверка по время хода при достижении новой клетки
 
     public bool CheckCellAfterStep(ECellTypes cellType, PlayerControl player) {
         if (cellType == ECellTypes.Checkpoint) {
@@ -71,6 +75,26 @@ public class CellChecker : MonoBehaviour
         }
 
         return true;
+    }
+
+    // Начало серии проверок клетки по окончании хода
+
+    public void CheckCellAfterMove(PlayerControl player) {
+        CheckCellHedgehog(player);
+    }
+
+    public void CheckCellHedgehog(PlayerControl player) {
+        CellControl cell = player.GetCurrentCell();
+
+        if (cell.CellType == ECellTypes.HedgehogBranch) {
+            if (cell.TryGetComponent(out BranchCell branchCell)) {
+                BranchControl branch = branchCell.BranchControl;
+                ActivateBranch(player, branch, 0);
+                return;
+            }
+        }
+
+        CheckCellCharacter(player);
     }
 
     // Проверка, может ли игрок избежать вредного эффекта

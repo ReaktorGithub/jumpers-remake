@@ -4,24 +4,14 @@ using UnityEngine.UI;
 public class BoosterButton : MonoBehaviour
 {
     private SpriteRenderer _booster;
-    private GameObject _selected, _armorOverlay;
-    private Image _armorOverlayImage;
+    private GameObject _selected;
     private Button _button;
     private bool _disabled = false;
     private EBoosters _boosterType = EBoosters.None;
-    private bool _isArmorMode = false;
-    private int _armor = 0;
-    private int _armorIron = 0;
     private CursorManager _cursorManager;
-    
 
     private void Awake() {
-        _button = GetComponent<Button>();
-        _booster = transform.Find("booster").GetComponent<SpriteRenderer>();
-        _selected = transform.Find("booster-selected").gameObject;
-        _armorOverlay = transform.Find("armor").gameObject;
-        _armorOverlayImage = _armorOverlay.GetComponent<Image>();
-        _cursorManager = GetComponent<CursorManager>();
+        UpdateLinks();
     }
 
     public EBoosters BoosterType {
@@ -31,59 +21,11 @@ public class BoosterButton : MonoBehaviour
         }
     }
 
-    public bool IsArmorMode {
-        get { return _isArmorMode; }
-        set { _isArmorMode = value; }
-    }
-
-    public int Armor {
-        get { return _armor; }
-        set {
-            UpdateShield(value);
-        }
-    }
-
-    public int ArmorIron {
-        get { return _armorIron; }
-        set {
-            UpdateShieldIron(value);
-        }
-    }
-
-    private void UpdateShield(int armor) {
-        _armorOverlayImage.color = new Color32(41, 163, 246, 80);
-        float newScale = 1f / 4f * armor;
-        _armorOverlay.transform.localScale = new Vector3(1f, newScale, 1f);
-        _armorOverlay.SetActive(armor > 0);
-    }
-
-    private void UpdateShieldIron(int armor) {
-        _armorOverlayImage.color = new Color32(177, 0, 255, 80);
-        float newScale = 1f / 12f * armor;
-        _armorOverlay.transform.localScale = new Vector3(1f, newScale, 1f);
-        _armorOverlay.SetActive(armor > 0);
-    }
-
-    public void OnSelect() {
-        if (IsShield()) {
-            PlayerControl player = PlayersControl.Instance.GetMe();
-            if (player != null) {
-                // мы должны запомнить, на какой кнопке игрок активировал щит
-                player.SelectedShieldButton = this;
-                BoostersControl.Instance.ExecuteShield(player, _boosterType == EBoosters.ShieldIron);
-            }
-            return;
-        }
-
-        if (IsAttackOnly()) {
-            BoostersControl.Instance.ShowAttackOnlyWarning();
-            return;
-        }
-
-        SetSelected(true);
-        BoostersControl.Instance.DisableAllButtons(this);
-        EffectsControl.Instance.DisableAllButtons(true);
-        BoostersControl.Instance.ActivateBooster(_boosterType);
+    public void UpdateLinks() {
+        _button = GetComponent<Button>();
+        _selected = transform.Find("booster-selected").gameObject;
+        _cursorManager = GetComponent<CursorManager>();
+        _booster = transform.Find("booster").GetComponent<SpriteRenderer>();
     }
 
     public void SetSelected(bool value) {
@@ -143,7 +85,13 @@ public class BoosterButton : MonoBehaviour
     // если кнопка энейблится, но при этом она пустая, или в режиме брони, то ничего не делать
 
     public void SetDisabled(bool value) {
-        bool dontEnable = IsEmpty() || _isArmorMode;
+        bool isArmorMode = false;
+        transform.TryGetComponent(out BoosterButtonActivate activate);
+        if (activate != null) {
+            isArmorMode = activate.IsArmorMode;
+        }
+
+        bool dontEnable = IsEmpty() || isArmorMode;
         if (!value && dontEnable) {
             return;
         }

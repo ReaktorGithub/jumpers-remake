@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 6230336400984801236}
   m_Layer: 0
   m_Name: BranchButton
-  m_TagString: Untagged
+  m_TagString: BranchButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -110,6 +110,7 @@ MonoBehaviour:
   _pulseMinValue: 0.45
   _pulseDefaultValue: 0.5
   _nextCell: {fileID: 0}
+  _aiBranchType: 0
 --- !u!114 &349160190350118856
 MonoBehaviour:
   m_ObjectHideFlags: 0

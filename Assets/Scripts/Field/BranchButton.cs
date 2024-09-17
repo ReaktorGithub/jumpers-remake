@@ -12,6 +12,7 @@ public class BranchButton : MonoBehaviour
     [SerializeField] private EAiBranchTypes _aiBranchType = EAiBranchTypes.Normal;
     private float _currentX;
     private bool _pausePulse = false;
+    private bool _disabled = false;
     
     private void Awake() {
         _currentX = transform.localScale.x;
@@ -27,9 +28,22 @@ public class BranchButton : MonoBehaviour
         private set {}
     }
 
+    public bool Disabled {
+        get { return _disabled; }
+        set {
+            _disabled = value;
+            if (value) {
+                StopPulse();
+            }
+        }
+    }
+
     // Pulse animation
 
     public void StartPulse() {
+        if (_disabled) {
+            return;
+        }
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
         }
@@ -49,6 +63,10 @@ public class BranchButton : MonoBehaviour
     }
 
     public void PausePulse() {
+        if (_disabled) {
+            return;
+        }
+
         _pausePulse = true;
         transform.localScale = new Vector3(
             _pulseDefaultValue,
@@ -57,6 +75,10 @@ public class BranchButton : MonoBehaviour
     }
 
     public void UnpausePulse() {
+        if (_disabled) {
+            return;
+        }
+
         _pausePulse = false;
     }
 
@@ -91,10 +113,22 @@ public class BranchButton : MonoBehaviour
     }
 
     public void ConfirmNewDirection() {
+        if (_disabled) {
+            return;
+        }
+        
+        bool isHedgehog = transform.TryGetComponent(out BranchButtonHedge hedge);
+
+        if (isHedgehog) {
+            hedge.ExecuteHedgehogChoice(_nextCell);
+            return;
+        }
+
         if (MoveControl.Instance.IsViolateMode) {
             MoveControl.Instance.SwitchBranchViolate(_nextCell);
-        } else {
-            MoveControl.Instance.SwitchBranch(_nextCell);
+            return;
         }
+
+        MoveControl.Instance.SwitchBranch(_nextCell);
     }
 }

@@ -10,6 +10,7 @@ TagManager:
   - wall
   - LockZoom
   - boosterButton
+  - BranchButton
   layers:
   - Default
   - TransparentFX

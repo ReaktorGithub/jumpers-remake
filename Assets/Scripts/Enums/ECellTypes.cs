@@ -8,5 +8,5 @@ public enum ECellTypes
     Lightning,
     Wall,
     Surprise,
-    BlueArrow,
+    HedgehogBranch,
 }
