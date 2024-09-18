@@ -191,6 +191,8 @@ public class MoveControl : MonoBehaviour
             StartCoroutine(AiControl.Instance.AiThrowCubic());
         }
         BoostersControl.Instance.EnableAllButtons(!isMe);
+
+        // CellsControl.Instance.ShowTokensAtCells();
     }
 
     private void StartCellCheckBeforeStep() {
@@ -361,6 +363,7 @@ public class MoveControl : MonoBehaviour
 
     public void SwitchBranchHedgehog(GameObject nextCell, SplineContainer nextArrowSpline) {
         CellControl cell = _currentPlayer.GetCurrentCell();
+        
 
         if (!cell.TryGetComponent(out BranchCell branchCell)) {
             Debug.Log("Error while switching branch");
@@ -369,8 +372,10 @@ public class MoveControl : MonoBehaviour
         
         branchCell.BranchControl.HideAllBranches();
         _topPanel.CloseWindow();
+        
 
         TokenControl token = _currentPlayer.GetTokenControl();
+        cell.RemoveToken(token.gameObject);
         token.ExecuteArrowMove(nextArrowSpline, nextCell);
         string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " перемещается по стрелке";
         Messages.Instance.AddMessage(message);

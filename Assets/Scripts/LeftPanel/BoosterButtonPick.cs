@@ -5,7 +5,6 @@ using UnityEngine;
 public class BoosterButtonPick : MonoBehaviour
 {
     private ModalHedgehogArrow _modal;
-    private bool _isSelected = false;
     private BoosterButton _boosterButton;
 
     private void Awake() {
@@ -13,12 +12,7 @@ public class BoosterButtonPick : MonoBehaviour
         _boosterButton = transform.GetComponent<BoosterButton>();
     }
 
-    public bool IsSelected {
-        get { return _isSelected; }
-        set { _isSelected = value; }
-    }
-
-    public void OnSelect() {
-        _modal.OnItemClick(_boosterButton, this);
+    public void OnHedgehogSelect() {
+        _modal.OnItemClick(_boosterButton);
     }
 }

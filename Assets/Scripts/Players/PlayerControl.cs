@@ -250,6 +250,79 @@ public class PlayerControl : MonoBehaviour
         set { _selectedShieldButton = value; }
     }
 
+    // Подсчет бустеров
+
+    public int GetMagnetsCount() {
+        return BoosterMagnet + BoosterSuperMagnet;
+    }
+
+    public int GetShieldsCount() {
+        return BoosterShield + BoosterShieldIron;
+    }
+
+    // Для массового изменения бустеров
+
+    public void AddTheBooster(EBoosters booster, int value) {
+        switch(booster) {
+            case EBoosters.Lasso: {
+                BoosterLasso += value;
+                break;
+            }
+            case EBoosters.Magnet: {
+                BoosterMagnet += value;
+                break;
+            }
+            case EBoosters.MagnetSuper: {
+                BoosterSuperMagnet += value;
+                break;
+            }
+            case EBoosters.Shield: {
+                BoosterShield += value;
+                break;
+            }
+            case EBoosters.ShieldIron: {
+                BoosterShieldIron += value;
+                break;
+            }
+            case EBoosters.Vampire: {
+                BoosterVampire += value;
+                break;
+            }
+        }
+    }
+
+    // Собирает все бустеры, не включая особые
+
+    public List<EBoosters> CollectAllRegularBoosters() {
+        List<EBoosters> result = new();
+
+        for (int i = 0; i < BoosterLasso; i++) {
+            result.Add(EBoosters.Lasso);
+        }
+
+        for (int i = 0; i < BoosterMagnet; i++) {
+            result.Add(EBoosters.Magnet);
+        }
+
+        for (int i = 0; i < BoosterSuperMagnet; i++) {
+            result.Add(EBoosters.MagnetSuper);
+        }
+
+        for (int i = 0; i < BoosterShield; i++) {
+            result.Add(EBoosters.Shield);
+        }
+
+        for (int i = 0; i < BoosterShieldIron; i++) {
+            result.Add(EBoosters.ShieldIron);
+        }
+
+        for (int i = 0; i < BoosterVampire; i++) {
+            result.Add(EBoosters.Vampire);
+        }
+
+        return result;
+    }
+
     // Изменение параметров движения с помощью инкремента или декремента
 
     public void AddMovesToDo(int count) {
@@ -518,6 +591,12 @@ public class PlayerControl : MonoBehaviour
             StartCoroutine(MoveControl.Instance.EndMoveDefer());
         });
         StartCoroutine(coroutine);
+    }
+
+    public void ExecuteHedgehogArrow(List<EBoosters> selectedBoosters) {
+        foreach(EBoosters booster in selectedBoosters) {
+            AddTheBooster(booster, -1);
+        }
     }
 
     public void ExecuteReplaceEffect(EControllableEffects effect) {

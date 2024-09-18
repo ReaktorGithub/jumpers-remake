@@ -9,10 +9,12 @@ public class BranchButtonHedge : MonoBehaviour
     [SerializeField] private GameObject _nextArrowSpline;
     private ModalHedgehogArrow _modal;
     private BranchControl _branchControl;
+    private BranchButton _branchButton;
 
     private void Awake() {
         _modal = GameObject.Find("GameScripts").GetComponent<ModalHedgehogArrow>();
         _branchControl = transform.parent.GetComponent<BranchControl>();
+        _branchButton = transform.GetComponent<BranchButton>();
     }
 
     public int TaxCost {
@@ -20,15 +22,18 @@ public class BranchButtonHedge : MonoBehaviour
         private set {}
     }
 
-    public void ExecuteHedgehogChoice(GameObject nextCell) {
+    public void InitiateHedgehogChoice() {
         if (_taxCost > 0) {
             _branchControl.SetDisabledAllButtons(true);
-            _modal.BuildContent(MoveControl.Instance.CurrentPlayer, _taxCost);
+            _modal.BuildContent(MoveControl.Instance.CurrentPlayer, _branchControl, this);
             _modal.OpenWindow();
             return;
         }
 
-        SplineContainer spline = _nextArrowSpline.GetComponent<SplineContainer>();
-        MoveControl.Instance.SwitchBranchHedgehog(nextCell, spline);
+        ExecuteHedgehogChoice();
+    }
+
+    public void ExecuteHedgehogChoice() {
+        _branchButton.ExecuteHedgehogChoice(_nextArrowSpline.GetComponent<SplineContainer>());
     }
 }

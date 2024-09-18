@@ -99,4 +99,15 @@ public static class Utils
 
         return candidates[randomIndex];
     }
+
+    public static List<T> GetRandomElements<T>(List<T> sourceList, int count) {
+        if (sourceList.Count < count) {
+            throw new ArgumentException("Количество элементов в исходном списке меньше, чем запрошенное количество случайных элементов.");
+        }
+
+        List<T> randomElements = new();
+        randomElements.AddRange(sourceList.OrderBy(x => Guid.NewGuid()).Take(count));
+
+        return randomElements;
+    }
 }

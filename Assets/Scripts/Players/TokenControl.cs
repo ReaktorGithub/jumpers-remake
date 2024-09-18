@@ -233,11 +233,15 @@ public class TokenControl : MonoBehaviour
         _splineAnimate.StopAllCoroutines();
         _splineAnimate.Container = null;
         if (nextCell == null) {
+            // обычная стрелка
             CellControl currentCellControl = GetCurrentCellControl();
             currentCellControl.RemoveToken(transform.gameObject);
             _currentCell = currentCellControl.transform.GetComponent<ArrowCell>().ArrowToCell;
         } else {
+            // hedgehog
             _currentCell = nextCell;
+            CellControl currentCellControl = GetCurrentCellControl();
+            currentCellControl.RemoveToken(transform.gameObject);
         }
         transform.SetLocalPositionAndRotation(_currentCell.transform.localPosition, Quaternion.Euler(new Vector3(0,0,0)));
         DisableIndicators(false);

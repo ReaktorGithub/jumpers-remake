@@ -2,21 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ModalHedgehogArrow : MonoBehaviour
 {
     private GameObject _modal;
     private ModalWindow _windowControl;
     private IEnumerator _coroutine;
-    [SerializeField] private GameObject _boosterButtonSample, _itemsObj, _selectedItemsObj;
-    private List<BoosterButton> _boosterButtonsList = new();
+    [SerializeField] private GameObject _boosterButtonSample, _itemsObj, _selectedItemsObj, _buttonConfirmObj;
     [SerializeField] private TextMeshProUGUI _boosterName, _boosterDescription, _conditionDescription;
-    private int _selectedCount = 0;
+    [SerializeField] private float _confirmDelay = 0.5f;
     private int _maxSelected = 1;
+    private List<(EBoosters, int)> _initialList = new();
+    private List<GameObject> _initialButtonsLinks = new();
+    private List<EBoosters> _selectedList = new();
+    private List<GameObject> _selectedButtonsLinks = new();
+    private BranchControl _branchControl;
+    private BranchButtonHedge _branchButtonHedge;
+    private Button _buttonConfirm;
 
     private void Awake() {
         _modal = GameObject.Find("ModalHedgehogArrow");
         _windowControl = _modal.transform.Find("WindowHedgehogArrow").GetComponent<ModalWindow>();
+        _buttonConfirm = _buttonConfirmObj.GetComponent<Button>();
     }
 
     private void Start() {
@@ -39,101 +47,20 @@ public class ModalHedgehogArrow : MonoBehaviour
         _windowControl.ResetScale();
     }
 
-    private List<GameObject> GetAllButtons(GameObject obj) {
-        Transform[] children = obj.transform.GetComponentsInChildren<Transform>();
-
-        List<GameObject> list = new();
-
-        foreach (Transform child in children) {
-            if (child.CompareTag("boosterButton")) {
-                list.Add(child.gameObject);
-            }
-        }
-
-        return list;
+    public void EnableBranchButtons() {
+        _branchControl.SetDisabledAllButtons(false);
     }
 
-    private void UpdateBoosterButtonsList() {
-        Transform[] children = _itemsObj.transform.GetComponentsInChildren<Transform>();
-
-        foreach (Transform child in children) {
-            if (child.CompareTag("boosterButton")) {
-                _boosterButtonsList.Add(child.gameObject.GetComponent<BoosterButton>());
-            }
-        }
-    }
-
-    public void RemoveAllItems() {
-        List<GameObject> buttons = GetAllButtons(_itemsObj);
-
-        foreach(GameObject button in buttons) {
-            Destroy(button);
-        }
-
-        _boosterButtonsList = new();
-    }
-
-    public void RemoveAllSelectedItems() {
-        List<GameObject> buttons = GetAllButtons(_selectedItemsObj);
-
-        foreach(GameObject button in buttons) {
-            Destroy(button);
-        }
-    }
-
-    private GameObject GetNewBoosterButton(EBoosters booster, bool selected = false) {
-        GameObject instantiate = Instantiate(_boosterButtonSample);
-        BoosterButton boosterButton = instantiate.GetComponent<BoosterButton>();
-        boosterButton.UpdateLinks();
-        boosterButton.BoosterType = booster;
-        BoosterButtonPick pick = instantiate.GetComponent<BoosterButtonPick>();
-        pick.IsSelected = selected;
-        instantiate.SetActive(true);
-        return instantiate;
-    }
-
-    private void AddItemToList(EBoosters booster, bool selected = false) {
-        GameObject instantiate = GetNewBoosterButton(booster, selected);
-        instantiate.transform.SetParent(_itemsObj.transform);
-        instantiate.transform.localScale = new Vector3(1f, 1f, 1f);
-    }
-
-    private void HideItemFromList(BoosterButton button, bool hide) {
-        foreach (BoosterButton found in _boosterButtonsList) {
-            if (found == button) {
-                Debug.Log("found");
-                found.gameObject.SetActive(!hide);
-            }
-        }
-    }
-
-    private void RemoveSelectedItemFromList(BoosterButton button) {
-        Transform[] children = _selectedItemsObj.transform.GetComponentsInChildren<Transform>();
-
-        foreach (Transform child in children) {
-            BoosterButton found = child.gameObject.GetComponent<BoosterButton>();
-            if (found == button) {
-                Destroy(found.transform.gameObject);
-            }
-        }
-    }
-
-    private void AddSelectedItemToList(EBoosters booster, bool selected = false) {
-        GameObject instantiate = GetNewBoosterButton(booster, selected);
-        instantiate.transform.SetParent(_selectedItemsObj.transform);
-        instantiate.transform.localScale = new Vector3(1f, 1f, 1f);
-    }
-
-    public void BuildContent(PlayerControl currentPlayer, int cost) {
-        _selectedCount = 0;
+    public void BuildContent(PlayerControl currentPlayer, BranchControl branchControl, BranchButtonHedge branchButton) {
         _boosterName.text = "";
         _boosterDescription.text = "";
-        _maxSelected = cost;
-        RemoveAllItems();
-        RemoveAllSelectedItems();
+        _maxSelected = branchButton.TaxCost;
+        _branchControl = branchControl;
+        _branchButtonHedge = branchButton;
+        _initialList.Clear();
 
         string insertText = "";
-        switch(cost) {
+        switch(branchButton.TaxCost) {
             case 2: {
                 insertText = "2 усилителя, которые";
                 break;
@@ -150,36 +77,88 @@ public class ModalHedgehogArrow : MonoBehaviour
 
         _conditionDescription.text = "Выберите " + insertText + " вы готовы отдать ёжику-налоговику.";
 
-        for (int i = 0; i < currentPlayer.BoosterLasso; i++) {
-            AddItemToList(EBoosters.Lasso);
-        }
+        _initialList.Add((EBoosters.Lasso, currentPlayer.BoosterLasso));
+        _initialList.Add((EBoosters.Magnet, currentPlayer.BoosterMagnet));
+        _initialList.Add((EBoosters.MagnetSuper, currentPlayer.BoosterSuperMagnet));
+        _initialList.Add((EBoosters.Shield, currentPlayer.BoosterShield));
+        _initialList.Add((EBoosters.ShieldIron, currentPlayer.BoosterShieldIron));
+        _initialList.Add((EBoosters.Vampire, currentPlayer.BoosterVampire));
 
-        for (int i = 0; i < currentPlayer.BoosterMagnet; i++) {
-            AddItemToList(EBoosters.Magnet);
-        }
-
-        for (int i = 0; i < currentPlayer.BoosterSuperMagnet; i++) {
-            AddItemToList(EBoosters.MagnetSuper);
-        }
-
-        for (int i = 0; i < currentPlayer.BoosterShield; i++) {
-            AddItemToList(EBoosters.Shield);
-        }
-
-        for (int i = 0; i < currentPlayer.BoosterShieldIron; i++) {
-            AddItemToList(EBoosters.ShieldIron);
-        }
-
-        for (int i = 0; i < currentPlayer.BoosterVampire; i++) {
-            AddItemToList(EBoosters.Vampire);
-        }
-
-        UpdateBoosterButtonsList();
+        UpdateInitialList();
+        SetButtonConfirmInteractable(false);
     }
 
-    public void OnItemClick(BoosterButton button, BoosterButtonPick buttonPick) {
+    private GameObject GetNewBoosterButton(EBoosters booster) {
+        GameObject instantiate = Instantiate(_boosterButtonSample);
+        BoosterButton boosterButton = instantiate.GetComponent<BoosterButton>();
+        boosterButton.UpdateLinks();
+        boosterButton.BoosterType = booster;
+        instantiate.SetActive(true);
+        return instantiate;
+    }
+
+    private void UpdateInitialList() {
+        foreach(GameObject button in _initialButtonsLinks) {
+            Destroy(button);
+        }
+
+        foreach((EBoosters, int) booster in _initialList) {
+            for (int i = 0; i < booster.Item2; i++) {
+                GameObject newButton = GetNewBoosterButton(booster.Item1);
+                newButton.transform.SetParent(_itemsObj.transform);
+                newButton.transform.localScale = new Vector3(1f, 1f, 1f);
+                _initialButtonsLinks.Add(newButton);
+            }
+        }
+    }
+
+    private void ChangeInitialList(EBoosters booster, int count) {
+        int index = 0;
+
+        foreach((EBoosters, int) item in _initialList) {
+            if (item.Item1 == booster) {
+                break;
+            } else {
+                index++;
+            }
+        }
+
+        _initialList[index] = (_initialList[index].Item1, _initialList[index].Item2 + count);
+        UpdateInitialList();
+    }
+
+    private void AddItemToSelectedList(EBoosters booster) {
+        _selectedList.Add(booster);
+        UpdateSelectedList();
+    }
+
+    private void RemoveItemFromSelectedList(EBoosters booster) {
+        if (_selectedList.Contains(booster)) {
+            _selectedList.Remove(booster);
+            UpdateSelectedList();
+        }
+    }
+
+    private void UpdateSelectedList() {
+        foreach(GameObject button in _selectedButtonsLinks) {
+            Destroy(button);
+        }
+
+        foreach(EBoosters booster in _selectedList) {
+            GameObject newButton = GetNewBoosterButton(booster);
+            newButton.transform.SetParent(_selectedItemsObj.transform);
+            newButton.transform.localScale = new Vector3(1f, 1f, 1f);
+            _selectedButtonsLinks.Add(newButton);
+        }
+
+        SetButtonConfirmInteractable(_selectedList.Count == _maxSelected);
+    }
+
+    public void OnItemClick(BoosterButton button) {
+        EBoosters booster = button.BoosterType;
         ManualContent manual = BoostersControl.Instance.GetBoosterManual(button.BoosterType);
-        if (button.BoosterType == EBoosters.Lasso) {
+
+        if (booster == EBoosters.Lasso) {
             _boosterName.text = manual.GetEntityNameWithLevel(1); // todo
             _boosterDescription.text = manual.GetShortDescription(1); // todo
         } else {
@@ -187,16 +166,31 @@ public class ModalHedgehogArrow : MonoBehaviour
             _boosterDescription.text = manual.GetShortDescription();
         }
 
-        EBoosters booster = button.BoosterType;
+        bool isSelected = button.transform.parent == _selectedItemsObj.transform;
 
-        if (buttonPick.IsSelected) {
-            RemoveSelectedItemFromList(button);
-            HideItemFromList(button, false);
-            _selectedCount--;
-        } else if (_selectedCount < _maxSelected) {
-            AddSelectedItemToList(booster, true);
-            HideItemFromList(button, true);
-            _selectedCount++;
+        if (isSelected) {
+            RemoveItemFromSelectedList(booster);
+            ChangeInitialList(booster, 1);
+        } else if (_selectedList.Count < _maxSelected) {
+            ChangeInitialList(booster, -1);
+            AddItemToSelectedList(booster);
         }
+    }
+
+    private void SetButtonConfirmInteractable(bool value) {
+        _buttonConfirm.interactable = value;
+        _buttonConfirm.GetComponent<CursorManager>().Disabled = !value;
+    }
+
+    public void OnConfirm() {
+        CloseWindow();
+        MoveControl.Instance.CurrentPlayer.ExecuteHedgehogArrow(_selectedList);
+        BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+        StartCoroutine(ConfirmDefer());
+    }
+
+    private IEnumerator ConfirmDefer() {
+        yield return new WaitForSeconds(_confirmDelay);
+        _branchButtonHedge.ExecuteHedgehogChoice();
     }
 }

@@ -190,6 +190,15 @@ public static class AiLib
     public static int GetBranchVariantPoints(PlayerControl player, BranchButton branchButton, CellControl cell) {
         int points = cell.AiScore;
 
+        int hedgehogTax = branchButton.GetHedgehogTax();
+        if (hedgehogTax > 0) {
+            int totalBoosters = player.CollectAllRegularBoosters().Count;
+            if (totalBoosters < hedgehogTax) return _exclude;
+            if (totalBoosters == hedgehogTax) points -= 15;
+            if (totalBoosters - hedgehogTax == 1) points += 5;
+            if (totalBoosters - hedgehogTax > 1) points += 10;
+        }
+
         if (cell.IsPenaltyEffect() && player.Power <= 1) points -= 80;
 
         if (branchButton.AiBranchType == EAiBranchTypes.Tasty) points += 10;
@@ -211,5 +220,49 @@ public static class AiLib
         if (player.Power > 2 && cell.CurrentTokens.Count > 0) points += 8;
 
         return points;
+    }
+
+    public static BranchButton GetBestBranchButton(PlayerControl player, BranchControl branch, int rest) {
+        if (player.AiType == EAiTypes.Random) {
+            List<BranchButton> list = new();
+            foreach(GameObject obj in branch.BranchButtonsList) {
+                BranchButton button = obj.GetComponent<BranchButton>();
+                if (button.GetHedgehogTax() == 0) {
+                    list.Add(button);
+                }
+            }
+            System.Random random = new();
+            int index = random.Next(0, list.Count);
+            return list[index];
+        }
+
+        List<(BranchButton, int)> variants = new(); // branchButton и очки ai
+
+        foreach(GameObject button in branch.BranchButtonsList) {
+            BranchButton branchButton = button.GetComponent<BranchButton>();
+            (GameObject, int) cells = CellsControl.Instance.FindCellBySteps(branchButton.NextCell, !branch.IsReverse, rest);
+            GameObject targetCell = cells.Item1;
+            if (targetCell == null) {
+                variants.Add((branchButton, 0));
+            } else if (targetCell.TryGetComponent(out BranchCell _)) {
+                variants.Add((branchButton, 0));
+            } else {
+                int points = GetBranchVariantPoints(player, branchButton, targetCell.GetComponent<CellControl>());
+                variants.Add((branchButton, points));
+            }
+        }
+
+        // debug
+
+        string message = "Ai type: " + player.AiType + "; ";
+        foreach((BranchButton, int) variant in variants) {
+            message += "Branch cell: " + variant.Item1.NextCell.name + ", Points: " + variant.Item2 + "; ";
+        }
+        Debug.Log("Отчет Ai о решении бранча: " + message);
+
+        // выбрать лучший вариант
+
+        (BranchButton selectedBranch, _) = Utils.GetMostValuableElement(variants);
+        return selectedBranch;
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Splines;
 
 public class BranchButton : MonoBehaviour
 {
@@ -34,6 +35,8 @@ public class BranchButton : MonoBehaviour
             _disabled = value;
             if (value) {
                 StopPulse();
+            } else {
+                StartPulse();
             }
         }
     }
@@ -41,9 +44,6 @@ public class BranchButton : MonoBehaviour
     // Pulse animation
 
     public void StartPulse() {
-        if (_disabled) {
-            return;
-        }
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
         }
@@ -120,7 +120,7 @@ public class BranchButton : MonoBehaviour
         bool isHedgehog = transform.TryGetComponent(out BranchButtonHedge hedge);
 
         if (isHedgehog) {
-            hedge.ExecuteHedgehogChoice(_nextCell);
+            hedge.InitiateHedgehogChoice();
             return;
         }
 
@@ -130,5 +130,23 @@ public class BranchButton : MonoBehaviour
         }
 
         MoveControl.Instance.SwitchBranch(_nextCell);
+    }
+
+    public void ExecuteHedgehogChoice(SplineContainer spline) {
+        MoveControl.Instance.SwitchBranchHedgehog(_nextCell, spline);
+    }
+
+    public int GetHedgehogTax() {
+        transform.TryGetComponent(out BranchButtonHedge button);
+        if (button != null) {
+            return button.TaxCost;
+        } else {
+            return 0;
+        }
+    }
+
+    public BranchButtonHedge GetHedgehogScript() {
+        transform.TryGetComponent(out BranchButtonHedge button);
+        return button;
     }
 }
