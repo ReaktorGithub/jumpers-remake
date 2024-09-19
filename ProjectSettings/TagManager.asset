@@ -11,6 +11,7 @@ TagManager:
   - LockZoom
   - boosterButton
   - BranchButton
+  - MoneyboxStep
   layers:
   - Default
   - TransparentFX
