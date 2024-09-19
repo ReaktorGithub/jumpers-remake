@@ -18,7 +18,10 @@ public class CellsControl : MonoBehaviour
         Transform[] children = GetComponentsInChildren<Transform>();
         foreach (Transform child in children) {
             if (child.CompareTag("cell")) {
-                _allCellControls.Add(child.gameObject.GetComponent<CellControl>());
+                CellControl control = child.gameObject.GetComponent<CellControl>();
+                if (control.CellType != ECellTypes.HedgehogBranch) {
+                    _allCellControls.Add(control);
+                }
             }
         }
     }

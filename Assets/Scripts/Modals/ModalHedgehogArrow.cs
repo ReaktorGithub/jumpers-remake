@@ -17,7 +17,6 @@ public class ModalHedgehogArrow : MonoBehaviour
     private List<GameObject> _initialButtonsLinks = new();
     private List<EBoosters> _selectedList = new();
     private List<GameObject> _selectedButtonsLinks = new();
-    private BranchControl _branchControl;
     private BranchButtonHedge _branchButtonHedge;
     private Button _buttonConfirm;
 
@@ -48,16 +47,16 @@ public class ModalHedgehogArrow : MonoBehaviour
     }
 
     public void EnableBranchButtons() {
-        _branchControl.SetDisabledAllButtons(false);
+        _branchButtonHedge.BranchControl.SetDisabledAllButtons(false);
     }
 
-    public void BuildContent(PlayerControl currentPlayer, BranchControl branchControl, BranchButtonHedge branchButton) {
+    public void BuildContent(PlayerControl currentPlayer, BranchButtonHedge branchButton) {
         _boosterName.text = "";
         _boosterDescription.text = "";
         _maxSelected = branchButton.TaxCost;
-        _branchControl = branchControl;
         _branchButtonHedge = branchButton;
         _initialList.Clear();
+        _selectedList.Clear();
 
         string insertText = "";
         switch(branchButton.TaxCost) {
@@ -85,6 +84,7 @@ public class ModalHedgehogArrow : MonoBehaviour
         _initialList.Add((EBoosters.Vampire, currentPlayer.BoosterVampire));
 
         UpdateInitialList();
+        UpdateSelectedList();
         SetButtonConfirmInteractable(false);
     }
 
@@ -186,6 +186,8 @@ public class ModalHedgehogArrow : MonoBehaviour
         CloseWindow();
         MoveControl.Instance.CurrentPlayer.ExecuteHedgehogArrow(_selectedList);
         BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+        _branchButtonHedge.BranchHedgehog.AddBoostersCollected(_selectedList);
+        _branchButtonHedge.BranchHedgehog.IncreaseFeedCount();
         StartCoroutine(ConfirmDefer());
     }
 

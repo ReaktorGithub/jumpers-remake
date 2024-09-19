@@ -27,6 +27,7 @@ public class PlayerControl : MonoBehaviour
     
     private Pedestal _pedestal;
     private Sprite _tokenImage;
+    private CameraControl _camera;
 
     // Ресурсы игрока
     [SerializeField] private int _coins = 0;
@@ -61,6 +62,7 @@ public class PlayerControl : MonoBehaviour
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
         _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
+        _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
     }
 
     // Изменение свойств напрямую
@@ -591,12 +593,30 @@ public class PlayerControl : MonoBehaviour
             StartCoroutine(MoveControl.Instance.EndMoveDefer());
         });
         StartCoroutine(coroutine);
+        _camera.ClearFollow();
     }
 
     public void ExecuteHedgehogArrow(List<EBoosters> selectedBoosters) {
         foreach(EBoosters booster in selectedBoosters) {
             AddTheBooster(booster, -1);
         }
+    }
+
+    public void ExecuteHedgehogFinishPay(int cost) {
+        AddCoins(-cost);
+        PlayersControl.Instance.UpdatePlayersInfo();
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " платит дань " + Utils.Wrap("ежу", UIColors.DarkGreen);
+        Messages.Instance.AddMessage(message);
+        ExecuteFinish();
+    }
+
+    public void ExecuteHedgehogFinishFight() {
+        AddPower(-3);
+        PlayersControl.Instance.UpdatePlayersInfo();
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ПОБИЛ ", UIColors.Red) + Utils.Wrap("ежа!", UIColors.DarkGreen) + " Финиш свободен";
+        Messages.Instance.AddMessage(message);
+        // todo нужно разбрасывать дань по полю
+        ExecuteFinish();
     }
 
     public void ExecuteReplaceEffect(EControllableEffects effect) {

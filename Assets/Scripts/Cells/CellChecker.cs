@@ -57,15 +57,23 @@ public class CellChecker : MonoBehaviour
 
     // Проверка по время хода при достижении новой клетки
 
-    public bool CheckCellAfterStep(ECellTypes cellType, PlayerControl player) {
+    public bool CheckCellAfterStep(CellControl currentCell, PlayerControl player) {
+        ECellTypes cellType = currentCell.CellType;
+
         if (cellType == ECellTypes.Checkpoint) {
             string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " достигает " + Utils.Wrap("чекпойнта", UIColors.Blue);
             Messages.Instance.AddMessage(message);
         }
 
         if (cellType == ECellTypes.Finish) {
+            currentCell.TryGetComponent(out FinishCell finish);
+            if (finish != null) {
+                bool isHedgehog = finish.CheckHedgehog();
+                if (isHedgehog) {
+                   return false; 
+                }
+            }
             player.ExecuteFinish();
-            _camera.ClearFollow();
             return false;
         }
 

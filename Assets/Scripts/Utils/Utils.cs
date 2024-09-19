@@ -110,4 +110,16 @@ public static class Utils
 
         return randomElements;
     }
+
+    public static T GetRandomElement<T>(List<T> sourceList) {
+        if (sourceList.Count == 0) {
+            throw new ArgumentException("Список не должен быть пустым.");
+        }
+        if (sourceList.Count == 1) {
+            return sourceList[0];
+        }
+        System.Random random = new();
+        int index = random.Next(0, sourceList.Count);
+        return sourceList[index];
+    }
 }

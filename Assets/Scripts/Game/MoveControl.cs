@@ -19,6 +19,7 @@ public class MoveControl : MonoBehaviour
     private CameraControl _camera;
     private TopPanel _topPanel;
     private ModifiersControl _modifiersControl;
+    private HedgehogsControl _hedgehogsControl;
     private bool _isLassoMode = false;
     private bool _isViolateMode = false; // в этом режиме текущий игрок является жертвой волшебного пинка или пылесоса
     private int _restSteps = 0; // сохранение оставшихся шагов в режиме жертвы
@@ -31,6 +32,7 @@ public class MoveControl : MonoBehaviour
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
         _modifiersControl = GameObject.Find("Modifiers").GetComponent<ModifiersControl>();
+        _hedgehogsControl = GameObject.Find("LevelScripts").GetComponent<HedgehogsControl>();
     }
 
     public PlayerControl CurrentPlayer {
@@ -129,6 +131,10 @@ public class MoveControl : MonoBehaviour
 
     private bool ExecuteSideEffects() {
         PlayersControl.Instance.SpendPlayersArmor();
+        BranchHedgehog branch = _hedgehogsControl.FindCompletedHedgehogBranch();
+        if (branch != null) {
+            _hedgehogsControl.MoveHedgehog(branch);
+        }
         return true;
     }
 
@@ -216,7 +222,7 @@ public class MoveControl : MonoBehaviour
         // проверяем тип клетки, на которой сейчас находимся
         // некоторые типы прерывают движение, либо вызывают код во время движения
 
-        bool check = CellChecker.Instance.CheckCellAfterStep(_currentPlayer.GetCurrentCell().CellType, _currentPlayer);
+        bool check = CellChecker.Instance.CheckCellAfterStep(_currentPlayer.GetCurrentCell(), _currentPlayer);
         if (!check) {
             return;
         }
@@ -373,12 +379,9 @@ public class MoveControl : MonoBehaviour
         branchCell.BranchControl.HideAllBranches();
         _topPanel.CloseWindow();
         
-
         TokenControl token = _currentPlayer.GetTokenControl();
         cell.RemoveToken(token.gameObject);
         token.ExecuteArrowMove(nextArrowSpline, nextCell);
-        string message = Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " перемещается по стрелке";
-        Messages.Instance.AddMessage(message);
     }
 
     // Конец хода

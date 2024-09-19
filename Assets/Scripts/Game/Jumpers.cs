@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class Jumpers : MonoBehaviour
 {
+    // private GameObject _testArrow, _arrowBody;
+
+    // private void Awake() {
+    //     _testArrow = GameObject.Find("ArrowHedge1d");
+    //     _arrowBody = GameObject.Find("arrow-body");
+    // }
+
     private void Start() {
         CleanInstances();
         PlayersControl.Instance.BindTokensToPlayers();
@@ -21,4 +28,20 @@ public class Jumpers : MonoBehaviour
         Instances.transform.Find("vampire").gameObject.SetActive(false);
         Instances.transform.Find("BoosterButtonPick").gameObject.SetActive(false);
     }
+
+    // private void Update() {
+    //     if (Input.GetKeyUp(KeyCode.F)) {
+    //         ModalHedgehogFinish modal = GameObject.Find("GameScripts").GetComponent<ModalHedgehogFinish>();
+    //         modal.BuildContent(MoveControl.Instance.CurrentPlayer);
+    //         modal.OpenWindow();
+    //     }
+    // }
+
+    // private void Update() {
+    //     if (Input.GetKeyUp(KeyCode.U)) {
+    //         _arrowBody.SetActive(true);
+    //         _testArrow.SetActive(!_testArrow.activeInHierarchy);
+    //         _arrowBody.SetActive(false);
+    //     }
+    // }
 }

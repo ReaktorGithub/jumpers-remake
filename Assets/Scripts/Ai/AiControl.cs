@@ -102,6 +102,9 @@ public class AiControl : MonoBehaviour
                 player.ExecuteHedgehogArrow(selectedList);
                 BranchButtonHedge button = selectedBranch.GetHedgehogScript();
                 if (button != null) {
+                    BranchHedgehog branchHedgehog = branch.transform.GetComponent<BranchHedgehog>();
+                    branchHedgehog.AddBoostersCollected(selectedList);
+                    branchHedgehog.IncreaseFeedCount();
                     button.ExecuteHedgehogChoice();
                 }
             } else {
