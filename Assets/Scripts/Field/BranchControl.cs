@@ -10,7 +10,7 @@ public class BranchControl : MonoBehaviour
         Transform[] children = GetComponentsInChildren<Transform>();
 
         foreach (Transform child in children) {
-            if (child.name == "BranchButton") {
+            if (child.CompareTag("BranchButton")) {
                 _branchButtonsList.Add(child.gameObject);
             }
         }
@@ -23,6 +23,10 @@ public class BranchControl : MonoBehaviour
     public List<GameObject> BranchButtonsList {
         get { return _branchButtonsList; }
         private set {}
+    }
+
+    public bool IsHedgehog() {
+        return transform.TryGetComponent(out BranchButtonHedge _);
     }
 
     public List<GameObject> GetAllNextCells() {
@@ -48,7 +52,15 @@ public class BranchControl : MonoBehaviour
     public void ShowAllBranches() {
         foreach (GameObject branch in _branchButtonsList) {
             branch.SetActive(true);
-            branch.GetComponent<BranchButton>().StartPulse();
+            BranchButton branchButton = branch.GetComponent<BranchButton>();
+            branchButton.Disabled = false;
+            branchButton.StartPulse();
+        }
+    }
+
+    public void SetDisabledAllButtons(bool value) {
+        foreach (GameObject branch in _branchButtonsList) {
+            branch.GetComponent<BranchButton>().Disabled = value;
         }
     }
 }

@@ -14,7 +14,7 @@ public class CellControl : MonoBehaviour
     private GameObject _container, _glow;
     private SpriteRenderer _spriteRenderer, _glowSpriteRenderer;
     private float[] _cellScale = new float[2];
-    private List<GameObject> _currentTokens = new();
+    [SerializeField] private List<GameObject> _currentTokens = new();
     private bool _isEffectPlacementMode, _isLassoMode = false;
     private TextMeshPro _text;
     private bool _isChanging = false;

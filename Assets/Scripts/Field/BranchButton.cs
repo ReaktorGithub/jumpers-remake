@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Splines;
 
 public class BranchButton : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class BranchButton : MonoBehaviour
     [SerializeField] private EAiBranchTypes _aiBranchType = EAiBranchTypes.Normal;
     private float _currentX;
     private bool _pausePulse = false;
+    private bool _disabled = false;
     
     private void Awake() {
         _currentX = transform.localScale.x;
@@ -25,6 +27,18 @@ public class BranchButton : MonoBehaviour
     public EAiBranchTypes AiBranchType {
         get { return _aiBranchType; }
         private set {}
+    }
+
+    public bool Disabled {
+        get { return _disabled; }
+        set {
+            _disabled = value;
+            if (value) {
+                StopPulse();
+            } else {
+                StartPulse();
+            }
+        }
     }
 
     // Pulse animation
@@ -49,6 +63,10 @@ public class BranchButton : MonoBehaviour
     }
 
     public void PausePulse() {
+        if (_disabled) {
+            return;
+        }
+
         _pausePulse = true;
         transform.localScale = new Vector3(
             _pulseDefaultValue,
@@ -57,6 +75,10 @@ public class BranchButton : MonoBehaviour
     }
 
     public void UnpausePulse() {
+        if (_disabled) {
+            return;
+        }
+
         _pausePulse = false;
     }
 
@@ -91,10 +113,40 @@ public class BranchButton : MonoBehaviour
     }
 
     public void ConfirmNewDirection() {
+        if (_disabled) {
+            return;
+        }
+        
+        bool isHedgehog = transform.TryGetComponent(out BranchButtonHedge hedge);
+
+        if (isHedgehog) {
+            hedge.InitiateHedgehogChoice();
+            return;
+        }
+
         if (MoveControl.Instance.IsViolateMode) {
             MoveControl.Instance.SwitchBranchViolate(_nextCell);
-        } else {
-            MoveControl.Instance.SwitchBranch(_nextCell);
+            return;
         }
+
+        MoveControl.Instance.SwitchBranch(_nextCell);
+    }
+
+    public void ExecuteHedgehogChoice(SplineContainer spline) {
+        MoveControl.Instance.SwitchBranchHedgehog(_nextCell, spline);
+    }
+
+    public int GetHedgehogTax() {
+        transform.TryGetComponent(out BranchButtonHedge button);
+        if (button != null) {
+            return button.TaxCost;
+        } else {
+            return 0;
+        }
+    }
+
+    public BranchButtonHedge GetHedgehogScript() {
+        transform.TryGetComponent(out BranchButtonHedge button);
+        return button;
     }
 }

@@ -47,21 +47,23 @@ public class BoostersRow : MonoBehaviour
         }
 
         foreach(BoosterButton button in _list) {
+            BoosterButtonActivate activateScript = button.GetComponent<BoosterButtonActivate>();
+
             button.SetDisabled(true);
-            button.IsArmorMode = true;
+            activateScript.IsArmorMode = true;
 
             // У кнопки, выбранной игроком, отображается эффект брони
             // У остальных кнопок этот эффект снимается
 
             if (button == selectedButton) {
                 if (isIron) {
-                    button.ArmorIron = armor;
+                    activateScript.ArmorIron = armor;
                 } else {
-                    button.Armor = armor;
+                    activateScript.Armor = armor;
                 }
             } else {
-                button.Armor = 0;
-                button.ArmorIron = 0;
+                activateScript.Armor = 0;
+                activateScript.ArmorIron = 0;
             }
         }
     }
@@ -70,9 +72,11 @@ public class BoostersRow : MonoBehaviour
 
     public void DeactivateShieldMode() {
         foreach(BoosterButton button in _list) {
-            button.IsArmorMode = false;
-            button.Armor = 0;
-            button.ArmorIron = 0;
+            BoosterButtonActivate activateScript = button.GetComponent<BoosterButtonActivate>();
+
+            activateScript.IsArmorMode = false;
+            activateScript.Armor = 0;
+            activateScript.ArmorIron = 0;
         }
     }
 }

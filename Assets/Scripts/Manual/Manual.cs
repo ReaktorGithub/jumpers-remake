@@ -3,7 +3,8 @@ using UnityEngine;
 public class Manual : MonoBehaviour
 {
     public static Manual Instance { get; private set; }
-    private ManualContent _power, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect, _attackUsual, _attackMagicKick, _attackVampire, _attackKnockout;
+    private ManualContent _power, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect, _attackUsual, _attackMagicKick, _attackVampire, _attackKnockout,
+    _boosterLasso, _boosterMagnet, _boosterSuperMagnet, _boosterShield, _boosterIronShield, _boosterVampire;
 
     private void Awake() {
         Instance = this;
@@ -18,6 +19,12 @@ public class Manual : MonoBehaviour
         _attackMagicKick = transform.Find("AttackMagicKick").GetComponent<ManualContent>();
         _attackVampire = transform.Find("AttackVampire").GetComponent<ManualContent>();
         _attackKnockout = transform.Find("AttackKnockout").GetComponent<ManualContent>();
+        _boosterLasso = transform.Find("BoosterLasso").GetComponent<ManualContent>();
+        _boosterMagnet = transform.Find("BoosterMagnet").GetComponent<ManualContent>();
+        _boosterSuperMagnet = transform.Find("BoosterSuperMagnet").GetComponent<ManualContent>();
+        _boosterShield = transform.Find("BoosterShield").GetComponent<ManualContent>();
+        _boosterIronShield = transform.Find("BoosterIronShield").GetComponent<ManualContent>();
+        _boosterVampire = transform.Find("BoosterVampire").GetComponent<ManualContent>();
     }
 
     public ManualContent Power {
@@ -72,6 +79,36 @@ public class Manual : MonoBehaviour
 
     public ManualContent AttackKnockout {
         get { return _attackKnockout; }
+        private set {}
+    }
+
+    public ManualContent BoosterLasso {
+        get { return _boosterLasso; }
+        private set {}
+    }
+
+    public ManualContent BoosterMagnet {
+        get { return _boosterMagnet; }
+        private set {}
+    }
+
+    public ManualContent BoosterSuperMagnet {
+        get { return _boosterSuperMagnet; }
+        private set {}
+    }
+
+    public ManualContent BoosterShield {
+        get { return _boosterShield; }
+        private set {}
+    }
+
+    public ManualContent BoosterIronShield {
+        get { return _boosterIronShield; }
+        private set {}
+    }
+
+    public ManualContent BoosterVampire {
+        get { return _boosterVampire; }
         private set {}
     }
 

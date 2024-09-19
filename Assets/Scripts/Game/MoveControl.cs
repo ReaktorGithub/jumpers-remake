@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Splines;
 
 public class MoveControl : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class MoveControl : MonoBehaviour
     private CameraControl _camera;
     private TopPanel _topPanel;
     private ModifiersControl _modifiersControl;
+    private HedgehogsControl _hedgehogsControl;
     private bool _isLassoMode = false;
     private bool _isViolateMode = false; // в этом режиме текущий игрок является жертвой волшебного пинка или пылесоса
     private int _restSteps = 0; // сохранение оставшихся шагов в режиме жертвы
@@ -30,6 +32,7 @@ public class MoveControl : MonoBehaviour
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
         _modifiersControl = GameObject.Find("Modifiers").GetComponent<ModifiersControl>();
+        _hedgehogsControl = GameObject.Find("LevelScripts").GetComponent<HedgehogsControl>();
     }
 
     public PlayerControl CurrentPlayer {
@@ -128,6 +131,10 @@ public class MoveControl : MonoBehaviour
 
     private bool ExecuteSideEffects() {
         PlayersControl.Instance.SpendPlayersArmor();
+        BranchHedgehog branch = _hedgehogsControl.FindCompletedHedgehogBranch();
+        if (branch != null) {
+            _hedgehogsControl.MoveHedgehog(branch);
+        }
         return true;
     }
 
@@ -190,6 +197,8 @@ public class MoveControl : MonoBehaviour
             StartCoroutine(AiControl.Instance.AiThrowCubic());
         }
         BoostersControl.Instance.EnableAllButtons(!isMe);
+
+        // CellsControl.Instance.ShowTokensAtCells();
     }
 
     private void StartCellCheckBeforeStep() {
@@ -213,7 +222,7 @@ public class MoveControl : MonoBehaviour
         // проверяем тип клетки, на которой сейчас находимся
         // некоторые типы прерывают движение, либо вызывают код во время движения
 
-        bool check = CellChecker.Instance.CheckCellAfterStep(_currentPlayer.GetCurrentCell().CellType, _currentPlayer);
+        bool check = CellChecker.Instance.CheckCellAfterStep(_currentPlayer.GetCurrentCell(), _currentPlayer);
         if (!check) {
             return;
         }
@@ -304,7 +313,7 @@ public class MoveControl : MonoBehaviour
         CellControl cell = _currentPlayer.GetCurrentCell();
         cell.AddToken(_currentPlayer.TokenObject);
         cell.AlignTokens(_alignTime, () => {
-            CellChecker.Instance.CheckCellCharacter(_currentPlayer);
+            CellChecker.Instance.CheckCellAfterMove(_currentPlayer);
         });
     }
 
@@ -357,6 +366,25 @@ public class MoveControl : MonoBehaviour
         CellControl nextCellControl = nextCell.GetComponent<CellControl>();
         MakeMagicKickMove(_currentPlayer, nextCellControl, _restSteps - 1);
     }
+
+    public void SwitchBranchHedgehog(GameObject nextCell, SplineContainer nextArrowSpline) {
+        CellControl cell = _currentPlayer.GetCurrentCell();
+        
+
+        if (!cell.TryGetComponent(out BranchCell branchCell)) {
+            Debug.Log("Error while switching branch");
+            return;
+        }
+        
+        branchCell.BranchControl.HideAllBranches();
+        _topPanel.CloseWindow();
+        
+        TokenControl token = _currentPlayer.GetTokenControl();
+        cell.RemoveToken(token.gameObject);
+        token.ExecuteArrowMove(nextArrowSpline, nextCell);
+    }
+
+    // Конец хода
 
     public IEnumerator EndMoveDefer() {
         yield return new WaitForSeconds(_endMoveDelay);

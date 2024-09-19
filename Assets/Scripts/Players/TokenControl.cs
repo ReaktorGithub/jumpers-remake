@@ -4,13 +4,12 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using TMPro;
 using UnityEngine.Splines;
-using UnityEngine.UI;
 
 public class TokenControl : MonoBehaviour
 {
     private IEnumerator _coroutine, _squeezeCoroutine;
-    [SerializeField] private GameObject _playerName, _indicators, _aiThinking;
-    private GameObject _currentCell, _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
+    [SerializeField] private GameObject _currentCell, _playerName, _indicators, _aiThinking;
+    private GameObject _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
     private PlayerControl _playerControl;
     private SortingGroup _sortingGroup;
     private bool _isSqueeze = false;
@@ -217,25 +216,33 @@ public class TokenControl : MonoBehaviour
 
     // перемещения по стрелкам
 
-    public void ExecuteArrowMove(SplineContainer spline) {
+    public void ExecuteArrowMove(SplineContainer spline, GameObject nextCell = null) {
         DisableIndicators(true);
         _splineAnimate.Container = spline;
         _splineAnimate.Restart(false);
         _splineAnimate.Play();
-        StartCoroutine(ConfirmNewArrowPositionDefer());
+        StartCoroutine(ConfirmNewArrowPositionDefer(nextCell));
     }
 
-    public IEnumerator ConfirmNewArrowPositionDefer() {
+    public IEnumerator ConfirmNewArrowPositionDefer(GameObject nextCell = null) {
         yield return new WaitForSeconds(TokensControl.Instance.ArrowMovingTime);
-        ConfirmNewArrowPosition();
+        ConfirmNewArrowPosition(nextCell);
     }
 
-    public void ConfirmNewArrowPosition() {
+    public void ConfirmNewArrowPosition(GameObject nextCell = null) {
         _splineAnimate.StopAllCoroutines();
         _splineAnimate.Container = null;
-        CellControl currentCellControl = GetCurrentCellControl();
-        currentCellControl.RemoveToken(transform.gameObject);
-        _currentCell = currentCellControl.transform.GetComponent<ArrowCell>().ArrowToCell;
+        if (nextCell == null) {
+            // обычная стрелка
+            CellControl currentCellControl = GetCurrentCellControl();
+            currentCellControl.RemoveToken(transform.gameObject);
+            _currentCell = currentCellControl.transform.GetComponent<ArrowCell>().ArrowToCell;
+        } else {
+            // hedgehog
+            _currentCell = nextCell;
+            CellControl currentCellControl = GetCurrentCellControl();
+            currentCellControl.RemoveToken(transform.gameObject);
+        }
         transform.SetLocalPositionAndRotation(_currentCell.transform.localPosition, Quaternion.Euler(new Vector3(0,0,0)));
         DisableIndicators(false);
         MoveControl.Instance.ConfirmNewPosition();

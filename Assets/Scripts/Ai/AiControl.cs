@@ -91,46 +91,25 @@ public class AiControl : MonoBehaviour
     */
 
     public void AiSelectBranch(PlayerControl player, BranchControl branch, int rest) {
-        if (player.AiType == EAiTypes.Random) {
-            System.Random random = new();
-            int index = random.Next(0, branch.BranchButtonsList.Count);
-            BranchButton branchButton = branch.BranchButtonsList[index].GetComponent<BranchButton>();
-            StartCoroutine(ImitateThinking(player, () => {
-                branchButton.ConfirmNewDirection();
-            }));
-            return;
-        }
+        BranchButton selectedBranch = AiLib.GetBestBranchButton(player, branch, rest);
 
-        List<(BranchButton, int)> variants = new(); // branchButton и очки ai
-
-        foreach(GameObject button in branch.BranchButtonsList) {
-            BranchButton branchButton = button.GetComponent<BranchButton>();
-            (GameObject, int) cells = CellsControl.Instance.FindCellBySteps(branchButton.NextCell, !branch.IsReverse, rest);
-            GameObject targetCell = cells.Item1;
-            bool isBranch = targetCell.TryGetComponent(out BranchCell _);
-            if (targetCell == null) {
-                variants.Add((branchButton, 0));
-            } else if (targetCell.TryGetComponent(out BranchCell _)) {
-                variants.Add((branchButton, 0));
-            } else {
-                int points = AiLib.GetBranchVariantPoints(player, branchButton, targetCell.GetComponent<CellControl>());
-                variants.Add((branchButton, points));
-            }
-        }
-
-        // debug
-
-        string message = "Ai type: " + player.AiType + "; ";
-        foreach((BranchButton, int) variant in variants) {
-            message += "Branch cell: " + variant.Item1.NextCell.name + ", Points: " + variant.Item2 + "; ";
-        }
-        Debug.Log("Отчет Ai о решении бранча: " + message);
-
-        // выбрать лучший вариант
-
-        (BranchButton selectedBranch, _) = Utils.GetMostValuableElement(variants);
         StartCoroutine(ImitateThinking(player, () => {
-            selectedBranch.ConfirmNewDirection();
+            int hedgehogTax = selectedBranch.GetHedgehogTax();
+            if (hedgehogTax > 0) {
+                // todo нужно отдавать предпочтение наименее ценным бустерам
+                List<EBoosters> list = player.CollectAllRegularBoosters();
+                List<EBoosters> selectedList = Utils.GetRandomElements(list, hedgehogTax);
+                player.ExecuteHedgehogArrow(selectedList);
+                BranchButtonHedge button = selectedBranch.GetHedgehogScript();
+                if (button != null) {
+                    BranchHedgehog branchHedgehog = branch.transform.GetComponent<BranchHedgehog>();
+                    branchHedgehog.AddBoostersCollected(selectedList);
+                    branchHedgehog.IncreaseFeedCount();
+                    button.ExecuteHedgehogChoice();
+                }
+            } else {
+                selectedBranch.ConfirmNewDirection();
+            }
         }));
     }
 }

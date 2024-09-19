@@ -257,4 +257,28 @@ public class BoostersControl : MonoBehaviour
         _modalWarning.SetCallback();
         _modalWarning.OpenWindow();
     }
+
+    public ManualContent GetBoosterManual(EBoosters booster) {
+        switch(booster) {
+            case EBoosters.Magnet: {
+                return Manual.Instance.BoosterMagnet;
+            }
+            case EBoosters.MagnetSuper: {
+                return Manual.Instance.BoosterSuperMagnet;
+            }
+            case EBoosters.Lasso: {
+                return Manual.Instance.BoosterLasso;
+            }
+            case EBoosters.Shield: {
+                return Manual.Instance.BoosterShield;
+            }
+            case EBoosters.ShieldIron: {
+                return Manual.Instance.BoosterIronShield;
+            }
+            case EBoosters.Vampire: {
+                return Manual.Instance.BoosterVampire;
+            }
+            default: return null;
+        }
+    }
 }
