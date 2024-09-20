@@ -18,6 +18,7 @@ public class CubicControl : MonoBehaviour
     private int _finalScore;
     private GameObject _border, _borderSelect;
     private PopupMagnet _popupMagnet;
+    private ModifiersControl _modifiersControl;
 
     private void Awake() {
         Instance = this;
@@ -29,6 +30,7 @@ public class CubicControl : MonoBehaviour
         _borderSelect = transform.Find("cubic_border_select").gameObject;
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
         _cursorManager = _cubicButton.GetComponent<CursorManager>();
+        _modifiersControl = GameObject.Find("Modifiers").GetComponent<ModifiersControl>();
     }
 
     private void Start() {
@@ -41,20 +43,9 @@ public class CubicControl : MonoBehaviour
         }
     }
 
-    private void SetScore(int specifiedScore = 0) {
-        int score;
-        if (specifiedScore != 0) {
-            score = specifiedScore;
-        } else {
-            int max = MoveControl.Instance.CurrentPlayer.CubicMaxScore + 1;
-            System.Random random = new();
-            score = random.Next(1, max);
-        }
-        _finalScore = score;
-        _anim.SetInteger("score", _finalScore);
-        _anim.SetBool("isRotate", false);
-        _coroutine = MakeMoveDefer();
-        StartCoroutine(_coroutine);
+    public ModifiersControl ModifiersControl {
+        get { return _modifiersControl; }
+        private set {}
     }
 
     public void OnCubicClick(int specifiedScore = 0) {
@@ -86,6 +77,26 @@ public class CubicControl : MonoBehaviour
             Messages.Instance.AddMessage(text1 + text2);
         }
         SetScore(specifiedScore);
+    }
+
+    private void SetScore(int specifiedScore = 0) {
+        int score;
+        if (specifiedScore != 0) {
+            score = specifiedScore;
+        } else {
+            int max = MoveControl.Instance.CurrentPlayer.CubicMaxScore + 1;
+            System.Random random = new();
+            score = random.Next(1, max);
+        }
+        int multiplier = 1;
+        if (MoveControl.Instance.CurrentPlayer.LightningMoves > 0 || MoveControl.Instance.CurrentPlayer.ShowLightningOverMessage) {
+            multiplier = 2;
+        }
+        _finalScore = score * multiplier;
+        _anim.SetInteger("score", score);
+        _anim.SetBool("isRotate", false);
+        _coroutine = MakeMoveDefer();
+        StartCoroutine(_coroutine);
     }
 
     private IEnumerator MakeMoveDefer() {

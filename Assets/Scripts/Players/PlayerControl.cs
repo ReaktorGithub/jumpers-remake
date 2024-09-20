@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -17,6 +16,8 @@ public class PlayerControl : MonoBehaviour
     private int _movesSkip = 0; // пропуски хода
     private int _movesToDo = 0; // сколько нужно сделать ходов с броском кубика
     private int _stepsLeft = 0; // сколько шагов фишкой осталось сделать
+    [SerializeField] private int _lightningMoves = 0; // осталось ходов с молнией
+    private bool _showLightningOverMessage = false; // показать сообщение, что молния закончилась
     [SerializeField] private int _armor = 0; // сколько ходов осталось со щитом (включая ходы соперников)
     [SerializeField] private bool _isIronArmor = false;
     [SerializeField] private BoosterButton _selectedShieldButton;
@@ -80,6 +81,16 @@ public class PlayerControl : MonoBehaviour
     public EPlayerTypes Type {
         get { return _type; }
         set { _type = value; }
+    }
+
+    public int LightningMoves {
+        get { return _lightningMoves; }
+        private set {}
+    }
+
+    public bool ShowLightningOverMessage {
+        get { return _showLightningOverMessage; }
+        set { _showLightningOverMessage = value; }
     }
 
     public bool IsMe() {
@@ -536,6 +547,9 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void ExecuteRedEffect() {
+        _movesToDo = 0;
+        _stepsLeft = 0;
+
         if (_armor > 0 && _isIronArmor) {
             OpenSavedByShieldModal(() => {
                 string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Возврат на чекпойнт";
@@ -679,12 +693,22 @@ public class PlayerControl : MonoBehaviour
     public void LeaveMoneybox(MoneyboxVault vault) {
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " покидает " + Utils.Wrap("копилку", UIColors.Green);
         Messages.Instance.AddMessage(message);
-        MoveControl.Instance.PreparePlayerForMove();
+        _movesToDo++;
 
+        MoveControl.Instance.PreparePlayerForMove();
+        
         vault.ReassignPlayers();
     }
 
-    // Исполнение щитов
+    public void ExecuteLightning() {
+        _lightningMoves = 3;
+        TokenControl token = GetTokenControl();
+        token.AddIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("молнию", UIColors.Green) + "! Очки на кубике x2";
+        Messages.Instance.AddMessage(message);
+    }
+
+    // Трата щитов
 
     public void SpendArmor() {
         if (_armor == 0) {
@@ -729,6 +753,18 @@ public class PlayerControl : MonoBehaviour
             rival.AddCoins(coinBonus);
         }
         PlayersControl.Instance.UpdatePlayersInfo();
+    }
+
+    // Трата молнии
+
+    public void SpendLightning() {
+        if (_lightningMoves == 0) {
+            return;
+        }
+
+        _lightningMoves--;
+        _showLightningOverMessage = _lightningMoves == 0;
+        CubicControl.Instance.ModifiersControl.ShowModifierLightning(true);
     }
 
     // Разное

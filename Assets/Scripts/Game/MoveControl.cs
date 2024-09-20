@@ -18,7 +18,6 @@ public class MoveControl : MonoBehaviour
     private ModalLose _modalLose;
     private CameraControl _camera;
     private TopPanel _topPanel;
-    private ModifiersControl _modifiersControl;
     private HedgehogsControl _hedgehogsControl;
     private bool _isLassoMode = false;
     private bool _isViolateMode = false; // в этом режиме текущий игрок является жертвой волшебного пинка или пылесоса
@@ -31,7 +30,6 @@ public class MoveControl : MonoBehaviour
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
-        _modifiersControl = GameObject.Find("Modifiers").GetComponent<ModifiersControl>();
         _hedgehogsControl = GameObject.Find("LevelScripts").GetComponent<HedgehogsControl>();
     }
 
@@ -152,6 +150,8 @@ public class MoveControl : MonoBehaviour
             BoostersControl.Instance.UpdateBoostersFromPlayer(_currentPlayer);
         }
 
+        _currentPlayer.SpendLightning();
+
         // проверка на копилку
         bool check = CellChecker.Instance.CheckMoneyboxBeforeMove(_currentPlayer);
         if (!check) {
@@ -192,7 +192,7 @@ public class MoveControl : MonoBehaviour
         }
         CubicControl.Instance.WriteStatus(cubicMessage);
 
-        // возможность применять эффекты должна восстанавливаться только если это новый ход, а не продолжение текущего хода
+        // возможность применять эффекты должна восстанавливаться только если это новый ход, а не возвращение хода после лассо / пылесоса и т.д
         bool isNewMove = !_isLassoMode;
         if (isNewMove) {
            _currentPlayer.IsEffectPlaced = false;
@@ -419,11 +419,11 @@ public class MoveControl : MonoBehaviour
     public void EndMove() {
         // CellsControl.Instance.ShowTokensAtCells();
 
-        // сброс параметров
-        _modifiersControl.HideModifierMagnet();
-        CellsControl.Instance.ResetCellMagnetHint();
+        // Сброс параметров
 
-        // проверка на окончание гонки
+        ResetParamsAfterMove();
+
+        // Проверка на окончание гонки
 
         bool isRaceOver = IsRaceOver();
 
@@ -434,14 +434,14 @@ public class MoveControl : MonoBehaviour
             return;
         }
 
-        // текущий игрок мог финишировать во время хода - проверить
+        // Текущий игрок мог финишировать во время хода - проверить
 
         if (_currentPlayer.IsFinished) {
             SetNextPlayerIndex();
             return;
         }
 
-        // проверка на бонусные ходы
+        // Проверка на бонусные ходы
 
         _currentPlayer.AddMovesToDo(-1);
 
@@ -451,15 +451,42 @@ public class MoveControl : MonoBehaviour
             return;
         }
 
-        // проверка на пропуск хода
+        // Игрок продолжит тратить ходы в любом случае, поэтому активируем молнию
+        // Но только если это не ход лассо!
+
+        if (!_isLassoMode) {
+            _currentPlayer.SpendLightning();
+        }
+
+        // Проверка на пропуск хода
 
         if (_currentPlayer.MovesSkip > 0) {
             StartCoroutine(SkipMoveDefer());
             return;
         }
 
-        // текущий игрок продолжает ходить
+        // Текущий игрок продолжает ходить
         PreparePlayerForMove();
+    }
+
+    private void ResetParamsAfterMove() {
+        CubicControl.Instance.ModifiersControl.HideModifierMagnet();
+        CubicControl.Instance.ModifiersControl.ShowModifierLightning(false);
+        CellsControl.Instance.ResetCellMagnetHint();
+
+        // молния
+        
+        TokenControl token = _currentPlayer.GetTokenControl();
+        if (_currentPlayer.LightningMoves == 0) {
+            token.RemoveIndicator(ETokenIndicators.Lightning);
+        } else {
+            token.UpdateIndicator(ETokenIndicators.Lightning, _currentPlayer.LightningMoves.ToString());
+        }
+        if (_currentPlayer.ShowLightningOverMessage) {
+            string message = "У " + Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " закончилась " + Utils.Wrap("молния", UIColors.Green);
+            Messages.Instance.AddMessage(message);
+            _currentPlayer.ShowLightningOverMessage = false;
+        }
     }
 
     public IEnumerator RaceOverDefer() {

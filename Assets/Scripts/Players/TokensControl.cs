@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class TokensControl : MonoBehaviour
@@ -11,9 +9,16 @@ public class TokensControl : MonoBehaviour
     [SerializeField] private float _squeezeMinValue = 4.6f;
     [SerializeField] private float _squeezeDefaultValue = 4.6f;
     [SerializeField] private float _arrowMovingTime = 1.5f;
+    [SerializeField] private float _indicatorWidthDefault = 3.4f;
+    [SerializeField] private float _indicatorWidthSmall = 2f;
+    private GameObject _tokenIndicatorSample;
+    [SerializeField] GameObject _indicatorLightningObject;
+    private Sprite _indicatorLightningSprite;
 
     private void Awake() {
         Instance = this;
+        _tokenIndicatorSample = GameObject.Find("Instances").transform.Find("TokenIndicator").gameObject;
+        _indicatorLightningSprite = _indicatorLightningObject.GetComponent<SpriteRenderer>().sprite;
     }
 
     public float PedestalMoveTime {
@@ -43,6 +48,26 @@ public class TokensControl : MonoBehaviour
 
     public float ArrowMovingTime {
         get { return _arrowMovingTime; }
+        private set {}
+    }
+
+    public float IndicatorWidthDefault {
+        get { return _indicatorWidthDefault; }
+        private set {}
+    }
+
+    public float IndicatorWidthSmall {
+        get { return _indicatorWidthSmall; }
+        private set {}
+    }
+
+    public GameObject TokenIndicatorSample {
+        get { return _tokenIndicatorSample; }
+        private set {}
+    }
+
+    public Sprite IndicatorLightningSprite {
+        get { return _indicatorLightningSprite; }
         private set {}
     }
 }
