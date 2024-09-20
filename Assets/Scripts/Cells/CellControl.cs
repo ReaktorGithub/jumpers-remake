@@ -89,6 +89,17 @@ public class CellControl : MonoBehaviour
         set { _currentTokens = value; }
     }
 
+    public List<PlayerControl> GetCurrentPlayers() {
+        List<PlayerControl> result = new();
+
+        foreach(GameObject obj in _currentTokens) {
+            TokenControl token = obj.GetComponent<TokenControl>();
+            result.Add(token.PlayerControl);
+        }
+
+        return result;
+    }
+
     public bool HasToken(GameObject tokenObject) {
         return _currentTokens.Contains(tokenObject);
     }

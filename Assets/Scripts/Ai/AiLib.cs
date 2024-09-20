@@ -265,4 +265,37 @@ public static class AiLib
         (BranchButton selectedBranch, _) = Utils.GetMostValuableElement(variants);
         return selectedBranch;
     }
+
+    public static bool GetMoneyboxDecision(PlayerControl player, MoneyboxVault vault) {
+        if (player.AiType == EAiTypes.Random) {
+            return Utils.GetRandomDecision();
+        }
+
+        if (vault.CurrentStep == 10) {
+            return true;
+        }
+        
+        int criticalGap;
+
+        switch(player.AiType) {
+            case EAiTypes.Risky: {
+                criticalGap = 16;
+                break;
+            }
+            case EAiTypes.Careful: {
+                criticalGap = 5;
+                break;
+            }
+            default: {
+                criticalGap = 10;
+                break;
+            }
+        }
+
+        if (vault.CurrentStep > 4 && vault.CurrentStep < 10) {
+            criticalGap += 3;
+        }
+
+        return !player.AmIBehingMyRivals(criticalGap);
+    }
 }

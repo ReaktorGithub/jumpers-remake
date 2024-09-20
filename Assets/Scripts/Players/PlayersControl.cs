@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayersControl : MonoBehaviour
@@ -273,5 +271,53 @@ public class PlayersControl : MonoBehaviour
         System.Random random = new();
         int index = random.Next(0, players.Count);
         return players[index];
+    }
+
+    
+    // Вернёт ближайшего игрока, который ходит следующим после текущего.
+    // Допустим, текущий игрок ходит 2-м.
+    // Получен список претендентов, которые ходят 1-м и 4-м.
+    // Результат - игрок, который ходит 4-м.
+
+    public PlayerControl GetNearestPlayerByMoveOrder(PlayerControl initialPlayer, List<PlayerControl> pretenders) {
+        if (pretenders.Count == 0) {
+            return null;
+        }
+
+        if (pretenders.Count == 1) {
+            return pretenders[0];
+        }
+
+        List<PlayerControl> array = new() {
+            initialPlayer,
+        };
+
+        foreach(PlayerControl player in pretenders) {
+            array.Add(player);
+        }
+
+        array.Sort((a, b) => a.MoveOrder - b.MoveOrder);
+
+        PlayerControl result = null;
+        bool getNext = false;
+        int index = 0;
+        int maxIndex = array.Count - 1;
+
+        do {
+            if (getNext) {
+                result = array[index];
+            } else {
+                if (array[index].MoveOrder == initialPlayer.MoveOrder) {
+                    getNext = true;
+                }
+                if (index == maxIndex) {
+                    index = 0;
+                } else {
+                    index++;
+                }
+            }
+        } while (result == null);
+
+        return result;
     }
 }

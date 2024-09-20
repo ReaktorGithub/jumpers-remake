@@ -5239,6 +5239,7 @@ GameObject:
   - component: {fileID: 209808289}
   - component: {fileID: 209808292}
   - component: {fileID: 209808293}
+  - component: {fileID: 209808294}
   - component: {fileID: 209808281}
   - component: {fileID: 209808290}
   - component: {fileID: 209808287}
@@ -5485,6 +5486,23 @@ MonoBehaviour:
   _payCostText: {fileID: 9881519}
   _fightCost: 3
   _clickDelay: 0.5
+--- !u!114 &209808294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 209808276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5c4ad30987f9d74faa544565a8757e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _powerRow: {fileID: 2007348950}
+  _coinsRow: {fileID: 1939984004}
+  _rubiesRow: {fileID: 1458869235}
+  _coinsBonusText: {fileID: 20491870}
+  _clockDelay: 0.5
 --- !u!1 &213087342
 GameObject:
   m_ObjectHideFlags: 0
@@ -12298,6 +12316,11 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &480751201 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8187169300494355662, guid: 1c20fc19b2215cd4f9241ca22ede8ddf, type: 3}
+  m_PrefabInstance: {fileID: 4482650262236367636}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &482894587
 GameObject:
   m_ObjectHideFlags: 0
@@ -24758,7 +24781,7 @@ PrefabInstance:
     - target: {fileID: 7917971435729288403, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: nextCell
       value: 
-      objectReference: {fileID: 317371281}
+      objectReference: {fileID: 246290313}
     - target: {fileID: 7917971435729288403, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: previousCell
       value: 
@@ -27227,7 +27250,7 @@ PrefabInstance:
     - target: {fileID: 7917971435729288403, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: nextCell
       value: 
-      objectReference: {fileID: 317371281}
+      objectReference: {fileID: 1511722565}
     - target: {fileID: 7917971435729288403, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: previousCell
       value: 
@@ -34676,11 +34699,11 @@ PrefabInstance:
     - target: {fileID: 3232457311835161768, guid: 77a2573791b309b4aaff4944645d6835, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 209808292}
+      objectReference: {fileID: 209808294}
     - target: {fileID: 3232457311835161768, guid: 77a2573791b309b4aaff4944645d6835, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 209808292}
+      objectReference: {fileID: 209808294}
     - target: {fileID: 3232457311835161768, guid: 77a2573791b309b4aaff4944645d6835, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -34695,15 +34718,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3232457311835161768, guid: 77a2573791b309b4aaff4944645d6835, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: EnableBranchButtons
+      value: OnLeaveMoneybox
       objectReference: {fileID: 0}
     - target: {fileID: 3232457311835161768, guid: 77a2573791b309b4aaff4944645d6835, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: ModalHedgehogArrow, Assembly-CSharp
+      value: ModalMoneybox, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3232457311835161768, guid: 77a2573791b309b4aaff4944645d6835, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
-      value: ModalHedgehogArrow, Assembly-CSharp
+      value: ModalMoneybox, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3232457311835161768, guid: 77a2573791b309b4aaff4944645d6835, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -35306,7 +35329,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 689a9e6843d04664d90a94060e2ad650, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxFeedCount: 1
+  _maxFeedCount: 3
   _hedgehogBranches:
   - {fileID: 735324963}
   _finishCells:
@@ -35758,6 +35781,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5639945292148811126, guid: 87d630d70ce78ac42a2713ab996d10bb, type: 3}
   m_PrefabInstance: {fileID: 1429915662}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1429915666 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5982776885352339938, guid: 87d630d70ce78ac42a2713ab996d10bb, type: 3}
+  m_PrefabInstance: {fileID: 1429915662}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429915664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1430211053
 GameObject:
   m_ObjectHideFlags: 0
@@ -36296,30 +36330,54 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 209808292}
+      objectReference: {fileID: 209808294}
+    - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 209808294}
     - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnConfirm
+      value: CloseWindow
+      objectReference: {fileID: 0}
+    - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: OnSkipMove
       objectReference: {fileID: 0}
     - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: ModalHedgehogArrow, Assembly-CSharp
+      value: ModalMoneybox, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: ModalMoneybox, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 1036093857523551892, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 2709331268403883606, guid: 6a6e643c7ce5bd24296a326cfe6768a3, type: 3}
@@ -39225,6 +39283,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: c1
       objectReference: {fileID: 0}
+    - target: {fileID: 1158541994727111406, guid: babd95848a46f5f43aab4f75c51185b7, type: 3}
+      propertyPath: _moneyboxVault
+      value: 
+      objectReference: {fileID: 480751201}
     - target: {fileID: 2464060740468901326, guid: babd95848a46f5f43aab4f75c51185b7, type: 3}
       propertyPath: m_LocalPosition.x
       value: -50.88
@@ -39265,6 +39327,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5477336701222047924, guid: babd95848a46f5f43aab4f75c51185b7, type: 3}
+      propertyPath: nextCell
+      value: 
+      objectReference: {fileID: 249760081}
+    - target: {fileID: 5477336701222047924, guid: babd95848a46f5f43aab4f75c51185b7, type: 3}
+      propertyPath: previousCell
+      value: 
+      objectReference: {fileID: 51064632}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -49132,7 +49202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdd8dbdf823c08469f9821f5fb89dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _arrowSpline: {fileID: 1429915664}
+  _arrowSpline: {fileID: 1429915666}
   _arrowToCell: {fileID: 408557072}
   _isForward: 1
 --- !u!1001 &2016337957

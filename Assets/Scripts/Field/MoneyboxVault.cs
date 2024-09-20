@@ -4,8 +4,9 @@ using UnityEngine;
 public class MoneyboxVault : MonoBehaviour
 {
     private List<MoneyboxStep> _stepScripts = new();
-    private int _currentStep = 0;
-    private bool _isOver = false;
+    [SerializeField] private int _currentStep = 0;
+    [SerializeField] private bool _isOver = false;
+    [SerializeField] private PlayerControl _occupiedPlayer;
 
     private void Awake() {
         Transform[] children = GetComponentsInChildren<Transform>();
@@ -18,6 +19,21 @@ public class MoneyboxVault : MonoBehaviour
 
     private void Start() {
         UpdateSelection();
+    }
+
+    public int CurrentStep {
+        get { return _currentStep; }
+        private set {}
+    }
+
+    public bool IsOver {
+        get { return _isOver; }
+        private set {}
+    }
+
+    public PlayerControl OccupiedPlayer {
+        get { return _occupiedPlayer; }
+        set { _occupiedPlayer = value; }
     }
 
     public void UpdateSelection() {
@@ -51,5 +67,32 @@ public class MoneyboxVault : MonoBehaviour
         }
 
         return (0, 0, 1);
+    }
+
+    public void PutPlayerToVault(PlayerControl player) {
+        _occupiedPlayer = player;
+        if (player != null) {
+            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " попадает в " + Utils.Wrap("копилку", UIColors.Green);
+            Messages.Instance.AddMessage(message);
+        }
+    }
+
+    // собрать всех игроков на клетке, исключая текущего
+    // свитчить игроков в порядке хода, начиная с текущего
+    // назначить первого попавшегося игрока как текущего
+    // если таких игроков нет, то _occupiedPlayer = null
+
+    public void ReassignPlayers() {
+        List<PlayerControl> pretenders = new();
+        List<PlayerControl> allPlayers = _occupiedPlayer.GetCurrentCell().GetCurrentPlayers();
+
+        foreach(PlayerControl player in allPlayers) {
+            if (player.MoveOrder != _occupiedPlayer.MoveOrder) {
+                pretenders.Add(player);
+            }
+        }
+
+        PlayerControl newPlayer = PlayersControl.Instance.GetNearestPlayerByMoveOrder(_occupiedPlayer, pretenders);
+        PutPlayerToVault(newPlayer);
     }
 }

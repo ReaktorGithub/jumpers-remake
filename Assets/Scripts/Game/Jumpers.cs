@@ -44,4 +44,11 @@ public class Jumpers : MonoBehaviour
     //         _arrowBody.SetActive(false);
     //     }
     // }
+
+    // private void Update() {
+    //     if (Input.GetKeyUp(KeyCode.G)) {
+    //         float result = MoveControl.Instance.CurrentPlayer.GetOtherPlayersMeanGap();
+    //         Debug.Log(result);
+    //     }
+    // }
 }

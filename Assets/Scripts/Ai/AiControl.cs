@@ -112,4 +112,23 @@ public class AiControl : MonoBehaviour
             }
         }));
     }
+
+    /*
+        Учесть:
+        - отставание от других игроков
+        - содержимое копилки
+        - тип ai
+    */
+
+    public void AiMoneybox(PlayerControl player, MoneyboxVault vault) {
+        bool execute = AiLib.GetMoneyboxDecision(player, vault);
+
+        StartCoroutine(ImitateThinking(player, () => {
+            if (execute) {
+                player.ExecuteMoneybox(vault);
+            } else {
+                player.LeaveMoneybox(vault);
+            }
+        }));
+    }
 }

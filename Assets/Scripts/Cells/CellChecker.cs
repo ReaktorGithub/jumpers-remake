@@ -9,6 +9,7 @@ public class CellChecker : MonoBehaviour
     private PopupAttack _popupAttack;
     [SerializeField] private List<ECellTypes> _skipRivalCheckTypes = new();
     private ModalReplaceEffect _modalReplace;
+    private ModalMoneybox _modalMoneybox;
 
     private void Awake() {
         Instance = this;
@@ -16,6 +17,7 @@ public class CellChecker : MonoBehaviour
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _popupAttack = GameObject.Find("GameScripts").GetComponent<PopupAttack>();
         _modalReplace = GameObject.Find("GameScripts").GetComponent<ModalReplaceEffect>();
+        _modalMoneybox = GameObject.Find("GameScripts").GetComponent<ModalMoneybox>();
     }
 
     public bool CheckBranch(PlayerControl player) {
@@ -163,6 +165,10 @@ public class CellChecker : MonoBehaviour
             return;
         }
 
+        if (cell.CellType == ECellTypes.Moneybox) {
+            CheckMoneyboxAfterMove(player);
+        }
+
         CheckCellArrows(player);
     }
 
@@ -230,5 +236,52 @@ public class CellChecker : MonoBehaviour
         // закончить ход, если нет соперников
 
         StartCoroutine(MoveControl.Instance.EndMoveDefer());
+    }
+
+    public bool CheckMoneyboxBeforeMove(PlayerControl player) {
+        CellControl cell = player.GetCurrentCell();
+
+        if (cell.CellType != ECellTypes.Moneybox) {
+            return true;
+        }
+        
+        MoneyboxVault vault = cell.GetComponent<MoneyboxCell>().MoneyboxVault;
+
+        if (vault.IsOver) {
+            return true;
+        }
+
+        if (vault.OccupiedPlayer.MoveOrder == player.MoveOrder) {
+            if (player.IsMe()) {
+                _modalMoneybox.BuildContent(player);
+                _modalMoneybox.OpenWindow();
+            }
+
+            if (player.IsAi()) {
+                AiControl.Instance.AiMoneybox(player, vault);
+            }
+            
+            return false;
+        }
+
+        return true;
+    }
+
+    private void CheckMoneyboxAfterMove(PlayerControl player) {
+        CellControl cell = player.GetCurrentCell();
+
+        if (cell.CellType != ECellTypes.Moneybox) {
+            return;
+        }
+
+        MoneyboxVault vault = cell.GetComponent<MoneyboxCell>().MoneyboxVault;
+
+        if (vault.IsOver) {
+            return;
+        }
+
+        if (vault.OccupiedPlayer == null) {
+            vault.PutPlayerToVault(player);
+        }
     }
 }

@@ -134,7 +134,7 @@ public class PopupAttack : MonoBehaviour
     }
 
     public void SetSelectedPlayer(PlayerControl player) {
-        if (_selectedPlayer == player) {
+        if (_selectedPlayer.MoveOrder == player.MoveOrder) {
             _selectedPlayer = null;
             _tokenName.text = "";
             UpdatePlayerSelection();
@@ -148,7 +148,7 @@ public class PopupAttack : MonoBehaviour
 
     private void UpdatePlayerSelection() {
         foreach(TokenAttackButton button in _tokenAttackButtons) {
-            button.SetSelected(button.Player == _selectedPlayer);
+            button.SetSelected(button.Player.MoveOrder == _selectedPlayer.MoveOrder);
         }
         UpdateAttackButtonStatus();
     }
