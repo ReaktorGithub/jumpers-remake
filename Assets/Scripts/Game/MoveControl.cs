@@ -152,7 +152,16 @@ public class MoveControl : MonoBehaviour
             BoostersControl.Instance.UpdateBoostersFromPlayer(_currentPlayer);
         }
 
-        // проверка текущего игрока на пропуск хода
+        // проверка на копилку
+        bool check = CellChecker.Instance.CheckMoneyboxBeforeMove(_currentPlayer);
+        if (!check) {
+            return;
+        }
+
+        CheckMoveSkipAndPreparePlayer();
+    }
+
+    public void CheckMoveSkipAndPreparePlayer() {
         if (_currentPlayer.MovesSkip == 0) {
             _currentPlayer.AddMovesToDo(1);
             PreparePlayerForMove();
@@ -161,7 +170,7 @@ public class MoveControl : MonoBehaviour
         }
     }
 
-    private void PreparePlayerForMove() {
+    public void PreparePlayerForMove() {
         string cubicMessage;
         switch (_currentPlayer.Type) {
             case EPlayerTypes.Me: {

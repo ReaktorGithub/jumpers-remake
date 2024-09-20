@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -64,7 +65,7 @@ public class CellsControl : MonoBehaviour
     // cellTypesToFind - список типов клеток, которые мы ищем
     // Возвращает клетку и дистанцию до нее
 
-    public (GameObject, int) FindNearestCell(GameObject startCell, bool isForward, List<ECellTypes> cellTypesToFind) {
+    public (GameObject, int) FindNearestCell(GameObject startCell, bool isForward, Func<CellControl, bool> predicate) {
         GameObject result = null;
         List<GameObject> forAnalyseList = new() { startCell };
         List<GameObject> tempList = new();
@@ -77,7 +78,7 @@ public class CellsControl : MonoBehaviour
                 GameObject cell = forAnalyseList[i];
                 CellControl cellControl = cell.GetComponent<CellControl>();
 
-                if (cellTypesToFind.Contains(cellControl.CellType)) {
+                if (predicate(cellControl)) {
                     stop = true;
                     result = cell;
                     break;
@@ -105,7 +106,6 @@ public class CellsControl : MonoBehaviour
                     }
                     if (nextCell == null) {
                         stop = true;
-                        Debug.Log("Target cell by type not found");
                     } else {
                         tempList.Add(nextCell);
                     }
@@ -353,9 +353,31 @@ public class CellsControl : MonoBehaviour
     // Возвращает количество шагов до финиша - ближайший маршрут
 
     public int GetStepsToFinish(GameObject currentCell) {
-        List<ECellTypes> findCells = new() { ECellTypes.Finish };
-        (GameObject _, int distance) = FindNearestCell(currentCell, true, findCells);
+        (GameObject _, int distance) = FindNearestCell(currentCell, true, IsFinishPredicate);
         return distance;
+    }
+
+    private bool IsFinishPredicate(CellControl cell) {
+        return cell.CellType == ECellTypes.Finish;
+    }
+
+    // Возвращает расстояние между двумя клетками
+    // Если клетка находится позади, то возвращает отрицательное число
+
+    public int GetCellsGap(CellControl cell1, CellControl cell2) {
+        (GameObject, int) resultForward = FindNearestCell(cell1.gameObject, true, (CellControl cell) => {
+            return cell2.gameObject == cell.gameObject;
+        });
+
+        if (resultForward.Item1 != null) {
+            return resultForward.Item2;
+        }
+
+        (GameObject, int) resultBackward = FindNearestCell(cell1.gameObject, false, (CellControl cell) => {
+            return cell2.gameObject == cell.gameObject;
+        });
+
+        return -resultBackward.Item2;
     }
 
     // Подсказки для магнита

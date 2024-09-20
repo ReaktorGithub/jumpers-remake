@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -655,6 +656,34 @@ public class PlayerControl : MonoBehaviour
         CheckIsPlayerOutOfPower(this);
     }
 
+    public void ExecuteMoneybox(MoneyboxVault vault) {
+        (int, int, int) bonus = vault.GetBonus();
+        AddPower(bonus.Item1);
+        AddCoins(bonus.Item2);
+        AddRubies(bonus.Item3);
+        PlayersControl.Instance.UpdatePlayersInfo();
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " забрал бонус из " + Utils.Wrap("копилки", UIColors.Green);
+        Messages.Instance.AddMessage(message);
+        _movesSkip++;
+
+        MoveControl.Instance.CheckMoveSkipAndPreparePlayer();
+
+        vault.SetNextStep();
+
+        if (vault.IsOver) {
+            string vaultMessage = Utils.Wrap("Копилка", UIColors.Green) + " исчерпана";
+            Messages.Instance.AddMessage(vaultMessage);
+        }
+    }
+
+    public void LeaveMoneybox(MoneyboxVault vault) {
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " покидает " + Utils.Wrap("копилку", UIColors.Green);
+        Messages.Instance.AddMessage(message);
+        MoveControl.Instance.PreparePlayerForMove();
+
+        vault.ReassignPlayers();
+    }
+
     // Исполнение щитов
 
     public void SpendArmor() {
@@ -786,5 +815,33 @@ public class PlayerControl : MonoBehaviour
         } else {
             callback1?.Invoke();
         }
+    }
+
+    // Вычислить среднее отставание от других игроков (в шагах)
+    // Если число положительное, то есть отставание
+
+    public float GetOtherPlayersMeanGap() {
+        CellControl myCell = GetCurrentCell();
+        int myStepsToFinish = CellsControl.Instance.GetStepsToFinish(myCell.gameObject);
+
+        int otherPlayersCount = 0;
+
+        int totalSteps = myStepsToFinish;
+
+        foreach(PlayerControl player in PlayersControl.Instance.Players) {
+            if (player.MoveOrder != _moveOrder && !player.IsFinished) {
+                GameObject cell = player.GetCurrentCell().gameObject;
+                int steps = CellsControl.Instance.GetStepsToFinish(cell);
+                otherPlayersCount++;
+                totalSteps += steps;
+            }
+        }
+
+        float average = totalSteps / (otherPlayersCount + 1);
+        return myStepsToFinish - average;
+    }
+
+    public bool AmIBehingMyRivals(int criticalSteps = 10) {
+        return GetOtherPlayersMeanGap() > criticalSteps;
     }
 }

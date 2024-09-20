@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &7683207007362854539
+--- !u!1001 &2441269463280626791
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -10,11 +10,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 275629510173075881, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -33.141872
       objectReference: {fileID: 0}
     - target: {fileID: 275629510173075881, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -25.146946
       objectReference: {fileID: 0}
     - target: {fileID: 275629510173075881, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_LocalPosition.z
@@ -50,15 +50,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2324068203896962674, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_Name
-      value: Finish Variant
+      value: Moneybox Variant
       objectReference: {fileID: 0}
     - target: {fileID: 2656521992059027252, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 273dd76fe7cd26242aa6f6d6d215edc0, type: 3}
+      objectReference: {fileID: 21300000, guid: c7552eb7547b3fa408b94b3b6941a2b0, type: 3}
     - target: {fileID: 7917971435729288403, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       propertyPath: cellType
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -67,22 +67,22 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 2324068203896962674, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3605137250217316127}
+      addedObject: {fileID: 1158541994727111406}
   m_SourcePrefab: {fileID: 100100000, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
---- !u!1 &5395457107252826361 stripped
+--- !u!1 &117548872831029781 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2324068203896962674, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
-  m_PrefabInstance: {fileID: 7683207007362854539}
+  m_PrefabInstance: {fileID: 2441269463280626791}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3605137250217316127
+--- !u!114 &1158541994727111406
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5395457107252826361}
+  m_GameObject: {fileID: 117548872831029781}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 045c1068b50f7804c887fe0b15241fbb, type: 3}
+  m_Script: {fileID: 11500000, guid: 61c4f2392b9f8c745a10f0d062b8e412, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
