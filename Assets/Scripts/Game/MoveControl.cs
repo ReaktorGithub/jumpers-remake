@@ -150,8 +150,6 @@ public class MoveControl : MonoBehaviour
             BoostersControl.Instance.UpdateBoostersFromPlayer(_currentPlayer);
         }
 
-        _currentPlayer.SpendLightning();
-
         // проверка на копилку
         bool check = CellChecker.Instance.CheckMoneyboxBeforeMove(_currentPlayer);
         if (!check) {
@@ -197,6 +195,9 @@ public class MoveControl : MonoBehaviour
         if (isNewMove) {
            _currentPlayer.IsEffectPlaced = false;
         }
+
+        // включение индикатора молнии на кубике
+        _currentPlayer.CheckLightningStartMove();
         
         bool isMe = _currentPlayer.IsMe();
         if (isMe) {
@@ -247,6 +248,7 @@ public class MoveControl : MonoBehaviour
     public void MakeMove(int score) {
         _isLassoMode = false;
         _currentPlayer.StepsLeft = score;
+        _currentPlayer.SpendLightning();
         CellControl cell = _currentPlayer.GetCurrentCell();
         cell.RemoveToken(_currentPlayer.TokenObject);
         cell.AlignTokens(_alignTime);
@@ -413,6 +415,7 @@ public class MoveControl : MonoBehaviour
         yield return new WaitForSeconds(_skipMoveDelay);
         TokenControl token = _currentPlayer.GetTokenControl();
         _currentPlayer.SkipMoveDecrease(token);
+        _currentPlayer.SpendLightning();
         EndMove();
     }
 
@@ -422,6 +425,10 @@ public class MoveControl : MonoBehaviour
         // Сброс параметров
 
         ResetParamsAfterMove();
+
+        // Проверка молнии
+
+        _currentPlayer.CheckLightningEndMove();
 
         // Проверка на окончание гонки
 
@@ -451,13 +458,6 @@ public class MoveControl : MonoBehaviour
             return;
         }
 
-        // Игрок продолжит тратить ходы в любом случае, поэтому активируем молнию
-        // Но только если это не ход лассо!
-
-        if (!_isLassoMode) {
-            _currentPlayer.SpendLightning();
-        }
-
         // Проверка на пропуск хода
 
         if (_currentPlayer.MovesSkip > 0) {
@@ -471,22 +471,7 @@ public class MoveControl : MonoBehaviour
 
     private void ResetParamsAfterMove() {
         CubicControl.Instance.ModifiersControl.HideModifierMagnet();
-        CubicControl.Instance.ModifiersControl.ShowModifierLightning(false);
         CellsControl.Instance.ResetCellMagnetHint();
-
-        // молния
-        
-        TokenControl token = _currentPlayer.GetTokenControl();
-        if (_currentPlayer.LightningMoves == 0) {
-            token.RemoveIndicator(ETokenIndicators.Lightning);
-        } else {
-            token.UpdateIndicator(ETokenIndicators.Lightning, _currentPlayer.LightningMoves.ToString());
-        }
-        if (_currentPlayer.ShowLightningOverMessage) {
-            string message = "У " + Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow) + " закончилась " + Utils.Wrap("молния", UIColors.Green);
-            Messages.Instance.AddMessage(message);
-            _currentPlayer.ShowLightningOverMessage = false;
-        }
     }
 
     public IEnumerator RaceOverDefer() {

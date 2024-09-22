@@ -17,7 +17,7 @@ public class PlayerControl : MonoBehaviour
     private int _movesToDo = 0; // сколько нужно сделать ходов с броском кубика
     private int _stepsLeft = 0; // сколько шагов фишкой осталось сделать
     [SerializeField] private int _lightningMoves = 0; // осталось ходов с молнией
-    private bool _showLightningOverMessage = false; // показать сообщение, что молния закончилась
+    [SerializeField] private bool _isLightning = false; // режим молнии
     [SerializeField] private int _armor = 0; // сколько ходов осталось со щитом (включая ходы соперников)
     [SerializeField] private bool _isIronArmor = false;
     [SerializeField] private BoosterButton _selectedShieldButton;
@@ -83,14 +83,9 @@ public class PlayerControl : MonoBehaviour
         set { _type = value; }
     }
 
-    public int LightningMoves {
-        get { return _lightningMoves; }
+    public bool IsLightning {
+        get { return _isLightning; }
         private set {}
-    }
-
-    public bool ShowLightningOverMessage {
-        get { return _showLightningOverMessage; }
-        set { _showLightningOverMessage = value; }
     }
 
     public bool IsMe() {
@@ -700,12 +695,53 @@ public class PlayerControl : MonoBehaviour
         vault.ReassignPlayers();
     }
 
+    // Молнии
+
+    // При попадании на клетку с молнией
+
     public void ExecuteLightning() {
-        _lightningMoves = 3;
+        _lightningMoves = 1;
+        _isLightning = true;
         TokenControl token = GetTokenControl();
         token.AddIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("молнию", UIColors.Green) + "! Очки на кубике x2";
         Messages.Instance.AddMessage(message);
+    }
+
+    // При подготовке игрока к ходу (в т.ч. дополнительному)
+
+    public void CheckLightningStartMove() {
+        if (_isLightning) {
+            CubicControl.Instance.ModifiersControl.ShowModifierLightning(true);
+        }
+    }
+
+    // Сразу после кидания кубика или пропуска хода
+
+    public void SpendLightning() {
+        if (_isLightning) {
+            _lightningMoves--;
+        }
+    }
+
+    // В конце хода
+
+    public void CheckLightningEndMove() {
+        CubicControl.Instance.ModifiersControl.ShowModifierLightning(false);
+
+        if (!_isLightning) {
+            return;
+        }
+
+        TokenControl token = GetTokenControl();
+        if (_lightningMoves == 0) {
+            token.RemoveIndicator(ETokenIndicators.Lightning);
+            string message = "У " + Utils.Wrap(PlayerName, UIColors.Yellow) + " закончилась " + Utils.Wrap("молния", UIColors.Green);
+            Messages.Instance.AddMessage(message);
+            _isLightning = false;
+        } else {
+            token.UpdateIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
+        }
     }
 
     // Трата щитов
@@ -753,18 +789,6 @@ public class PlayerControl : MonoBehaviour
             rival.AddCoins(coinBonus);
         }
         PlayersControl.Instance.UpdatePlayersInfo();
-    }
-
-    // Трата молнии
-
-    public void SpendLightning() {
-        if (_lightningMoves == 0) {
-            return;
-        }
-
-        _lightningMoves--;
-        _showLightningOverMessage = _lightningMoves == 0;
-        CubicControl.Instance.ModifiersControl.ShowModifierLightning(true);
     }
 
     // Разное

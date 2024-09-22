@@ -253,7 +253,7 @@ public class CellChecker : MonoBehaviour
             return true;
         }
 
-        if (vault.OccupiedPlayer.MoveOrder == player.MoveOrder) {
+        if (vault.OccupiedPlayer == player) {
             if (player.IsMe()) {
                 _modalMoneybox.BuildContent(player);
                 _modalMoneybox.OpenWindow();

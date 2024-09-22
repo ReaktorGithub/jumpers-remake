@@ -48,6 +48,12 @@ public class BranchButtonHedge : MonoBehaviour
     }
 
     public void ExecuteHedgehogChoice() {
+        _branchButton.ExecuteHedgehogChoice(_nextArrowSpline.GetComponent<SplineContainer>());
+
+        if (_taxCost == 0) {
+            return;
+        }
+
         int rest = _hedgehogsControl.MaxFeedCount - _branchHedgehog.FeedCount;
         string name = MoveControl.Instance.CurrentPlayer.PlayerName;
         string restText = "";
@@ -69,7 +75,5 @@ public class BranchButtonHedge : MonoBehaviour
         }
         string message = Utils.Wrap(name, UIColors.Yellow) + " кормит " + Utils.Wrap("ежа", UIColors.DarkGreen) + restText;
         Messages.Instance.AddMessage(message);
-
-        _branchButton.ExecuteHedgehogChoice(_nextArrowSpline.GetComponent<SplineContainer>());
     }
 }

@@ -9,13 +9,14 @@ using System.Collections.Generic;
 public class TokenControl : MonoBehaviour
 {
     private IEnumerator _coroutine, _squeezeCoroutine;
-    [SerializeField] private GameObject _currentCell, _playerName, _indicators, _aiThinking, _indicatorsList;
+    [SerializeField] private GameObject _currentCell, _playerName, _indicators, _aiThinking, _indicatorsList, _indicatorBg;
     private GameObject _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
     private PlayerControl _playerControl;
     private SortingGroup _sortingGroup;
     private bool _isSqueeze = false;
     private GameObject _pedestal;
     private SplineAnimate _splineAnimate;
+    private int _indicatorsCount = 0;
 
     private void Awake() {
         _squeezable = transform.Find("Squeezable").gameObject;
@@ -31,6 +32,7 @@ public class TokenControl : MonoBehaviour
         _sortingGroup = GetComponent<SortingGroup>();
         _pedestal = GameObject.Find("Pedestal");
         _splineAnimate = GetComponent<SplineAnimate>();
+        RemoveAllIndicators();
     }
 
     public GameObject CurrentCell {
@@ -271,9 +273,24 @@ public class TokenControl : MonoBehaviour
 
         foreach (TokenIndicator indicator in indicators) {
             if (indicator.Type == type) {
+                _indicatorsCount--;
                 Destroy(indicator.gameObject);
             }
         }
+
+        // если индикаторов не осталось, то убрать фон
+        _indicatorBg.SetActive(_indicatorsCount != 0);
+    }
+
+    public void RemoveAllIndicators() {
+        List<TokenIndicator> indicators = GetAllIndicators();
+
+        foreach (TokenIndicator indicator in indicators) {
+            Destroy(indicator.gameObject);
+        }
+
+        _indicatorsCount = 0;
+        _indicatorBg.SetActive(false);
     }
 
     public void AddIndicator(ETokenIndicators type, string text = "") {
@@ -297,6 +314,9 @@ public class TokenControl : MonoBehaviour
         }
 
         clone.SetActive(true);
+        clone.transform.localScale = new Vector3(1f,1f,1f);
+        _indicatorBg.SetActive(true);
+        _indicatorsCount++;
     }
 
     public void UpdateIndicator(ETokenIndicators type, string newText) {
