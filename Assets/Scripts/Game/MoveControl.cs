@@ -313,6 +313,11 @@ public class MoveControl : MonoBehaviour
         });
     }
 
+    public void BreakMovingAndConfirmNewPosition() {
+        _currentPlayer.StepsLeft = 0;
+        StartCoroutine(ConfirmNewPositionDefer());
+    }
+
     private IEnumerator ConfirmNewPositionDefer() {
         yield return new WaitForSeconds(_stepDelay);
         ConfirmNewPosition();

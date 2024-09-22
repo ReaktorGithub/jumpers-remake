@@ -121,7 +121,7 @@ public class PlayerControl : MonoBehaviour
 
     public bool IsReverseMove {
         get { return _isReverseMove; }
-        set {}
+        set { _isReverseMove = value; }
     }
 
     public GameObject TokenObject {
@@ -700,7 +700,7 @@ public class PlayerControl : MonoBehaviour
     // При попадании на клетку с молнией
 
     public void ExecuteLightning() {
-        _lightningMoves = 1;
+        _lightningMoves = 3;
         _isLightning = true;
         TokenControl token = GetTokenControl();
         token.AddIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());

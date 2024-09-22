@@ -25,15 +25,25 @@ public class CellChecker : MonoBehaviour
 
         if (cell.TryGetComponent(out BranchCell branchCell)) {
             BranchControl branch = branchCell.BranchControl;
-            if (branch.IsReverse != player.IsReverseMove) {
-                // Если направление движения фишки не соответствует направлению бранча, то скипаем
+
+            // Если фишка движется назад, а бранч не реверс, то у фишки надо сменить направление, затем активируем бранч
+            if (player.IsReverseMove && !branch.IsReverse) {
+                player.IsReverseMove = false;
+                ActivateBranch(player, branch, player.StepsLeft);
+                return false;
+            }
+
+            // Если направление фишки не соответствует направлению бранча, то скипаем
+            if (player.IsReverseMove != branch.IsReverse) {
                 return true;
             }
             
+            // Направление фишки соответствует направлению бранча
             ActivateBranch(player, branch, player.StepsLeft);
             return false;
         }
 
+        // Клетка не является бранчем, продолжаем движение
         return true;
     }
 
@@ -79,8 +89,13 @@ public class CellChecker : MonoBehaviour
             return false;
         }
 
-        if (cellType == ECellTypes.Start && player.IsReverseMove) {
-            _camera.ClearFollow();
+        if (cellType == ECellTypes.Start && player.IsReverseMove || cellType == ECellTypes.Wall && !player.IsReverseMove) {
+            player.IsReverseMove = !player.IsReverseMove;
+            MoveControl.Instance.BreakMovingAndConfirmNewPosition();
+            if (cellType == ECellTypes.Wall) {
+                string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " уткнулся носом в " + Utils.Wrap("стену", UIColors.Brick);
+                Messages.Instance.AddMessage(message);
+            }
             return false;
         }
 
