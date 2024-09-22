@@ -168,6 +168,18 @@ public class CellChecker : MonoBehaviour
             player.ExecuteStarEffect();
         }
 
+        if (cell.CellType == ECellTypes.Moneybox) {
+            CheckMoneyboxAfterMove(player);
+        }
+
+        if (cell.CellType == ECellTypes.Lightning) {
+            player.ExecuteLightning();
+        }
+
+        if (cell.CoinBonusValue != 0) {
+            player.ExecuteCoinBonus(cell.CoinBonusValue);
+        }
+
         if (cell.Effect == EControllableEffects.Black) {
             player.ExecuteBlackEffect();
             return;
@@ -176,14 +188,6 @@ public class CellChecker : MonoBehaviour
         if (cell.Effect == EControllableEffects.Red) {
             player.ExecuteRedEffect();
             return;
-        }
-
-        if (cell.CellType == ECellTypes.Moneybox) {
-            CheckMoneyboxAfterMove(player);
-        }
-
-        if (cell.CellType == ECellTypes.Lightning) {
-            player.ExecuteLightning();
         }
 
         CheckCellArrows(player);

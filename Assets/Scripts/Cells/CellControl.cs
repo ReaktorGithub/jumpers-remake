@@ -11,12 +11,14 @@ public class CellControl : MonoBehaviour
     [SerializeField] private GameObject previousCell;
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
+    [SerializeField] private int _coinBonusValue = 0;
+    private GameObject _coinBonusObject;
     private GameObject _container, _glow;
     private SpriteRenderer _spriteRenderer, _glowSpriteRenderer;
     private float[] _cellScale = new float[2];
     [SerializeField] private List<GameObject> _currentTokens = new();
     private bool _isEffectPlacementMode, _isLassoMode = false;
-    private TextMeshPro _text;
+    private TextMeshPro _text, _coinBonusText;
     private bool _isChanging = false;
     private IEnumerator _changingCoroutine;
     private Sprite _oldSprite, _newSprite;
@@ -43,11 +45,14 @@ public class CellControl : MonoBehaviour
         if (button != null) {
             _cursorManager = button.GetComponent<CursorManager>();
         }
+        _coinBonusObject = _container.transform.Find("CoinBonus").gameObject;
+        _coinBonusText = _coinBonusObject.transform.Find("CoinBonusText").GetComponent<TextMeshPro>();
     }
 
     private void Start() {
         SetCursorDisabled(true);
         UpdateAiScore();
+        UpdateCoinBonusView();
     }
 
     private void SetCursorDisabled(bool value) {
@@ -74,6 +79,14 @@ public class CellControl : MonoBehaviour
     public int AiScore {
         get { return _aiScore; }
         private set {}
+    }
+
+    public int CoinBonusValue {
+        get { return _coinBonusValue; }
+        set {
+            _coinBonusValue = value;
+            UpdateCoinBonusView();
+        }
     }
 
     public EControllableEffects Effect {
@@ -384,6 +397,18 @@ public class CellControl : MonoBehaviour
         if (effect == EControllableEffects.Star) points += 12;
         if (effect == EControllableEffects.Yellow) points -= 8;
 
+        if (_coinBonusValue > 90) {
+            _aiScore = 20;
+            return;
+        } else if (_coinBonusValue > 30) {
+            points += 5;
+        } else if (_coinBonusValue < -90) {
+            _aiScore = -20;
+            return;
+        } else if (_coinBonusValue < -30) {
+            points -= 5;
+        }
+
         bool isArrow = transform.TryGetComponent(out ArrowCell arrow);
         if (isArrow) {
             int add = arrow.IsForward ? 6 : -6;
@@ -391,5 +416,18 @@ public class CellControl : MonoBehaviour
         }
 
         _aiScore = points;
+    }
+
+    private void UpdateCoinBonusView() {
+        if (_coinBonusValue == 0) {
+            _coinBonusObject.SetActive(false);
+            return;
+        }
+
+        string text = _coinBonusValue > 0 ? "+" + _coinBonusValue : _coinBonusValue.ToString();
+        Color32 newColor = _coinBonusValue > 0 ? new Color32(3,74,0,255) : new Color32(180,6,0,255);
+        _coinBonusText.text = text;
+        _coinBonusText.color = newColor;
+        _coinBonusObject.SetActive(true);
     }
 }
