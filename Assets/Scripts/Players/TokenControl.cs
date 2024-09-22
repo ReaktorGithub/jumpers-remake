@@ -79,7 +79,7 @@ public class TokenControl : MonoBehaviour
             return;
         }
         CellControl cell = _currentCell.GetComponent<CellControl>();
-        GameObject nextCell = MoveControl.Instance.CurrentPlayer.IsReverseMove ? cell.PreviousCell : cell.NextCell;
+        GameObject nextCell = _playerControl.IsReverseMove ? cell.PreviousCell : cell.NextCell;
 
         if (nextCell == null) {
             Debug.Log("Next cell not specified");
