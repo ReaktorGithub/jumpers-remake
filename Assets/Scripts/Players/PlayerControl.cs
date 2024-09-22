@@ -671,7 +671,7 @@ public class PlayerControl : MonoBehaviour
         AddCoins(bonus.Item2);
         AddRubies(bonus.Item3);
         PlayersControl.Instance.UpdatePlayersInfo();
-        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " забрал бонус из " + Utils.Wrap("копилки", UIColors.Green);
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " забирает бонус из " + Utils.Wrap("копилки", UIColors.Green);
         Messages.Instance.AddMessage(message);
         _movesSkip++;
 
@@ -693,6 +693,14 @@ public class PlayerControl : MonoBehaviour
         MoveControl.Instance.PreparePlayerForMove();
         
         vault.ReassignPlayers();
+    }
+
+    public void ExecuteCoinBonus(int bonus) {
+        AddCoins(bonus);
+        PlayersControl.Instance.UpdatePlayersInfo();
+        string effectText = bonus > 0 ? Utils.Wrap("бонус", UIColors.Green) : Utils.Wrap("штраф", UIColors.Red);
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " получает " + effectText + " " + bonus + " монет";
+        Messages.Instance.AddMessage(message);
     }
 
     // Молнии
