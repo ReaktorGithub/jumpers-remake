@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -17,6 +16,8 @@ public class PlayerControl : MonoBehaviour
     private int _movesSkip = 0; // пропуски хода
     private int _movesToDo = 0; // сколько нужно сделать ходов с броском кубика
     private int _stepsLeft = 0; // сколько шагов фишкой осталось сделать
+    [SerializeField] private int _lightningMoves = 0; // осталось ходов с молнией
+    [SerializeField] private bool _isLightning = false; // режим молнии
     [SerializeField] private int _armor = 0; // сколько ходов осталось со щитом (включая ходы соперников)
     [SerializeField] private bool _isIronArmor = false;
     [SerializeField] private BoosterButton _selectedShieldButton;
@@ -80,6 +81,11 @@ public class PlayerControl : MonoBehaviour
     public EPlayerTypes Type {
         get { return _type; }
         set { _type = value; }
+    }
+
+    public bool IsLightning {
+        get { return _isLightning; }
+        private set {}
     }
 
     public bool IsMe() {
@@ -536,6 +542,9 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void ExecuteRedEffect() {
+        _movesToDo = 0;
+        _stepsLeft = 0;
+
         if (_armor > 0 && _isIronArmor) {
             OpenSavedByShieldModal(() => {
                 string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Возврат на чекпойнт";
@@ -679,12 +688,63 @@ public class PlayerControl : MonoBehaviour
     public void LeaveMoneybox(MoneyboxVault vault) {
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " покидает " + Utils.Wrap("копилку", UIColors.Green);
         Messages.Instance.AddMessage(message);
-        MoveControl.Instance.PreparePlayerForMove();
+        _movesToDo++;
 
+        MoveControl.Instance.PreparePlayerForMove();
+        
         vault.ReassignPlayers();
     }
 
-    // Исполнение щитов
+    // Молнии
+
+    // При попадании на клетку с молнией
+
+    public void ExecuteLightning() {
+        _lightningMoves = 1;
+        _isLightning = true;
+        TokenControl token = GetTokenControl();
+        token.AddIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("молнию", UIColors.Green) + "! Очки на кубике x2";
+        Messages.Instance.AddMessage(message);
+    }
+
+    // При подготовке игрока к ходу (в т.ч. дополнительному)
+
+    public void CheckLightningStartMove() {
+        if (_isLightning) {
+            CubicControl.Instance.ModifiersControl.ShowModifierLightning(true);
+        }
+    }
+
+    // Сразу после кидания кубика или пропуска хода
+
+    public void SpendLightning() {
+        if (_isLightning) {
+            _lightningMoves--;
+        }
+    }
+
+    // В конце хода
+
+    public void CheckLightningEndMove() {
+        CubicControl.Instance.ModifiersControl.ShowModifierLightning(false);
+
+        if (!_isLightning) {
+            return;
+        }
+
+        TokenControl token = GetTokenControl();
+        if (_lightningMoves == 0) {
+            token.RemoveIndicator(ETokenIndicators.Lightning);
+            string message = "У " + Utils.Wrap(PlayerName, UIColors.Yellow) + " закончилась " + Utils.Wrap("молния", UIColors.Green);
+            Messages.Instance.AddMessage(message);
+            _isLightning = false;
+        } else {
+            token.UpdateIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
+        }
+    }
+
+    // Трата щитов
 
     public void SpendArmor() {
         if (_armor == 0) {

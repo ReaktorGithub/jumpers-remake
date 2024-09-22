@@ -18,7 +18,6 @@ public class MoveControl : MonoBehaviour
     private ModalLose _modalLose;
     private CameraControl _camera;
     private TopPanel _topPanel;
-    private ModifiersControl _modifiersControl;
     private HedgehogsControl _hedgehogsControl;
     private bool _isLassoMode = false;
     private bool _isViolateMode = false; // в этом режиме текущий игрок является жертвой волшебного пинка или пылесоса
@@ -31,7 +30,6 @@ public class MoveControl : MonoBehaviour
         _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
-        _modifiersControl = GameObject.Find("Modifiers").GetComponent<ModifiersControl>();
         _hedgehogsControl = GameObject.Find("LevelScripts").GetComponent<HedgehogsControl>();
     }
 
@@ -192,11 +190,14 @@ public class MoveControl : MonoBehaviour
         }
         CubicControl.Instance.WriteStatus(cubicMessage);
 
-        // возможность применять эффекты должна восстанавливаться только если это новый ход, а не продолжение текущего хода
+        // возможность применять эффекты должна восстанавливаться только если это новый ход, а не возвращение хода после лассо / пылесоса и т.д
         bool isNewMove = !_isLassoMode;
         if (isNewMove) {
            _currentPlayer.IsEffectPlaced = false;
         }
+
+        // включение индикатора молнии на кубике
+        _currentPlayer.CheckLightningStartMove();
         
         bool isMe = _currentPlayer.IsMe();
         if (isMe) {
@@ -247,6 +248,7 @@ public class MoveControl : MonoBehaviour
     public void MakeMove(int score) {
         _isLassoMode = false;
         _currentPlayer.StepsLeft = score;
+        _currentPlayer.SpendLightning();
         CellControl cell = _currentPlayer.GetCurrentCell();
         cell.RemoveToken(_currentPlayer.TokenObject);
         cell.AlignTokens(_alignTime);
@@ -413,17 +415,22 @@ public class MoveControl : MonoBehaviour
         yield return new WaitForSeconds(_skipMoveDelay);
         TokenControl token = _currentPlayer.GetTokenControl();
         _currentPlayer.SkipMoveDecrease(token);
+        _currentPlayer.SpendLightning();
         EndMove();
     }
 
     public void EndMove() {
         // CellsControl.Instance.ShowTokensAtCells();
 
-        // сброс параметров
-        _modifiersControl.HideModifierMagnet();
-        CellsControl.Instance.ResetCellMagnetHint();
+        // Сброс параметров
 
-        // проверка на окончание гонки
+        ResetParamsAfterMove();
+
+        // Проверка молнии
+
+        _currentPlayer.CheckLightningEndMove();
+
+        // Проверка на окончание гонки
 
         bool isRaceOver = IsRaceOver();
 
@@ -434,14 +441,14 @@ public class MoveControl : MonoBehaviour
             return;
         }
 
-        // текущий игрок мог финишировать во время хода - проверить
+        // Текущий игрок мог финишировать во время хода - проверить
 
         if (_currentPlayer.IsFinished) {
             SetNextPlayerIndex();
             return;
         }
 
-        // проверка на бонусные ходы
+        // Проверка на бонусные ходы
 
         _currentPlayer.AddMovesToDo(-1);
 
@@ -451,15 +458,20 @@ public class MoveControl : MonoBehaviour
             return;
         }
 
-        // проверка на пропуск хода
+        // Проверка на пропуск хода
 
         if (_currentPlayer.MovesSkip > 0) {
             StartCoroutine(SkipMoveDefer());
             return;
         }
 
-        // текущий игрок продолжает ходить
+        // Текущий игрок продолжает ходить
         PreparePlayerForMove();
+    }
+
+    private void ResetParamsAfterMove() {
+        CubicControl.Instance.ModifiersControl.HideModifierMagnet();
+        CellsControl.Instance.ResetCellMagnetHint();
     }
 
     public IEnumerator RaceOverDefer() {

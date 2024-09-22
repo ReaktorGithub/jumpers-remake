@@ -4,17 +4,19 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using TMPro;
 using UnityEngine.Splines;
+using System.Collections.Generic;
 
 public class TokenControl : MonoBehaviour
 {
     private IEnumerator _coroutine, _squeezeCoroutine;
-    [SerializeField] private GameObject _currentCell, _playerName, _indicators, _aiThinking;
+    [SerializeField] private GameObject _currentCell, _playerName, _indicators, _aiThinking, _indicatorsList, _indicatorBg;
     private GameObject _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
     private PlayerControl _playerControl;
     private SortingGroup _sortingGroup;
     private bool _isSqueeze = false;
     private GameObject _pedestal;
     private SplineAnimate _splineAnimate;
+    private int _indicatorsCount = 0;
 
     private void Awake() {
         _squeezable = transform.Find("Squeezable").gameObject;
@@ -30,6 +32,7 @@ public class TokenControl : MonoBehaviour
         _sortingGroup = GetComponent<SortingGroup>();
         _pedestal = GameObject.Find("Pedestal");
         _splineAnimate = GetComponent<SplineAnimate>();
+        RemoveAllIndicators();
     }
 
     public GameObject CurrentCell {
@@ -246,5 +249,83 @@ public class TokenControl : MonoBehaviour
         transform.SetLocalPositionAndRotation(_currentCell.transform.localPosition, Quaternion.Euler(new Vector3(0,0,0)));
         DisableIndicators(false);
         MoveControl.Instance.ConfirmNewPosition();
+    }
+
+    // Индикаторы
+
+    private List<TokenIndicator> GetAllIndicators() {
+        List<TokenIndicator> result = new();
+
+        Transform[] children = _indicatorsList.GetComponentsInChildren<Transform>();
+
+        foreach (Transform child in children) {
+            if (child.CompareTag("TokenIndicator")) {
+                TokenIndicator control = child.gameObject.GetComponent<TokenIndicator>();
+                result.Add(control);
+            }
+        }
+
+        return result;
+    }
+
+    public void RemoveIndicator(ETokenIndicators type) {
+        List<TokenIndicator> indicators = GetAllIndicators();
+
+        foreach (TokenIndicator indicator in indicators) {
+            if (indicator.Type == type) {
+                _indicatorsCount--;
+                Destroy(indicator.gameObject);
+            }
+        }
+
+        // если индикаторов не осталось, то убрать фон
+        _indicatorBg.SetActive(_indicatorsCount != 0);
+    }
+
+    public void RemoveAllIndicators() {
+        List<TokenIndicator> indicators = GetAllIndicators();
+
+        foreach (TokenIndicator indicator in indicators) {
+            Destroy(indicator.gameObject);
+        }
+
+        _indicatorsCount = 0;
+        _indicatorBg.SetActive(false);
+    }
+
+    public void AddIndicator(ETokenIndicators type, string text = "") {
+        GameObject clone = Instantiate(TokensControl.Instance.TokenIndicatorSample);
+        clone.transform.SetParent(_indicatorsList.transform);
+        TokenIndicator indicator = clone.GetComponent<TokenIndicator>();
+        indicator.UpdateLinks();
+        indicator.Type = type;
+        indicator.SetText(TokensControl.Instance.IndicatorWidthSmall, TokensControl.Instance.IndicatorWidthDefault, text);
+
+        switch(type) {
+            case ETokenIndicators.Lightning: {
+                indicator.SetSprite(TokensControl.Instance.IndicatorLightningSprite);
+                indicator.SetTextColor(new Color32(49,255,34,255));
+                break;
+            }
+            default: {
+                indicator.SetSprite(null);
+                break;
+            }
+        }
+
+        clone.SetActive(true);
+        clone.transform.localScale = new Vector3(1f,1f,1f);
+        _indicatorBg.SetActive(true);
+        _indicatorsCount++;
+    }
+
+    public void UpdateIndicator(ETokenIndicators type, string newText) {
+        List<TokenIndicator> indicators = GetAllIndicators();
+
+        foreach (TokenIndicator indicator in indicators) {
+            if (indicator.Type == type) {
+                indicator.SetText(TokensControl.Instance.IndicatorWidthSmall, TokensControl.Instance.IndicatorWidthDefault, newText);
+            }
+        }
     }
 }

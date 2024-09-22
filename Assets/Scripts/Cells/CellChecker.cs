@@ -159,14 +159,16 @@ public class CellChecker : MonoBehaviour
         }
 
         if (cell.Effect == EControllableEffects.Red) {
-            player.MovesToDo = 0;
-            player.StepsLeft = 0;
             player.ExecuteRedEffect();
             return;
         }
 
         if (cell.CellType == ECellTypes.Moneybox) {
             CheckMoneyboxAfterMove(player);
+        }
+
+        if (cell.CellType == ECellTypes.Lightning) {
+            player.ExecuteLightning();
         }
 
         CheckCellArrows(player);
@@ -251,7 +253,7 @@ public class CellChecker : MonoBehaviour
             return true;
         }
 
-        if (vault.OccupiedPlayer.MoveOrder == player.MoveOrder) {
+        if (vault.OccupiedPlayer == player) {
             if (player.IsMe()) {
                 _modalMoneybox.BuildContent(player);
                 _modalMoneybox.OpenWindow();

@@ -307,7 +307,7 @@ public class PlayersControl : MonoBehaviour
             if (getNext) {
                 result = array[index];
             } else {
-                if (array[index].MoveOrder == initialPlayer.MoveOrder) {
+                if (array[index] == initialPlayer) {
                     getNext = true;
                 }
                 if (index == maxIndex) {

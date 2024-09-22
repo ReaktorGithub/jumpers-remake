@@ -3,10 +3,11 @@ using UnityEngine.UI;
 
 public class ModifiersControl : MonoBehaviour
 {
-    [SerializeField] private GameObject _modifierMagnet;
+    [SerializeField] private GameObject _modifierMagnet, _modifierLightning;
 
     private void Awake() {
         HideModifierMagnet();
+        ShowModifierLightning(false);
     }
 
     public void ShowModifierMagnet(bool isSuper) {
@@ -23,5 +24,9 @@ public class ModifiersControl : MonoBehaviour
 
     public void HideModifierMagnet() {
         _modifierMagnet.SetActive(false);
+    }
+
+    public void ShowModifierLightning(bool value) {
+        _modifierLightning.SetActive(value);
     }
 }

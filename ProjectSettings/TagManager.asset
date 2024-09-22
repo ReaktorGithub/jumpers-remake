@@ -12,6 +12,7 @@ TagManager:
   - boosterButton
   - BranchButton
   - MoneyboxStep
+  - TokenIndicator
   layers:
   - Default
   - TransparentFX
