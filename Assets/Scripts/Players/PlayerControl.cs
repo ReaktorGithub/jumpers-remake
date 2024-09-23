@@ -356,6 +356,8 @@ public class PlayerControl : MonoBehaviour
 
     public void AddCoins(int value) {
         _coins += value;
+        TokenControl token = GetTokenControl();
+        token.AddBonusEventToQueue(value);
     }
 
     public void AddPower(int value) {
