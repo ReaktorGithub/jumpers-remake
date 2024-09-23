@@ -9,7 +9,9 @@ using System.Collections.Generic;
 public class TokenControl : MonoBehaviour
 {
     private IEnumerator _coroutine, _squeezeCoroutine;
-    [SerializeField] private GameObject _currentCell, _playerName, _indicators, _aiThinking, _indicatorsList, _indicatorBg;
+    [SerializeField] private GameObject _currentCell, _playerName, _indicators, _aiThinking, _indicatorsList, _indicatorBg, _bonusEventsList;
+    [SerializeField] private float _bonushFlashTime = 3f;
+    [SerializeField] private float _nextBonusTime = 1.5f;
     private GameObject _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
     private PlayerControl _playerControl;
     private SortingGroup _sortingGroup;
@@ -17,6 +19,8 @@ public class TokenControl : MonoBehaviour
     private GameObject _pedestal;
     private SplineAnimate _splineAnimate;
     private int _indicatorsCount = 0;
+    private List<int> _bonusQueue = new();
+    private bool _isProcessingQueue = false;
 
     private void Awake() {
         _squeezable = transform.Find("Squeezable").gameObject;
@@ -327,5 +331,55 @@ public class TokenControl : MonoBehaviour
                 indicator.SetText(TokensControl.Instance.IndicatorWidthSmall, TokensControl.Instance.IndicatorWidthDefault, newText);
             }
         }
+    }
+
+    // Событие появления бонуса
+
+    public void AddBonusEventToQueue(int bonus) {
+        if (!transform.gameObject.activeInHierarchy || !_indicators.activeInHierarchy) {
+            return;
+        }
+
+        _bonusQueue.Add(bonus);
+
+        if (!_isProcessingQueue) {
+            StartCoroutine(StartBonusQueue());
+        }
+    }
+
+    private IEnumerator StartBonusQueue() {
+        _isProcessingQueue = true;
+
+        while (_bonusQueue.Count > 0) {
+            FlashBonusEvent(_bonusQueue[0]);
+            _bonusQueue.RemoveAt(0);
+            yield return new WaitForSeconds(_nextBonusTime);
+        }
+
+        _isProcessingQueue = false; // Завершаем обработку очереди
+    }
+
+    private void FlashBonusEvent(int bonus) {
+        GameObject clone = Instantiate(TokensControl.Instance.BonusEventSample);
+        clone.transform.SetParent(_bonusEventsList.transform);
+        clone.transform.localScale = new Vector3(1f,1f,1f);
+
+        TextMeshPro text = clone.transform.Find("Text (TMP)").GetComponent<TextMeshPro>();
+        (string, Color32) values = Utils.GetTextWithSymbolAndColor(bonus);
+        text.text = values.Item1;
+        text.color = values.Item2;
+
+        Animator animator = clone.GetComponent<Animator>();
+        clone.SetActive(true);
+        animator.SetBool("isFlash", true);
+        
+        StartCoroutine(DestroyBonusEventDefer(clone));
+    }
+
+    private IEnumerator DestroyBonusEventDefer(GameObject bonusObj) {
+        yield return new WaitForSeconds(_bonushFlashTime);
+        Animator animator = bonusObj.GetComponent<Animator>();
+        animator.SetBool("isFlash", false);
+        Destroy(bonusObj);
     }
 }

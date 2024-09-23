@@ -12,7 +12,7 @@ public class TokensControl : MonoBehaviour
     [SerializeField] private float _indicatorWidthDefault = 3.4f;
     [SerializeField] private float _indicatorWidthSmall = 2f;
     private GameObject _tokenIndicatorSample;
-    [SerializeField] GameObject _indicatorLightningObject;
+    [SerializeField] GameObject _indicatorLightningObject, _bonusEventSample;
     private Sprite _indicatorLightningSprite;
 
     private void Awake() {
@@ -63,6 +63,11 @@ public class TokensControl : MonoBehaviour
 
     public GameObject TokenIndicatorSample {
         get { return _tokenIndicatorSample; }
+        private set {}
+    }
+
+    public GameObject BonusEventSample {
+        get { return _bonusEventSample; }
         private set {}
     }
 

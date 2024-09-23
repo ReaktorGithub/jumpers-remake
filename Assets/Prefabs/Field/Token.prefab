@@ -306,6 +306,9 @@ MonoBehaviour:
   _aiThinking: {fileID: 1146540809508368421}
   _indicatorsList: {fileID: 8249493644703612553}
   _indicatorBg: {fileID: 2319332044737301654}
+  _bonusEventsList: {fileID: 3690122233229078926}
+  _bonushFlashTime: 3
+  _nextBonusTime: 1.5
 --- !u!210 &9155227978669411130
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -509,6 +512,50 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &3690122233229078926
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2254469151920892934}
+  - component: {fileID: 6041723846672614906}
+  m_Layer: 0
+  m_Name: BonusEvents
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2254469151920892934
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3690122233229078926}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.34, y: 0.71, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7673273082078924259}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!210 &6041723846672614906
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3690122233229078926}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 30
+  m_SortAtRoot: 0
 --- !u!1 &3894266050681863224
 GameObject:
   m_ObjectHideFlags: 0
@@ -848,6 +895,7 @@ Transform:
   - {fileID: 8132889905743751313}
   - {fileID: 2896938852977655276}
   - {fileID: 7567353262103491019}
+  - {fileID: 2254469151920892934}
   m_Father: {fileID: 3081057535012890092}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7891503711408244657

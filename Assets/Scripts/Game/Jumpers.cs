@@ -28,6 +28,7 @@ public class Jumpers : MonoBehaviour
         Instances.transform.Find("vampire").gameObject.SetActive(false);
         Instances.transform.Find("BoosterButtonPick").gameObject.SetActive(false);
         Instances.transform.Find("TokenIndicator").gameObject.SetActive(false);
+        Instances.transform.Find("TokenBonusEvent").gameObject.SetActive(false);
         Instances.transform.Find("lightning").gameObject.SetActive(false);
     }
 
@@ -48,15 +49,8 @@ public class Jumpers : MonoBehaviour
     // }
 
     // private void Update() {
-    //     if (Input.GetKeyUp(KeyCode.G)) {
-    //         float result = MoveControl.Instance.CurrentPlayer.GetOtherPlayersMeanGap();
-    //         Debug.Log(result);
-    //     }
-    // }
-
-    // private void Update() {
-    //     if (Input.GetKeyUp(KeyCode.L)) {
-    //         MoveControl.Instance.CurrentPlayer.ExecuteLightning();
+    //     if (Input.GetKeyUp(KeyCode.B)) {
+    //         MoveControl.Instance.CurrentPlayer.GetTokenControl().AddBonusEventToQueue(-30);
     //     }
     // }
 }

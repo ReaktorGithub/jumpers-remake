@@ -424,10 +424,9 @@ public class CellControl : MonoBehaviour
             return;
         }
 
-        string text = _coinBonusValue > 0 ? "+" + _coinBonusValue : _coinBonusValue.ToString();
-        Color32 newColor = _coinBonusValue > 0 ? new Color32(3,74,0,255) : new Color32(180,6,0,255);
-        _coinBonusText.text = text;
-        _coinBonusText.color = newColor;
+        (string, Color32) values = Utils.GetTextWithSymbolAndColor(_coinBonusValue);
+        _coinBonusText.text = values.Item1;
+        _coinBonusText.color = values.Item2;
         _coinBonusObject.SetActive(true);
     }
 }

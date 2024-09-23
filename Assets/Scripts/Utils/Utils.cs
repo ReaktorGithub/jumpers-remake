@@ -122,4 +122,13 @@ public static class Utils
         int index = random.Next(0, sourceList.Count);
         return sourceList[index];
     }
+
+    // Если число положительное, то добавляет +
+    // Положительные числа окрашивает в зеленый, а отрицательные в красный
+
+    public static (string, Color32) GetTextWithSymbolAndColor(int number) {
+        string text = number > 0 ? "+" + number : number.ToString();
+        Color32 color = number > 0 ? new Color32(3,74,0,255) : new Color32(180,6,0,255);
+        return (text, color);
+    }
 }
