@@ -172,38 +172,38 @@ public class EffectsControl : MonoBehaviour
 
     public void OnChangeEffect(CellControl cell) {
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
-        player.IsEffectPlaced = true;
+        player.Effects.IsEffectPlaced = true;
         Sprite sprite;
         string effectName = "";
 
         switch(_selectedEffect) {
             case EControllableEffects.Green: {
                 sprite = _greenCellSprite.GetComponent<SpriteRenderer>().sprite;
-                player.AddEffectGreen(-1);
+                player.Effects.AddGreen(-1);
                 effectName = "зеленый";
                 break;
             }
             case EControllableEffects.Red: {
                 sprite = _redCellSprite.GetComponent<SpriteRenderer>().sprite;
-                player.AddEffectRed(-1);
+                player.Effects.AddRed(-1);
                 effectName = "красный";
                 break;
             }
             case EControllableEffects.Yellow: {
                 sprite = _yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
-                player.AddEffectYellow(-1);
+                player.Effects.AddYellow(-1);
                 effectName = "желтый";
                 break;
             }
             case EControllableEffects.Black: {
                 sprite = _blackCellSprite.GetComponent<SpriteRenderer>().sprite;
-                player.AddEffectBlack(-1);
+                player.Effects.AddBlack(-1);
                 effectName = "черный";
                 break;
             }
             case EControllableEffects.Star: {
                 sprite = _starCellSprite.GetComponent<SpriteRenderer>().sprite;
-                player.AddEffectStar(-1);
+                player.Effects.AddStar(-1);
                 effectName = "звезда";
                 break;
             }
@@ -226,19 +226,19 @@ public class EffectsControl : MonoBehaviour
     }
 
     public void UpdateEffectEmptiness(PlayerControl player) {
-        _greenEffectButton.SetIsEmpty(player.EffectsGreen == 0);
-        _yellowEffectButton.SetIsEmpty(player.EffectsYellow == 0);
-        _redEffectButton.SetIsEmpty(player.EffectsRed == 0);
-        _blackEffectButton.SetIsEmpty(player.EffectsBlack == 0);
-        _starEffectButton.SetIsEmpty(player.EffectsStar == 0);
+        _greenEffectButton.SetIsEmpty(player.Effects.Green == 0);
+        _yellowEffectButton.SetIsEmpty(player.Effects.Yellow == 0);
+        _redEffectButton.SetIsEmpty(player.Effects.Red == 0);
+        _blackEffectButton.SetIsEmpty(player.Effects.Black == 0);
+        _starEffectButton.SetIsEmpty(player.Effects.Star == 0);
     }
 
     public void UpdateQuantityText(PlayerControl player) {
-        _greenQuantityText.text = "x " + player.EffectsGreen;
-        _yellowQuantityText.text = "x " + player.EffectsYellow;
-        _redQuantityText.text = "x " + player.EffectsRed;
-        _blackQuantityText.text = "x " + player.EffectsBlack;
-        _starQuantityText.text = "x " + player.EffectsStar;
+        _greenQuantityText.text = "x " + player.Effects.Green;
+        _yellowQuantityText.text = "x " + player.Effects.Yellow;
+        _redQuantityText.text = "x " + player.Effects.Red;
+        _blackQuantityText.text = "x " + player.Effects.Black;
+        _starQuantityText.text = "x " + player.Effects.Star;
     }
 
     public void DisableAllButtons(bool value) {
@@ -250,7 +250,7 @@ public class EffectsControl : MonoBehaviour
     // Кнопки эффектов энейблятся, только если игрок их еще не использовал
 
     public void TryToEnableAllEffectButtons() {
-        if (!MoveControl.Instance.CurrentPlayer.IsEffectPlaced) {
+        if (!MoveControl.Instance.CurrentPlayer.Effects.IsEffectPlaced) {
             DisableAllButtons(false);
         }
     }
@@ -263,7 +263,7 @@ public class EffectsControl : MonoBehaviour
         // изменить ресурсы игрока
 
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
-        player.ExecuteReplaceEffect(_selectedEffect);
+        player.Effects.ExecuteReplaceEffect(_selectedEffect);
         UpdateQuantityText(player);
         UpdateEffectEmptiness(player);
 

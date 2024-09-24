@@ -5795,6 +5795,14 @@ MonoBehaviour:
   - {fileID: 729651957}
   - {fileID: 626430700}
   - {fileID: 2057066688}
+  _maxMagnets: 3
+  _maxSuperMagnets: 3
+  _maxMagnetsTotal: 3
+  _maxLasso: 3
+  _maxShields: 3
+  _maxShieldsIron: 3
+  _maxShieldsTotal: 3
+  _maxVampires: 1
 --- !u!1 &213828017 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2549705245395199976, guid: 87d630d70ce78ac42a2713ab996d10bb, type: 3}
@@ -7836,6 +7844,8 @@ GameObject:
   m_Component:
   - component: {fileID: 312397160}
   - component: {fileID: 312397161}
+  - component: {fileID: 312397162}
+  - component: {fileID: 312397163}
   m_Layer: 0
   m_Name: player_4
   m_TagString: Untagged
@@ -7876,27 +7886,51 @@ MonoBehaviour:
   _tokenObject: {fileID: 0}
   _moveOrder: 0
   _isReverseMove: 0
-  _lightningMoves: 0
-  _isLightning: 0
-  _armor: 0
-  _isIronArmor: 0
-  _selectedShieldButton: {fileID: 0}
   _coins: 400
   _mallows: 0
   _rubies: 0
   _power: 0
-  _effectsGreen: 0
-  _effectsYellow: 0
-  _effectsBlack: 0
-  _effectsRed: 0
-  _effectsStar: 0
-  _boosterMagnet: 0
-  _boosterSuperMagnet: 3
-  _boosterLasso: 1
-  _boosterShield: 0
-  _boosterShieldIron: 3
-  _boosterVampire: 1
   _cubicMaxScore: 6
+--- !u!114 &312397162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 312397159}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 634b3dc8fd0a3784b8a3d23f75810712, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _green: 0
+  _yellow: 0
+  _black: 0
+  _red: 0
+  _star: 0
+  _lightningMoves: 0
+  _isLightning: 0
+--- !u!114 &312397163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 312397159}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1ec307e4623d92489209a3f1f2b403f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _magnet: 2
+  _superMagnet: 0
+  _lasso: 1
+  _shield: 2
+  _shieldIron: 1
+  _vampire: 0
+  _armor: 0
+  _isIronArmor: 0
+  _selectedShieldButton: {fileID: 0}
 --- !u!1 &316243182
 GameObject:
   m_ObjectHideFlags: 0
@@ -15340,6 +15374,8 @@ GameObject:
   m_Component:
   - component: {fileID: 576735062}
   - component: {fileID: 576735063}
+  - component: {fileID: 576735064}
+  - component: {fileID: 576735065}
   m_Layer: 0
   m_Name: player_3
   m_TagString: Untagged
@@ -15380,27 +15416,51 @@ MonoBehaviour:
   _tokenObject: {fileID: 0}
   _moveOrder: 0
   _isReverseMove: 0
-  _lightningMoves: 0
-  _isLightning: 0
-  _armor: 0
-  _isIronArmor: 0
-  _selectedShieldButton: {fileID: 0}
   _coins: 600
   _mallows: 0
   _rubies: 0
   _power: 5
-  _effectsGreen: 0
-  _effectsYellow: 0
-  _effectsBlack: 0
-  _effectsRed: 0
-  _effectsStar: 0
-  _boosterMagnet: 1
-  _boosterSuperMagnet: 2
-  _boosterLasso: 3
-  _boosterShield: 2
-  _boosterShieldIron: 1
-  _boosterVampire: 0
   _cubicMaxScore: 6
+--- !u!114 &576735064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 576735061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 634b3dc8fd0a3784b8a3d23f75810712, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _green: 0
+  _yellow: 0
+  _black: 0
+  _red: 0
+  _star: 0
+  _lightningMoves: 0
+  _isLightning: 0
+--- !u!114 &576735065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 576735061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1ec307e4623d92489209a3f1f2b403f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _magnet: 0
+  _superMagnet: 3
+  _lasso: 1
+  _shield: 0
+  _shieldIron: 3
+  _vampire: 1
+  _armor: 0
+  _isIronArmor: 0
+  _selectedShieldButton: {fileID: 0}
 --- !u!1 &577475579
 GameObject:
   m_ObjectHideFlags: 0
@@ -17430,6 +17490,8 @@ GameObject:
   m_Component:
   - component: {fileID: 668012812}
   - component: {fileID: 668012813}
+  - component: {fileID: 668012814}
+  - component: {fileID: 668012815}
   m_Layer: 0
   m_Name: player_2
   m_TagString: Untagged
@@ -17470,27 +17532,51 @@ MonoBehaviour:
   _tokenObject: {fileID: 0}
   _moveOrder: 0
   _isReverseMove: 0
-  _lightningMoves: 0
-  _isLightning: 0
-  _armor: 0
-  _isIronArmor: 0
-  _selectedShieldButton: {fileID: 0}
   _coins: 400
   _mallows: 0
   _rubies: 1
   _power: 4
-  _effectsGreen: 0
-  _effectsYellow: 0
-  _effectsBlack: 0
-  _effectsRed: 0
-  _effectsStar: 0
-  _boosterMagnet: 0
-  _boosterSuperMagnet: 1
-  _boosterLasso: 0
-  _boosterShield: 1
-  _boosterShieldIron: 0
-  _boosterVampire: 1
   _cubicMaxScore: 6
+--- !u!114 &668012814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 668012811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 634b3dc8fd0a3784b8a3d23f75810712, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _green: 0
+  _yellow: 0
+  _black: 0
+  _red: 0
+  _star: 0
+  _lightningMoves: 0
+  _isLightning: 0
+--- !u!114 &668012815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 668012811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1ec307e4623d92489209a3f1f2b403f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _magnet: 1
+  _superMagnet: 0
+  _lasso: 2
+  _shield: 3
+  _shieldIron: 0
+  _vampire: 1
+  _armor: 0
+  _isIronArmor: 0
+  _selectedShieldButton: {fileID: 0}
 --- !u!1 &670553072 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2324068203896962674, guid: f31e597c831fd3d418d19519efebc8f0, type: 3}
@@ -20255,6 +20341,8 @@ GameObject:
   m_Component:
   - component: {fileID: 751539031}
   - component: {fileID: 751539032}
+  - component: {fileID: 751539033}
+  - component: {fileID: 751539034}
   m_Layer: 0
   m_Name: player_1
   m_TagString: Untagged
@@ -20295,27 +20383,51 @@ MonoBehaviour:
   _tokenObject: {fileID: 0}
   _moveOrder: 0
   _isReverseMove: 0
-  _lightningMoves: 0
-  _isLightning: 0
-  _armor: 0
-  _isIronArmor: 0
-  _selectedShieldButton: {fileID: 0}
   _coins: 400
   _mallows: 0
   _rubies: 0
   _power: 1
-  _effectsGreen: 0
-  _effectsYellow: 0
-  _effectsBlack: 0
-  _effectsRed: 0
-  _effectsStar: 0
-  _boosterMagnet: 2
-  _boosterSuperMagnet: 1
-  _boosterLasso: 2
-  _boosterShield: 2
-  _boosterShieldIron: 1
-  _boosterVampire: 1
   _cubicMaxScore: 6
+--- !u!114 &751539033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 751539030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 634b3dc8fd0a3784b8a3d23f75810712, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _green: 0
+  _yellow: 0
+  _black: 0
+  _red: 0
+  _star: 0
+  _lightningMoves: 0
+  _isLightning: 0
+--- !u!114 &751539034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 751539030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1ec307e4623d92489209a3f1f2b403f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _magnet: 2
+  _superMagnet: 1
+  _lasso: 3
+  _shield: 2
+  _shieldIron: 1
+  _vampire: 1
+  _armor: 0
+  _isIronArmor: 0
+  _selectedShieldButton: {fileID: 0}
 --- !u!1 &760382438
 GameObject:
   m_ObjectHideFlags: 0

@@ -66,12 +66,12 @@ public class ModalHedgehogFinish : MonoBehaviour
         yield return new WaitForSeconds(_clickDelay);
         int cost = _levelData.PrizeCoins[3];
         _finishCell.AddCoinsCollected(cost);
-        _currentPlayer.ExecuteHedgehogFinishPay(cost);
+        _currentPlayer.Effects.ExecuteHedgehogFinishPay(cost);
     }
 
     private IEnumerator OnFightDefer() {
         yield return new WaitForSeconds(_clickDelay);
-        _currentPlayer.ExecuteHedgehogFinishFight();
+        _currentPlayer.Effects.ExecuteHedgehogFinishFight();
         _finishCell.BoostersCollected.Clear();
         _finishCell.CoinsCollected = 0;
         _finishCell.IsHedgehog = false;

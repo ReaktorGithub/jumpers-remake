@@ -53,4 +53,23 @@ public class Jumpers : MonoBehaviour
     //         MoveControl.Instance.CurrentPlayer.GetTokenControl().AddBonusEventToQueue(-30);
     //     }
     // }
+
+    private void Update() {
+        if (Input.GetKeyUp(KeyCode.Z)) {
+            MoveControl.Instance.CurrentPlayer.Boosters.AddMagnets(1);
+            BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+        }
+        if (Input.GetKeyUp(KeyCode.X)) {
+            MoveControl.Instance.CurrentPlayer.Boosters.AddMagnetsSuper(1);
+            BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+        }
+        if (Input.GetKeyUp(KeyCode.C)) {
+            MoveControl.Instance.CurrentPlayer.Boosters.AddShield(1);
+            BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+        }
+        if (Input.GetKeyUp(KeyCode.V)) {
+            MoveControl.Instance.CurrentPlayer.Boosters.AddShieldIron(1);
+            BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+        }
+    }
 }

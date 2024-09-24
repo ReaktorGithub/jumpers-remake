@@ -85,7 +85,7 @@ public class CellChecker : MonoBehaviour
                    return false; 
                 }
             }
-            player.ExecuteFinish();
+            player.Effects.ExecuteFinish();
             return false;
         }
 
@@ -127,7 +127,7 @@ public class CellChecker : MonoBehaviour
     public void CheckCellCharacter(PlayerControl player) {
         CellControl cell = player.GetCurrentCell();
         
-        if (cell.IsNegativeEffect() && player.IsEnoughEffects(cell.Effect)) {
+        if (cell.IsNegativeEffect() && player.Effects.IsEnoughEffects(cell.Effect)) {
             if (player.IsAi()) {
                 // todo научить принимать решения
                 CheckCellEffects(player);
@@ -165,7 +165,7 @@ public class CellChecker : MonoBehaviour
         }
 
         if (cell.Effect == EControllableEffects.Star) {
-            player.ExecuteStarEffect();
+            player.Effects.ExecuteStar();
         }
 
         if (cell.CellType == ECellTypes.Moneybox) {
@@ -173,20 +173,20 @@ public class CellChecker : MonoBehaviour
         }
 
         if (cell.CellType == ECellTypes.Lightning) {
-            player.ExecuteLightning();
+            player.Effects.ExecuteLightning();
         }
 
         if (cell.CoinBonusValue != 0) {
-            player.ExecuteCoinBonus(cell.CoinBonusValue);
+            player.Effects.ExecuteCoinBonus(cell.CoinBonusValue);
         }
 
         if (cell.Effect == EControllableEffects.Black) {
-            player.ExecuteBlackEffect();
+            player.Effects.ExecuteBlack();
             return;
         }
 
         if (cell.Effect == EControllableEffects.Red) {
-            player.ExecuteRedEffect();
+            player.Effects.ExecuteRed();
             return;
         }
 
@@ -231,7 +231,7 @@ public class CellChecker : MonoBehaviour
             foreach(PlayerControl playerForCheck in PlayersControl.Instance.Players) {
                 if (tokens.Contains(playerForCheck.TokenObject) && player.TokenObject != playerForCheck.TokenObject) {
                     rivals.Add(playerForCheck);
-                    if (playerForCheck.Armor > 0) {
+                    if (playerForCheck.Boosters.Armor > 0) {
                         rivalsWithShields.Add(playerForCheck);
                     } else {
                         rivalsUnprotected.Add(playerForCheck);
@@ -240,7 +240,7 @@ public class CellChecker : MonoBehaviour
             }
 
             if (rivalsWithShields.Count > 0) {
-                player.HarvestShieldBonus(rivalsWithShields);
+                player.Boosters.HarvestShieldBonus(rivalsWithShields);
             }
 
             if (rivalsUnprotected.Count > 0) {

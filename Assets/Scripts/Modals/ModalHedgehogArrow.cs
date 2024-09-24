@@ -76,12 +76,12 @@ public class ModalHedgehogArrow : MonoBehaviour
 
         _conditionDescription.text = "Выберите " + insertText + " вы готовы отдать ёжику-налоговику.";
 
-        _initialList.Add((EBoosters.Lasso, currentPlayer.BoosterLasso));
-        _initialList.Add((EBoosters.Magnet, currentPlayer.BoosterMagnet));
-        _initialList.Add((EBoosters.MagnetSuper, currentPlayer.BoosterSuperMagnet));
-        _initialList.Add((EBoosters.Shield, currentPlayer.BoosterShield));
-        _initialList.Add((EBoosters.ShieldIron, currentPlayer.BoosterShieldIron));
-        _initialList.Add((EBoosters.Vampire, currentPlayer.BoosterVampire));
+        _initialList.Add((EBoosters.Lasso, currentPlayer.Boosters.Lasso));
+        _initialList.Add((EBoosters.Magnet, currentPlayer.Boosters.Magnet));
+        _initialList.Add((EBoosters.MagnetSuper, currentPlayer.Boosters.SuperMagnet));
+        _initialList.Add((EBoosters.Shield, currentPlayer.Boosters.Shield));
+        _initialList.Add((EBoosters.ShieldIron, currentPlayer.Boosters.ShieldIron));
+        _initialList.Add((EBoosters.Vampire, currentPlayer.Boosters.Vampire));
 
         UpdateInitialList();
         UpdateSelectedList();
@@ -184,7 +184,7 @@ public class ModalHedgehogArrow : MonoBehaviour
 
     public void OnConfirm() {
         CloseWindow();
-        MoveControl.Instance.CurrentPlayer.ExecuteHedgehogArrow(_selectedList);
+        MoveControl.Instance.CurrentPlayer.Effects.ExecuteHedgehogArrow(_selectedList);
         BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
         _branchButtonHedge.BranchHedgehog.AddBoostersCollected(_selectedList);
         _branchButtonHedge.BranchHedgehog.IncreaseFeedCount();

@@ -89,7 +89,7 @@ public class CubicControl : MonoBehaviour
             score = random.Next(1, max);
         }
         int multiplier = 1;
-        if (MoveControl.Instance.CurrentPlayer.IsLightning) {
+        if (MoveControl.Instance.CurrentPlayer.Effects.IsLightning) {
             multiplier = 2;
         }
         _finalScore = score * multiplier;

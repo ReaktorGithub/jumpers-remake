@@ -92,7 +92,7 @@ public static class AiLib
     */
 
     public static (PlayerControl, int) GetAttackVampirePoints(PlayerControl player, List<PlayerControl> rivals) {
-        if (player.BoosterVampire < 1) {
+        if (player.Boosters.Vampire < 1) {
             return (null, _exclude);
         }
 
@@ -192,7 +192,7 @@ public static class AiLib
 
         int hedgehogTax = branchButton.GetHedgehogTax();
         if (hedgehogTax > 0) {
-            int totalBoosters = player.CollectAllRegularBoosters().Count;
+            int totalBoosters = player.Boosters.CollectAllRegularBoosters().Count;
             if (totalBoosters < hedgehogTax) return _exclude;
             if (totalBoosters == hedgehogTax) points -= 15;
             if (totalBoosters - hedgehogTax == 1) points += 5;

@@ -65,7 +65,7 @@ public class PopupAttack : MonoBehaviour
 
         // раздел с атаками
 
-        if (currentPlayer.BoosterVampire > 0) {
+        if (currentPlayer.Boosters.Vampire > 0) {
             currentPlayer.AddAvailableAttackType(EAttackTypes.Vampire);
         } else {
             currentPlayer.RemoveAvailableAttackType(EAttackTypes.Vampire);
@@ -102,9 +102,9 @@ public class PopupAttack : MonoBehaviour
                     Button buttonComponent = button.gameObject.GetComponent<Button>();
                     buttonComponent.onClick.RemoveAllListeners();
 
-                    if (rival.Armor > 0) {
+                    if (rival.Boosters.Armor > 0) {
                         TokenControl token = rival.GetTokenControl();
-                        Sprite sprite = rival.IsIronArmor ? token.GetArmorIronSprite() : token.GetArmorSprite();
+                        Sprite sprite = rival.Boosters.IsIronArmor ? token.GetArmorIronSprite() : token.GetArmorSprite();
                         button.SetShieldImage(sprite);
                         button.DisableShieldImage(false);
                         button.SetDisabled(true);

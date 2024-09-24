@@ -102,6 +102,6 @@ public class ModalReplaceEffect : MonoBehaviour
 
         // Информация о наличии щита
         bool isPowerDangerEffect = effect == EControllableEffects.Black || effect == EControllableEffects.Red;
-        _shieldInfo.SetActive(isPowerDangerEffect && currentPlayer.Armor > 0 && currentPlayer.IsIronArmor);
+        _shieldInfo.SetActive(isPowerDangerEffect && currentPlayer.Boosters.Armor > 0 && currentPlayer.Boosters.IsIronArmor);
     }
 }

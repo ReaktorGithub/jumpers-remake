@@ -59,11 +59,11 @@ public class ModalMoneybox : MonoBehaviour
 
     private IEnumerator OnLeaveMoneyboxDefer() {
         yield return new WaitForSeconds(_clockDelay);
-        _currentPlayer.LeaveMoneybox(_moneyboxVault);
+        _currentPlayer.Effects.LeaveMoneybox(_moneyboxVault);
     }
 
     private IEnumerator OnSkipMoveDefer() {
         yield return new WaitForSeconds(_clockDelay);
-        _currentPlayer.ExecuteMoneybox(_moneyboxVault);
+        _currentPlayer.Effects.ExecuteMoneybox(_moneyboxVault);
     }
 }
