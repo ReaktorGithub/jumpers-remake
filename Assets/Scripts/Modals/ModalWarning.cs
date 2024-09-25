@@ -5,38 +5,21 @@ using UnityEngine;
 
 public class ModalWarning : MonoBehaviour
 {
-    private GameObject _modal;
-    private ModalWindow _windowControl;
-    private TextMeshProUGUI _headingText, _bodyText;
-    private IEnumerator _coroutine;
+    private Modal _modal;
+    [SerializeField] private TextMeshProUGUI _headingText, _bodyText;
     private Action _callback;
     [SerializeField] private float _waitAfterClose = 0.4f;
 
     private void Awake() {
-        _modal = GameObject.Find("ModalWarning");
-        _windowControl = _modal.transform.Find("WindowWarning").GetComponent<ModalWindow>();
-        _headingText = Utils.FindChildByName(_modal, "HeadingText").GetComponent<TextMeshProUGUI>();
-        _bodyText = Utils.FindChildByName(_modal, "BodyText").GetComponent<TextMeshProUGUI>();
+        _modal = GameObject.Find("ModalWarning").GetComponent<Modal>();
     }
 
-    private void Start() {
-        _modal.SetActive(false);
+    public void OpenModal() {
+        _modal.OpenModal();
     }
 
-    public void OpenWindow() {
-        if (!_modal.activeInHierarchy) {
-            _modal.SetActive(true);
-            _coroutine = _windowControl.FadeIn();
-            StartCoroutine(_coroutine);
-        }
-    }
-
-    public void CloseWindow() {
-        if (_coroutine != null) {
-            StopCoroutine(_coroutine);
-        }
-        _modal.SetActive(false);
-        _windowControl.ResetScale();
+    public void CloseModal() {
+        _modal.CloseModal();
         StartCoroutine(CallbackDefer());
     }
 

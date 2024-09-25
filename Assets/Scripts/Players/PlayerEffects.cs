@@ -21,7 +21,7 @@ public class PlayerEffects : MonoBehaviour
 
     private void Awake() {
         _player = GetComponent<PlayerControl>();
-        _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
+        _modalWin = GameObject.Find("ModalScripts").GetComponent<ModalWin>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
     }
@@ -151,7 +151,7 @@ public class PlayerEffects : MonoBehaviour
 
     public void ExecuteFinish() {
         if (_player.IsMe()) {
-            _modalWin.OpenWindow();
+            _modalWin.OpenModal();
         }
         _player.IsFinished = true;
         int place = _pedestal.SetPlayerToMaxPlace(_player);

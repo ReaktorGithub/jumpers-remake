@@ -25,9 +25,9 @@ public class MoveControl : MonoBehaviour
 
     private void Awake() {
         Instance = this;
-        _modalResults = GameObject.Find("ModalResults").GetComponent<ModalResults>();
-        _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
-        _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
+        _modalResults = GameObject.Find("ModalScripts").GetComponent<ModalResults>();
+        _modalWin = GameObject.Find("ModalScripts").GetComponent<ModalWin>();
+        _modalLose = GameObject.Find("ModalScripts").GetComponent<ModalLose>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
         _hedgehogsControl = GameObject.Find("LevelScripts").GetComponent<HedgehogsControl>();
@@ -486,16 +486,17 @@ public class MoveControl : MonoBehaviour
     public void RaceOver() {
         PlayersControl.Instance.GiveResourcesAfterRace();
         CloseAllOptionalModals();
-        _modalResults.OpenWindow(PlayersControl.Instance.Players);
+        _modalResults.BuildContent(PlayersControl.Instance.Players);
+        _modalResults.OpenModal();
     }
 
     public void CloseAllOptionalModals() {
         if (_modalLose.gameObject.activeInHierarchy) {
-            _modalLose.CloseWindow();
+            _modalLose.CloseModal();
         }
 
         if (_modalWin.gameObject.activeInHierarchy) {
-            _modalWin.CloseWindow();
+            _modalWin.CloseModal();
         }
     }
 

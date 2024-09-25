@@ -41,8 +41,8 @@ public class PlayerControl : MonoBehaviour
         _availableAttackTypes.Add(EAttackTypes.Usual);
         _availableAttackTypes.Add(EAttackTypes.MagicKick);
         _availableAttackTypes.Add(EAttackTypes.Knockout);
-        _modalWarning = GameObject.Find("GameScripts").GetComponent<ModalWarning>();
-        _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
+        _modalWarning = GameObject.Find("ModalScripts").GetComponent<ModalWarning>();
+        _modalLose = GameObject.Find("ModalScripts").GetComponent<ModalLose>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
         _effects = GetComponent<PlayerEffects>();
         _boosters = GetComponent<PlayerBoosters>();
@@ -321,26 +321,26 @@ public class PlayerControl : MonoBehaviour
         _modalWarning.SetHeadingText("Предупреждение");
         _modalWarning.SetBodyText("Силы на нуле. Красная или чёрная клетки приведут к поражению!");
         _modalWarning.SetCallback(callback);
-        _modalWarning.OpenWindow();
+        _modalWarning.OpenModal();
     }
 
     public void OpenSavedByShieldModal(Action callback = null) {
         _modalWarning.SetHeadingText("Железный щит");
         _modalWarning.SetBodyText("Благодаря <b>железному щиту</b> вы не теряете силу на этой клетке.");
         _modalWarning.SetCallback(callback);
-        _modalWarning.OpenWindow();
+        _modalWarning.OpenModal();
     }
 
     public void OpenAttackShieldModal(Action callback = null) {
         _modalWarning.SetHeadingText("Соперник защищён");
         _modalWarning.SetBodyText("Вы не можете атаковать соперника со щитом.");
         _modalWarning.SetCallback(callback);
-        _modalWarning.OpenWindow();
+        _modalWarning.OpenModal();
     }
 
     public void ConfirmLose() {
         if (IsMe()) {
-            _modalLose.OpenWindow();
+            _modalLose.OpenModal();
         }
         _isFinished = true;
         int place = _pedestal.SetPlayerToMinPlace(this);

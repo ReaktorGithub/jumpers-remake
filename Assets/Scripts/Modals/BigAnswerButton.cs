@@ -1,20 +1,20 @@
 using UnityEngine;
+using UnityEngine.UI;
 
-public class ReplaceAnswerButton : MonoBehaviour
+public class BigAnswerButton : MonoBehaviour
 {
     private GameObject _hover;
     private bool _disabled = false;
-    [SerializeField] private bool _isReplaceAction;
-    private ModalReplaceEffect _modalControl;
     private CursorManager _cursorManager;
+    private Button _button;
 
     private void Awake() {
         _hover = transform.Find("Hover").gameObject;
-        _modalControl = GameObject.Find("GameScripts").GetComponent<ModalReplaceEffect>();
         _cursorManager = GetComponent<CursorManager>();
+        _button = GetComponent<Button>();
     }
 
-    private void Start() {
+    private void OnEnable() {
         _hover.SetActive(false);
     }
 
@@ -28,24 +28,13 @@ public class ReplaceAnswerButton : MonoBehaviour
         _hover.SetActive(false);
     }
 
-    public void OnClick() {
-        if (_isReplaceAction) {
-            if (!_disabled) {
-                _modalControl.CloseWindow();
-                EffectsControl.Instance.ActivateSelectionMode(true);
-            }
-        } else {
-            MoveControl.Instance.CheckCellEffects();
-            _modalControl.CloseWindow();
-        }
-    }
-
     public bool Disabled {
         get { return _disabled; }
         set { 
             _disabled = value;
             _hover.SetActive(!value);
             _cursorManager.Disabled = value;
+            _button.interactable = !value;
         }
     }
 }

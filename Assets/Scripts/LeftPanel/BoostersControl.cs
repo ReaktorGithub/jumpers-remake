@@ -51,7 +51,7 @@ public class BoostersControl : MonoBehaviour
             _boosterButtonsList.Add(button.GetComponent<BoosterButton>());
         }
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
-        _modalWarning = GameObject.Find("GameScripts").GetComponent<ModalWarning>();
+        _modalWarning = GameObject.Find("ModalScripts").GetComponent<ModalWarning>();
     }
 
     public Sprite MagnetSprite {
@@ -303,7 +303,7 @@ public class BoostersControl : MonoBehaviour
         _modalWarning.SetHeadingText("Недоступно");
         _modalWarning.SetBodyText("Этот усилитель доступен только во время атаки на соперника.");
         _modalWarning.SetCallback();
-        _modalWarning.OpenWindow();
+        _modalWarning.OpenModal();
     }
 
     public ManualContent GetBoosterManual(EBoosters booster) {

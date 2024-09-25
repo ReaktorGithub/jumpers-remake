@@ -16,8 +16,8 @@ public class CellChecker : MonoBehaviour
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _popupAttack = GameObject.Find("GameScripts").GetComponent<PopupAttack>();
-        _modalReplace = GameObject.Find("GameScripts").GetComponent<ModalReplaceEffect>();
-        _modalMoneybox = GameObject.Find("GameScripts").GetComponent<ModalMoneybox>();
+        _modalReplace = GameObject.Find("ModalScripts").GetComponent<ModalReplaceEffect>();
+        _modalMoneybox = GameObject.Find("ModalScripts").GetComponent<ModalMoneybox>();
     }
 
     public bool CheckBranch(PlayerControl player) {
@@ -135,7 +135,7 @@ public class CellChecker : MonoBehaviour
             }
             EffectsControl.Instance.SelectedEffect = cell.Effect;
             _modalReplace.BuildContent(player);
-            _modalReplace.OpenWindow();
+            _modalReplace.OpenModal();
             return;
         }
 
@@ -275,7 +275,7 @@ public class CellChecker : MonoBehaviour
         if (vault.OccupiedPlayer == player) {
             if (player.IsMe()) {
                 _modalMoneybox.BuildContent(player);
-                _modalMoneybox.OpenWindow();
+                _modalMoneybox.OpenModal();
             }
 
             if (player.IsAi()) {

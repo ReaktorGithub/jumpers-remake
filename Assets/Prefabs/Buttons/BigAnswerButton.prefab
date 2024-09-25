@@ -167,12 +167,12 @@ GameObject:
   - component: {fileID: 5200403166417164034}
   - component: {fileID: 3794724617093994530}
   - component: {fileID: 159775822520549504}
-  - component: {fileID: 7049924143283341559}
+  - component: {fileID: 8893053729133785283}
   - component: {fileID: 4776069280109790717}
   - component: {fileID: 5510648706984928645}
   - component: {fileID: 246148500772425752}
   m_Layer: 5
-  m_Name: ReplaceAnswerButton
+  m_Name: BigAnswerButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -198,7 +198,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 315, y: 240}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5200403166417164034
 CanvasRenderer:
@@ -282,18 +282,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7049924143283341559}
-        m_TargetAssemblyTypeName: ReplaceAnswerButton, Assembly-CSharp
-        m_MethodName: OnClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 246148500772425752}
         m_TargetAssemblyTypeName: CursorManager, Assembly-CSharp
         m_MethodName: OnMouseExit
@@ -306,7 +294,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &7049924143283341559
+--- !u!114 &8893053729133785283
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -315,10 +303,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 7356041114705036594}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e9cacfc74b33af499481b86f259a80a, type: 3}
+  m_Script: {fileID: 11500000, guid: b7ad6379664192c42896df4c6a20a84e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isReplaceAction: 0
 --- !u!114 &4776069280109790717
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -362,8 +349,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7049924143283341559}
-          m_TargetAssemblyTypeName: ReplaceAnswerButton, Assembly-CSharp
+        - m_Target: {fileID: 246148500772425752}
+          m_TargetAssemblyTypeName: CursorManager, Assembly-CSharp
           m_MethodName: OnMouseEnter
           m_Mode: 1
           m_Arguments:
@@ -374,8 +361,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 246148500772425752}
-          m_TargetAssemblyTypeName: CursorManager, Assembly-CSharp
+        - m_Target: {fileID: 8893053729133785283}
+          m_TargetAssemblyTypeName: BigAnswerButton, Assembly-CSharp
           m_MethodName: OnMouseEnter
           m_Mode: 1
           m_Arguments:
@@ -390,8 +377,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7049924143283341559}
-          m_TargetAssemblyTypeName: ReplaceAnswerButton, Assembly-CSharp
+        - m_Target: {fileID: 246148500772425752}
+          m_TargetAssemblyTypeName: CursorManager, Assembly-CSharp
           m_MethodName: OnMouseExit
           m_Mode: 1
           m_Arguments:
@@ -402,8 +389,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 246148500772425752}
-          m_TargetAssemblyTypeName: CursorManager, Assembly-CSharp
+        - m_Target: {fileID: 8893053729133785283}
+          m_TargetAssemblyTypeName: BigAnswerButton, Assembly-CSharp
           m_MethodName: OnMouseExit
           m_Mode: 1
           m_Arguments:

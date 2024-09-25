@@ -34,7 +34,7 @@ public class Jumpers : MonoBehaviour
 
     // private void Update() {
     //     if (Input.GetKeyUp(KeyCode.F)) {
-    //         ModalHedgehogFinish modal = GameObject.Find("GameScripts").GetComponent<ModalHedgehogFinish>();
+    //         ModalHedgehogFinish modal = GameObject.Find("ModalScripts").GetComponent<ModalHedgehogFinish>();
     //         modal.BuildContent(MoveControl.Instance.CurrentPlayer);
     //         modal.OpenWindow();
     //     }
