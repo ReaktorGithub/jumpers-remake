@@ -11,7 +11,7 @@ public class HedgehogsControl : MonoBehaviour
     [SerializeField] private float _openFinishModalDelay = 0.5f;
 
     private void Awake() {
-        _modal = GameObject.Find("GameScripts").GetComponent<ModalHedgehogFinish>();
+        _modal = GameObject.Find("ModalScripts").GetComponent<ModalHedgehogFinish>();
     }
 
     public int MaxFeedCount {
@@ -56,6 +56,6 @@ public class HedgehogsControl : MonoBehaviour
     private IEnumerator OpenModalDefer(FinishCell finishCell) {
         yield return new WaitForSeconds(_openFinishModalDelay);
         _modal.BuildContent(MoveControl.Instance.CurrentPlayer, finishCell);
-        _modal.OpenWindow();
+        _modal.OpenModal();
     }
 }

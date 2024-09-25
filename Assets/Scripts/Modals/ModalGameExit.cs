@@ -1,19 +1,11 @@
-using System.Collections;
 using UnityEngine;
 
 public class ModalGameExit : MonoBehaviour
 {
-    private GameObject _modal;
-    private ModalWindow _windowControl;
-    private IEnumerator _coroutine;
+    private Modal _modal;
 
     private void Awake() {
-        _modal = GameObject.Find("ModalGameExit");
-        _windowControl = _modal.transform.Find("WindowExit").GetComponent<ModalWindow>();
-    }
-
-    private void Start() {
-        _modal.SetActive(false);
+        _modal = GameObject.Find("ModalGameExit").GetComponent<Modal>();
     }
 
     public void ExitApplication() {
@@ -22,23 +14,15 @@ public class ModalGameExit : MonoBehaviour
 
     private void FixedUpdate() {
         if (Input.GetKeyDown(KeyCode.Escape)) {
-            OpenWindow();
+            OpenModal();
         }
     }
 
-    public void OpenWindow() {
-        if (!_modal.activeInHierarchy) {
-            _modal.SetActive(true);
-            _coroutine = _windowControl.FadeIn();
-            StartCoroutine(_coroutine);
-        }
+    public void OpenModal() {
+        _modal.OpenModal();
     }
 
-    public void CloseWindow() {
-        if (_coroutine != null) {
-            StopCoroutine(_coroutine);
-        }
-        _modal.SetActive(false);
-        _windowControl.ResetScale();
+    public void CloseModal() {
+        _modal.CloseModal();
     }
 }

@@ -14,7 +14,7 @@ public class BranchButtonHedge : MonoBehaviour
     private HedgehogsControl _hedgehogsControl;
 
     private void Awake() {
-        _modal = GameObject.Find("GameScripts").GetComponent<ModalHedgehogArrow>();
+        _modal = GameObject.Find("ModalScripts").GetComponent<ModalHedgehogArrow>();
         _branchControl = transform.parent.GetComponent<BranchControl>();
         _branchButton = transform.GetComponent<BranchButton>();
         _branchHedgehog = _branchControl.transform.GetComponent<BranchHedgehog>();
@@ -40,7 +40,7 @@ public class BranchButtonHedge : MonoBehaviour
         if (_taxCost > 0) {
             _branchControl.SetDisabledAllButtons(true);
             _modal.BuildContent(MoveControl.Instance.CurrentPlayer, this);
-            _modal.OpenWindow();
+            _modal.OpenModal();
             return;
         }
 

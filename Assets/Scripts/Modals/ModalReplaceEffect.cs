@@ -1,51 +1,27 @@
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ModalReplaceEffect : MonoBehaviour
 {
-    private GameObject _modal;
-    private ModalWindow _windowControl;
-    private IEnumerator _coroutine;
-    [SerializeField] private GameObject _iconExecute, _iconCostEffect, _iconResource, _lowPower, _answerButton, _shieldInfo;
+    private Modal _modal;
+    [SerializeField] private GameObject _iconExecute, _iconCostEffect, _iconResource, _lowPower, _replaceButton, _shieldInfo;
     [SerializeField] private TextMeshProUGUI _descriptionText, _effectCostName, _resourceCost, _resourceCostText, _effectName;
     private TextMeshProUGUI _lowPowerText;
-    private ReplaceAnswerButton _answerButtonScript;
+    private BigAnswerButton _replaceButtonScript;
 
     private void Awake() {
-        _modal = GameObject.Find("ModalReplaceEffect");
-        _windowControl = _modal.transform.Find("WindowReplaceEffect").GetComponent<ModalWindow>();
+        _modal = GameObject.Find("ModalReplaceEffect").GetComponent<Modal>();
         _lowPowerText = _lowPower.GetComponent<TextMeshProUGUI>();
-        _answerButtonScript = _answerButton.GetComponent<ReplaceAnswerButton>();
+        _replaceButtonScript = _replaceButton.GetComponent<BigAnswerButton>();
     }
 
     private void Start() {
         _lowPower.SetActive(false);
-        _modal.SetActive(false);
-
-        // EffectsControl.Instance.SelectedEffect = EControllableEffects.Black;
-
-        // if (Manual.Instance.GetEffectCharacter(EffectsControl.Instance.SelectedEffect) == EResourceCharacters.Negative) {
-        //     BuildContent(MoveControl.Instance.CurrentPlayer);
-        //     OpenWindow();
-        // }
     }
 
-    public void OpenWindow() {
-        if (!_modal.activeInHierarchy) {
-            _modal.SetActive(true);
-            _coroutine = _windowControl.FadeIn();
-            StartCoroutine(_coroutine);
-        }
-    }
-
-    public void CloseWindow() {
-        if (_coroutine != null) {
-            StopCoroutine(_coroutine);
-        }
-        _modal.SetActive(false);
-        _windowControl.ResetScale();
+    public void OpenModal() {
+        _modal.OpenModal();
     }
 
     private void SetNewEffectIcon(Sprite sprite) {
@@ -96,12 +72,22 @@ public class ModalReplaceEffect : MonoBehaviour
         }
 
         _lowPower.SetActive(isNotEnough);
-        _answerButtonScript.Disabled = isNotEnough;
+        _replaceButtonScript.Disabled = isNotEnough;
         _iconResource.GetComponent<Image>().sprite = resourceManual.Sprite;
         _resourceCostText.text = resourceManual.GetEntityName(true);
 
         // Информация о наличии щита
         bool isPowerDangerEffect = effect == EControllableEffects.Black || effect == EControllableEffects.Red;
-        _shieldInfo.SetActive(isPowerDangerEffect && currentPlayer.Armor > 0 && currentPlayer.IsIronArmor);
+        _shieldInfo.SetActive(isPowerDangerEffect && currentPlayer.Boosters.Armor > 0 && currentPlayer.Boosters.IsIronArmor);
+    }
+
+    public void OnConfirmClick() {
+        _modal.CloseModal();
+        MoveControl.Instance.CheckCellEffects();
+    }
+
+    public void OnReplaceClick() {
+        _modal.CloseModal();
+        EffectsControl.Instance.ActivateSelectionMode(true);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -200,11 +201,11 @@ public class PlayersControl : MonoBehaviour
 
     public void GiveEffectsBeforeRace() {
         foreach(PlayerControl player in _players) {
-            player.EffectsGreen = _levelData.EffectsGreen;
-            player.EffectsYellow = _levelData.EffectsYellow;
-            player.EffectsBlack = _levelData.EffectsBlack;
-            player.EffectsRed = _levelData.EffectsRed;
-            player.EffectsStar = _levelData.EffectsStar;
+            player.Effects.Green = _levelData.EffectsGreen;
+            player.Effects.Yellow = _levelData.EffectsYellow;
+            player.Effects.Black = _levelData.EffectsBlack;
+            player.Effects.Red = _levelData.EffectsRed;
+            player.Effects.Star = _levelData.EffectsStar;
         }
         PlayerControl currentPlayer = GetPlayer(MoveControl.Instance.CurrentPlayerIndex);
         EffectsControl.Instance.UpdateQuantityText(currentPlayer);
@@ -224,7 +225,7 @@ public class PlayersControl : MonoBehaviour
 
     public void SpendPlayersArmor() {
         foreach(PlayerControl player in _players) {
-            player.SpendArmor();
+            player.Boosters.SpendArmor();
         }
     }
 
@@ -319,5 +320,25 @@ public class PlayersControl : MonoBehaviour
         } while (result == null);
 
         return result;
+    }
+
+    public void CheckIsPlayerOutOfPower(PlayerControl player, Action callback1 = null, Action callback2 = null) {
+        if (player.Power == 0 && player.IsMe()) {
+            player.OpenPowerWarningModal(() => {
+                callback1?.Invoke();
+            });
+            return;
+        }
+
+        if (player.Power < 0) {
+            player.ConfirmLose();
+            return;
+        }
+
+        if (callback2 != null) {
+            callback2.Invoke();
+        } else {
+            callback1?.Invoke();
+        }
     }
 }

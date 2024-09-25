@@ -141,9 +141,9 @@ public class PopupMagnet : MonoBehaviour
         // пересчет ресурсов
 
         if (_isSuper) {
-            player.AddMagnetsSuper(-1);
+            player.Boosters.AddMagnetsSuper(-1);
         } else {
-            player.AddMagnets(-1);
+            player.Boosters.AddMagnets(-1);
         }
         BoostersControl.Instance.UpdateBoostersFromPlayer(player);
     }

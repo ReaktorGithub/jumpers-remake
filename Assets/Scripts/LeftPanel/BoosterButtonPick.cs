@@ -8,7 +8,7 @@ public class BoosterButtonPick : MonoBehaviour
     private BoosterButton _boosterButton;
 
     private void Awake() {
-        _modal = GameObject.Find("GameScripts").GetComponent<ModalHedgehogArrow>();
+        _modal = GameObject.Find("ModalScripts").GetComponent<ModalHedgehogArrow>();
         _boosterButton = transform.GetComponent<BoosterButton>();
     }
 

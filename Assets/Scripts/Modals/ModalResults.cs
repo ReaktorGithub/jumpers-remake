@@ -1,24 +1,20 @@
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ModalResults : MonoBehaviour
 {
-    private ModalWindow _windowControl;
-    private IEnumerator _coroutine;
+    private Modal _modal;
     private LevelData _levelData;
+    private LoadLevel _loadLevel;
 
     private void Awake() {
-        _windowControl = transform.Find("WindowResults").GetComponent<ModalWindow>();
+        _modal = GameObject.Find("ModalResults").GetComponent<Modal>();
         _levelData = GameObject.Find("LevelScripts").GetComponent<LevelData>();
+        _loadLevel = GameObject.Find("GameScripts").GetComponent<LoadLevel>();
     }
 
-    private void Start() {
-        transform.gameObject.SetActive(false);
-    }
-
-    private void BuildContent(PlayerControl[] players) {
+    public void BuildContent(PlayerControl[] players) {
         foreach(PlayerControl player in players) {
             GameObject row = Utils.FindChildByName(transform.gameObject, "PlayerResultRow" + player.PlaceAfterFinish);
             Image tokenImage = row.transform.Find("TokenImage").gameObject.GetComponent<Image>();
@@ -52,18 +48,12 @@ public class ModalResults : MonoBehaviour
         }
     }
 
-    public void OpenWindow(PlayerControl[] players) {
-        BuildContent(players);
-        transform.gameObject.SetActive(true);
-        _coroutine = _windowControl.FadeIn();
-        StartCoroutine(_coroutine);
+    public void OpenModal() {
+        _modal.OpenModal();
     }
 
-    public void CloseWindow() {
-        if (_coroutine != null) {
-            StopCoroutine(_coroutine);
-        }
-        _windowControl.ResetScale();
-        transform.gameObject.SetActive(false);
+    public void OnNext() {
+        _modal.CloseModal();
+        _loadLevel.OnLoadLevel();
     }
 }

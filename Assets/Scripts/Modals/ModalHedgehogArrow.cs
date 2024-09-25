@@ -6,9 +6,7 @@ using UnityEngine.UI;
 
 public class ModalHedgehogArrow : MonoBehaviour
 {
-    private GameObject _modal;
-    private ModalWindow _windowControl;
-    private IEnumerator _coroutine;
+    private Modal _modal;
     [SerializeField] private GameObject _boosterButtonSample, _itemsObj, _selectedItemsObj, _buttonConfirmObj;
     [SerializeField] private TextMeshProUGUI _boosterName, _boosterDescription, _conditionDescription;
     [SerializeField] private float _confirmDelay = 0.5f;
@@ -21,32 +19,16 @@ public class ModalHedgehogArrow : MonoBehaviour
     private Button _buttonConfirm;
 
     private void Awake() {
-        _modal = GameObject.Find("ModalHedgehogArrow");
-        _windowControl = _modal.transform.Find("WindowHedgehogArrow").GetComponent<ModalWindow>();
+        _modal = GameObject.Find("ModalHedgehogArrow").GetComponent<Modal>();
         _buttonConfirm = _buttonConfirmObj.GetComponent<Button>();
     }
 
-    private void Start() {
-        _modal.SetActive(false);
-    }
-
-    public void OpenWindow() {
-        if (!_modal.activeInHierarchy) {
-            _modal.SetActive(true);
-            _coroutine = _windowControl.FadeIn();
-            StartCoroutine(_coroutine);
-        }
-    }
-
-    public void CloseWindow() {
-        if (_coroutine != null) {
-            StopCoroutine(_coroutine);
-        }
-        _modal.SetActive(false);
-        _windowControl.ResetScale();
+    public void OpenModal() {
+        _modal.OpenModal();
     }
 
     public void EnableBranchButtons() {
+        _modal.CloseModal();
         _branchButtonHedge.BranchControl.SetDisabledAllButtons(false);
     }
 
@@ -76,12 +58,12 @@ public class ModalHedgehogArrow : MonoBehaviour
 
         _conditionDescription.text = "Выберите " + insertText + " вы готовы отдать ёжику-налоговику.";
 
-        _initialList.Add((EBoosters.Lasso, currentPlayer.BoosterLasso));
-        _initialList.Add((EBoosters.Magnet, currentPlayer.BoosterMagnet));
-        _initialList.Add((EBoosters.MagnetSuper, currentPlayer.BoosterSuperMagnet));
-        _initialList.Add((EBoosters.Shield, currentPlayer.BoosterShield));
-        _initialList.Add((EBoosters.ShieldIron, currentPlayer.BoosterShieldIron));
-        _initialList.Add((EBoosters.Vampire, currentPlayer.BoosterVampire));
+        _initialList.Add((EBoosters.Lasso, currentPlayer.Boosters.Lasso));
+        _initialList.Add((EBoosters.Magnet, currentPlayer.Boosters.Magnet));
+        _initialList.Add((EBoosters.MagnetSuper, currentPlayer.Boosters.SuperMagnet));
+        _initialList.Add((EBoosters.Shield, currentPlayer.Boosters.Shield));
+        _initialList.Add((EBoosters.ShieldIron, currentPlayer.Boosters.ShieldIron));
+        _initialList.Add((EBoosters.Vampire, currentPlayer.Boosters.Vampire));
 
         UpdateInitialList();
         UpdateSelectedList();
@@ -183,8 +165,8 @@ public class ModalHedgehogArrow : MonoBehaviour
     }
 
     public void OnConfirm() {
-        CloseWindow();
-        MoveControl.Instance.CurrentPlayer.ExecuteHedgehogArrow(_selectedList);
+        _modal.CloseModal();
+        MoveControl.Instance.CurrentPlayer.Effects.ExecuteHedgehogArrow(_selectedList);
         BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
         _branchButtonHedge.BranchHedgehog.AddBoostersCollected(_selectedList);
         _branchButtonHedge.BranchHedgehog.IncreaseFeedCount();

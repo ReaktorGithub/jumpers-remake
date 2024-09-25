@@ -383,7 +383,7 @@ public class CellsControl : MonoBehaviour
     // Подсказки для магнита
 
     public void UpdateCellMagnetHint(GameObject currentCell, int selectedScore) {
-        bool isLightning = MoveControl.Instance.CurrentPlayer.IsLightning;
+        bool isLightning = MoveControl.Instance.CurrentPlayer.Effects.IsLightning;
         int score = isLightning ? selectedScore * 2 : selectedScore;
 
         List<GameObject> cellObjects = FindTargetCells(currentCell, true, score);

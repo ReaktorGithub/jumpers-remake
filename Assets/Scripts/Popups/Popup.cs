@@ -51,7 +51,6 @@ public class Popup : MonoBehaviour
         float endX = transform.localPosition.x + shift;
         float startTime = Time.time;
         float velocity = 0f;
-        // Time.time - startTime < fadeTime
         while (_fadeTime - (Time.time - startTime) > 0.1f) {
             float progress = (Time.time - startTime) / _fadeTime;
             float x = Mathf.SmoothDamp(startX, endX, ref velocity, 0.1f, Mathf.Infinity, progress); 

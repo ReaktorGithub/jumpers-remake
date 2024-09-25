@@ -13,6 +13,14 @@ public class BoostersControl : MonoBehaviour
     private List<BoosterButton> _boosterButtonsList = new();
     private TopPanel _topPanel;
     private ModalWarning _modalWarning;
+    [SerializeField] private int _maxMagnets = 3;
+    [SerializeField] private int _maxSuperMagnets = 3;
+    [SerializeField] private int _maxMagnetsTotal = 3;
+    [SerializeField] private int _maxLasso = 3;
+    [SerializeField] private int _maxShields = 3;
+    [SerializeField] private int _maxShieldsIron = 3;
+    [SerializeField] private int _maxShieldsTotal = 3;
+    [SerializeField] private int _maxVampires = 1;
 
     private void Awake() {
         Instance = this;
@@ -43,7 +51,7 @@ public class BoostersControl : MonoBehaviour
             _boosterButtonsList.Add(button.GetComponent<BoosterButton>());
         }
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
-        _modalWarning = GameObject.Find("GameScripts").GetComponent<ModalWarning>();
+        _modalWarning = GameObject.Find("ModalScripts").GetComponent<ModalWarning>();
     }
 
     public Sprite MagnetSprite {
@@ -73,6 +81,46 @@ public class BoostersControl : MonoBehaviour
 
     public Sprite VampireSprite {
         get { return _vampireSprite; }
+        private set {}
+    }
+
+    public int MaxMagnets {
+        get { return _maxMagnets; }
+        private set {}
+    }
+
+    public int MaxSuperMagnets {
+        get { return _maxSuperMagnets; }
+        private set {}
+    }
+
+    public int MaxMagnetsTotal {
+        get { return _maxMagnetsTotal; }
+        private set {}
+    }
+
+    public int MaxShields {
+        get { return _maxShields; }
+        private set {}
+    }
+
+    public int MaxShieldsIron {
+        get { return _maxShieldsIron; }
+        private set {}
+    }
+
+    public int MaxShieldsTotal {
+        get { return _maxShieldsTotal; }
+        private set {}
+    }
+
+    public int MaxLasso {
+        get { return _maxLasso; }
+        private set {}
+    }
+
+    public int MaxVampires {
+        get { return _maxVampires; }
         private set {}
     }
 
@@ -143,22 +191,22 @@ public class BoostersControl : MonoBehaviour
         // Лассо
 
         for (int i = 1; i <= 3; i++) {
-            EBoosters booster = player.BoosterLasso >= i ? EBoosters.Lasso : EBoosters.None;
+            EBoosters booster = player.Boosters.Lasso >= i ? EBoosters.Lasso : EBoosters.None;
             _lassoRowScript.UpdateButton(i, booster);
         }
 
         // Магниты
 
-        UpdateBoostersRow(player.BoosterMagnet, player.BoosterSuperMagnet, EBoosters.Magnet, EBoosters.MagnetSuper, _magnetsRowScript);
+        UpdateBoostersRow(player.Boosters.Magnet, player.Boosters.SuperMagnet, EBoosters.Magnet, EBoosters.MagnetSuper, _magnetsRowScript);
 
         // Щиты
 
-        UpdateBoostersRow(player.BoosterShield, player.BoosterShieldIron, EBoosters.Shield, EBoosters.ShieldIron, _shieldsRowScript);
+        UpdateBoostersRow(player.Boosters.Shield, player.Boosters.ShieldIron, EBoosters.Shield, EBoosters.ShieldIron, _shieldsRowScript);
         UpdatePlayersArmorButtons(player);
 
         // Вампир
 
-        _vampireButtonScript.BoosterType = player.BoosterVampire > 0 ? EBoosters.Vampire : EBoosters.None;
+        _vampireButtonScript.BoosterType = player.Boosters.Vampire > 0 ? EBoosters.Vampire : EBoosters.None;
     }
 
     // Открытие разных усилителей при нажатиях на кнопки в левой панели
@@ -207,9 +255,9 @@ public class BoostersControl : MonoBehaviour
         }
         _topPanel.CloseWindow();
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
-        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " решил прокатиться на " + Utils.Wrap("лассо", UIColors.Orange);
+        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " решает прокатиться на " + Utils.Wrap("лассо", UIColors.Orange);
         Messages.Instance.AddMessage(message);
-        player.AddLasso(-1);
+        player.Boosters.AddLasso(-1);
         UpdateBoostersFromPlayer(player);
         UnselectAllButtons();
         MoveControl.Instance.MakeLassoMove(targetCell);
@@ -220,13 +268,13 @@ public class BoostersControl : MonoBehaviour
         string shieldText;
 
         if (_isIron) {
-            player.IsIronArmor = true;
-            player.Armor = 12;
+            player.Boosters.IsIronArmor = true;
+            player.Boosters.Armor = 12;
             token.UpdateShield(EBoosters.ShieldIron);
             shieldText = Utils.Wrap("железный щит", UIColors.ArmorIron);
         } else {
-            player.IsIronArmor = false;
-            player.Armor = 4;
+            player.Boosters.IsIronArmor = false;
+            player.Boosters.Armor = 4;
             token.UpdateShield(EBoosters.Shield);
             shieldText = Utils.Wrap("щит", UIColors.Armor);
         }
@@ -243,9 +291,9 @@ public class BoostersControl : MonoBehaviour
 
     public void UpdatePlayersArmorButtons(PlayerControl player) {
         _shieldsRowScript.UpdateShieldMode(
-            player.SelectedShieldButton,
-            player.IsIronArmor,
-            player.Armor
+            player.Boosters.SelectedShieldButton,
+            player.Boosters.IsIronArmor,
+            player.Boosters.Armor
         );
     }
 
@@ -255,7 +303,7 @@ public class BoostersControl : MonoBehaviour
         _modalWarning.SetHeadingText("Недоступно");
         _modalWarning.SetBodyText("Этот усилитель доступен только во время атаки на соперника.");
         _modalWarning.SetCallback();
-        _modalWarning.OpenWindow();
+        _modalWarning.OpenModal();
     }
 
     public ManualContent GetBoosterManual(EBoosters booster) {

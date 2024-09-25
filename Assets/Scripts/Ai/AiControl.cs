@@ -97,9 +97,9 @@ public class AiControl : MonoBehaviour
             int hedgehogTax = selectedBranch.GetHedgehogTax();
             if (hedgehogTax > 0) {
                 // todo нужно отдавать предпочтение наименее ценным бустерам
-                List<EBoosters> list = player.CollectAllRegularBoosters();
+                List<EBoosters> list = player.Boosters.CollectAllRegularBoosters();
                 List<EBoosters> selectedList = Utils.GetRandomElements(list, hedgehogTax);
-                player.ExecuteHedgehogArrow(selectedList);
+                player.Effects.ExecuteHedgehogArrow(selectedList);
                 BranchButtonHedge button = selectedBranch.GetHedgehogScript();
                 if (button != null) {
                     BranchHedgehog branchHedgehog = branch.transform.GetComponent<BranchHedgehog>();
@@ -125,9 +125,9 @@ public class AiControl : MonoBehaviour
 
         StartCoroutine(ImitateThinking(player, () => {
             if (execute) {
-                player.ExecuteMoneybox(vault);
+                player.Effects.ExecuteMoneybox(vault);
             } else {
-                player.LeaveMoneybox(vault);
+                player.Effects.LeaveMoneybox(vault);
             }
         }));
     }

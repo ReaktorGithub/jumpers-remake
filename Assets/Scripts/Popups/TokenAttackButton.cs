@@ -6,7 +6,6 @@ public class TokenAttackButton : MonoBehaviour
     private GameObject _selected, _hover, _shield;
     private Image _tokenImage, _shieldImage;
     private PlayerControl _player;
-    private Button _button;
     private bool _disabled = false;
 
     private void Awake() {
@@ -17,7 +16,6 @@ public class TokenAttackButton : MonoBehaviour
         _hover = transform.Find("HoverImage").gameObject;
         _selected.SetActive(false);
         _hover.SetActive(false);
-        _button = GetComponent<Button>();
     }
 
     public void SetTokenImage(Sprite sprite) {

@@ -25,9 +25,9 @@ public class MoveControl : MonoBehaviour
 
     private void Awake() {
         Instance = this;
-        _modalResults = GameObject.Find("ModalResults").GetComponent<ModalResults>();
-        _modalWin = GameObject.Find("GameScripts").GetComponent<ModalWin>();
-        _modalLose = GameObject.Find("GameScripts").GetComponent<ModalLose>();
+        _modalResults = GameObject.Find("ModalScripts").GetComponent<ModalResults>();
+        _modalWin = GameObject.Find("ModalScripts").GetComponent<ModalWin>();
+        _modalLose = GameObject.Find("ModalScripts").GetComponent<ModalLose>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
         _hedgehogsControl = GameObject.Find("LevelScripts").GetComponent<HedgehogsControl>();
@@ -193,11 +193,11 @@ public class MoveControl : MonoBehaviour
         // возможность применять эффекты должна восстанавливаться только если это новый ход, а не возвращение хода после лассо / пылесоса и т.д
         bool isNewMove = !_isLassoMode;
         if (isNewMove) {
-           _currentPlayer.IsEffectPlaced = false;
+           _currentPlayer.Effects.IsEffectPlaced = false;
         }
 
         // включение индикатора молнии на кубике
-        _currentPlayer.CheckLightningStartMove();
+        _currentPlayer.Effects.CheckLightningStartMove();
         
         bool isMe = _currentPlayer.IsMe();
         if (isMe) {
@@ -248,7 +248,7 @@ public class MoveControl : MonoBehaviour
     public void MakeMove(int score) {
         _isLassoMode = false;
         _currentPlayer.StepsLeft = score;
-        _currentPlayer.SpendLightning();
+        _currentPlayer.Effects.SpendLightning();
         CellControl cell = _currentPlayer.GetCurrentCell();
         cell.RemoveToken(_currentPlayer.TokenObject);
         cell.AlignTokens(_alignTime);
@@ -418,9 +418,8 @@ public class MoveControl : MonoBehaviour
         message = Utils.Wrap("пропуск", UIColors.Yellow);
         CubicControl.Instance.WriteStatus(message);
         yield return new WaitForSeconds(_skipMoveDelay);
-        TokenControl token = _currentPlayer.GetTokenControl();
-        _currentPlayer.SkipMoveDecrease(token);
-        _currentPlayer.SpendLightning();
+        _currentPlayer.SkipMoveDecrease();
+        _currentPlayer.Effects.SpendLightning();
         EndMove();
     }
 
@@ -433,7 +432,7 @@ public class MoveControl : MonoBehaviour
 
         // Проверка молнии
 
-        _currentPlayer.CheckLightningEndMove();
+        _currentPlayer.Effects.CheckLightningEndMove();
 
         // Проверка на окончание гонки
 
@@ -487,16 +486,17 @@ public class MoveControl : MonoBehaviour
     public void RaceOver() {
         PlayersControl.Instance.GiveResourcesAfterRace();
         CloseAllOptionalModals();
-        _modalResults.OpenWindow(PlayersControl.Instance.Players);
+        _modalResults.BuildContent(PlayersControl.Instance.Players);
+        _modalResults.OpenModal();
     }
 
     public void CloseAllOptionalModals() {
         if (_modalLose.gameObject.activeInHierarchy) {
-            _modalLose.CloseWindow();
+            _modalLose.CloseModal();
         }
 
         if (_modalWin.gameObject.activeInHierarchy) {
-            _modalWin.CloseWindow();
+            _modalWin.CloseModal();
         }
     }
 
@@ -510,8 +510,8 @@ public class MoveControl : MonoBehaviour
         Debug.Log("_currentPlayer " + _currentPlayer.PlayerName);
         Debug.Log("Cerrent cell control name " + _currentPlayer.GetCurrentCell().transform.name);
         foreach(PlayerControl player in PlayersControl.Instance.Players) {
-            if (player.Armor > 0) {
-                Debug.Log(player.PlayerName + " " + player.Armor);
+            if (player.Boosters.Armor > 0) {
+                Debug.Log(player.PlayerName + " " + player.Boosters.Armor);
             }
         }
     }
