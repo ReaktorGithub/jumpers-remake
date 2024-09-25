@@ -67,6 +67,14 @@ public class EffectsControl : MonoBehaviour
         }
     }
 
+    public void UpdateButtonsGrind(PlayerGrind grind) {
+        _greenEffectButton.UpdateGrind(grind.Green);
+        _yellowEffectButton.UpdateGrind(grind.Yellow);
+        _redEffectButton.UpdateGrind(grind.Red);
+        _blackEffectButton.UpdateGrind(grind.Black);
+        _starEffectButton.UpdateGrind(grind.Star);
+    }
+
     public void ActivateSelectionMode(bool isReplace = false) {
         if (_isSelectionMode) {
             return;
@@ -175,40 +183,47 @@ public class EffectsControl : MonoBehaviour
         player.Effects.IsEffectPlaced = true;
         Sprite sprite;
         string effectName = "";
+        int effectLevel;
 
         switch(_selectedEffect) {
             case EControllableEffects.Green: {
                 sprite = _greenCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.Effects.AddGreen(-1);
                 effectName = "зеленый";
+                effectLevel = player.Grind.Green;
                 break;
             }
             case EControllableEffects.Red: {
                 sprite = _redCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.Effects.AddRed(-1);
                 effectName = "красный";
+                effectLevel = player.Grind.Red;
                 break;
             }
             case EControllableEffects.Yellow: {
                 sprite = _yellowCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.Effects.AddYellow(-1);
                 effectName = "желтый";
+                effectLevel = player.Grind.Yellow;
                 break;
             }
             case EControllableEffects.Black: {
                 sprite = _blackCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.Effects.AddBlack(-1);
                 effectName = "черный";
+                effectLevel = player.Grind.Black;
                 break;
             }
             case EControllableEffects.Star: {
                 sprite = _starCellSprite.GetComponent<SpriteRenderer>().sprite;
                 player.Effects.AddStar(-1);
                 effectName = "звезда";
+                effectLevel = player.Grind.Star;
                 break;
             }
             default: {
                 sprite = _emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
+                effectLevel = 1;
                 break;
             }
         }
@@ -216,7 +231,7 @@ public class EffectsControl : MonoBehaviour
         string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " ставит эффект <b>" + effectName + "</b> на клетку " + cell.GetCellText();
         Messages.Instance.AddMessage(message);
 
-        cell.ChangeEffect(_selectedEffect, sprite);
+        cell.ChangeEffect(_selectedEffect, sprite, effectLevel);
         cell.StartChanging();
 
         UpdateQuantityText(player);
@@ -270,8 +285,9 @@ public class EffectsControl : MonoBehaviour
         // удалить эффект на текущей клетке
 
         CellControl oldCell = player.GetCurrentCell();
+        int effectLevel = oldCell.EffectLevel;
         Sprite sprite = _emptyCellSprite.GetComponent<SpriteRenderer>().sprite;
-        oldCell.ChangeEffect(EControllableEffects.None, sprite);
+        oldCell.ChangeEffect(EControllableEffects.None, sprite, 1);
         Sprite newCellSprite;
 
         // спавнить спрайт краски на текущей клетке
@@ -325,7 +341,7 @@ public class EffectsControl : MonoBehaviour
 
             // добавить эффект на новой клетке
 
-            newCell.ChangeEffect(_selectedEffect, newCellSprite);
+            newCell.ChangeEffect(_selectedEffect, newCellSprite, effectLevel);
             newCell.StartChanging();
 
             // выйти из режима перемещения

@@ -147,6 +147,7 @@ public class MoveControl : MonoBehaviour
         if (_currentPlayer.IsMe()) {
             EffectsControl.Instance.UpdateQuantityText(_currentPlayer);
             EffectsControl.Instance.UpdateEffectEmptiness(_currentPlayer);
+            EffectsControl.Instance.UpdateButtonsGrind(_currentPlayer.Grind);
             BoostersControl.Instance.UpdateBoostersFromPlayer(_currentPlayer);
         }
 

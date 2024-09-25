@@ -9,10 +9,14 @@ public class CellsControl : MonoBehaviour
     [SerializeField] private float _changingEffectTime = 0.5f;
     [SerializeField] private float _changingEffectDuration = 3.25f;
     [SerializeField] private float _changingEffectDelay = 1.85f;
+    private Sprite _grind2Sprite, _grind3Sprite;
 
     private void Awake() {
         Instance = this;
         AssignAllCellControls();
+        GameObject Instances = GameObject.Find("Instances");
+        _grind2Sprite = Instances.transform.Find("grind-dash2").GetComponent<SpriteRenderer>().sprite;
+        _grind3Sprite = Instances.transform.Find("grind-dash3").GetComponent<SpriteRenderer>().sprite;
     }
 
     public void AssignAllCellControls() {
@@ -57,6 +61,16 @@ public class CellsControl : MonoBehaviour
         foreach (CellControl cell in _allCellControls) {
             cell.TurnOffEffectPlacementMode();
         }
+    }
+
+    public Sprite Grind2Sprite {
+        get { return _grind2Sprite; }
+        private set {}
+    }
+
+    public Sprite Grind3Sprite {
+        get { return _grind3Sprite; }
+        private set {}
     }
 
     // Находит ближайшую клетку по условию

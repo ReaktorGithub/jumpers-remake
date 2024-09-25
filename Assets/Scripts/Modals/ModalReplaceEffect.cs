@@ -31,9 +31,9 @@ public class ModalReplaceEffect : MonoBehaviour
 
     public void BuildContent(PlayerControl currentPlayer) {
         EControllableEffects effect = EffectsControl.Instance.SelectedEffect;
-
-        // todo уровень эффекта должен вычисляться из PlayerControl
-        int effectLevel = 1;
+        
+        CellControl cell = currentPlayer.GetCurrentCell();
+        int effectLevel = cell.EffectLevel;
         
         // иконка
 

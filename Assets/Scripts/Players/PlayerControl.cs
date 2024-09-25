@@ -5,6 +5,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(PlayerEffects))]
 [RequireComponent(typeof(PlayerBoosters))]
+[RequireComponent(typeof(PlayerGrind))]
 
 public class PlayerControl : MonoBehaviour
 {
@@ -27,6 +28,7 @@ public class PlayerControl : MonoBehaviour
     private Sprite _tokenImage;
     private PlayerEffects _effects;
     private PlayerBoosters _boosters;
+    private PlayerGrind _grind;
 
     // Ресурсы игрока
     [SerializeField] private int _coins = 0;
@@ -46,6 +48,7 @@ public class PlayerControl : MonoBehaviour
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
         _effects = GetComponent<PlayerEffects>();
         _boosters = GetComponent<PlayerBoosters>();
+        _grind = GetComponent<PlayerGrind>();
     }
 
     // Изменение свойств напрямую
@@ -162,6 +165,11 @@ public class PlayerControl : MonoBehaviour
 
     public PlayerBoosters Boosters {
         get { return _boosters; }
+        private set {}
+    }
+
+    public PlayerGrind Grind {
+        get { return _grind; }
         private set {}
     }
 

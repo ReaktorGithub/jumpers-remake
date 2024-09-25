@@ -7,17 +7,18 @@ using UnityEngine;
 public class CellControl : MonoBehaviour
 {
     // todo добавить _ перед переделыванием уровня
-    [SerializeField] private GameObject nextCell;
-    [SerializeField] private GameObject previousCell;
+    [SerializeField] private GameObject nextCell, previousCell;
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
+    [SerializeField] private int _effectLevel = 1;
+    private int _oldEffectLevel = 1;
     [SerializeField] private int _coinBonusValue = 0;
     [SerializeField] private bool _enableReverse = false;
     // Если _enableReverse = true, то клетка находится в ответвлении со стеной. Нахождение фишки на этой клетке никак не влияет на её направление.
     // Если _enableReverse = false, то клетка обычная. После остановки фишки у игрока будет принудительно сменено направление на "вперед"
     private GameObject _coinBonusObject;
     private GameObject _container, _glow;
-    private SpriteRenderer _spriteRenderer, _glowSpriteRenderer;
+    private SpriteRenderer _spriteRenderer, _glowSpriteRenderer, _grindSpriteRenderer;
     private float[] _cellScale = new float[2];
     [SerializeField] private List<GameObject> _currentTokens = new();
     private bool _isEffectPlacementMode, _isLassoMode = false;
@@ -50,12 +51,14 @@ public class CellControl : MonoBehaviour
         }
         _coinBonusObject = _container.transform.Find("CoinBonus").gameObject;
         _coinBonusText = _coinBonusObject.transform.Find("CoinBonusText").GetComponent<TextMeshPro>();
+        _grindSpriteRenderer = _container.transform.Find("grind").GetComponent<SpriteRenderer>();
     }
 
     private void Start() {
         SetCursorDisabled(true);
         UpdateAiScore();
         UpdateCoinBonusView();
+        UpdateGrindVisual(_effectLevel);
     }
 
     private void SetCursorDisabled(bool value) {
@@ -105,6 +108,11 @@ public class CellControl : MonoBehaviour
         }
     }
 
+    public int EffectLevel {
+        get { return _effectLevel; }
+        private set {}
+    }
+
     public List<GameObject> CurrentTokens {
         get { return _currentTokens; }
         set { _currentTokens = value; }
@@ -149,6 +157,23 @@ public class CellControl : MonoBehaviour
 
     public bool IsPenaltyEffect() {
         return effect == EControllableEffects.Black || effect == EControllableEffects.Red;
+    }
+
+    public void UpdateGrindVisual(int level) {
+        switch(level) {
+            case 2: {
+                _grindSpriteRenderer.sprite = CellsControl.Instance.Grind2Sprite;
+                break;
+            }
+            case 3: {
+                _grindSpriteRenderer.sprite = CellsControl.Instance.Grind3Sprite;
+                break;
+            }
+            default: {
+                _grindSpriteRenderer.sprite = null;
+                break;
+            }
+        }
     }
 
     // Перераспределить позиции фишек на клетке
@@ -290,7 +315,9 @@ public class CellControl : MonoBehaviour
 
     // установка нового эффекта на эту клетку
 
-    public void ChangeEffect(EControllableEffects newEffect, Sprite newSprite) {
+    public void ChangeEffect(EControllableEffects newEffect, Sprite newSprite, int level) {
+        _oldEffectLevel = _effectLevel;
+        _effectLevel = level;
         Effect = newEffect;
 
         // Наложение спрайта и изменение цвета текста
@@ -342,11 +369,13 @@ public class CellControl : MonoBehaviour
     private void SetNewEffect() {
         _spriteRenderer.sprite = _newSprite;
         _text.color = _newTextColor;
+        UpdateGrindVisual(_effectLevel);
     }
 
     private void SetOldEffect() {
         _spriteRenderer.sprite = _oldSprite;
         _text.color = _oldTextColor;
+        UpdateGrindVisual(_oldEffectLevel);
     }
 
     public void StartChanging() {

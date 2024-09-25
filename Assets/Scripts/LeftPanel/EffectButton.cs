@@ -4,9 +4,8 @@ using UnityEngine.UI;
 
 public class EffectButton : MonoBehaviour
 {
-    private GameObject _effect;
+    private GameObject _effect, _selected, _grind1, _grind2, _grind3;
     private SpriteRenderer _effectRenderer;
-    private GameObject _selected;
     private Button _button;
     private bool _isEmpty = false;
     [SerializeField] GameObject _quantityTextObject;
@@ -17,6 +16,9 @@ public class EffectButton : MonoBehaviour
     private void Awake() {
         _effect = transform.Find("effect").gameObject;
         _selected = transform.Find("effect-selected").gameObject;
+        _grind1 = transform.Find("grind1").gameObject;
+        _grind2 = transform.Find("grind2").gameObject;
+        _grind3 = transform.Find("grind3").gameObject;
         _button = GetComponent<Button>();
         _effectRenderer = _effect.GetComponent<SpriteRenderer>();
         _quantityText = _quantityTextObject.GetComponent<TextMeshProUGUI>();
@@ -55,5 +57,11 @@ public class EffectButton : MonoBehaviour
         _effectRenderer.color = color;
         _quantityText.color = color;
         _cursorManager.Disabled = value;
+    }
+
+    public void UpdateGrind(int level) {
+        _grind1.SetActive(level == 1);
+        _grind2.SetActive(level == 2);
+        _grind3.SetActive(level == 3);
     }
 }

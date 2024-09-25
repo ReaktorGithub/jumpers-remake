@@ -30,6 +30,8 @@ public class Jumpers : MonoBehaviour
         Instances.transform.Find("TokenIndicator").gameObject.SetActive(false);
         Instances.transform.Find("TokenBonusEvent").gameObject.SetActive(false);
         Instances.transform.Find("lightning").gameObject.SetActive(false);
+        Instances.transform.Find("grind-dash2").gameObject.SetActive(false);
+        Instances.transform.Find("grind-dash3").gameObject.SetActive(false);
     }
 
     // private void Update() {
