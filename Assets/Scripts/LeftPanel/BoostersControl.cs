@@ -289,9 +289,35 @@ public class BoostersControl : MonoBehaviour
         _shieldsRowScript.DeactivateShieldMode();
     }
 
+    // Проверяет, является оверлей щита актуальным для данной кнопки
+
+    private bool IsArmorOverlayActual(PlayerBoosters boosters) {
+        BoosterButton button = boosters.SelectedShieldButton;
+
+        if (button == null || boosters.Armor == 0) {
+            return true;
+        }
+
+        if (boosters.IsIronArmor) {
+            return button.BoosterType == EBoosters.ShieldIron;
+        } else {
+            return button.BoosterType == EBoosters.Shield;
+        }
+    }
+
     public void UpdatePlayersArmorButtons(PlayerControl player) {
+        // В этот момент количество щитов могло измениться. Поэтому SelectedShieldButton также может измениться
+        BoosterButton button = player.Boosters.SelectedShieldButton;
+        bool isActual = IsArmorOverlayActual(player.Boosters);
+        
+        if (!isActual) {
+            int index = player.Boosters.GetActualBoosterButtonIndex();
+            button = _shieldsRowScript.List[index];
+            player.Boosters.SelectedShieldButton = button;
+        }
+
         _shieldsRowScript.UpdateShieldMode(
-            player.Boosters.SelectedShieldButton,
+            button,
             player.Boosters.IsIronArmor,
             player.Boosters.Armor
         );

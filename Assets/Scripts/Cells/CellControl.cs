@@ -12,6 +12,9 @@ public class CellControl : MonoBehaviour
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
     [SerializeField] private int _coinBonusValue = 0;
+    [SerializeField] private bool _enableReverse = false;
+    // Если _enableReverse = true, то клетка находится в ответвлении со стеной. Нахождение фишки на этой клетке никак не влияет на её направление.
+    // Если _enableReverse = false, то клетка обычная. После остановки фишки у игрока будет принудительно сменено направление на "вперед"
     private GameObject _coinBonusObject;
     private GameObject _container, _glow;
     private SpriteRenderer _spriteRenderer, _glowSpriteRenderer;
@@ -79,6 +82,11 @@ public class CellControl : MonoBehaviour
     public int AiScore {
         get { return _aiScore; }
         private set {}
+    }
+
+    public bool EnableReverse {
+        get { return _enableReverse; }
+        set { _enableReverse = value; }
     }
 
     public int CoinBonusValue {

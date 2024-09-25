@@ -20,6 +20,12 @@ public class CellChecker : MonoBehaviour
         _modalMoneybox = GameObject.Find("ModalScripts").GetComponent<ModalMoneybox>();
     }
 
+    // Проверка клетки перед совершением хода
+
+    public bool CheckCellBeforeStep(PlayerControl player) {
+        return CheckBranch(player);
+    }
+
     public bool CheckBranch(PlayerControl player) {
         CellControl cell = player.GetCurrentCell();
 

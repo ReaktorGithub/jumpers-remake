@@ -61,8 +61,17 @@ public class ModalHedgehogArrow : MonoBehaviour
         _initialList.Add((EBoosters.Lasso, currentPlayer.Boosters.Lasso));
         _initialList.Add((EBoosters.Magnet, currentPlayer.Boosters.Magnet));
         _initialList.Add((EBoosters.MagnetSuper, currentPlayer.Boosters.SuperMagnet));
-        _initialList.Add((EBoosters.Shield, currentPlayer.Boosters.Shield));
-        _initialList.Add((EBoosters.ShieldIron, currentPlayer.Boosters.ShieldIron));
+        int shields = currentPlayer.Boosters.Shield;
+        int ironShields = currentPlayer.Boosters.ShieldIron;
+        if (currentPlayer.Boosters.Armor > 0) {
+            if (currentPlayer.Boosters.IsIronArmor) {
+                ironShields--;
+            } else {
+                shields--;
+            }
+        }
+        _initialList.Add((EBoosters.Shield, shields));
+        _initialList.Add((EBoosters.ShieldIron, ironShields));
         _initialList.Add((EBoosters.Vampire, currentPlayer.Boosters.Vampire));
 
         UpdateInitialList();
