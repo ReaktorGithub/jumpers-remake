@@ -212,7 +212,14 @@ public class MoveControl : MonoBehaviour
     }
 
     private void StartCellCheckBeforeStep() {
-        bool check = CellChecker.Instance.CheckBranch(_currentPlayer);
+        CellControl cell = _currentPlayer.GetCurrentCell();
+        
+        // Подробнее об этом условии см. в CellControl
+        if (!cell.EnableReverse) {
+            _currentPlayer.IsReverseMove = false;
+        }
+
+        bool check = CellChecker.Instance.CheckCellBeforeStep(_currentPlayer);
         if (check) {
             StartCoroutine(MakeStepDefer());
         }

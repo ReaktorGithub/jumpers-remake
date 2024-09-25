@@ -188,7 +188,7 @@ public static class AiLib
     }
 
     public static int GetBranchVariantPoints(PlayerControl player, BranchButton branchButton, CellControl cell) {
-        int points = cell.AiScore;
+        int points = cell.AiScore; // 8
 
         int hedgehogTax = branchButton.GetHedgehogTax();
         if (hedgehogTax > 0) {
@@ -217,7 +217,22 @@ public static class AiLib
             }
         }
 
-        if (player.Power > 2 && cell.CurrentTokens.Count > 0) points += 8;
+        // Избегать игроков со щитами
+        // Обычный игрок +8, со щитом -10
+        
+        List<PlayerControl> rivals = cell.GetCurrentPlayers();
+        int dangerRivals = 0;
+        int normalRivals = 0;
+        foreach(PlayerControl rival in rivals) {
+            if (rival.Boosters.Armor > 0) {
+                dangerRivals++;
+            } else {
+                normalRivals++;
+            }
+        }
+        points -= dangerRivals * 10;
+
+        if (player.Power > 2 && normalRivals > 0) points += 8;
 
         return points;
     }
@@ -240,7 +255,7 @@ public static class AiLib
 
         foreach(GameObject button in branch.BranchButtonsList) {
             BranchButton branchButton = button.GetComponent<BranchButton>();
-            (GameObject, int) cells = CellsControl.Instance.FindCellBySteps(branchButton.NextCell, !branch.IsReverse, rest);
+            (GameObject, int) cells = CellsControl.Instance.FindCellBySteps(branchButton.NextCell, !branch.IsReverse, rest - 1);
             GameObject targetCell = cells.Item1;
             if (targetCell == null) {
                 variants.Add((branchButton, 0));

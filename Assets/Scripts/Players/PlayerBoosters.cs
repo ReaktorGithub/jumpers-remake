@@ -261,4 +261,18 @@ public class PlayerBoosters : MonoBehaviour
         }
         PlayersControl.Instance.UpdatePlayersInfo();
     }
+
+    // Вычислить и вернуть индекс первой попавшейся кнопки щита, годной для отображения оверлея щита
+
+    public int GetActualBoosterButtonIndex() {
+        int firstIndex;
+
+        if (IsIronArmor) {
+            firstIndex = Shield + ShieldIron - 1;
+        } else {
+            firstIndex = Shield - 1;
+        }
+
+        return firstIndex;
+    }
 }

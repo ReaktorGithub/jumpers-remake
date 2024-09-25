@@ -16,6 +16,11 @@ public class BoostersRow : MonoBehaviour
         _list.Add(_boosterButton3);
     }
 
+    public List<BoosterButton> List {
+        get { return _list; }
+        private set {}
+    }
+
     public void UpdateButton(int number, EBoosters booster) {
         switch(number) {
             case 1: {

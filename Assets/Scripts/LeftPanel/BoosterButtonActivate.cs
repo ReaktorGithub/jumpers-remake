@@ -53,12 +53,17 @@ public class BoosterButtonActivate : MonoBehaviour
 
     public void OnSelect() {
         if (_boosterButton.IsShield()) {
-            PlayerControl player = PlayersControl.Instance.GetMe();
-            if (player != null) {
-                // мы должны запомнить, на какой кнопке игрок активировал щит
-                player.Boosters.SelectedShieldButton = _boosterButton;
-                BoostersControl.Instance.ExecuteShield(player, _boosterButton.BoosterType == EBoosters.ShieldIron);
+            PlayerControl player;
+
+            if (AiControl.Instance.EnableAi) {
+                player = PlayersControl.Instance.GetMe();
+            } else {
+                player = MoveControl.Instance.CurrentPlayer;
             }
+
+            // мы должны запомнить, на какой кнопке игрок активировал щит
+            player.Boosters.SelectedShieldButton = _boosterButton;
+            BoostersControl.Instance.ExecuteShield(player, _boosterButton.BoosterType == EBoosters.ShieldIron);
             return;
         }
 
