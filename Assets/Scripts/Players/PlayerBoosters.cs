@@ -289,4 +289,45 @@ public class PlayerBoosters : MonoBehaviour
 
         return firstIndex;
     }
+
+    // Бумка
+
+    public void ExecuteBoombaster(int powerPenalty) {
+        if (powerPenalty == 0) {
+            return;
+        }
+        
+        string resultText;
+        if (Armor > 0) {
+            resultText = "Щит слетает";
+        } else {
+            string powerText = powerPenalty == 1 ? " сила" : " силы";
+            resultText = "-" + powerPenalty + powerText;
+        }
+        
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " задело " + Utils.Wrap("БУМКОЙ! ", UIColors.Red) + resultText;
+        Messages.Instance.AddMessage(message);
+
+        TokenControl token = _player.GetTokenControl();
+        bool isMe = _player.IsMe();
+
+        if (Armor > 0) {
+            Armor = 0;
+            token.UpdateShield(EBoosters.None);
+            if (IsIronArmor) {
+                AddShieldIron(-1);
+                if (isMe) {
+                   BoostersControl.Instance.DeactivateArmorButtons(); 
+                }
+            } else {
+                AddShield(-1);
+                if (isMe) {
+                    BoostersControl.Instance.DeactivateArmorButtons();
+                }
+            }
+        } else {
+            _player.AddPower(-powerPenalty);
+            PlayersControl.Instance.UpdatePlayersInfo();
+        }
+    }
 }

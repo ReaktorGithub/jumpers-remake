@@ -53,16 +53,16 @@ public class Jumpers : MonoBehaviour
     //     }
     // }
 
-    private void Update() {
-        if (Input.GetKeyUp(KeyCode.B)) {
-            GameObject cell = GameObject.Find("c4");
-            List<CellControl> list = CellsControl.Instance.GetCellsInArea(cell.GetComponent<CellControl>());
-            Debug.Log("list count: " + list.Count);
-            foreach(CellControl found in list) {
-                Debug.Log("found: " + found.gameObject.name);
-            }
-        }
-    }
+    // private void Update() {
+    //     if (Input.GetKeyUp(KeyCode.B)) {
+    //         GameObject cell = GameObject.Find("c4");
+    //         List<CellControl> list = CellsControl.Instance.GetCellsInArea(cell.GetComponent<CellControl>(), 1);
+    //         Debug.Log("list count: " + list.Count);
+    //         foreach(CellControl found in list) {
+    //             Debug.Log("found: " + found.gameObject.name);
+    //         }
+    //     }
+    // }
 
     // private void Update() {
     //     if (Input.GetKeyUp(KeyCode.Z)) {

@@ -405,7 +405,14 @@ public class CellsControl : MonoBehaviour
 
     public List<CellControl> GetCellsInArea(CellControl initialCell, int areaSize = 1) {
         List<CellControl> result = new();
+        
+        float defaultScale = 4f;
+        float trueScale = 4.6f;
+        float scale = trueScale * (areaSize * 2 + 1) - trueScale;
+
+        initialCell.Intersection.transform.localScale = new Vector3(scale, scale, 1);
         BoxCollider2D initialCollider = initialCell.Intersection.GetComponent<BoxCollider2D>();
+        Physics2D.SyncTransforms();
 
         foreach(CellControl cell in _allCellControls) {
             BoxCollider2D collider = cell.Intersection.GetComponent<BoxCollider2D>();
@@ -413,6 +420,8 @@ public class CellsControl : MonoBehaviour
                 result.Add(cell);
             }
         }
+
+        initialCell.Intersection.transform.localScale = new Vector3(defaultScale, defaultScale, 1);
 
         return result;
     }
@@ -449,8 +458,9 @@ public class CellsControl : MonoBehaviour
 
     // Бумка
 
-    public void AddBoombaster(CellControl targetCell) {
+    public void AddBoombaster(CellControl targetCell, int level) {
         targetCell.IsBoombaster = true;
+        targetCell.BoombasterLevel = level;
         targetCell.BoombasterTimer = _boombasterMaxTicks;
         _boombastersList.Add(targetCell);
     }
@@ -473,14 +483,83 @@ public class CellsControl : MonoBehaviour
     public void ExecuteBoombasterExplosion(CellControl targetCell) {
         _explosion.SetPosition(targetCell.transform.localPosition);
         _explosion.Explode();
-        // todo сделать область взрыва и эффект на игроков
+        ManualContent manual = Manual.Instance.BoosterBoombaster;
+        int level = targetCell.BoombasterLevel;
+        int areaSize = manual.GetCauseEffect(level);
+
+        // Вычисляем игроков, попавших в эпицентр
+        List<PlayerControl> playersArea0 = targetCell.GetCurrentPlayers();
+
+        // Вычисляем игроков на расстоянии 1
+        List<PlayerControl> playersArea1 = GetPlayersInArea(targetCell, 1);
+        
+        // Вычисляем игроков на расстоянии 2
+        List<PlayerControl> playersArea2 = new();
+        if (areaSize > 1) {
+            List<PlayerControl> pretenders = GetPlayersInArea(targetCell, 2);
+            foreach(PlayerControl pretender in pretenders) {
+                if (!playersArea1.Contains(pretender)) {
+                    playersArea2.Add(pretender);
+                }
+            }
+        }
+
+        // Вычисляем игроков на расстоянии 3
+        List<PlayerControl> playersArea3 = new();
+        if (areaSize == 3) {
+            List<PlayerControl> pretenders = GetPlayersInArea(targetCell, 3);
+            foreach(PlayerControl pretender in pretenders) {
+                if (!playersArea1.Contains(pretender) && !playersArea2.Contains(pretender)) {
+                    playersArea3.Add(pretender);
+                }
+            }
+        }
+
+        // Применение эффектов взрыва на игроках
+        foreach(PlayerControl player in playersArea0) {
+            int penalty = BoostersControl.Instance.GetBoombasterPowerPenalty(level, 0);
+            player.Boosters.ExecuteBoombaster(penalty);
+        }
+
+        foreach(PlayerControl player in playersArea1) {
+            int penalty = BoostersControl.Instance.GetBoombasterPowerPenalty(level, 1);
+            player.Boosters.ExecuteBoombaster(penalty);
+        }
+
+        foreach(PlayerControl player in playersArea2) {
+            int penalty = BoostersControl.Instance.GetBoombasterPowerPenalty(level, 2);
+            player.Boosters.ExecuteBoombaster(penalty);
+        }
+
+        foreach(PlayerControl player in playersArea3) {
+            int penalty = BoostersControl.Instance.GetBoombasterPowerPenalty(level, 3);
+            player.Boosters.ExecuteBoombaster(penalty);
+        }
+
         StartCoroutine(ExecuteBoombasterExplosionDefer());
     }
 
     private IEnumerator ExecuteBoombasterExplosionDefer() {
         yield return new WaitForSeconds(_boombasterDelay);
-        // todo проверить на выбывших игроков и окончание гонки
+        // todo проверить на выбывших игроков и окончание гонки, протестировать щиты
         MoveControl.Instance.ContinueSwitchPlayer();
+    }
+
+    // Возвращает игроков по площади вокруг выбранной клетки на определенном расстоянии
+    // areaSize == 1: будет исследован квадрат 3x3; areaSize == 2: будет исследован квадрат 5x5 и.т.д.
+
+    private List<PlayerControl> GetPlayersInArea(CellControl initialCell, int areaSize = 1) {
+        List<PlayerControl> playersArea = new();
+
+        List<CellControl> surroundCells = GetCellsInArea(initialCell, areaSize);
+        foreach(CellControl cell in surroundCells) {
+            List<PlayerControl> playersAtCell = cell.GetCurrentPlayers();
+            foreach(PlayerControl player in playersAtCell) {
+                playersArea.Add(player);
+            }
+        }
+
+        return playersArea;
     }
 
     // Дебаг

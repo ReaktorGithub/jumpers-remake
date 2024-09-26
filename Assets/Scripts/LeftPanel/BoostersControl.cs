@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class BoostersControl : MonoBehaviour
 {
@@ -351,9 +352,41 @@ public class BoostersControl : MonoBehaviour
     }
 
     public void ExecuteBoombaster(PlayerControl player, CellControl targetCell) {
-        CellsControl.Instance.AddBoombaster(targetCell);
+        CellsControl.Instance.AddBoombaster(targetCell, player.Grind.Boombaster);
         player.Boosters.AddBoombaster(-1);
         UpdateBoostersFromPlayer(player);
+
+        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " устанавливает " + Utils.Wrap("бумку", UIColors.DarkYellow) + " на клетке " + targetCell.GetCellText();
+        Messages.Instance.AddMessage(message);
+    }
+
+    public int GetBoombasterPowerPenalty(int level, int areaRow) {
+        switch(level) {
+            case 1: {
+                return areaRow switch {
+                    0 => 3,
+                    1 => 1,
+                    _ => 0,
+                };
+            }
+            case 2: {
+                return areaRow switch {
+                    0 => 3,
+                    1 => 2,
+                    2 => 1,
+                    _ => 0,
+                };
+            }
+            case 3: {
+                return areaRow switch {
+                    0 => 4,
+                    1 => 3,
+                    2 => 2,
+                    _ => 1,
+                };
+            }
+            default: return 0;
+        }
     }
 
     // разное

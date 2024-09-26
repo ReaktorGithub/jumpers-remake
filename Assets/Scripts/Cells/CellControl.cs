@@ -33,6 +33,7 @@ public class CellControl : MonoBehaviour
     [SerializeField] private int _aiScore = 0; // чем выше число, тем больше эта клетка нравится ai
     private bool _isBoombaster = false;
     private int _boombasterTimer = 9;
+    private int _boombasterLevel = 1;
 
     private void Awake() {
         _container = transform.Find("container").gameObject;
@@ -96,6 +97,11 @@ public class CellControl : MonoBehaviour
     public bool IsBoombaster {
         get { return _isBoombaster; }
         set {_isBoombaster = value; }
+    }
+
+    public int BoombasterLevel {
+        get { return _boombasterLevel; }
+        set {_boombasterLevel = value; }
     }
 
     public int BoombasterTimer {
@@ -176,6 +182,9 @@ public class CellControl : MonoBehaviour
     }
 
     public string GetCellText() {
+        if (_text == null) {
+            return transform.name;
+        }
         return _text.text;
     }
 
