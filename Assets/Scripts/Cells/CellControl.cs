@@ -16,7 +16,7 @@ public class CellControl : MonoBehaviour
     [SerializeField] private bool _enableReverse = false;
     // Если _enableReverse = true, то клетка находится в ответвлении со стеной. Нахождение фишки на этой клетке никак не влияет на её направление.
     // Если _enableReverse = false, то клетка обычная. После остановки фишки у игрока будет принудительно сменено направление на "вперед"
-    private GameObject _container, _glow, _coinBonusObject, _brick, _boombaster;
+    private GameObject _container, _glow, _coinBonusObject, _brick, _boombaster, _intersection;
     private SpriteRenderer _spriteRenderer, _glowSpriteRenderer, _grindSpriteRenderer;
     private float[] _cellScale = new float[2];
     [SerializeField] private List<GameObject> _currentTokens = new();
@@ -56,6 +56,7 @@ public class CellControl : MonoBehaviour
         _brick = _container.transform.Find("brick").gameObject;
         _boombaster = _container.transform.Find("Boombaster").gameObject;
         _boombasterText = _boombaster.transform.Find("timer").GetComponent<TextMeshPro>();
+        _intersection = _container.transform.Find("intersection").gameObject;
     }
 
     private void Start() {
@@ -132,6 +133,11 @@ public class CellControl : MonoBehaviour
 
     public int EffectLevel {
         get { return _effectLevel; }
+        private set {}
+    }
+
+    public GameObject Intersection {
+        get { return _intersection; }
         private set {}
     }
 
@@ -512,5 +518,9 @@ public class CellControl : MonoBehaviour
         IsBoombaster = false;
         UpdateBoombasterVisual();
         CellsControl.Instance.ExecuteBoombasterExplosion(this);
+    }
+
+    public void SetIntersectionScale(Vector3 scale) {
+        _intersection.transform.localScale = scale;
     }
 }

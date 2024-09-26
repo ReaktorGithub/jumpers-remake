@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 // Класс предназначен для предварительной настройки игры перед запуском уровня
@@ -52,14 +53,16 @@ public class Jumpers : MonoBehaviour
     //     }
     // }
 
-    // private void Update() {
-    //     if (Input.GetKeyUp(KeyCode.B)) {
-    //         Explosion explosion = GameObject.Find("Explosion").GetComponent<Explosion>();
-    //         GameObject cell = GameObject.Find("c3");
-    //         explosion.SetPosition(cell.transform.position);
-    //         explosion.Explode();
-    //     }
-    // }
+    private void Update() {
+        if (Input.GetKeyUp(KeyCode.B)) {
+            GameObject cell = GameObject.Find("c4");
+            List<CellControl> list = CellsControl.Instance.GetCellsInArea(cell.GetComponent<CellControl>());
+            Debug.Log("list count: " + list.Count);
+            foreach(CellControl found in list) {
+                Debug.Log("found: " + found.gameObject.name);
+            }
+        }
+    }
 
     // private void Update() {
     //     if (Input.GetKeyUp(KeyCode.Z)) {

@@ -400,6 +400,23 @@ public class CellsControl : MonoBehaviour
         return -resultBackward.Item2;
     }
 
+    // Возвращает все клетки из квадратной области вокруг текущей
+    // areaSize == 1: будет исследован квадрат 3x3; areaSize == 2: будет исследован квадрат 5x5 и.т.д.
+
+    public List<CellControl> GetCellsInArea(CellControl initialCell, int areaSize = 1) {
+        List<CellControl> result = new();
+        BoxCollider2D initialCollider = initialCell.Intersection.GetComponent<BoxCollider2D>();
+
+        foreach(CellControl cell in _allCellControls) {
+            BoxCollider2D collider = cell.Intersection.GetComponent<BoxCollider2D>();
+            if (cell != initialCell && collider.bounds.Intersects(initialCollider.bounds)) {
+                result.Add(cell);
+            }
+        }
+
+        return result;
+    }
+
     // Подсказки для магнита
 
     public void UpdateCellMagnetHint(GameObject currentCell, int selectedScore) {
