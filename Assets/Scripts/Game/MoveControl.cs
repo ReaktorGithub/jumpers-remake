@@ -146,8 +146,7 @@ public class MoveControl : MonoBehaviour
         PlayersControl.Instance.UpdatePlayersInfo();
         if (_currentPlayer.IsMe()) {
             EffectsControl.Instance.UpdateQuantityText(_currentPlayer);
-            EffectsControl.Instance.UpdateEffectEmptiness(_currentPlayer);
-            EffectsControl.Instance.UpdateButtonsGrind(_currentPlayer.Grind);
+            EffectsControl.Instance.UpdateButtonsVisual(_currentPlayer);
             BoostersControl.Instance.UpdateBoostersFromPlayer(_currentPlayer);
         }
 
@@ -199,7 +198,10 @@ public class MoveControl : MonoBehaviour
 
         // включение индикатора молнии на кубике
         _currentPlayer.Effects.CheckLightningStartMove();
-        
+
+        // сброс параметров
+        _currentPlayer.SkipMoveCount = 0;
+
         bool isMe = _currentPlayer.IsMe();
         if (isMe) {
             EffectsControl.Instance.TryToEnableAllEffectButtons();
@@ -425,10 +427,22 @@ public class MoveControl : MonoBehaviour
         Messages.Instance.AddMessage(message);
         message = Utils.Wrap("пропуск", UIColors.Yellow);
         CubicControl.Instance.WriteStatus(message);
+
         yield return new WaitForSeconds(_skipMoveDelay);
+
         _currentPlayer.SkipMoveDecrease();
         _currentPlayer.Effects.SpendLightning();
-        EndMove();
+
+        // подсчет ходов, пропущенных на желтой клетке
+        CellControl cell = _currentPlayer.GetCurrentCell();
+        if (cell.Effect == EControllableEffects.Yellow) {
+            _currentPlayer.IncreaseSkipMoveCount();
+        }
+        bool check = _currentPlayer.Effects.ExecuteYellowPowerPenalty();
+
+        if (check) {
+           EndMove(); 
+        }
     }
 
     public void EndMove() {

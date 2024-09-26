@@ -61,20 +61,6 @@ public class EffectsControl : MonoBehaviour
         set { _selectedEffect = value; }
     }
 
-    public void UpdateButtonsSelection() {
-        foreach (EffectButton button in _effectButtonsList) {
-            button.SetSelected(button.GetComponent<EffectButton>().EffectType == _selectedEffect);
-        }
-    }
-
-    public void UpdateButtonsGrind(PlayerGrind grind) {
-        _greenEffectButton.UpdateGrind(grind.Green);
-        _yellowEffectButton.UpdateGrind(grind.Yellow);
-        _redEffectButton.UpdateGrind(grind.Red);
-        _blackEffectButton.UpdateGrind(grind.Black);
-        _starEffectButton.UpdateGrind(grind.Star);
-    }
-
     public void ActivateSelectionMode(bool isReplace = false) {
         if (_isSelectionMode) {
             return;
@@ -235,17 +221,26 @@ public class EffectsControl : MonoBehaviour
         cell.StartChanging();
 
         UpdateQuantityText(player);
-        UpdateEffectEmptiness(player);
+        UpdateButtonsVisual(player);
         DisableAllButtons(true);
         StartCoroutine(DeactivateSelectionModeDefer());
     }
 
-    public void UpdateEffectEmptiness(PlayerControl player) {
-        _greenEffectButton.SetIsEmpty(player.Effects.Green == 0);
-        _yellowEffectButton.SetIsEmpty(player.Effects.Yellow == 0);
-        _redEffectButton.SetIsEmpty(player.Effects.Red == 0);
-        _blackEffectButton.SetIsEmpty(player.Effects.Black == 0);
-        _starEffectButton.SetIsEmpty(player.Effects.Star == 0);
+    public void UpdateButtonsSelection() {
+        foreach (EffectButton button in _effectButtonsList) {
+            button.SetSelected(button.GetComponent<EffectButton>().EffectType == _selectedEffect);
+        }
+    }
+
+    public void UpdateButtonsVisual(PlayerControl player) {
+        PlayerGrind grind = player.Grind;
+        PlayerEffects effects = player.Effects;
+
+        _greenEffectButton.SetIsEmpty(effects.Green == 0, grind.Green);
+        _yellowEffectButton.SetIsEmpty(effects.Yellow == 0, grind.Yellow);
+        _redEffectButton.SetIsEmpty(effects.Red == 0, grind.Red);
+        _blackEffectButton.SetIsEmpty(effects.Black == 0, grind.Black);
+        _starEffectButton.SetIsEmpty(effects.Star == 0, grind.Star);
     }
 
     public void UpdateQuantityText(PlayerControl player) {
@@ -280,7 +275,7 @@ public class EffectsControl : MonoBehaviour
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
         player.Effects.ExecuteReplaceEffect(_selectedEffect);
         UpdateQuantityText(player);
-        UpdateEffectEmptiness(player);
+        UpdateButtonsVisual(player);
 
         // удалить эффект на текущей клетке
 

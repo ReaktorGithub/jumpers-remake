@@ -16,8 +16,7 @@ public class CellControl : MonoBehaviour
     [SerializeField] private bool _enableReverse = false;
     // Если _enableReverse = true, то клетка находится в ответвлении со стеной. Нахождение фишки на этой клетке никак не влияет на её направление.
     // Если _enableReverse = false, то клетка обычная. После остановки фишки у игрока будет принудительно сменено направление на "вперед"
-    private GameObject _coinBonusObject;
-    private GameObject _container, _glow;
+    private GameObject _container, _glow, _coinBonusObject, _brick;
     private SpriteRenderer _spriteRenderer, _glowSpriteRenderer, _grindSpriteRenderer;
     private float[] _cellScale = new float[2];
     [SerializeField] private List<GameObject> _currentTokens = new();
@@ -52,6 +51,7 @@ public class CellControl : MonoBehaviour
         _coinBonusObject = _container.transform.Find("CoinBonus").gameObject;
         _coinBonusText = _coinBonusObject.transform.Find("CoinBonusText").GetComponent<TextMeshPro>();
         _grindSpriteRenderer = _container.transform.Find("grind").GetComponent<SpriteRenderer>();
+        _brick = _container.transform.Find("brick").gameObject;
     }
 
     private void Start() {
@@ -159,6 +159,10 @@ public class CellControl : MonoBehaviour
         return effect == EControllableEffects.Black || effect == EControllableEffects.Red;
     }
 
+    public bool IsWallEffect() {
+        return EffectLevel == 3 && IsPenaltyEffect();
+    }
+
     public void UpdateGrindVisual(int level) {
         switch(level) {
             case 2: {
@@ -174,6 +178,9 @@ public class CellControl : MonoBehaviour
                 break;
             }
         }
+
+        bool isWall = level == 3 && IsPenaltyEffect();
+        _brick.SetActive(isWall);
     }
 
     // Перераспределить позиции фишек на клетке

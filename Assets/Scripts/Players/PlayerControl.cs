@@ -18,8 +18,10 @@ public class PlayerControl : MonoBehaviour
     private int _placeAfterFinish;
     private bool _isFinished = false;
     private int _movesSkip = 0; // пропуски хода
+    private int _skipMoveCount = 0; // сколько пропущено ходов на желтой клетке подряд
     private int _movesToDo = 0; // сколько нужно сделать ходов с броском кубика
     private int _stepsLeft = 0; // сколько шагов фишкой осталось сделать
+    private bool _isLuckyStar = false; // защита от чёрных клеток
     
     private List<EAttackTypes> _availableAttackTypes = new();
     private ModalWarning _modalWarning;
@@ -35,9 +37,6 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private int _mallows = 0;
     [SerializeField] private int _rubies = 0;
     [SerializeField] private int _power = 2;
-
-    // Кубик
-    [SerializeField] private int _cubicMaxScore = 6;
 
     private void Awake() {
         _availableAttackTypes.Add(EAttackTypes.Usual);
@@ -86,6 +85,11 @@ public class PlayerControl : MonoBehaviour
     public int MovesSkip {
         get { return _movesSkip; }
         private set {}
+    }
+
+    public int SkipMoveCount {
+        get { return _skipMoveCount; }
+        set { _skipMoveCount = value; }
     }
 
     public int MovesToDo {
@@ -138,6 +142,11 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
+    public bool IsLuckyStar {
+        get { return _isLuckyStar; }
+        set { _isLuckyStar = value; }
+    }
+
     public int Coins {
         get { return _coins; }
         set { _coins = value; }
@@ -173,11 +182,6 @@ public class PlayerControl : MonoBehaviour
         private set {}
     }
 
-    public int CubicMaxScore {
-        get { return _cubicMaxScore; }
-        set { _cubicMaxScore = value; }
-    }
-
     // Изменение параметров движения с помощью инкремента или декремента
 
     public void AddMovesToDo(int count) {
@@ -186,6 +190,10 @@ public class PlayerControl : MonoBehaviour
 
     public void AddMovesSkip(int count) {
         _movesSkip += count;
+    }
+
+    public void IncreaseSkipMoveCount() {
+        _skipMoveCount++;
     }
 
     public void AddStepsLeft(int count) {
@@ -275,14 +283,18 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void ExecuteAttackMagicKick(PlayerControl rival) {
-        int powerSpend = Manual.Instance.AttackMagicKick.GetCost(1); // todo вычислять из уровня атаки
+        ManualContent manual = Manual.Instance.AttackMagicKick;
+        int level = _grind.MagicKick;
+        int powerSpend = manual.GetCost(level);
+
         AddPower(-powerSpend);
         PlayersControl.Instance.UpdatePlayersInfo();
+
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ДАЁТ ПИНКА ", UIColors.Red) + Utils.Wrap(rival.PlayerName, UIColors.Yellow) + "!";
         Messages.Instance.AddMessage(message);
 
-        int steps = Manual.Instance.AttackMagicKick.GetCauseEffect(1); // todo вычислять из уровня атаки
-        MoveControl.Instance.MakeMagicKickMove(rival, rival.GetCurrentCell(), steps); 
+        int steps = manual.GetCauseEffect(level);
+        MoveControl.Instance.MakeMagicKickMove(rival, rival.GetCurrentCell(), steps);
 
         PlayersControl.Instance.CheckIsPlayerOutOfPower(this);
     }
@@ -302,15 +314,19 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void ExecuteAttackKnockout(PlayerControl rival) {
-        int powerSpend = Manual.Instance.AttackKnockout.GetCost(3); // todo вычислять из уровня атаки
-        int moneyBonus = Manual.Instance.AttackKnockout.GetCauseEffect(3); // todo вычислять из уровня атаки
+        ManualContent manual = Manual.Instance.AttackKnockout;
+        int level = _grind.Knockout;
+        int powerSpend = manual.GetCost(level);
+        int moneyBonus = manual.GetCauseEffect(level);
 
         AddPower(-powerSpend);
         AddMovesToDo(1);
         rival.AddCoins(-moneyBonus);
         AddCoins(moneyBonus);
+
         string message1 = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" НОКАУТИРУЕТ ", UIColors.Red) + Utils.Wrap(rival.PlayerName, UIColors.Yellow) + "!";
         Messages.Instance.AddMessage(message1);
+
         rival.ConfirmLose();
         PlayersControl.Instance.UpdatePlayersInfo();
 
@@ -335,6 +351,13 @@ public class PlayerControl : MonoBehaviour
     public void OpenSavedByShieldModal(Action callback = null) {
         _modalWarning.SetHeadingText("Железный щит");
         _modalWarning.SetBodyText("Благодаря <b>железному щиту</b> вы не теряете силу на этой клетке.");
+        _modalWarning.SetCallback(callback);
+        _modalWarning.OpenModal();
+    }
+
+    public void OpenSavedByStarModal(Action callback = null) {
+        _modalWarning.SetHeadingText("Счастливая звезда");
+        _modalWarning.SetBodyText("Благодаря <b>счастливой звезде</b> вы не теряете силу на этой клетке.");
         _modalWarning.SetCallback(callback);
         _modalWarning.OpenModal();
     }
@@ -371,6 +394,15 @@ public class PlayerControl : MonoBehaviour
 
     public CellControl GetCurrentCell() {
         return GetTokenControl().GetCurrentCellControl();
+    }
+
+    public int GetCubicMaxScore() {
+        return _grind.Cubic switch {
+            2 => 7,
+            3 => 8,
+            4 => 9,
+            _ => 6,
+        };
     }
 
     // Вычислить среднее отставание от других игроков (в шагах)

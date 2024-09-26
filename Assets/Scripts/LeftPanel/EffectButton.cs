@@ -40,10 +40,15 @@ public class EffectButton : MonoBehaviour
         _selected.SetActive(value);
     }
 
-    public void SetIsEmpty(bool value) {
+    public void SetIsEmpty(bool value, int grindLevel) {
         _isEmpty = value;
         _effect.SetActive(!value);
         _button.interactable = !value;
+        
+        int level = value ? 0 : grindLevel;
+        _grind1.SetActive(level == 1);
+        _grind2.SetActive(level == 2);
+        _grind3.SetActive(level == 3);
     }
 
     // если кнопка энейблится, но при этом она пустая, то ничего не делать
@@ -57,11 +62,5 @@ public class EffectButton : MonoBehaviour
         _effectRenderer.color = color;
         _quantityText.color = color;
         _cursorManager.Disabled = value;
-    }
-
-    public void UpdateGrind(int level) {
-        _grind1.SetActive(level == 1);
-        _grind2.SetActive(level == 2);
-        _grind3.SetActive(level == 3);
     }
 }

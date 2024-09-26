@@ -5,15 +5,21 @@ using UnityEngine.UI;
 public class ModalReplaceEffect : MonoBehaviour
 {
     private Modal _modal;
-    [SerializeField] private GameObject _iconExecute, _iconCostEffect, _iconResource, _lowPower, _replaceButton, _shieldInfo;
+    [SerializeField] private GameObject _iconExecute, _iconCostEffect, _iconResource, _lowPower, _replaceButton, _shieldInfo, _shieldIcon;
     [SerializeField] private TextMeshProUGUI _descriptionText, _effectCostName, _resourceCost, _resourceCostText, _effectName;
     private TextMeshProUGUI _lowPowerText;
     private BigAnswerButton _replaceButtonScript;
+    private Sprite _shieldSprite, _starSprite;
+    private Image _shieldImage;
 
     private void Awake() {
+        GameObject Instances = GameObject.Find("Instances");
         _modal = GameObject.Find("ModalReplaceEffect").GetComponent<Modal>();
         _lowPowerText = _lowPower.GetComponent<TextMeshProUGUI>();
         _replaceButtonScript = _replaceButton.GetComponent<BigAnswerButton>();
+        _shieldSprite = Instances.transform.Find("shield-iron").GetComponent<SpriteRenderer>().sprite;
+        _starSprite = Instances.transform.Find("star-icon").GetComponent<SpriteRenderer>().sprite;
+        _shieldImage = _shieldIcon.GetComponent<Image>();
     }
 
     private void Start() {
@@ -76,9 +82,16 @@ public class ModalReplaceEffect : MonoBehaviour
         _iconResource.GetComponent<Image>().sprite = resourceManual.Sprite;
         _resourceCostText.text = resourceManual.GetEntityName(true);
 
-        // Информация о наличии щита
+        // Информация о защите
+        bool showStar = effect == EControllableEffects.Black && currentPlayer.IsLuckyStar;
         bool isPowerDangerEffect = effect == EControllableEffects.Black || effect == EControllableEffects.Red;
-        _shieldInfo.SetActive(isPowerDangerEffect && currentPlayer.Boosters.Armor > 0 && currentPlayer.Boosters.IsIronArmor);
+        bool showShield = isPowerDangerEffect && currentPlayer.Boosters.Armor > 0 && currentPlayer.Boosters.IsIronArmor;
+        if (showStar) {
+            _shieldImage.sprite = _starSprite;
+        } else if (showShield) {
+            _shieldImage.sprite = _shieldSprite;
+        }
+        _shieldInfo.SetActive(showStar || showShield);
     }
 
     public void OnConfirmClick() {

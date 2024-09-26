@@ -14,9 +14,9 @@ public class PopupAttack : MonoBehaviour
     private PlayerControl _selectedPlayer = null;
     private EAttackTypes _selectedAttackType = EAttackTypes.Usual;
     private Button _buttonAttack, _buttonCancel;
-    private int _powerInitial = 0;
     private int _powerNeed = 0;
     [SerializeField] private float _attackDelay = 0.7f;
+    private PlayerControl _player;
 
     private void Awake() {
         _attack = GameObject.Find("PopupAttack");
@@ -61,6 +61,7 @@ public class PopupAttack : MonoBehaviour
     }
 
     public void BuildContent(PlayerControl currentPlayer, List<PlayerControl> rivals) {
+        _player = currentPlayer;
         SetSelectedAttackType(EAttackTypes.Usual);
 
         // раздел с атаками
@@ -81,7 +82,6 @@ public class PopupAttack : MonoBehaviour
 
         // сила
 
-        _powerInitial = currentPlayer.Power;
         UpdatePower();
 
         // раздел с соперниками
@@ -178,8 +178,9 @@ public class PopupAttack : MonoBehaviour
                 break;
             }
             case EAttackTypes.MagicKick: {
-                result[0] = Manual.Instance.AttackMagicKick.GetEntityNameWithLevel(1); // todo добывать уровень из current player
-                result[1] = Manual.Instance.AttackMagicKick.GetShortDescription(1);
+                int level = _player.Grind.MagicKick;
+                result[0] = Manual.Instance.AttackMagicKick.GetEntityNameWithLevel(level);
+                result[1] = Manual.Instance.AttackMagicKick.GetShortDescription(level);
                 break;
             }
             case EAttackTypes.Vampire: {
@@ -188,8 +189,9 @@ public class PopupAttack : MonoBehaviour
                 break;
             }
             case EAttackTypes.Knockout: {
-                result[0] = Manual.Instance.AttackKnockout.GetEntityNameWithLevel(3); // todo добывать уровень из current player
-                result[1] = Manual.Instance.AttackKnockout.GetShortDescription(3);
+                int level = _player.Grind.Knockout;
+                result[0] = Manual.Instance.AttackKnockout.GetEntityNameWithLevel(level);
+                result[1] = Manual.Instance.AttackKnockout.GetShortDescription(level);
                 break;
             }
             default: {
@@ -230,9 +232,12 @@ public class PopupAttack : MonoBehaviour
     }
 
     private void UpdatePower() {
+        int powerInitial = _player.Power;
         int powerNeed = 0;
-        int magicCost = Manual.Instance.AttackMagicKick.GetCost(1); // todo добывать в зависимости от уровня из currentPlayer
-        int knockoutCost = Manual.Instance.AttackKnockout.GetCost(3); // todo добывать в зависимости от уровня из currentPlayer
+        int kickLevel = _player.Grind.MagicKick;
+        int knockoutLevel = _player.Grind.Knockout;
+        int magicCost = Manual.Instance.AttackMagicKick.GetCost(kickLevel);
+        int knockoutCost = Manual.Instance.AttackKnockout.GetCost(knockoutLevel);
 
         switch (_selectedAttackType) {
             case EAttackTypes.Usual:
@@ -247,11 +252,11 @@ public class PopupAttack : MonoBehaviour
             break;
         }
 
-        int powerLeft = _powerInitial - powerNeed;
+        int powerLeft = powerInitial - powerNeed;
         _powerNeed = powerNeed;
         string powerLeftString = powerLeft > 0 ? powerLeft.ToString() : Utils.Wrap(powerLeft.ToString(), UIColors.Red);
 
-        _powerNow.text = "Сил в наличии: <b>" + _powerInitial + "</b>";
+        _powerNow.text = "Сил в наличии: <b>" + powerInitial + "</b>";
         _powerLeft.text = "Сил останется: <b>" + powerLeftString + "</b>";
 
         UpdateAttackButtonStatus();
@@ -261,7 +266,7 @@ public class PopupAttack : MonoBehaviour
         if (_selectedPlayer == null) {
             SetButtonAttackInteractable(false);
             _warningText.text = "Выберите соперника";
-        } else if (_powerInitial - _powerNeed < 0) {
+        } else if (_player.Power - _powerNeed < 0) {
             SetButtonAttackInteractable(false);
             _warningText.text = "Мало сил";
         } else {

@@ -83,9 +83,60 @@ public class PlayerEffects : MonoBehaviour
 
     // исполнение эффектов
 
-    public void ExecuteBlack() {
+    public void ExecuteGreen() {
+        ManualContent manual = Manual.Instance.GetEffectManual(EControllableEffects.Green);
         CellControl cell = _player.GetCurrentCell();
-        TokenControl token = _player.GetTokenControl();
+        int moves = manual.GetCauseEffect(cell.EffectLevel);
+        int coins = cell.EffectLevel == 3 ? 50 : 0;
+
+        _player.AddMovesToDo(moves);
+        _player.AddCoins(coins);
+
+        string movesMessage = moves == 1 ? "раз" : (moves + " раза");
+        string coinsMessage = coins > 0 ? ". " + Utils.Wrap("Бонус", UIColors.Green) + " +" + coins + " монет!" : "";
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("зелёный", UIColors.Green) + " эффект и походит ещё " + movesMessage + coinsMessage;
+        Messages.Instance.AddMessage(message);
+    }
+
+    public void ExecuteYellow() {
+        ManualContent manual = Manual.Instance.GetEffectManual(EControllableEffects.Yellow);
+        CellControl cell = _player.GetCurrentCell();
+        int coins = manual.GetCauseEffect(cell.EffectLevel);
+
+        _player.SkipMoveIncrease();
+        _player.AddCoins(coins);
+
+        string coinsMessage = coins == 0 ? "" : ". " + Utils.Wrap("Штраф", UIColors.Red) + " " + coins + " монет";
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("жёлтый", UIColors.Yellow) + " эффект и пропустит ход" + coinsMessage;
+        Messages.Instance.AddMessage(message);
+    }
+
+    // Если игрок находится на желтой клетке 3 уровня и пропускает более 1 года подряд, то снизить его силу на 1
+
+    public bool ExecuteYellowPowerPenalty() {
+        CellControl cell = _player.GetCurrentCell();
+
+        if (cell.Effect != EControllableEffects.Yellow || cell.EffectLevel != 3 || _player.SkipMoveCount < 2) {
+            return true;
+        }
+
+        _player.AddPower(-1);
+
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " слишком долго отдыхает на жёлтой клетке 3 уровня! " + Utils.Wrap("Штраф", UIColors.Red) + " -1 сила";
+        Messages.Instance.AddMessage(message);
+
+        PlayersControl.Instance.CheckIsPlayerOutOfPower(_player, () => MoveControl.Instance.EndMove());
+        
+        return false;
+    }
+
+    public void ExecuteBlack() {
+        if (_player.IsLuckyStar) {
+            _player.OpenSavedByStarModal(() => {
+                CellChecker.Instance.CheckCellArrows(_player);
+            });
+            return;
+        }
 
         if (_player.Boosters.Armor > 0 && _player.Boosters.IsIronArmor) {
             _player.OpenSavedByShieldModal(() => {
@@ -96,7 +147,8 @@ public class PlayerEffects : MonoBehaviour
 
         _player.AddPower(-1);
         PlayersControl.Instance.UpdatePlayersInfo();
-        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("ЧЁРНЫЙ", UIColors.Black) + " эффект! Минус 1 сила";
+
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("ЧЁРНЫЙ", UIColors.Black) + " эффект! -1 сила";
         Messages.Instance.AddMessage(message);
 
         PlayersControl.Instance.CheckIsPlayerOutOfPower(_player, () => CellChecker.Instance.CheckCellArrows(_player));
@@ -115,9 +167,15 @@ public class PlayerEffects : MonoBehaviour
             return;
         }
 
-        _player.AddPower(-1);
+        CellControl cell = _player.GetCurrentCell();
+        ManualContent manual = Manual.Instance.GetEffectManual(EControllableEffects.Red);
+        int powerPenalty = manual.GetCauseEffect(cell.EffectLevel);
+
+        _player.AddPower(-powerPenalty);
         PlayersControl.Instance.UpdatePlayersInfo();
-        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Минус 1 сила. Возврат на чекпойнт";
+
+        string powerText = powerPenalty == 1 ? "сила" : "силы";
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! -" + powerPenalty + " " + powerText + ". Возврат на чекпойнт";
         Messages.Instance.AddMessage(message);
 
         PlayersControl.Instance.CheckIsPlayerOutOfPower(_player, RedEffectTokenMove, () => StartCoroutine(RedEffectTokenMoveDefer()));
@@ -143,10 +201,23 @@ public class PlayerEffects : MonoBehaviour
     }
 
     public void ExecuteStar() {
-        _player.AddPower(1);
-        PlayersControl.Instance.UpdatePlayersInfo();
-        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("звезду", UIColors.DarkBlue) + " и получает 1 силу";
+        CellControl cell = _player.GetCurrentCell();
+        ManualContent manual = Manual.Instance.GetEffectManual(EControllableEffects.Star);
+        int powerBonus = manual.GetCauseEffect(cell.EffectLevel);
+
+        string powerText = powerBonus == 1 ? " силу" : " силы";
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("звезду", UIColors.DarkBlue) + " и получает " + powerBonus + powerText;
         Messages.Instance.AddMessage(message);
+
+        bool isLucky = cell.EffectLevel == 3;
+        if (isLucky && !_player.IsLuckyStar) {
+            string luckyMessage = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " получает " + Utils.Wrap("счастливую звезду!", UIColors.DarkBlue) + " Защита от " + Utils.Wrap("чёрных", UIColors.Black) + " клеток до конца гонки";
+            Messages.Instance.AddMessage(luckyMessage);
+        }
+
+        _player.IsLuckyStar = isLucky;
+        _player.AddPower(powerBonus);
+        PlayersControl.Instance.UpdatePlayersInfo();
     }
 
     public void ExecuteFinish() {
@@ -155,6 +226,7 @@ public class PlayerEffects : MonoBehaviour
         }
         _player.IsFinished = true;
         int place = _pedestal.SetPlayerToMaxPlace(_player);
+
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + Utils.Wrap(" ФИНИШИРУЕТ ", UIColors.Green) + " на " + place + " месте!";
         Messages.Instance.AddMessage(message);
 
@@ -176,16 +248,20 @@ public class PlayerEffects : MonoBehaviour
     public void ExecuteHedgehogFinishPay(int cost) {
         _player.AddCoins(-cost);
         PlayersControl.Instance.UpdatePlayersInfo();
+
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " платит дань " + Utils.Wrap("ежу", UIColors.DarkGreen);
         Messages.Instance.AddMessage(message);
+
         ExecuteFinish();
     }
 
     public void ExecuteHedgehogFinishFight() {
         _player.AddPower(-3);
         PlayersControl.Instance.UpdatePlayersInfo();
+
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + Utils.Wrap(" ПОБИЛ ", UIColors.Red) + Utils.Wrap("ежа!", UIColors.DarkGreen) + " Финиш свободен";
         Messages.Instance.AddMessage(message);
+
         // todo нужно разбрасывать дань по полю
         ExecuteFinish();
     }
@@ -195,10 +271,11 @@ public class PlayerEffects : MonoBehaviour
         _player.AddPower(bonus.Item1);
         _player.AddCoins(bonus.Item2);
         _player.AddRubies(bonus.Item3);
+        _player.AddMovesSkip(1);
         PlayersControl.Instance.UpdatePlayersInfo();
+
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " забирает бонус из " + Utils.Wrap("копилки", UIColors.Green);
         Messages.Instance.AddMessage(message);
-        _player.AddMovesSkip(1);
 
         MoveControl.Instance.CheckMoveSkipAndPreparePlayer();
 
@@ -211,9 +288,10 @@ public class PlayerEffects : MonoBehaviour
     }
 
     public void LeaveMoneybox(MoneyboxVault vault) {
+        _player.AddMovesToDo(1);
+
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " покидает " + Utils.Wrap("копилку", UIColors.Green);
         Messages.Instance.AddMessage(message);
-        _player.AddMovesToDo(1);
 
         MoveControl.Instance.PreparePlayerForMove();
         
@@ -223,6 +301,7 @@ public class PlayerEffects : MonoBehaviour
     public void ExecuteCoinBonus(int bonus) {
         _player.AddCoins(bonus);
         PlayersControl.Instance.UpdatePlayersInfo();
+
         string effectText = bonus > 0 ? Utils.Wrap("бонус", UIColors.Green) : Utils.Wrap("штраф", UIColors.Red);
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " получает " + effectText + " " + bonus + " монет";
         Messages.Instance.AddMessage(message);
@@ -237,6 +316,7 @@ public class PlayerEffects : MonoBehaviour
         _isLightning = true;
         TokenControl token = _player.GetTokenControl();
         token.AddIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
+
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("молнию", UIColors.Green) + "! Очки на кубике x2";
         Messages.Instance.AddMessage(message);
     }
@@ -279,11 +359,10 @@ public class PlayerEffects : MonoBehaviour
 
     public void ExecuteReplaceEffect(EControllableEffects effect) {
         ManualContent manual = Manual.Instance.GetEffectManual(effect);
-
-        // todo уровень эффекта должен вычисляться из PlayerControl
-        int effectLevel = 1;
-
+        CellControl cell = _player.GetCurrentCell();
+        int effectLevel = cell.EffectLevel;
         int cost = manual.GetCost(effectLevel);
+        
         if (manual.CostResourceType == EResourceTypes.Power) {
             _player.AddPower(-cost);
         } else {

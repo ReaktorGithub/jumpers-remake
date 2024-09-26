@@ -72,7 +72,7 @@ public class PopupMagnet : MonoBehaviour
         _icon.sprite = isSuper ? BoostersControl.Instance.MagnetSuperSprite : BoostersControl.Instance.MagnetSprite;
         foreach (CubicButton button in _cubicButtons) {
             button.SetSelected(false);
-            button.gameObject.SetActive(player.CubicMaxScore >= button.Score);
+            button.gameObject.SetActive(player.GetCubicMaxScore() >= button.Score);
         }
         _selectedScore = 0;
         _playerCell = playerCell.gameObject;
@@ -114,7 +114,7 @@ public class PopupMagnet : MonoBehaviour
         _modifiersControl.ShowModifierMagnet(_isSuper);
 
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
-        int max = player.CubicMaxScore;
+        int max = player.GetCubicMaxScore();
         List<int> scores = new();
         for (int i = 0; i < max; i++) {
             scores.Add(i + 1);
