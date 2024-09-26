@@ -84,7 +84,7 @@ public class CubicControl : MonoBehaviour
         if (specifiedScore != 0) {
             score = specifiedScore;
         } else {
-            int max = MoveControl.Instance.CurrentPlayer.CubicMaxScore + 1;
+            int max = MoveControl.Instance.CurrentPlayer.GetCubicMaxScore() + 1;
             System.Random random = new();
             score = random.Next(1, max);
         }

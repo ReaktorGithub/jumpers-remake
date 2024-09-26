@@ -212,24 +212,31 @@ public class BoostersControl : MonoBehaviour
     // Открытие разных усилителей при нажатиях на кнопки в левой панели
 
     public void ActivateBooster(EBoosters booster) {
-        CellControl cell = MoveControl.Instance.CurrentPlayer.GetCurrentCell();
+        PlayerControl player = MoveControl.Instance.CurrentPlayer;
+        CellControl cell = player.GetCurrentCell();
 
         switch(booster) {
             case EBoosters.Magnet: {
-                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, cell, false);
+                _popupMagnet.BuildContent(player, cell, false);
                 _popupMagnet.OnOpenWindow();
                 break;
             }
             case EBoosters.MagnetSuper: {
-                _popupMagnet.BuildContent(MoveControl.Instance.CurrentPlayer, cell, true);
+                _popupMagnet.BuildContent(player, cell, true);
                 _popupMagnet.OnOpenWindow();
                 break;
             }
             case EBoosters.Lasso: {
                 CubicControl.Instance.SetCubicInteractable(false);
-                _topPanel.SetText("Подвиньте свою фишку в пределах 3 шагов"); // todo зависит от уровня лассо
+
+                int level = player.Grind.Lasso;
+                ManualContent manual = Manual.Instance.BoosterLasso;
+                int steps = manual.GetCauseEffect(level);
+
+                string stepsText = steps == 1 ? " шага" : " шагов";
+                _topPanel.SetText("Подвиньте свою фишку в пределах " + steps + stepsText);
                 _topPanel.OpenWindow();
-                List<GameObject> collected = CellsControl.Instance.FindNearCellsDeepTwoSide(cell, 3);
+                List<GameObject> collected = CellsControl.Instance.FindNearCellsDeepTwoSide(cell, steps);
                 foreach(GameObject cellFound in collected) {
                     cellFound.GetComponent<CellControl>().TurnOnLassoMode();
                 }

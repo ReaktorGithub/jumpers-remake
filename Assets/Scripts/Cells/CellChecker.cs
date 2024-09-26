@@ -73,7 +73,7 @@ public class CellChecker : MonoBehaviour
         }
     }
 
-    // Проверка по время хода при достижении новой клетки
+    // Проверка во время хода при достижении новой клетки
 
     public bool CheckCellAfterStep(CellControl currentCell, PlayerControl player) {
         ECellTypes cellType = currentCell.CellType;
@@ -81,6 +81,13 @@ public class CellChecker : MonoBehaviour
         if (cellType == ECellTypes.Checkpoint) {
             string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " достигает " + Utils.Wrap("чекпойнта", UIColors.Blue);
             Messages.Instance.AddMessage(message);
+        }
+
+        // Могут вызвать прерывание
+
+        if (currentCell.IsWallEffect()) {
+            MoveControl.Instance.BreakMovingAndConfirmNewPosition();
+            return false;
         }
 
         if (cellType == ECellTypes.Finish) {
@@ -108,7 +115,15 @@ public class CellChecker : MonoBehaviour
         return true;
     }
 
-    // Начало серии проверок клетки по окончании хода
+    /*
+        Начало серии проверок клетки по окончании хода
+        1. Проверка на ежа.
+        2. Подбор бонуса.
+        3. Проверка, может ли игрок избежать вредного эффекта.
+        4. Исполнение эффекта.
+        5. Исполнение эффекта «стрелка».
+        6. Атака на соперников.
+    */
 
     public void CheckCellAfterMove(PlayerControl player) {
         CheckCellHedgehog(player);
@@ -148,26 +163,15 @@ public class CellChecker : MonoBehaviour
         CheckCellEffects(player);
     }
 
-    // Необходимые действия перед завершением хода:
-    // 1.	Подбор бонуса.
-    // 2.	Срабатывание капкана.
-    // 3.	Исполнение эффекта.
-    // 4.	Исполнение эффекта «стрелка», либо «синяя стрелка».
-    // 5.	Атака на соперников.
-
     public void CheckCellEffects(PlayerControl player) {
         CellControl cell = player.GetCurrentCell();
 
         if (cell.Effect == EControllableEffects.Green) {
-            player.AddMovesToDo(1);
-            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("зелёный", UIColors.Green) + " эффект и походит ещё раз";
-            Messages.Instance.AddMessage(message);
+            player.Effects.ExecuteGreen();
         }
 
         if (cell.Effect == EControllableEffects.Yellow) {
-            player.SkipMoveIncrease();
-            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("жёлтый", UIColors.Yellow) + " эффект и пропустит ход";
-            Messages.Instance.AddMessage(message);
+            player.Effects.ExecuteYellow();
         }
 
         if (cell.Effect == EControllableEffects.Star) {
@@ -185,6 +189,8 @@ public class CellChecker : MonoBehaviour
         if (cell.CoinBonusValue != 0) {
             player.Effects.ExecuteCoinBonus(cell.CoinBonusValue);
         }
+
+        // Вызывают прерывание
 
         if (cell.Effect == EControllableEffects.Black) {
             player.Effects.ExecuteBlack();
@@ -264,6 +270,8 @@ public class CellChecker : MonoBehaviour
 
         StartCoroutine(MoveControl.Instance.EndMoveDefer());
     }
+
+    // Проверка копилки
 
     public bool CheckMoneyboxBeforeMove(PlayerControl player) {
         CellControl cell = player.GetCurrentCell();

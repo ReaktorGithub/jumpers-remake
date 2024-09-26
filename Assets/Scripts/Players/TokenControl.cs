@@ -336,7 +336,7 @@ public class TokenControl : MonoBehaviour
     // Событие появления бонуса
 
     public void AddBonusEventToQueue(int bonus) {
-        if (!transform.gameObject.activeInHierarchy || !_indicators.activeInHierarchy) {
+        if (!transform.gameObject.activeInHierarchy || !_indicators.activeInHierarchy || bonus == 0) {
             return;
         }
 

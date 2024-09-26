@@ -209,7 +209,7 @@ public class PlayersControl : MonoBehaviour
         }
         PlayerControl currentPlayer = GetPlayer(MoveControl.Instance.CurrentPlayerIndex);
         EffectsControl.Instance.UpdateQuantityText(currentPlayer);
-        EffectsControl.Instance.UpdateEffectEmptiness(currentPlayer);
+        EffectsControl.Instance.UpdateButtonsVisual(currentPlayer);
     }
 
     public void GiveResourcesAfterRace() {
