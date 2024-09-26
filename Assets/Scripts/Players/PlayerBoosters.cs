@@ -13,6 +13,8 @@ public class PlayerBoosters : MonoBehaviour
     [SerializeField] private int _shield = 0;
     [SerializeField] private int _shieldIron = 0;
     [SerializeField] private int _vampire = 0;
+    [SerializeField] private int _boombaster = 0;
+
     [SerializeField] private int _armor = 0; // сколько ходов осталось со щитом (включая ходы соперников)
     [SerializeField] private bool _isIronArmor = false;
     [SerializeField] private BoosterButton _selectedShieldButton;
@@ -77,6 +79,14 @@ public class PlayerBoosters : MonoBehaviour
         }
     }
 
+    public int Boombaster {
+        get { return _boombaster; }
+        set {
+            int newValue = Math.Clamp(value, 0, BoostersControl.Instance.MaxBoombasters);
+            _boombaster = newValue;
+        }
+    }
+
     public int Armor {
         get { return _armor; }
         set { _armor = value; }
@@ -114,6 +124,10 @@ public class PlayerBoosters : MonoBehaviour
 
     public void AddVampire(int value) {
         Vampire += value;
+    }
+
+    public void AddBoombaster(int value) {
+        Boombaster += value;
     }
 
     public void AddArmor(int value) {

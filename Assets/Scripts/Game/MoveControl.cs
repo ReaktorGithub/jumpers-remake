@@ -133,12 +133,13 @@ public class MoveControl : MonoBehaviour
         if (branch != null) {
             _hedgehogsControl.MoveHedgehog(branch);
         }
-        return true;
+        bool isBlast = CellsControl.Instance.TickAllBoombasters();
+        return !isBlast;
     }
 
     // Вторая часть метода по переключению игроков
 
-    private void ContinueSwitchPlayer() {
+    public void ContinueSwitchPlayer() {
         // апдейт камеры
         FollowCameraToCurrentPlayer();
 

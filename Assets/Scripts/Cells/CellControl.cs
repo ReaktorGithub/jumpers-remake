@@ -16,12 +16,12 @@ public class CellControl : MonoBehaviour
     [SerializeField] private bool _enableReverse = false;
     // Если _enableReverse = true, то клетка находится в ответвлении со стеной. Нахождение фишки на этой клетке никак не влияет на её направление.
     // Если _enableReverse = false, то клетка обычная. После остановки фишки у игрока будет принудительно сменено направление на "вперед"
-    private GameObject _container, _glow, _coinBonusObject, _brick;
+    private GameObject _container, _glow, _coinBonusObject, _brick, _boombaster;
     private SpriteRenderer _spriteRenderer, _glowSpriteRenderer, _grindSpriteRenderer;
     private float[] _cellScale = new float[2];
     [SerializeField] private List<GameObject> _currentTokens = new();
     private bool _isEffectPlacementMode, _isLassoMode = false;
-    private TextMeshPro _text, _coinBonusText;
+    private TextMeshPro _text, _coinBonusText, _boombasterText;
     private bool _isChanging = false;
     private IEnumerator _changingCoroutine;
     private Sprite _oldSprite, _newSprite;
@@ -31,6 +31,8 @@ public class CellControl : MonoBehaviour
     private float _pulseMinAlpha = 0.2f;
     private CursorManager _cursorManager;
     [SerializeField] private int _aiScore = 0; // чем выше число, тем больше эта клетка нравится ai
+    private bool _isBoombaster = false;
+    private int _boombasterTimer = 9;
 
     private void Awake() {
         _container = transform.Find("container").gameObject;
@@ -52,6 +54,8 @@ public class CellControl : MonoBehaviour
         _coinBonusText = _coinBonusObject.transform.Find("CoinBonusText").GetComponent<TextMeshPro>();
         _grindSpriteRenderer = _container.transform.Find("grind").GetComponent<SpriteRenderer>();
         _brick = _container.transform.Find("brick").gameObject;
+        _boombaster = _container.transform.Find("Boombaster").gameObject;
+        _boombasterText = _boombaster.transform.Find("timer").GetComponent<TextMeshPro>();
     }
 
     private void Start() {
@@ -59,6 +63,7 @@ public class CellControl : MonoBehaviour
         UpdateAiScore();
         UpdateCoinBonusView();
         UpdateGrindVisual(_effectLevel);
+        UpdateBoombasterVisual();
     }
 
     private void SetCursorDisabled(bool value) {
@@ -85,6 +90,23 @@ public class CellControl : MonoBehaviour
     public int AiScore {
         get { return _aiScore; }
         private set {}
+    }
+
+    public bool IsBoombaster {
+        get { return _isBoombaster; }
+        set {_isBoombaster = value; }
+    }
+
+    public int BoombasterTimer {
+        get { return _boombasterTimer; }
+        set {
+            _boombasterTimer = value;
+            if (value == -1 && IsBoombaster) {
+                ExecuteBoombasterExplosion();
+            } else {
+                UpdateBoombasterVisual();
+            }
+        }
     }
 
     public bool EnableReverse {
@@ -472,5 +494,23 @@ public class CellControl : MonoBehaviour
         _coinBonusText.text = values.Item1;
         _coinBonusText.color = values.Item2;
         _coinBonusObject.SetActive(true);
+    }
+
+    // Если произошел взрыв, то возвращает true
+
+    public bool TickBoombaster() {
+        BoombasterTimer--;
+        return BoombasterTimer == -1;
+    }
+
+    private void UpdateBoombasterVisual() {
+        _boombasterText.text = _boombasterTimer.ToString();
+        _boombaster.SetActive(_isBoombaster);
+    }
+
+    private void ExecuteBoombasterExplosion() {
+        IsBoombaster = false;
+        UpdateBoombasterVisual();
+        CellsControl.Instance.ExecuteBoombasterExplosion(this);
     }
 }

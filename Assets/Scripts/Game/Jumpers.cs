@@ -22,6 +22,7 @@ public class Jumpers : MonoBehaviour
         Instances.transform.Find("arrow-body-tax").gameObject.SetActive(false);
         Instances.transform.Find("magnet").gameObject.SetActive(false);
         Instances.transform.Find("magnet-super").gameObject.SetActive(false);
+        Instances.transform.Find("boombaster-icon").gameObject.SetActive(false);
         Instances.transform.Find("lasso").gameObject.SetActive(false);
         Instances.transform.Find("shield").gameObject.SetActive(false);
         Instances.transform.Find("shield-iron").gameObject.SetActive(false);
@@ -53,26 +54,29 @@ public class Jumpers : MonoBehaviour
 
     // private void Update() {
     //     if (Input.GetKeyUp(KeyCode.B)) {
-    //         MoveControl.Instance.CurrentPlayer.GetTokenControl().AddBonusEventToQueue(-30);
+    //         Explosion explosion = GameObject.Find("Explosion").GetComponent<Explosion>();
+    //         GameObject cell = GameObject.Find("c3");
+    //         explosion.SetPosition(cell.transform.position);
+    //         explosion.Explode();
     //     }
     // }
 
-    private void Update() {
-        if (Input.GetKeyUp(KeyCode.Z)) {
-            MoveControl.Instance.CurrentPlayer.Boosters.AddMagnets(1);
-            BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
-        }
-        if (Input.GetKeyUp(KeyCode.X)) {
-            MoveControl.Instance.CurrentPlayer.Boosters.AddMagnetsSuper(1);
-            BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
-        }
-        if (Input.GetKeyUp(KeyCode.C)) {
-            MoveControl.Instance.CurrentPlayer.Boosters.AddShield(1);
-            BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
-        }
-        if (Input.GetKeyUp(KeyCode.V)) {
-            MoveControl.Instance.CurrentPlayer.Boosters.AddShieldIron(1);
-            BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
-        }
-    }
+    // private void Update() {
+    //     if (Input.GetKeyUp(KeyCode.Z)) {
+    //         MoveControl.Instance.CurrentPlayer.Boosters.AddMagnets(1);
+    //         BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+    //     }
+    //     if (Input.GetKeyUp(KeyCode.X)) {
+    //         MoveControl.Instance.CurrentPlayer.Boosters.AddMagnetsSuper(1);
+    //         BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+    //     }
+    //     if (Input.GetKeyUp(KeyCode.C)) {
+    //         MoveControl.Instance.CurrentPlayer.Boosters.AddShield(1);
+    //         BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+    //     }
+    //     if (Input.GetKeyUp(KeyCode.V)) {
+    //         MoveControl.Instance.CurrentPlayer.Boosters.AddShieldIron(1);
+    //         BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+    //     }
+    // }
 }

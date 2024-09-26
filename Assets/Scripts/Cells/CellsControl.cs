@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,7 +10,11 @@ public class CellsControl : MonoBehaviour
     [SerializeField] private float _changingEffectTime = 0.5f;
     [SerializeField] private float _changingEffectDuration = 3.25f;
     [SerializeField] private float _changingEffectDelay = 1.85f;
+    [SerializeField] private int _boombasterMaxTicks = 9;
+    [SerializeField] private float _boombasterDelay = 3f;
     private Sprite _grind2Sprite, _grind3Sprite;
+    private List<CellControl> _boombastersList = new();
+    private Explosion _explosion;
 
     private void Awake() {
         Instance = this;
@@ -17,6 +22,7 @@ public class CellsControl : MonoBehaviour
         GameObject Instances = GameObject.Find("Instances");
         _grind2Sprite = Instances.transform.Find("grind-dash2").GetComponent<SpriteRenderer>().sprite;
         _grind3Sprite = Instances.transform.Find("grind-dash3").GetComponent<SpriteRenderer>().sprite;
+        _explosion = GameObject.Find("Explosion").GetComponent<Explosion>();
     }
 
     public void AssignAllCellControls() {
@@ -422,6 +428,42 @@ public class CellsControl : MonoBehaviour
             cell.DownscaleCell(true);
             cell.TurnOffGlow();
         }
+    }
+
+    // Бумка
+
+    public void AddBoombaster(CellControl targetCell) {
+        targetCell.IsBoombaster = true;
+        targetCell.BoombasterTimer = _boombasterMaxTicks;
+        _boombastersList.Add(targetCell);
+    }
+
+    // Возвращает true, если взорвалась хотя бы 1 бумка
+
+    public bool TickAllBoombasters() {
+        bool isBlastAll = false;
+
+        foreach(CellControl cell in _boombastersList) {
+            bool isBlast = cell.TickBoombaster();
+            if (isBlast) {
+                isBlastAll = true;
+            }
+        }
+
+        return isBlastAll;
+    }
+
+    public void ExecuteBoombasterExplosion(CellControl targetCell) {
+        _explosion.SetPosition(targetCell.transform.localPosition);
+        _explosion.Explode();
+        // todo сделать область взрыва и эффект на игроков
+        StartCoroutine(ExecuteBoombasterExplosionDefer());
+    }
+
+    private IEnumerator ExecuteBoombasterExplosionDefer() {
+        yield return new WaitForSeconds(_boombasterDelay);
+        // todo проверить на выбывших игроков и окончание гонки
+        MoveControl.Instance.ContinueSwitchPlayer();
     }
 
     // Дебаг
