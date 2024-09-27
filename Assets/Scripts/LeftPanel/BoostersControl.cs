@@ -5,10 +5,10 @@ using UnityEngine.Rendering;
 public class BoostersControl : MonoBehaviour
 {
     public static BoostersControl Instance { get; private set; }
-    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite;
-    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton, _boombasterButton;
+    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite, _stuckSprite;
+    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton, _boombasterButton, _stuckButton;
     private BoostersRow _magnetsRowScript, _lassoRowScript, _shieldsRowScript;
-    private BoosterButton _vampireButtonScript, _boombasterButtonScript;
+    private BoosterButton _vampireButtonScript, _boombasterButtonScript, _stuckButtonScript;
     private PopupMagnet _popupMagnet;
     [SerializeField] private List<GameObject> _boostersList;
     private List<BoosterButton> _boosterButtonsList = new();
@@ -23,6 +23,7 @@ public class BoostersControl : MonoBehaviour
     [SerializeField] private int _maxShieldsTotal = 3;
     [SerializeField] private int _maxVampires = 1;
     [SerializeField] private int _maxBoombasters = 1;
+    [SerializeField] private int _maxStuck = 1;
 
     private void Awake() {
         Instance = this;
@@ -35,22 +36,14 @@ public class BoostersControl : MonoBehaviour
         _lassoSprite = Instances.transform.Find("lasso").GetComponent<SpriteRenderer>().sprite;
         _vampireSprite = Instances.transform.Find("vampire").GetComponent<SpriteRenderer>().sprite;
         _boombasterSprite = Instances.transform.Find("boombaster-icon").GetComponent<SpriteRenderer>().sprite;
+        _stuckSprite = Instances.transform.Find("stuck-icon").GetComponent<SpriteRenderer>().sprite;
 
-        if (_magnetsRow != null) {
-            _magnetsRowScript = _magnetsRow.GetComponent<BoostersRow>();
-        }
-        if (_lassoRow != null) {
-            _lassoRowScript = _lassoRow.GetComponent<BoostersRow>();
-        }
-        if (_shieldsRow != null) {
-            _shieldsRowScript = _shieldsRow.GetComponent<BoostersRow>();
-        }
-        if (_vampireButton != null) {
-            _vampireButtonScript = _vampireButton.GetComponent<BoosterButton>();
-        }
-        if (_vampireButton != null) {
-            _boombasterButtonScript = _boombasterButton.GetComponent<BoosterButton>();
-        }
+        _magnetsRowScript = _magnetsRow.GetComponent<BoostersRow>();
+        _lassoRowScript = _lassoRow.GetComponent<BoostersRow>();
+        _shieldsRowScript = _shieldsRow.GetComponent<BoostersRow>();
+        _vampireButtonScript = _vampireButton.GetComponent<BoosterButton>();
+        _boombasterButtonScript = _boombasterButton.GetComponent<BoosterButton>();
+        _stuckButtonScript = _stuckButton.GetComponent<BoosterButton>();
 
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
         foreach(GameObject button in _boostersList) {
@@ -92,6 +85,11 @@ public class BoostersControl : MonoBehaviour
 
     public Sprite BoombasterSprite {
         get { return _boombasterSprite; }
+        private set {}
+    }
+
+    public Sprite StuckSprite {
+        get { return _stuckSprite; }
         private set {}
     }
 
@@ -137,6 +135,11 @@ public class BoostersControl : MonoBehaviour
 
     public int MaxBoombasters {
         get { return _maxBoombasters; }
+        private set {}
+    }
+
+    public int MaxStuck {
+        get { return _maxStuck; }
         private set {}
     }
 
@@ -224,6 +227,7 @@ public class BoostersControl : MonoBehaviour
 
         _vampireButtonScript.BoosterType = player.Boosters.Vampire > 0 ? EBoosters.Vampire : EBoosters.None;
         _boombasterButtonScript.BoosterType = player.Boosters.Boombaster > 0 ? EBoosters.Boombaster : EBoosters.None;
+        _stuckButtonScript.BoosterType = player.Boosters.Stuck > 0 ? EBoosters.Stuck : EBoosters.None;
     }
 
     // Открытие разных усилителей при нажатиях на кнопки в левой панели
@@ -361,7 +365,7 @@ public class BoostersControl : MonoBehaviour
         player.Boosters.AddBoombaster(-1);
         UpdateBoostersFromPlayer(player);
 
-        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " устанавливает " + Utils.Wrap("бумку", UIColors.DarkYellow) + " на клетке " + targetCell.GetCellText();
+        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " устанавливает " + Utils.Wrap("бумку", UIColors.DarkYellow) + " на клетке №" + targetCell.NameDisplay;
         Messages.Instance.AddMessage(message);
     }
 

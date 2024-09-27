@@ -41,7 +41,7 @@ public class BoosterButton : MonoBehaviour
     }
 
     public bool IsAttackOnly() {
-        return _boosterType == EBoosters.Vampire || _boosterType == EBoosters.Slimer;
+        return _boosterType == EBoosters.Vampire || _boosterType == EBoosters.Stuck;
     }
 
     public void OnChangeBooster(EBoosters booster) {
@@ -74,6 +74,10 @@ public class BoosterButton : MonoBehaviour
             }
             case EBoosters.Boombaster: {
                 _booster.sprite = BoostersControl.Instance.BoombasterSprite;
+                break;
+            }
+            case EBoosters.Stuck: {
+                _booster.sprite = BoostersControl.Instance.StuckSprite;
                 break;
             }
             default: {

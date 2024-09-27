@@ -186,11 +186,9 @@ public class CellControl : MonoBehaviour
         }
     }
 
-    public string GetCellText() {
-        if (_text == null) {
-            return transform.name;
-        }
-        return _text.text;
+    public string NameDisplay {
+        get { return _nameDisplay; }
+        private set {}
     }
 
     public bool IsSelectionMode() {

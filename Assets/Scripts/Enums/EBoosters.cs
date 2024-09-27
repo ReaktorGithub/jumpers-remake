@@ -7,7 +7,7 @@ public enum EBoosters
     ShieldIron,
     Lasso,
     Boombaster,
-    Slimer,
+    Stuck,
     Trap,
     Vampire,
     Vacuum,

@@ -4,7 +4,7 @@ public class Manual : MonoBehaviour
 {
     public static Manual Instance { get; private set; }
     private ManualContent _power, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect, _attackUsual, _attackMagicKick, _attackVampire, _attackKnockout,
-    _boosterLasso, _boosterMagnet, _boosterSuperMagnet, _boosterShield, _boosterIronShield, _boosterVampire, _boosterBoombaster;
+    _boosterLasso, _boosterMagnet, _boosterSuperMagnet, _boosterShield, _boosterIronShield, _boosterVampire, _boosterBoombaster, _boosterStuck;
 
     private void Awake() {
         Instance = this;
@@ -26,6 +26,7 @@ public class Manual : MonoBehaviour
         _boosterIronShield = transform.Find("BoosterIronShield").GetComponent<ManualContent>();
         _boosterVampire = transform.Find("BoosterVampire").GetComponent<ManualContent>();
         _boosterBoombaster = transform.Find("BoosterBoombaster").GetComponent<ManualContent>();
+        _boosterStuck = transform.Find("BoosterStuck").GetComponent<ManualContent>();
     }
 
     public ManualContent Power {
@@ -115,6 +116,11 @@ public class Manual : MonoBehaviour
 
     public ManualContent BoosterBoombaster {
         get { return _boosterBoombaster; }
+        private set {}
+    }
+
+    public ManualContent BoosterStuck {
+        get { return _boosterStuck; }
         private set {}
     }
 
