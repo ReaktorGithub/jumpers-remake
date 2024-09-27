@@ -463,6 +463,7 @@ public class CellsControl : MonoBehaviour
     public void AddBoombaster(CellControl targetCell, int level) {
         targetCell.IsBoombaster = true;
         targetCell.BoombasterLevel = level;
+        targetCell.AddBoombasterInstance();
         targetCell.BoombasterTimer = _boombasterMaxTicks;
         _boombastersList.Add(targetCell);
     }

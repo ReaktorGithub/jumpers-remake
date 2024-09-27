@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CellControl : MonoBehaviour
 {
@@ -11,17 +12,19 @@ public class CellControl : MonoBehaviour
     [SerializeField] private ECellTypes cellType = ECellTypes.None;
     [SerializeField] private EControllableEffects effect = EControllableEffects.None;
     [SerializeField] private int _effectLevel = 1;
+    [SerializeField] private string _nameDisplay = "";
     private int _oldEffectLevel = 1;
     [SerializeField] private int _coinBonusValue = 0;
     [SerializeField] private bool _enableReverse = false;
     // Если _enableReverse = true, то клетка находится в ответвлении со стеной. Нахождение фишки на этой клетке никак не влияет на её направление.
     // Если _enableReverse = false, то клетка обычная. После остановки фишки у игрока будет принудительно сменено направление на "вперед"
-    private GameObject _container, _glow, _coinBonusObject, _brick, _boombaster, _intersection;
+    private GameObject _container, _glow, _coinBonusObject, _brick, _boombasterPlace, _boombasterInstance, _intersection;
+    private GameObject _boombasterCurrentInstance; // ссылка на работающую бумку, может быть null
     private SpriteRenderer _spriteRenderer, _glowSpriteRenderer, _grindSpriteRenderer;
     private float[] _cellScale = new float[2];
     [SerializeField] private List<GameObject> _currentTokens = new();
     private bool _isEffectPlacementMode, _isLassoMode = false;
-    private TextMeshPro _text, _coinBonusText, _boombasterText;
+    private TextMeshPro _text, _coinBonusText;
     private bool _isChanging = false;
     private IEnumerator _changingCoroutine;
     private Sprite _oldSprite, _newSprite;
@@ -46,6 +49,7 @@ public class CellControl : MonoBehaviour
         Transform number = _container.transform.Find("number");
         if (number != null) {
             _text = number.GetComponent<TextMeshPro>();
+            _text.text = _nameDisplay;
         }
         Transform button = transform.Find("button");
         if (button != null) {
@@ -55,8 +59,9 @@ public class CellControl : MonoBehaviour
         _coinBonusText = _coinBonusObject.transform.Find("CoinBonusText").GetComponent<TextMeshPro>();
         _grindSpriteRenderer = _container.transform.Find("grind").GetComponent<SpriteRenderer>();
         _brick = _container.transform.Find("brick").gameObject;
-        _boombaster = _container.transform.Find("Boombaster").gameObject;
-        _boombasterText = _boombaster.transform.Find("timer").GetComponent<TextMeshPro>();
+        _boombasterPlace = _container.transform.Find("BoombasterPlace").gameObject;
+        GameObject instances = GameObject.Find("Instances");
+        _boombasterInstance = instances.transform.Find("Boombaster").gameObject;
         _intersection = _container.transform.Find("intersection").gameObject;
     }
 
@@ -368,7 +373,9 @@ public class CellControl : MonoBehaviour
 
         _oldSprite = _spriteRenderer.sprite;
         _newSprite = newSprite;
-        _oldTextColor = _text.color;
+        if (_text != null) {
+            _oldTextColor = _text.color;
+        }
 
         switch(newEffect) {
             case EControllableEffects.Yellow:
@@ -412,13 +419,17 @@ public class CellControl : MonoBehaviour
 
     private void SetNewEffect() {
         _spriteRenderer.sprite = _newSprite;
-        _text.color = _newTextColor;
+        if (_text != null) {
+            _text.color = _newTextColor;
+        }
         UpdateGrindVisual(_effectLevel);
     }
 
     private void SetOldEffect() {
         _spriteRenderer.sprite = _oldSprite;
-        _text.color = _oldTextColor;
+        if (_text != null) {
+           _text.color = _oldTextColor;
+        }
         UpdateGrindVisual(_oldEffectLevel);
     }
 
@@ -511,6 +522,22 @@ public class CellControl : MonoBehaviour
         _coinBonusObject.SetActive(true);
     }
 
+    public void AddBoombasterInstance() {
+        GameObject clone = Instantiate(_boombasterInstance);
+        clone.transform.SetParent(_boombasterPlace.transform);
+        clone.transform.localScale = new Vector3(1f,1f,1f);
+        clone.transform.position = _boombasterPlace.transform.position;
+        clone.SetActive(true);
+        _boombasterCurrentInstance = clone;
+    }
+
+    public void RemoveBoombasterInstance() {
+        foreach(Transform child in _boombasterPlace.transform) {
+            Destroy(child.gameObject);
+        }
+        _boombasterCurrentInstance = null;
+    }
+
     // Если произошел взрыв, то возвращает true
 
     public bool TickBoombaster() {
@@ -519,13 +546,17 @@ public class CellControl : MonoBehaviour
     }
 
     private void UpdateBoombasterVisual() {
-        _boombasterText.text = _boombasterTimer.ToString();
-        _boombaster.SetActive(_isBoombaster);
+        if (_boombasterCurrentInstance == null) {
+            return;
+        }
+
+        TextMeshPro timer = _boombasterCurrentInstance.transform.Find("timer").gameObject.GetComponent<TextMeshPro>();
+        timer.text = _boombasterTimer.ToString();
     }
 
     private void ExecuteBoombasterExplosion() {
         IsBoombaster = false;
-        UpdateBoombasterVisual();
+        RemoveBoombasterInstance();
         CellsControl.Instance.ExecuteBoombasterExplosion(this);
     }
 
