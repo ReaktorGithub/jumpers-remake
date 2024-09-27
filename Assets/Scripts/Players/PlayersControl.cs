@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayersControl : MonoBehaviour
@@ -163,6 +164,18 @@ public class PlayersControl : MonoBehaviour
                 tokenControl.StopSqueeze();
             }
         }
+    }
+
+    public List<PlayerControl> SortPlayersByMoveOrder(PlayerControl[] players) {
+        List<PlayerControl> array = new();
+
+        foreach(PlayerControl player in players) {
+            array.Add(player);
+        }
+
+        array.Sort((a, b) => a.MoveOrder - b.MoveOrder);
+
+        return array;
     }
 
     public void MoveAllTokensToPedestal(float delay) {
@@ -340,5 +353,36 @@ public class PlayersControl : MonoBehaviour
         } else {
             callback1?.Invoke();
         }
+    }
+
+    public bool IsRaceOver() {
+        int count = 0;
+        foreach(PlayerControl player in _players) {
+            if (!player.IsFinished) {
+                count++;
+            }
+        }
+        return count < 2;
+    }
+
+    // Если есть хотя бы 1 игрок с отрицательной силой, то вернёт false, а для игрока запустит скрипт проигрыша
+
+    public bool IsEveryonePositivePower() {
+        List<PlayerControl> players = SortPlayersByMoveOrder(_players);
+
+        for (int i = 0; i < players.Count; i++) {
+            PlayerControl player = players[i];
+
+            if (player.IsFinished) {
+                continue;
+            }
+
+            if (player.Power < 0) {
+                player.ConfirmLose();
+                return false;
+            }
+        }
+
+        return true;
     }
 }

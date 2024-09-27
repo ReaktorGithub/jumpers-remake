@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 // Класс предназначен для предварительной настройки игры перед запуском уровня
@@ -22,6 +23,7 @@ public class Jumpers : MonoBehaviour
         Instances.transform.Find("arrow-body-tax").gameObject.SetActive(false);
         Instances.transform.Find("magnet").gameObject.SetActive(false);
         Instances.transform.Find("magnet-super").gameObject.SetActive(false);
+        Instances.transform.Find("boombaster-icon").gameObject.SetActive(false);
         Instances.transform.Find("lasso").gameObject.SetActive(false);
         Instances.transform.Find("shield").gameObject.SetActive(false);
         Instances.transform.Find("shield-iron").gameObject.SetActive(false);
@@ -53,26 +55,31 @@ public class Jumpers : MonoBehaviour
 
     // private void Update() {
     //     if (Input.GetKeyUp(KeyCode.B)) {
-    //         MoveControl.Instance.CurrentPlayer.GetTokenControl().AddBonusEventToQueue(-30);
+    //         GameObject cell = GameObject.Find("c4");
+    //         List<CellControl> list = CellsControl.Instance.GetCellsInArea(cell.GetComponent<CellControl>(), 1);
+    //         Debug.Log("list count: " + list.Count);
+    //         foreach(CellControl found in list) {
+    //             Debug.Log("found: " + found.gameObject.name);
+    //         }
     //     }
     // }
 
-    private void Update() {
-        if (Input.GetKeyUp(KeyCode.Z)) {
-            MoveControl.Instance.CurrentPlayer.Boosters.AddMagnets(1);
-            BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
-        }
-        if (Input.GetKeyUp(KeyCode.X)) {
-            MoveControl.Instance.CurrentPlayer.Boosters.AddMagnetsSuper(1);
-            BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
-        }
-        if (Input.GetKeyUp(KeyCode.C)) {
-            MoveControl.Instance.CurrentPlayer.Boosters.AddShield(1);
-            BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
-        }
-        if (Input.GetKeyUp(KeyCode.V)) {
-            MoveControl.Instance.CurrentPlayer.Boosters.AddShieldIron(1);
-            BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
-        }
-    }
+    // private void Update() {
+    //     if (Input.GetKeyUp(KeyCode.Z)) {
+    //         MoveControl.Instance.CurrentPlayer.Boosters.AddMagnets(1);
+    //         BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+    //     }
+    //     if (Input.GetKeyUp(KeyCode.X)) {
+    //         MoveControl.Instance.CurrentPlayer.Boosters.AddMagnetsSuper(1);
+    //         BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+    //     }
+    //     if (Input.GetKeyUp(KeyCode.C)) {
+    //         MoveControl.Instance.CurrentPlayer.Boosters.AddShield(1);
+    //         BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+    //     }
+    //     if (Input.GetKeyUp(KeyCode.V)) {
+    //         MoveControl.Instance.CurrentPlayer.Boosters.AddShieldIron(1);
+    //         BoostersControl.Instance.UpdateBoostersFromPlayer(MoveControl.Instance.CurrentPlayer);
+    //     }
+    // }
 }

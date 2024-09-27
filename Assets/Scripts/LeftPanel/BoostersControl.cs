@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class BoostersControl : MonoBehaviour
 {
     public static BoostersControl Instance { get; private set; }
-    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite;
-    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton;
+    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite;
+    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton, _boombasterButton;
     private BoostersRow _magnetsRowScript, _lassoRowScript, _shieldsRowScript;
-    private BoosterButton _vampireButtonScript;
+    private BoosterButton _vampireButtonScript, _boombasterButtonScript;
     private PopupMagnet _popupMagnet;
     [SerializeField] private List<GameObject> _boostersList;
     private List<BoosterButton> _boosterButtonsList = new();
@@ -21,6 +22,7 @@ public class BoostersControl : MonoBehaviour
     [SerializeField] private int _maxShieldsIron = 3;
     [SerializeField] private int _maxShieldsTotal = 3;
     [SerializeField] private int _maxVampires = 1;
+    [SerializeField] private int _maxBoombasters = 1;
 
     private void Awake() {
         Instance = this;
@@ -32,6 +34,7 @@ public class BoostersControl : MonoBehaviour
         _shieldIronSprite = Instances.transform.Find("shield-iron").GetComponent<SpriteRenderer>().sprite;
         _lassoSprite = Instances.transform.Find("lasso").GetComponent<SpriteRenderer>().sprite;
         _vampireSprite = Instances.transform.Find("vampire").GetComponent<SpriteRenderer>().sprite;
+        _boombasterSprite = Instances.transform.Find("boombaster-icon").GetComponent<SpriteRenderer>().sprite;
 
         if (_magnetsRow != null) {
             _magnetsRowScript = _magnetsRow.GetComponent<BoostersRow>();
@@ -44,6 +47,9 @@ public class BoostersControl : MonoBehaviour
         }
         if (_vampireButton != null) {
             _vampireButtonScript = _vampireButton.GetComponent<BoosterButton>();
+        }
+        if (_vampireButton != null) {
+            _boombasterButtonScript = _boombasterButton.GetComponent<BoosterButton>();
         }
 
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
@@ -84,6 +90,11 @@ public class BoostersControl : MonoBehaviour
         private set {}
     }
 
+    public Sprite BoombasterSprite {
+        get { return _boombasterSprite; }
+        private set {}
+    }
+
     public int MaxMagnets {
         get { return _maxMagnets; }
         private set {}
@@ -121,6 +132,11 @@ public class BoostersControl : MonoBehaviour
 
     public int MaxVampires {
         get { return _maxVampires; }
+        private set {}
+    }
+
+    public int MaxBoombasters {
+        get { return _maxBoombasters; }
         private set {}
     }
 
@@ -204,9 +220,10 @@ public class BoostersControl : MonoBehaviour
         UpdateBoostersRow(player.Boosters.Shield, player.Boosters.ShieldIron, EBoosters.Shield, EBoosters.ShieldIron, _shieldsRowScript);
         UpdatePlayersArmorButtons(player);
 
-        // Вампир
+        // Другие
 
         _vampireButtonScript.BoosterType = player.Boosters.Vampire > 0 ? EBoosters.Vampire : EBoosters.None;
+        _boombasterButtonScript.BoosterType = player.Boosters.Boombaster > 0 ? EBoosters.Boombaster : EBoosters.None;
     }
 
     // Открытие разных усилителей при нажатиях на кнопки в левой панели
@@ -249,6 +266,10 @@ public class BoostersControl : MonoBehaviour
                     EnableAllButtons();
                     CubicControl.Instance.SetCubicInteractable(true);
                 });
+                break;
+            }
+            case EBoosters.Boombaster: {
+                ExecuteBoombaster(player, cell);
                 break;
             }
         }
@@ -328,6 +349,49 @@ public class BoostersControl : MonoBehaviour
             player.Boosters.IsIronArmor,
             player.Boosters.Armor
         );
+    }
+
+    public void ExecuteBoombaster(PlayerControl player, CellControl targetCell) {
+        if (targetCell.IsBoombaster) {
+            player.OpenBoombasterModal();
+            return;
+        }
+        
+        CellsControl.Instance.AddBoombaster(targetCell, player.Grind.Boombaster);
+        player.Boosters.AddBoombaster(-1);
+        UpdateBoostersFromPlayer(player);
+
+        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " устанавливает " + Utils.Wrap("бумку", UIColors.DarkYellow) + " на клетке " + targetCell.GetCellText();
+        Messages.Instance.AddMessage(message);
+    }
+
+    public int GetBoombasterPowerPenalty(int level, int areaRow) {
+        switch(level) {
+            case 1: {
+                return areaRow switch {
+                    0 => 3,
+                    1 => 1,
+                    _ => 0,
+                };
+            }
+            case 2: {
+                return areaRow switch {
+                    0 => 3,
+                    1 => 2,
+                    2 => 1,
+                    _ => 0,
+                };
+            }
+            case 3: {
+                return areaRow switch {
+                    0 => 4,
+                    1 => 3,
+                    2 => 2,
+                    _ => 1,
+                };
+            }
+            default: return 0;
+        }
     }
 
     // разное

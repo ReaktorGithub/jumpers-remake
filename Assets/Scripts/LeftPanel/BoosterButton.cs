@@ -72,6 +72,10 @@ public class BoosterButton : MonoBehaviour
                 _booster.sprite = BoostersControl.Instance.VampireSprite;
                 break;
             }
+            case EBoosters.Boombaster: {
+                _booster.sprite = BoostersControl.Instance.BoombasterSprite;
+                break;
+            }
             default: {
                 _booster.sprite = null;
                 break;
@@ -80,6 +84,7 @@ public class BoosterButton : MonoBehaviour
 
         bool isEnabled = !IsEmpty() && !_disabled;
         _button.interactable = isEnabled;
+        _cursorManager.Disabled = !isEnabled;
     }
 
     // если кнопка энейблится, но при этом она пустая, или в режиме брони, то ничего не делать

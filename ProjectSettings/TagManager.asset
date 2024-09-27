@@ -62,6 +62,9 @@ TagManager:
   - name: Branches
     uniqueID: 2643324061
     locked: 0
+  - name: Effects
+    uniqueID: 1437478851
+    locked: 0
   - name: UI
     uniqueID: 927285429
     locked: 0

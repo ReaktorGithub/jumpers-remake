@@ -369,10 +369,20 @@ public class PlayerControl : MonoBehaviour
         _modalWarning.OpenModal();
     }
 
+    public void OpenBoombasterModal(Action callback = null) {
+        _modalWarning.SetHeadingText("Клетка занята");
+        _modalWarning.SetBodyText("Бумка уже установлена на этой клетке.");
+        _modalWarning.SetCallback(callback);
+        _modalWarning.OpenModal();
+    }
+
     public void ConfirmLose() {
-        if (IsMe()) {
+        bool isRaceOver = PlayersControl.Instance.IsRaceOver();
+
+        if (IsMe() && !isRaceOver) {
             _modalLose.OpenModal();
         }
+        
         _isFinished = true;
         int place = _pedestal.SetPlayerToMinPlace(this);
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ВЫЛЕТАЕТ С ТРАССЫ!", UIColors.Red);

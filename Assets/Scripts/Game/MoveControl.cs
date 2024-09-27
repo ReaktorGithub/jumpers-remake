@@ -20,6 +20,7 @@ public class MoveControl : MonoBehaviour
     private TopPanel _topPanel;
     private HedgehogsControl _hedgehogsControl;
     private bool _isLassoMode = false;
+    private bool _isBoombasterMode = false;
     private bool _isViolateMode = false; // в этом режиме текущий игрок является жертвой волшебного пинка или пылесоса
     private int _restSteps = 0; // сохранение оставшихся шагов в режиме жертвы
 
@@ -53,6 +54,11 @@ public class MoveControl : MonoBehaviour
         private set {}
     }
 
+    public bool IsBoombasterMode {
+        get { return _isBoombasterMode; }
+        set { _isBoombasterMode = value; }
+    }
+
     public bool IsViolateMode {
         get { return _isViolateMode; }
         private set {}
@@ -78,16 +84,6 @@ public class MoveControl : MonoBehaviour
                 Debug.Log("Error while set current player " + value);
             }
         }
-    }
-
-    private bool IsRaceOver() {
-        int count = 0;
-        foreach(PlayerControl player in PlayersControl.Instance.Players) {
-            if (!player.IsFinished) {
-                count++;
-            }
-        }
-        return count < 2;
     }
 
     private void FollowCameraToCurrentPlayer() {
@@ -133,12 +129,28 @@ public class MoveControl : MonoBehaviour
         if (branch != null) {
             _hedgehogsControl.MoveHedgehog(branch);
         }
-        return true;
+        bool isBlast = CellsControl.Instance.TickAllBoombasters();
+        return !isBlast;
     }
 
     // Вторая часть метода по переключению игроков
 
-    private void ContinueSwitchPlayer() {
+    public void ContinueSwitchPlayer() {
+        _isBoombasterMode = false;
+
+        // Еще раз проверить, не выбыл ли текущий игрок
+        if (_currentPlayer.IsFinished) {
+            bool isRaceOver = PlayersControl.Instance.IsRaceOver();
+
+            if (isRaceOver) {
+                ExecuteRaceOver();
+                return;
+            }
+            
+            SetNextPlayerIndex();
+            return;
+        }
+
         // апдейт камеры
         FollowCameraToCurrentPlayer();
 
@@ -349,7 +361,12 @@ public class MoveControl : MonoBehaviour
         CellControl cellControl = player.GetCurrentCell();
         cellControl.RemoveToken(player.TokenObject);
         cellControl.AlignTokens(_alignTime);
-        StartCoroutine(EndMoveDefer());
+
+        if (_isBoombasterMode) {
+            CellsControl.Instance.CheckPlayersAfterBoombasterExplosion();
+        } else {
+            StartCoroutine(EndMoveDefer());
+        }
     }
 
     public void CheckCellEffects() {
@@ -446,24 +463,30 @@ public class MoveControl : MonoBehaviour
     }
 
     public void EndMove() {
+        // Дебаг
         // CellsControl.Instance.ShowTokensAtCells();
 
         // Сброс параметров
 
-        ResetParamsAfterMove();
+        CubicControl.Instance.ModifiersControl.HideModifierMagnet();
+        CellsControl.Instance.ResetCellMagnetHint();
 
         // Проверка молнии
-
         _currentPlayer.Effects.CheckLightningEndMove();
 
         // Проверка на окончание гонки
 
-        bool isRaceOver = IsRaceOver();
+        bool isRaceOver = PlayersControl.Instance.IsRaceOver();
 
         if (isRaceOver) {
-            PlayersControl.Instance.UpdatePlayersInfo();
-            PlayersControl.Instance.MoveAllTokensToPedestal(_endMoveDelay);
-            StartCoroutine(RaceOverDefer());
+            ExecuteRaceOver();
+            return;
+        }
+
+        // Убедиться, что все игроки с положительной силой и готовы продолжать
+
+        bool isEveryoneReady = PlayersControl.Instance.IsEveryonePositivePower();
+        if (!isEveryoneReady) {
             return;
         }
 
@@ -495,9 +518,10 @@ public class MoveControl : MonoBehaviour
         PreparePlayerForMove();
     }
 
-    private void ResetParamsAfterMove() {
-        CubicControl.Instance.ModifiersControl.HideModifierMagnet();
-        CellsControl.Instance.ResetCellMagnetHint();
+    private void ExecuteRaceOver() {
+        PlayersControl.Instance.UpdatePlayersInfo();
+        PlayersControl.Instance.MoveAllTokensToPedestal(_endMoveDelay);
+        StartCoroutine(RaceOverDefer());
     }
 
     public IEnumerator RaceOverDefer() {

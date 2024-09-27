@@ -97,6 +97,8 @@ GameObject:
   - component: {fileID: 2261701833178310121}
   - component: {fileID: 9114187819151966112}
   - component: {fileID: 3979357666635876406}
+  - component: {fileID: 2580365692772459657}
+  - component: {fileID: 106022394685041333}
   - component: {fileID: 6145652620200773290}
   - component: {fileID: 5504641958492459819}
   - component: {fileID: 4823286621354102242}
@@ -211,7 +213,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3177306169442387250}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2580365692772459657}
+        m_TargetAssemblyTypeName: BoosterButtonActivate, Assembly-CSharp
+        m_MethodName: OnSelect
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &3979357666635876406
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,6 +236,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8ecc1a6a5d5410749b829fa4ef559418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2580365692772459657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 962209491290485435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc4c2955d9b3bea42b8bcb1478ec8d78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &106022394685041333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 962209491290485435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc4c2955d9b3bea42b8bcb1478ec8d78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &6145652620200773290
