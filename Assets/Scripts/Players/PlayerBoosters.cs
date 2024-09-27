@@ -327,6 +327,9 @@ public class PlayerBoosters : MonoBehaviour
             }
         } else {
             _player.AddPower(-powerPenalty);
+            if (_player.Power == 0 && _player.IsMe()) {
+                _player.OpenPowerWarningModal();
+            }
             PlayersControl.Instance.UpdatePlayersInfo();
         }
     }

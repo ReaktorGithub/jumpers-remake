@@ -108,7 +108,7 @@ public class CellControl : MonoBehaviour
         get { return _boombasterTimer; }
         set {
             _boombasterTimer = value;
-            if (value == -1 && IsBoombaster) {
+            if (value == 0 && IsBoombaster) {
                 ExecuteBoombasterExplosion();
             } else {
                 UpdateBoombasterVisual();
@@ -515,7 +515,7 @@ public class CellControl : MonoBehaviour
 
     public bool TickBoombaster() {
         BoombasterTimer--;
-        return BoombasterTimer == -1;
+        return BoombasterTimer == 0;
     }
 
     private void UpdateBoombasterVisual() {

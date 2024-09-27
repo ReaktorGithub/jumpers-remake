@@ -7,6 +7,7 @@ public class ModalResults : MonoBehaviour
     private Modal _modal;
     private LevelData _levelData;
     private LoadLevel _loadLevel;
+    [SerializeField] private GameObject _row1, _row2, _row3, _row4;
 
     private void Awake() {
         _modal = GameObject.Find("ModalResults").GetComponent<Modal>();
@@ -14,9 +15,18 @@ public class ModalResults : MonoBehaviour
         _loadLevel = GameObject.Find("GameScripts").GetComponent<LoadLevel>();
     }
 
+    private GameObject GetRow(int place) {
+        return place switch {
+            1 => _row1,
+            2 => _row2,
+            3 => _row3,
+            _ => _row4,
+        };
+    }
+
     public void BuildContent(PlayerControl[] players) {
         foreach(PlayerControl player in players) {
-            GameObject row = Utils.FindChildByName(transform.gameObject, "PlayerResultRow" + player.PlaceAfterFinish);
+            GameObject row = GetRow(player.PlaceAfterFinish);
             Image tokenImage = row.transform.Find("TokenImage").gameObject.GetComponent<Image>();
             tokenImage.sprite = player.TokenImage;
 

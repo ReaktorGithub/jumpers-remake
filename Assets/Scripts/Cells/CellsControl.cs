@@ -15,6 +15,7 @@ public class CellsControl : MonoBehaviour
     private Sprite _grind2Sprite, _grind3Sprite;
     private List<CellControl> _boombastersList = new();
     private Explosion _explosion;
+    private CameraControl _camera;
 
     private void Awake() {
         Instance = this;
@@ -23,6 +24,7 @@ public class CellsControl : MonoBehaviour
         _grind2Sprite = Instances.transform.Find("grind-dash2").GetComponent<SpriteRenderer>().sprite;
         _grind3Sprite = Instances.transform.Find("grind-dash3").GetComponent<SpriteRenderer>().sprite;
         _explosion = GameObject.Find("Explosion").GetComponent<Explosion>();
+        _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
     }
 
     public void AssignAllCellControls() {
@@ -481,11 +483,13 @@ public class CellsControl : MonoBehaviour
     }
 
     public void ExecuteBoombasterExplosion(CellControl targetCell) {
-        _explosion.SetPosition(targetCell.transform.localPosition);
-        _explosion.Explode();
+        MoveControl.Instance.IsBoombasterMode = true;
+        
         ManualContent manual = Manual.Instance.BoosterBoombaster;
         int level = targetCell.BoombasterLevel;
         int areaSize = manual.GetCauseEffect(level);
+        _explosion.SetPosition(targetCell.transform.localPosition);
+        _explosion.Explode(areaSize);
 
         // Вычисляем игроков, попавших в эпицентр
         List<PlayerControl> playersArea0 = targetCell.GetCurrentPlayers();
@@ -536,13 +540,22 @@ public class CellsControl : MonoBehaviour
             player.Boosters.ExecuteBoombaster(penalty);
         }
 
+        // камера
+        _camera.FollowObject(_explosion.transform);
+
         StartCoroutine(ExecuteBoombasterExplosionDefer());
     }
 
     private IEnumerator ExecuteBoombasterExplosionDefer() {
         yield return new WaitForSeconds(_boombasterDelay);
-        // todo проверить на выбывших игроков и окончание гонки, протестировать щиты
-        MoveControl.Instance.ContinueSwitchPlayer();
+        CheckPlayersAfterBoombasterExplosion();
+    }
+
+    public void CheckPlayersAfterBoombasterExplosion() {
+        bool isEveryoneReady = PlayersControl.Instance.IsEveryonePositivePower();
+        if (isEveryoneReady) {
+            MoveControl.Instance.ContinueSwitchPlayer();
+        }
     }
 
     // Возвращает игроков по площади вокруг выбранной клетки на определенном расстоянии

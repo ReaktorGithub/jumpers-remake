@@ -352,6 +352,11 @@ public class BoostersControl : MonoBehaviour
     }
 
     public void ExecuteBoombaster(PlayerControl player, CellControl targetCell) {
+        if (targetCell.IsBoombaster) {
+            player.OpenBoombasterModal();
+            return;
+        }
+        
         CellsControl.Instance.AddBoombaster(targetCell, player.Grind.Boombaster);
         player.Boosters.AddBoombaster(-1);
         UpdateBoostersFromPlayer(player);
