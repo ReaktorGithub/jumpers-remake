@@ -111,9 +111,12 @@ public class PopupMagnet : MonoBehaviour
     public void ThrowCubic() {
         string message = "Ход " + Utils.Wrap(_isSuper ? "супер-магнитом" : "магнитом", UIColors.Blue);
         Messages.Instance.AddMessage(message);
-        _modifiersControl.ShowModifierMagnet(_isSuper);
 
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
+        if (player.IsMe()) {
+            _modifiersControl.ShowModifierMagnet(_isSuper);
+        }
+        
         int max = player.GetCubicMaxScore();
         List<int> scores = new();
         for (int i = 0; i < max; i++) {

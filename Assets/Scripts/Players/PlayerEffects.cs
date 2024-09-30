@@ -324,7 +324,7 @@ public class PlayerEffects : MonoBehaviour
     // Молния: При подготовке игрока к ходу (в т.ч. дополнительному)
 
     public void CheckLightningStartMove() {
-        if (_isLightning) {
+        if (_isLightning && _player.IsMe()) {
             CubicControl.Instance.ModifiersControl.ShowModifierLightning(true);
         }
     }
@@ -340,7 +340,9 @@ public class PlayerEffects : MonoBehaviour
     // Молния: В конце хода
 
     public void CheckLightningEndMove() {
-        CubicControl.Instance.ModifiersControl.ShowModifierLightning(false);
+        if (_player.IsMe()) {
+            CubicControl.Instance.ModifiersControl.ShowModifierLightning(false);
+        }
 
         if (!_isLightning) {
             return;

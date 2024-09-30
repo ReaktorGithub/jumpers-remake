@@ -14,7 +14,8 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private EAiTypes _aiType = EAiTypes.Normal;
     [SerializeField] private GameObject _tokenObject;
     [SerializeField] private int _moveOrder;
-    [SerializeField] private bool _isReverseMove;
+    [SerializeField] private bool _isReverseMove = false;
+    [SerializeField] private bool _isDeadEndMode = false; // режим активируется в момент достижения стены
     private int _placeAfterFinish;
     private bool _isFinished = false;
     private int _movesSkip = 0; // пропуски хода
@@ -22,6 +23,7 @@ public class PlayerControl : MonoBehaviour
     private int _movesToDo = 0; // сколько нужно сделать ходов с броском кубика
     private int _stepsLeft = 0; // сколько шагов фишкой осталось сделать
     private bool _isLuckyStar = false; // защита от чёрных клеток
+    [SerializeField] private int _stuckAttached = 0; // количество зацепленных прилипал
     
     private List<EAttackTypes> _availableAttackTypes = new();
     private ModalWarning _modalWarning;
@@ -107,6 +109,11 @@ public class PlayerControl : MonoBehaviour
         set { _isReverseMove = value; }
     }
 
+    public bool IsDeadEndMode {
+        get { return _isDeadEndMode; }
+        set { _isDeadEndMode = value; }
+    }
+
     public GameObject TokenObject {
         get { return _tokenObject; }
         set { _tokenObject = value; }
@@ -182,6 +189,15 @@ public class PlayerControl : MonoBehaviour
         private set {}
     }
 
+    public int StuckAttached {
+        get { return _stuckAttached; }
+        set {
+            if (value > 4) return;
+            _stuckAttached = value;
+            GetTokenControl().UpdateStuckVisual(value);
+        }
+    }
+
     // Изменение параметров движения с помощью инкремента или декремента
 
     public void AddMovesToDo(int count) {
@@ -248,7 +264,12 @@ public class PlayerControl : MonoBehaviour
         private set {}
     }
 
-    public void ExecuteAttack(EAttackTypes type, PlayerControl selectedPlayer) {
+    public void ExecuteAttack(EAttackTypes type, bool isAddStuck, PlayerControl selectedPlayer) {
+        if (isAddStuck) {
+            _boosters.ExecuteStuckAsAgressor();
+            selectedPlayer.ExecuteStuckAsVictim();
+        }
+
         switch(type) {
             case EAttackTypes.MagicKick: {
                 ExecuteAttackMagicKick(selectedPlayer);
@@ -337,6 +358,13 @@ public class PlayerControl : MonoBehaviour
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " отказался от атаки";
         Messages.Instance.AddMessage(message);
         StartCoroutine(MoveControl.Instance.EndMoveDefer());
+    }
+
+    public void ExecuteStuckAsVictim() {
+        StuckAttached++;
+        if (IsMe()) {
+            CubicControl.Instance.ModifiersControl.ShowModifierStuck(StuckAttached);
+        }
     }
 
     // Модалки

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 public class TokenControl : MonoBehaviour
 {
     private IEnumerator _coroutine, _squeezeCoroutine;
-    [SerializeField] private GameObject _currentCell, _playerName, _indicators, _aiThinking, _indicatorsList, _indicatorBg, _bonusEventsList;
+    [SerializeField] private GameObject _currentCell, _playerName, _indicators, _aiThinking, _indicatorsList, _indicatorBg, _bonusEventsList, _stuck;
     [SerializeField] private float _bonushFlashTime = 3f;
     [SerializeField] private float _nextBonusTime = 1.5f;
     private GameObject _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
@@ -21,6 +21,7 @@ public class TokenControl : MonoBehaviour
     private int _indicatorsCount = 0;
     private List<int> _bonusQueue = new();
     private bool _isProcessingQueue = false;
+    private TokenStuck _stuckScript;
 
     private void Awake() {
         _squeezable = transform.Find("Squeezable").gameObject;
@@ -36,6 +37,7 @@ public class TokenControl : MonoBehaviour
         _sortingGroup = GetComponent<SortingGroup>();
         _pedestal = GameObject.Find("Pedestal");
         _splineAnimate = GetComponent<SplineAnimate>();
+        _stuckScript = _stuck.GetComponent<TokenStuck>();
         RemoveAllIndicators();
     }
 
@@ -177,6 +179,10 @@ public class TokenControl : MonoBehaviour
             }
             isIn = true;
         }
+    }
+
+    public void UpdateStuckVisual(int count) {
+        _stuckScript.UpdateStuckVisual(count);
     }
 
     // Отображаемое имя игрока

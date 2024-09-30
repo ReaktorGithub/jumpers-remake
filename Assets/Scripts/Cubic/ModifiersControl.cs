@@ -1,13 +1,17 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ModifiersControl : MonoBehaviour
 {
-    [SerializeField] private GameObject _modifierMagnet, _modifierLightning;
+    [SerializeField] private GameObject _modifierMagnet, _modifierLightning, _modifierStuck;
+    private TextMeshProUGUI _stuckText;
 
     private void Awake() {
         HideModifierMagnet();
         ShowModifierLightning(false);
+        _stuckText = _modifierStuck.transform.Find("text").GetComponent<TextMeshProUGUI>();
+        HideModifierStuck();
     }
 
     public void ShowModifierMagnet(bool isSuper) {
@@ -28,5 +32,14 @@ public class ModifiersControl : MonoBehaviour
 
     public void ShowModifierLightning(bool value) {
         _modifierLightning.SetActive(value);
+    }
+
+    public void HideModifierStuck() {
+        _modifierStuck.SetActive(false);
+    }
+
+    public void ShowModifierStuck(int count) {
+        _stuckText.text = "- " + count;
+        _modifierStuck.SetActive(true);
     }
 }

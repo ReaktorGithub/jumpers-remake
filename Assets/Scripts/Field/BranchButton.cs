@@ -11,6 +11,7 @@ public class BranchButton : MonoBehaviour
     [SerializeField] private float _pulseDefaultValue = 0.6f;
     [SerializeField] private GameObject _nextCell;
     [SerializeField] private EAiBranchTypes _aiBranchType = EAiBranchTypes.Normal;
+    [SerializeField] private bool _isDeadEnd = false;
     private float _currentX;
     private bool _pausePulse = false;
     private bool _disabled = false;
@@ -21,6 +22,11 @@ public class BranchButton : MonoBehaviour
 
     public GameObject NextCell {
         get { return _nextCell; }
+        private set {}
+    }
+
+    public bool IsDeadEnd {
+        get { return _isDeadEnd; }
         private set {}
     }
 
@@ -129,7 +135,7 @@ public class BranchButton : MonoBehaviour
             return;
         }
 
-        MoveControl.Instance.SwitchBranch(_nextCell);
+        MoveControl.Instance.SwitchBranch(_nextCell, _isDeadEnd);
     }
 
     public void ExecuteHedgehogChoice(SplineContainer spline) {

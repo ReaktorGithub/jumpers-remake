@@ -15,9 +15,7 @@ public class CellControl : MonoBehaviour
     [SerializeField] private string _nameDisplay = "";
     private int _oldEffectLevel = 1;
     [SerializeField] private int _coinBonusValue = 0;
-    [SerializeField] private bool _enableReverse = false;
-    // Если _enableReverse = true, то клетка находится в ответвлении со стеной. Нахождение фишки на этой клетке никак не влияет на её направление.
-    // Если _enableReverse = false, то клетка обычная. После остановки фишки у игрока будет принудительно сменено направление на "вперед"
+    [SerializeField] private bool _isDeadEndCell = false;
     private GameObject _container, _glow, _coinBonusObject, _brick, _boombasterPlace, _boombasterInstance, _intersection;
     private GameObject _boombasterCurrentInstance; // ссылка на работающую бумку, может быть null
     private SpriteRenderer _spriteRenderer, _glowSpriteRenderer, _grindSpriteRenderer;
@@ -121,9 +119,9 @@ public class CellControl : MonoBehaviour
         }
     }
 
-    public bool EnableReverse {
-        get { return _enableReverse; }
-        set { _enableReverse = value; }
+    public bool IsDeadEndCell {
+        get { return _isDeadEndCell; }
+        private set {}
     }
 
     public int CoinBonusValue {
@@ -177,7 +175,9 @@ public class CellControl : MonoBehaviour
     }
 
     public void AddToken(GameObject tokenObject) {
-        _currentTokens.Add(tokenObject);
+        if (!HasToken(tokenObject)) {
+            _currentTokens.Add(tokenObject);
+        }
     }
 
     public void RemoveToken(GameObject tokenObject) {

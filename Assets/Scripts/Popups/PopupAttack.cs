@@ -16,7 +16,10 @@ public class PopupAttack : MonoBehaviour
     private Button _buttonAttack, _buttonCancel;
     private int _powerNeed = 0;
     [SerializeField] private float _attackDelay = 0.7f;
+    [SerializeField] private GameObject _stuckAddButton, _optionalSectionStuckAdd;
+    private TokenAttackButton _stuckAddButtonScript;
     private PlayerControl _player;
+    private bool _isAddStuck = false;
 
     private void Awake() {
         _attack = GameObject.Find("PopupAttack");
@@ -41,6 +44,7 @@ public class PopupAttack : MonoBehaviour
         _powerNow = Utils.FindChildByName(_attack, "PowerNow").GetComponent<TextMeshProUGUI>();
         _powerLeft = Utils.FindChildByName(_attack, "PowerLeft").GetComponent<TextMeshProUGUI>();
         _warningText = Utils.FindChildByName(_attack, "WarningText").GetComponent<TextMeshProUGUI>();
+        _stuckAddButtonScript = _stuckAddButton.GetComponent<TokenAttackButton>();
     }
 
     // перед открытием окна сперва запускать BuildContent!
@@ -79,6 +83,11 @@ public class PopupAttack : MonoBehaviour
                 button.SetAsDisabled();
             }
         }
+
+        // Прилипалы
+        _stuckAddButtonScript.SetSelected(false);
+        _isAddStuck = false;
+        _optionalSectionStuckAdd.SetActive(currentPlayer.Boosters.Stuck > 0);
 
         // сила
 
@@ -131,6 +140,12 @@ public class PopupAttack : MonoBehaviour
         // кнопка атаки
 
         UpdateAttackButtonStatus();
+    }
+
+    public void ToggleStuckAdd() {
+        bool newValue = !_isAddStuck;
+        _isAddStuck = newValue;
+        _stuckAddButtonScript.SetSelected(newValue);
     }
 
     public void SetSelectedPlayer(PlayerControl player) {
@@ -277,7 +292,7 @@ public class PopupAttack : MonoBehaviour
 
     private IEnumerator ConfirmAttackDefer() {
         yield return new WaitForSeconds(_attackDelay);
-        MoveControl.Instance.CurrentPlayer.ExecuteAttack(_selectedAttackType, _selectedPlayer);
+        MoveControl.Instance.CurrentPlayer.ExecuteAttack(_selectedAttackType, _isAddStuck, _selectedPlayer);
     }
 
     private IEnumerator CancelAttackDefer() {

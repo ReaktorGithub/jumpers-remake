@@ -77,7 +77,7 @@ public class AiControl : MonoBehaviour
                 }
                 Debug.Log("selected attack: " + type + "; selectedPlayer: " + selectedPlayer);
                 
-                player.ExecuteAttack(type, selectedPlayer);
+                player.ExecuteAttack(type, false, selectedPlayer); // todo принять решение о прилипалах
             } else {
                 player.ExecuteCancelAttack();
             }

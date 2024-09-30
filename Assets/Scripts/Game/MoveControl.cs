@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -227,13 +228,6 @@ public class MoveControl : MonoBehaviour
     }
 
     private void StartCellCheckBeforeStep() {
-        CellControl cell = _currentPlayer.GetCurrentCell();
-        
-        // Подробнее об этом условии см. в CellControl
-        if (!cell.EnableReverse) {
-            _currentPlayer.IsReverseMove = false;
-        }
-
         bool check = CellChecker.Instance.CheckCellBeforeStep(_currentPlayer);
         if (check) {
             StartCoroutine(MakeStepDefer());
@@ -268,10 +262,24 @@ public class MoveControl : MonoBehaviour
     }
 
     public void MakeMove(int score) {
-        _isLassoMode = false;
-        _currentPlayer.StepsLeft = score;
-        _currentPlayer.Effects.SpendLightning();
         CellControl cell = _currentPlayer.GetCurrentCell();
+        _isLassoMode = false;
+        _currentPlayer.Effects.SpendLightning();
+
+        if (_currentPlayer.IsDeadEndMode) {
+            _currentPlayer.IsReverseMove = !_currentPlayer.IsReverseMove;
+        }
+
+        if (score < 0) {
+            _currentPlayer.IsReverseMove = !_currentPlayer.IsReverseMove;
+        }
+
+        if (score == 0) {
+            StartCoroutine(ConfirmNewPositionDefer());
+            return;
+        }
+
+        _currentPlayer.StepsLeft = Math.Abs(score);
         cell.RemoveToken(_currentPlayer.TokenObject);
         cell.AlignTokens(_alignTime);
         StartCellCheckBeforeStep();
@@ -340,7 +348,7 @@ public class MoveControl : MonoBehaviour
         StartCoroutine(ConfirmNewPositionDefer());
     }
 
-    private IEnumerator ConfirmNewPositionDefer() {
+    public IEnumerator ConfirmNewPositionDefer() {
         yield return new WaitForSeconds(_stepDelay);
         ConfirmNewPosition();
     }
@@ -349,6 +357,7 @@ public class MoveControl : MonoBehaviour
 
     public void ConfirmNewPosition() {
         CellControl cell = _currentPlayer.GetCurrentCell();
+        _currentPlayer.IsDeadEndMode = cell.IsDeadEndCell;
         cell.AddToken(_currentPlayer.TokenObject);
         cell.AlignTokens(_alignTime, () => {
             CellChecker.Instance.CheckCellAfterMove(_currentPlayer);
@@ -375,7 +384,7 @@ public class MoveControl : MonoBehaviour
 
     // смена направления
 
-    public void SwitchBranch(GameObject nextCell) {
+    public void SwitchBranch(GameObject nextCell, bool isDeadEnd) {
         CellControl cell = _currentPlayer.GetCurrentCell();
 
         if (!cell.TryGetComponent(out BranchCell branchCell)) {
@@ -444,6 +453,7 @@ public class MoveControl : MonoBehaviour
         Messages.Instance.AddMessage(message);
         message = Utils.Wrap("пропуск", UIColors.Yellow);
         CubicControl.Instance.WriteStatus(message);
+        CubicControl.Instance.HideFinalScoreDisplay();
 
         yield return new WaitForSeconds(_skipMoveDelay);
 
@@ -464,7 +474,7 @@ public class MoveControl : MonoBehaviour
 
     public void EndMove() {
         // Дебаг
-        // CellsControl.Instance.ShowTokensAtCells();
+        CellsControl.Instance.ShowTokensAtCells();
 
         // Сброс параметров
 

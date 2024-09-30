@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -15,8 +16,10 @@ public class CubicControl : MonoBehaviour
     [SerializeField] private float _holdTime = 1f;
     [SerializeField] private float _pulseTime = 0.5f;
     [SerializeField] private float _pulseMinAlpha = 0.2f;
+    [SerializeField] private float _showFinalScoreDelay = 0.2f;
     private int _finalScore;
-    private GameObject _border, _borderSelect;
+    private GameObject _border, _borderSelect, _finalScoreDisplay;
+    private TextMeshProUGUI _finalScoreDisplayText;
     private PopupMagnet _popupMagnet;
     private ModifiersControl _modifiersControl;
 
@@ -31,6 +34,8 @@ public class CubicControl : MonoBehaviour
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
         _cursorManager = _cubicButton.GetComponent<CursorManager>();
         _modifiersControl = GameObject.Find("Modifiers").GetComponent<ModifiersControl>();
+        _finalScoreDisplay = GameObject.Find("FinalScore");
+        _finalScoreDisplayText = _finalScoreDisplay.transform.Find("score").GetComponent<TextMeshProUGUI>();
     }
 
     private void Start() {
@@ -59,11 +64,11 @@ public class CubicControl : MonoBehaviour
         SetCubicInteractable(false);
         EffectsControl.Instance.DisableAllButtons(true);
         BoostersControl.Instance.DisableAllButtons();
+        _anim.SetInteger("score", 0);
+        _anim.SetBool("isRotate", true);
         if (_coroutine != null) {
             StopCoroutine(_coroutine);
         }
-        _anim.SetInteger("score", 0);
-        _anim.SetBool("isRotate", true);
         _coroutine = SetScoreDefer(specifiedScore, isMagnet);
         StartCoroutine(_coroutine);
     }
@@ -80,21 +85,31 @@ public class CubicControl : MonoBehaviour
     }
 
     private void SetScore(int specifiedScore = 0) {
+        PlayerControl player = MoveControl.Instance.CurrentPlayer;
+
         int score;
+
         if (specifiedScore != 0) {
             score = specifiedScore;
         } else {
-            int max = MoveControl.Instance.CurrentPlayer.GetCubicMaxScore() + 1;
+            int max = player.GetCubicMaxScore() + 1;
             System.Random random = new();
             score = random.Next(1, max);
         }
+
+        int scoreToDisplay = score;
+        score -= player.StuckAttached;
+
         int multiplier = 1;
-        if (MoveControl.Instance.CurrentPlayer.Effects.IsLightning) {
+        if (player.Effects.IsLightning) {
             multiplier = 2;
         }
+
         _finalScore = score * multiplier;
-        _anim.SetInteger("score", score);
+        _anim.SetInteger("score", Math.Abs(scoreToDisplay));
         _anim.SetBool("isRotate", false);
+        _finalScoreDisplayText.text = _finalScore.ToString();
+        StartCoroutine(ShowFinalScoreDisplayDefer());
         _coroutine = MakeMoveDefer();
         StartCoroutine(_coroutine);
     }
@@ -111,6 +126,7 @@ public class CubicControl : MonoBehaviour
         _borderSelect.SetActive(value);
         SpriteRenderer borderSelectSprite = _borderSelect.GetComponent<SpriteRenderer>();
         if (value) {
+            _finalScoreDisplay.SetActive(false);
             _coroutinePulse = Utils.StartPulse(borderSelectSprite, _pulseTime, _pulseMinAlpha);
             StartCoroutine(_coroutinePulse);
         } else if (_coroutinePulse != null) {
@@ -128,11 +144,18 @@ public class CubicControl : MonoBehaviour
         }
 
         WriteStatus(message);
-
-
     }
 
     public void WriteStatus(string text) {
         _statusText.text = text;
+    }
+
+    private IEnumerator ShowFinalScoreDisplayDefer() {
+        yield return new WaitForSeconds(_showFinalScoreDelay);
+        _finalScoreDisplay.SetActive(true);
+    }
+
+    public void HideFinalScoreDisplay() {
+        _finalScoreDisplay.SetActive(false);
     }
 }

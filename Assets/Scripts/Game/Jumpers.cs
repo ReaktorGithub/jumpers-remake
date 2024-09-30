@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 // Класс предназначен для предварительной настройки игры перед запуском уровня

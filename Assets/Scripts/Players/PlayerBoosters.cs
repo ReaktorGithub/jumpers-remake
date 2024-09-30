@@ -346,4 +346,9 @@ public class PlayerBoosters : MonoBehaviour
             PlayersControl.Instance.UpdatePlayersInfo();
         }
     }
+
+    public void ExecuteStuckAsAgressor() {
+        AddStuck(-1);
+        BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
+    }
 }
