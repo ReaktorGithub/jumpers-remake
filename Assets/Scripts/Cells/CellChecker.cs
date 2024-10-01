@@ -32,12 +32,14 @@ public class CellChecker : MonoBehaviour
         if (cell.TryGetComponent(out BranchCell branchCell)) {
             BranchControl branch = branchCell.BranchControl;
             
-            if (player.IsDeadEndMode && player.IsReverseMove) {
+            // Если игрок пришел сюда из ветки с тупиком, то сбросить параметры
+            // !!! Выбор бранча не скипать !!!
+            if (player.IsDeadEndMode && player.IsReverseMove && player.StepsLeft >= 0) {
                 player.IsDeadEndMode = false;
                 player.IsReverseMove = false;
             }
 
-            // Если направление фишки не соответствует направлению бранча, то скипаем
+            // Если направление фишки не соответствует направлению бранча, то выбор бранча не вызывать
             if (player.IsReverseMove != branch.IsReverse) {
                 return true;
             }
@@ -107,9 +109,7 @@ public class CellChecker : MonoBehaviour
         }
 
         if (cellType == ECellTypes.Wall) {
-            player.IsDeadEndMode = true;
-            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " уткнулся носом в " + Utils.Wrap("стену", UIColors.Brick);
-            Messages.Instance.AddMessage(message);
+            player.Effects.ExecuteWall(false);
             MoveControl.Instance.BreakMovingAndConfirmNewPosition();
             return false;
         }
@@ -193,12 +193,10 @@ public class CellChecker : MonoBehaviour
         }
 
         if (cell.CellType == ECellTypes.Wall) {
-            player.IsDeadEndMode = true;
-            string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " уткнулся носом в " + Utils.Wrap("стену", UIColors.Brick);
-            Messages.Instance.AddMessage(message);
+            player.Effects.ExecuteWall(true);
         }
 
-        // Вызывают прерывание
+        // Отменяют дальнейшую серию проверок
 
         if (cell.Effect == EControllableEffects.Black) {
             player.Effects.ExecuteBlack();

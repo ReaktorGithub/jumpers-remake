@@ -228,6 +228,22 @@ public class MoveControl : MonoBehaviour
     }
 
     private void StartCellCheckBeforeStep() {
+        // Определяем направление перед тем, как сделать делать шаг
+        // Зависит от достижения стены и отрицательного / положительного остатка шагов
+        bool isReverse = false;
+
+        if (_currentPlayer.IsDeadEndMode) {
+            if (_currentPlayer.StepsLeft > 0) {
+                isReverse = true;
+            }
+        } else {
+            if (_currentPlayer.StepsLeft < 0) {
+                isReverse = true;
+            }
+        }
+
+        _currentPlayer.IsReverseMove = isReverse;
+
         bool check = CellChecker.Instance.CheckCellBeforeStep(_currentPlayer);
         if (check) {
             StartCoroutine(MakeStepDefer());
@@ -240,8 +256,8 @@ public class MoveControl : MonoBehaviour
     }
 
     private void MakeStep() {
-        _currentPlayer.AddStepsLeft(-1);
-        _currentPlayer.GetTokenControl().SetToNextCell(_moveTime, AfterStep);
+        _currentPlayer.AddStepsLeft(_currentPlayer.StepsLeft > 0 ? -1: 1);
+        _currentPlayer.GetTokenControl().SetToNextCell(_currentPlayer.IsReverseMove, _moveTime, AfterStep);
     }
 
     private void AfterStep() {
@@ -254,10 +270,10 @@ public class MoveControl : MonoBehaviour
         }
 
         // если тип клетки не прерывает движение, то проверяем условие выхода из цикла шагов
-        if (_currentPlayer.StepsLeft > 0) {
-            StartCellCheckBeforeStep();
-        } else {
+        if (_currentPlayer.StepsLeft == 0) {
             StartCoroutine(ConfirmNewPositionDefer());
+        } else {
+            StartCellCheckBeforeStep();
         }
     }
 
@@ -266,20 +282,12 @@ public class MoveControl : MonoBehaviour
         _isLassoMode = false;
         _currentPlayer.Effects.SpendLightning();
 
-        if (_currentPlayer.IsDeadEndMode) {
-            _currentPlayer.IsReverseMove = !_currentPlayer.IsReverseMove;
-        }
-
-        if (score < 0) {
-            _currentPlayer.IsReverseMove = !_currentPlayer.IsReverseMove;
-        }
-
         if (score == 0) {
             StartCoroutine(ConfirmNewPositionDefer());
             return;
         }
 
-        _currentPlayer.StepsLeft = Math.Abs(score);
+        _currentPlayer.StepsLeft = score;
         cell.RemoveToken(_currentPlayer.TokenObject);
         cell.AlignTokens(_alignTime);
         StartCellCheckBeforeStep();
@@ -357,7 +365,12 @@ public class MoveControl : MonoBehaviour
 
     public void ConfirmNewPosition() {
         CellControl cell = _currentPlayer.GetCurrentCell();
-        _currentPlayer.IsDeadEndMode = cell.IsDeadEndCell;
+
+        // Если фишка попала на клетку, которая не относится к тупиковой ветке, то отменить параметр
+        if (!cell.IsDeadEndCell) {
+            _currentPlayer.IsDeadEndMode = false;
+        }
+
         cell.AddToken(_currentPlayer.TokenObject);
         cell.AlignTokens(_alignTime, () => {
             CellChecker.Instance.CheckCellAfterMove(_currentPlayer);

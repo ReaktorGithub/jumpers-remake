@@ -78,19 +78,23 @@ public class TokenControl : MonoBehaviour
         _indicators.SetActive(!value);
     }
 
-    public void SetToNextCell(float moveTime, Action callback = null) {
+    public void SetToNextCell(bool isReverseMode, float moveTime, Action callback = null) {
         ClearCoroutine();
+
         if (_currentCell == null) {
             Debug.Log("Current cell not found");
             return;
         }
+
         CellControl cell = _currentCell.GetComponent<CellControl>();
-        GameObject nextCell = _playerControl.IsReverseMove ? cell.PreviousCell : cell.NextCell;
+        GameObject nextCell = isReverseMode ? cell.PreviousCell : cell.NextCell;
 
         if (nextCell == null) {
             Debug.Log("Next cell not specified");
+            callback?.Invoke();
             return;
         }
+
         _currentCell = nextCell;
         _coroutine = Utils.MoveTo(transform.gameObject, nextCell.transform.position, moveTime, callback);
         StartCoroutine(_coroutine);

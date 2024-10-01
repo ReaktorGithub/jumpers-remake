@@ -21,7 +21,7 @@ public class PlayerControl : MonoBehaviour
     private int _movesSkip = 0; // пропуски хода
     private int _skipMoveCount = 0; // сколько пропущено ходов на желтой клетке подряд
     private int _movesToDo = 0; // сколько нужно сделать ходов с броском кубика
-    private int _stepsLeft = 0; // сколько шагов фишкой осталось сделать
+    private int _stepsLeft = 0; // сколько шагов фишкой осталось сделать, может быть
     private bool _isLuckyStar = false; // защита от чёрных клеток
     [SerializeField] private int _stuckAttached = 0; // количество зацепленных прилипал
     

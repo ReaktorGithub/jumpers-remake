@@ -8423,10 +8423,11 @@ MonoBehaviour:
   _moveOrder: 0
   _isReverseMove: 0
   _isDeadEndMode: 0
+  _stuckAttached: 0
   _coins: 400
   _mallows: 0
   _rubies: 0
-  _power: 0
+  _power: 4
 --- !u!114 &312397162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8460,12 +8461,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _magnet: 2
   _superMagnet: 0
-  _lasso: 1
+  _lasso: 3
   _shield: 2
   _shieldIron: 1
-  _vampire: 0
+  _vampire: 1
   _boombaster: 0
-  _stuck: 0
+  _stuck: 1
   _armor: 0
   _isIronArmor: 0
   _selectedShieldButton: {fileID: 0}
@@ -8486,10 +8487,10 @@ MonoBehaviour:
   _red: 1
   _black: 1
   _star: 1
-  _magicKick: 1
+  _magicKick: 2
   _oreol: 1
   _knockout: 1
-  _lasso: 1
+  _lasso: 3
   _boombaster: 1
   _bombElectro: 1
   _bombDirt: 1
@@ -16255,6 +16256,7 @@ MonoBehaviour:
   _moveOrder: 0
   _isReverseMove: 0
   _isDeadEndMode: 0
+  _stuckAttached: 0
   _coins: 600
   _mallows: 0
   _rubies: 0
@@ -16318,10 +16320,10 @@ MonoBehaviour:
   _red: 1
   _black: 1
   _star: 1
-  _magicKick: 1
+  _magicKick: 2
   _oreol: 1
   _knockout: 1
-  _lasso: 1
+  _lasso: 3
   _boombaster: 1
   _bombElectro: 1
   _bombDirt: 1
@@ -18519,6 +18521,7 @@ MonoBehaviour:
   _moveOrder: 0
   _isReverseMove: 0
   _isDeadEndMode: 0
+  _stuckAttached: 0
   _coins: 400
   _mallows: 0
   _rubies: 1
@@ -18582,10 +18585,10 @@ MonoBehaviour:
   _red: 2
   _black: 2
   _star: 2
-  _magicKick: 2
+  _magicKick: 3
   _oreol: 2
   _knockout: 3
-  _lasso: 2
+  _lasso: 3
   _boombaster: 2
   _bombElectro: 2
   _bombDirt: 2
@@ -21647,6 +21650,7 @@ MonoBehaviour:
   _moveOrder: 0
   _isReverseMove: 0
   _isDeadEndMode: 0
+  _stuckAttached: 0
   _coins: 400
   _mallows: 0
   _rubies: 0

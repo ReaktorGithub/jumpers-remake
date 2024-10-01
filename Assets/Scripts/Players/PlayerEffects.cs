@@ -307,6 +307,15 @@ public class PlayerEffects : MonoBehaviour
         Messages.Instance.AddMessage(message);
     }
 
+    public void ExecuteWall(bool showMessage) {
+        _player.IsDeadEndMode = true;
+
+        if (showMessage) {
+            string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " уткнулся носом в " + Utils.Wrap("стену", UIColors.Brick);
+            Messages.Instance.AddMessage(message);
+        }
+    }
+
     // Молнии
 
     // Молния: При попадании на клетку с молнией
