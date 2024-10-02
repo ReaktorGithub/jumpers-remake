@@ -152,6 +152,18 @@ public class CubicControl : MonoBehaviour
 
     private IEnumerator ShowFinalScoreDisplayDefer() {
         yield return new WaitForSeconds(_showFinalScoreDelay);
+
+        Color32 color = new(255,255,255,255);
+        if (_finalScore > 0) {
+            color = new(51,179,107,255);
+        } else if (_finalScore < 0) {
+            color = new(255,68,68,255);
+        }
+
+        Color32 textColor = _finalScore == 0 ? new(0,0,0,255) : new(255,255,255,255);
+        _finalScoreDisplay.GetComponent<Image>().color = color;
+        _finalScoreDisplayText.color = textColor;
+        
         _finalScoreDisplay.SetActive(true);
     }
 

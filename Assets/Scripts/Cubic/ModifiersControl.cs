@@ -39,6 +39,11 @@ public class ModifiersControl : MonoBehaviour
     }
 
     public void ShowModifierStuck(int count) {
+        if (count == 0) {
+            HideModifierStuck();
+            return;
+        }
+
         _stuckText.text = "- " + count;
         _modifierStuck.SetActive(true);
     }

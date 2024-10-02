@@ -219,6 +219,7 @@ public class MoveControl : MonoBehaviour
         if (isMe) {
             EffectsControl.Instance.TryToEnableAllEffectButtons();
             CubicControl.Instance.SetCubicInteractable(true);
+            CubicControl.Instance.ModifiersControl.ShowModifierStuck(_currentPlayer.StuckAttached);
         } else if (_currentPlayer.Type == EPlayerTypes.Ai) {
             StartCoroutine(AiControl.Instance.AiThrowCubic());
         }
@@ -228,8 +229,8 @@ public class MoveControl : MonoBehaviour
     }
 
     private void StartCellCheckBeforeStep() {
-        // Определяем направление перед тем, как сделать делать шаг
-        // Зависит от достижения стены и отрицательного / положительного остатка шагов
+        // Определяем направление перед тем, как сделать следующий шаг
+        // Зависит от тупика и отрицательного / положительного остатка шагов
         bool isReverse = false;
 
         if (_currentPlayer.IsDeadEndMode) {
@@ -285,6 +286,13 @@ public class MoveControl : MonoBehaviour
         if (score == 0) {
             StartCoroutine(ConfirmNewPositionDefer());
             return;
+        }
+
+        if (_currentPlayer.StuckAttached > 0) {
+            string stuckText = _currentPlayer.StuckAttached == 1 ? "Прилипала" : _currentPlayer.StuckAttached + " прилипалы";
+            string slowText = _currentPlayer.StuckAttached == 1 ? " замедляет " : " замедляют ";
+            string message = Utils.Wrap(stuckText, UIColors.LimeGreen) + slowText + Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow);
+            Messages.Instance.AddMessage(message);
         }
 
         _currentPlayer.StepsLeft = score;

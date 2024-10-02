@@ -350,5 +350,7 @@ public class PlayerBoosters : MonoBehaviour
     public void ExecuteStuckAsAgressor() {
         AddStuck(-1);
         BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
+        string message = "Обнаружено заражение новой " + Utils.Wrap("прилипалой", UIColors.LimeGreen);
+        Messages.Instance.AddMessage(message);
     }
 }

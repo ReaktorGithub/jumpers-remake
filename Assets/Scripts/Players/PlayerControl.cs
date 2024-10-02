@@ -264,11 +264,17 @@ public class PlayerControl : MonoBehaviour
         private set {}
     }
 
-    public void ExecuteAttack(EAttackTypes type, bool isAddStuck, PlayerControl selectedPlayer) {
+    public void ExecuteAttack(EAttackTypes type, bool isAddStuck, int removeStuck, PlayerControl selectedPlayer) {
+        int addStuck = isAddStuck ? 1 : 0;
+        addStuck += removeStuck;
+
         if (isAddStuck) {
             _boosters.ExecuteStuckAsAgressor();
-            selectedPlayer.ExecuteStuckAsVictim();
         }
+
+        selectedPlayer.ExecuteStuckAsVictim(addStuck);
+        StuckAttached -= removeStuck;
+        AddPower(-removeStuck);
 
         switch(type) {
             case EAttackTypes.MagicKick: {
@@ -360,8 +366,20 @@ public class PlayerControl : MonoBehaviour
         StartCoroutine(MoveControl.Instance.EndMoveDefer());
     }
 
-    public void ExecuteStuckAsVictim() {
-        StuckAttached++;
+    public void ExecuteStuckAsVictim(int count) {
+        StuckAttached += count;
+
+        if (IsMe()) {
+            CubicControl.Instance.ModifiersControl.ShowModifierStuck(StuckAttached);
+        }
+    }
+
+    public void ExecuteRemoveStuck(int stuckCount, int coinsCost, int rubiesCost) {
+        StuckAttached -= stuckCount;
+        AddCoins(-coinsCost);
+        AddRubies(-rubiesCost);
+        PlayersControl.Instance.UpdatePlayersInfo();
+
         if (IsMe()) {
             CubicControl.Instance.ModifiersControl.ShowModifierStuck(StuckAttached);
         }
