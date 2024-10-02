@@ -8,7 +8,8 @@ public class PopupAttack : MonoBehaviour
 {
     private GameObject _attack, _optionalSectionTokens;
     private Popup _popup;
-    private TextMeshProUGUI _tokenName, _attackHeading, _attackDescription, _powerNow, _powerLeft, _warningText;
+    private TextMeshProUGUI _tokenName, _attackHeading, _attackDescription, _powerNow, _powerLeft, _warningText, _removeStuckCost;
+    private Sprite _counterSprite;
     private List<TokenAttackButton> _tokenAttackButtons = new();
     private List<AttackTypeButton> _attackTypeButtons = new();
     private PlayerControl _selectedPlayer = null;
@@ -16,9 +17,16 @@ public class PopupAttack : MonoBehaviour
     private Button _buttonAttack, _buttonCancel;
     private int _powerNeed = 0;
     [SerializeField] private float _attackDelay = 0.7f;
+    [SerializeField] private GameObject _stuckAddButton, _optionalSectionStuckAdd, _optionalSectionStuckRemove, _removeStuckCostObject, _counterObject;
+    private TokenAttackButton _stuckAddButtonScript;
+    private Counter _counter;
     private PlayerControl _player;
+    private bool _isAddStuck = false;
+    private int _removeStuckCount = 0;
 
     private void Awake() {
+        GameObject instances = GameObject.Find("Instances");
+        _counterSprite = instances.transform.Find("stuck-icon").GetComponent<SpriteRenderer>().sprite;
         _attack = GameObject.Find("PopupAttack");
         _popup = _attack.GetComponent<Popup>();
         _optionalSectionTokens = _attack.transform.Find("OptionalSectionTokens").gameObject;
@@ -41,6 +49,9 @@ public class PopupAttack : MonoBehaviour
         _powerNow = Utils.FindChildByName(_attack, "PowerNow").GetComponent<TextMeshProUGUI>();
         _powerLeft = Utils.FindChildByName(_attack, "PowerLeft").GetComponent<TextMeshProUGUI>();
         _warningText = Utils.FindChildByName(_attack, "WarningText").GetComponent<TextMeshProUGUI>();
+        _stuckAddButtonScript = _stuckAddButton.GetComponent<TokenAttackButton>();
+        _removeStuckCost = _removeStuckCostObject.GetComponent<TextMeshProUGUI>();
+        _counter = _counterObject.GetComponent<Counter>();
     }
 
     // перед открытием окна сперва запускать BuildContent!
@@ -66,19 +77,27 @@ public class PopupAttack : MonoBehaviour
 
         // раздел с атаками
 
-        if (currentPlayer.Boosters.Vampire > 0) {
-            currentPlayer.AddAvailableAttackType(EAttackTypes.Vampire);
+        if (_player.Boosters.Vampire > 0) {
+            _player.AddAvailableAttackType(EAttackTypes.Vampire);
         } else {
-            currentPlayer.RemoveAvailableAttackType(EAttackTypes.Vampire);
+            _player.RemoveAvailableAttackType(EAttackTypes.Vampire);
         }
 
         foreach(AttackTypeButton button in _attackTypeButtons) {
-            if (currentPlayer.AvailableAttackTypes.Contains(button.AttackType)) {
+            if (_player.AvailableAttackTypes.Contains(button.AttackType)) {
                 button.SetAsEnabled();
             } else {
                 button.SetAsDisabled();
             }
         }
+
+        // Прилипалы
+        _stuckAddButtonScript.SetSelected(false);
+        _isAddStuck = false;
+        _optionalSectionStuckAdd.SetActive(_player.Boosters.Stuck > 0);
+        _optionalSectionStuckRemove.SetActive(_player.StuckAttached > 0);
+        _counter.Init(_counterSprite, 0, 0, _player.StuckAttached);
+        UpdateStuckRemoveCount(0);
 
         // сила
 
@@ -109,7 +128,7 @@ public class PopupAttack : MonoBehaviour
                         button.DisableShieldImage(false);
                         button.SetDisabled(true);
                         buttonComponent.onClick.AddListener(() => {
-                            currentPlayer.OpenAttackShieldModal();
+                            _player.OpenAttackShieldModal();
                         });
                     } else {
                         button.SetShieldImage(null);
@@ -131,6 +150,17 @@ public class PopupAttack : MonoBehaviour
         // кнопка атаки
 
         UpdateAttackButtonStatus();
+    }
+
+    public void ToggleStuckAdd() {
+        bool newValue = !_isAddStuck;
+        _isAddStuck = newValue;
+        _stuckAddButtonScript.SetSelected(newValue);
+    }
+
+    private void UpdateStuckRemoveCount(int value) {
+        _removeStuckCount = value;
+        _removeStuckCost.text = "Цена: " + value + " сила";
     }
 
     public void SetSelectedPlayer(PlayerControl player) {
@@ -241,6 +271,8 @@ public class PopupAttack : MonoBehaviour
 
         switch (_selectedAttackType) {
             case EAttackTypes.Usual:
+            powerNeed =+ 1;
+            break;
             case EAttackTypes.MagicKick:
             powerNeed =+ magicCost;
             break;
@@ -251,6 +283,8 @@ public class PopupAttack : MonoBehaviour
             powerNeed += knockoutCost;
             break;
         }
+
+        powerNeed += _removeStuckCount;
 
         int powerLeft = powerInitial - powerNeed;
         _powerNeed = powerNeed;
@@ -275,15 +309,27 @@ public class PopupAttack : MonoBehaviour
         }
     }
 
+    public void OnIncreaseStuckClick() {
+        int newValue = _counter.OnIncrease();
+        UpdateStuckRemoveCount(newValue);
+        UpdatePower();
+    }
+
+    public void OnDiscreaseStuckClick() {
+        int newValue = _counter.OnDiscrease();
+        UpdateStuckRemoveCount(newValue);
+        UpdatePower();
+    }
+
     private IEnumerator ConfirmAttackDefer() {
         yield return new WaitForSeconds(_attackDelay);
-        MoveControl.Instance.CurrentPlayer.ExecuteAttack(_selectedAttackType, _selectedPlayer);
+        _player.ExecuteAttack(_selectedAttackType, _isAddStuck, _removeStuckCount, _selectedPlayer);
     }
 
     private IEnumerator CancelAttackDefer() {
         yield return new WaitForSeconds(_attackDelay);
         ResetContent();
-        MoveControl.Instance.CurrentPlayer.ExecuteCancelAttack();
+        _player.ExecuteCancelAttack();
     }
 
     public void ConfirmAttack() {

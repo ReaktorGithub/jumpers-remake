@@ -31,15 +31,15 @@ public class CellChecker : MonoBehaviour
 
         if (cell.TryGetComponent(out BranchCell branchCell)) {
             BranchControl branch = branchCell.BranchControl;
-
-            // Если фишка движется назад, а бранч не реверс, то у фишки надо сменить направление, затем активируем бранч
-            if (player.IsReverseMove && !branch.IsReverse) {
+            
+            // Если игрок пришел сюда из ветки с тупиком, то сбросить параметры
+            // !!! Выбор бранча не скипать !!!
+            if (player.IsDeadEndMode && player.IsReverseMove && player.StepsLeft >= 0) {
+                player.IsDeadEndMode = false;
                 player.IsReverseMove = false;
-                ActivateBranch(player, branch, player.StepsLeft);
-                return false;
             }
 
-            // Если направление фишки не соответствует направлению бранча, то скипаем
+            // Если направление фишки не соответствует направлению бранча, то выбор бранча не вызывать
             if (player.IsReverseMove != branch.IsReverse) {
                 return true;
             }
@@ -102,13 +102,15 @@ public class CellChecker : MonoBehaviour
             return false;
         }
 
-        if (cellType == ECellTypes.Start && player.IsReverseMove || cellType == ECellTypes.Wall && !player.IsReverseMove) {
-            player.IsReverseMove = !player.IsReverseMove;
+        if (cellType == ECellTypes.Start && player.IsReverseMove) {
+            player.IsReverseMove = false;
             MoveControl.Instance.BreakMovingAndConfirmNewPosition();
-            if (cellType == ECellTypes.Wall) {
-                string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " уткнулся носом в " + Utils.Wrap("стену", UIColors.Brick);
-                Messages.Instance.AddMessage(message);
-            }
+            return false;
+        }
+
+        if (cellType == ECellTypes.Wall) {
+            player.Effects.ExecuteWall(false);
+            MoveControl.Instance.BreakMovingAndConfirmNewPosition();
             return false;
         }
 
@@ -190,7 +192,11 @@ public class CellChecker : MonoBehaviour
             player.Effects.ExecuteCoinBonus(cell.CoinBonusValue);
         }
 
-        // Вызывают прерывание
+        if (cell.CellType == ECellTypes.Wall) {
+            player.Effects.ExecuteWall(true);
+        }
+
+        // Отменяют дальнейшую серию проверок
 
         if (cell.Effect == EControllableEffects.Black) {
             player.Effects.ExecuteBlack();

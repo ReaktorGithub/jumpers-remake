@@ -307,6 +307,15 @@ public class PlayerEffects : MonoBehaviour
         Messages.Instance.AddMessage(message);
     }
 
+    public void ExecuteWall(bool showMessage) {
+        _player.IsDeadEndMode = true;
+
+        if (showMessage) {
+            string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " уткнулся носом в " + Utils.Wrap("стену", UIColors.Brick);
+            Messages.Instance.AddMessage(message);
+        }
+    }
+
     // Молнии
 
     // Молния: При попадании на клетку с молнией
@@ -324,7 +333,7 @@ public class PlayerEffects : MonoBehaviour
     // Молния: При подготовке игрока к ходу (в т.ч. дополнительному)
 
     public void CheckLightningStartMove() {
-        if (_isLightning) {
+        if (_isLightning && _player.IsMe()) {
             CubicControl.Instance.ModifiersControl.ShowModifierLightning(true);
         }
     }
@@ -340,7 +349,9 @@ public class PlayerEffects : MonoBehaviour
     // Молния: В конце хода
 
     public void CheckLightningEndMove() {
-        CubicControl.Instance.ModifiersControl.ShowModifierLightning(false);
+        if (_player.IsMe()) {
+            CubicControl.Instance.ModifiersControl.ShowModifierLightning(false);
+        }
 
         if (!_isLightning) {
             return;

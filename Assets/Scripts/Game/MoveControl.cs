@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -218,6 +219,7 @@ public class MoveControl : MonoBehaviour
         if (isMe) {
             EffectsControl.Instance.TryToEnableAllEffectButtons();
             CubicControl.Instance.SetCubicInteractable(true);
+            CubicControl.Instance.ModifiersControl.ShowModifierStuck(_currentPlayer.StuckAttached);
         } else if (_currentPlayer.Type == EPlayerTypes.Ai) {
             StartCoroutine(AiControl.Instance.AiThrowCubic());
         }
@@ -227,12 +229,21 @@ public class MoveControl : MonoBehaviour
     }
 
     private void StartCellCheckBeforeStep() {
-        CellControl cell = _currentPlayer.GetCurrentCell();
-        
-        // Подробнее об этом условии см. в CellControl
-        if (!cell.EnableReverse) {
-            _currentPlayer.IsReverseMove = false;
+        // Определяем направление перед тем, как сделать следующий шаг
+        // Зависит от тупика и отрицательного / положительного остатка шагов
+        bool isReverse = false;
+
+        if (_currentPlayer.IsDeadEndMode) {
+            if (_currentPlayer.StepsLeft > 0) {
+                isReverse = true;
+            }
+        } else {
+            if (_currentPlayer.StepsLeft < 0) {
+                isReverse = true;
+            }
         }
+
+        _currentPlayer.IsReverseMove = isReverse;
 
         bool check = CellChecker.Instance.CheckCellBeforeStep(_currentPlayer);
         if (check) {
@@ -246,8 +257,8 @@ public class MoveControl : MonoBehaviour
     }
 
     private void MakeStep() {
-        _currentPlayer.AddStepsLeft(-1);
-        _currentPlayer.GetTokenControl().SetToNextCell(_moveTime, AfterStep);
+        _currentPlayer.AddStepsLeft(_currentPlayer.StepsLeft > 0 ? -1: 1);
+        _currentPlayer.GetTokenControl().SetToNextCell(_currentPlayer.IsReverseMove, _moveTime, AfterStep);
     }
 
     private void AfterStep() {
@@ -260,18 +271,31 @@ public class MoveControl : MonoBehaviour
         }
 
         // если тип клетки не прерывает движение, то проверяем условие выхода из цикла шагов
-        if (_currentPlayer.StepsLeft > 0) {
-            StartCellCheckBeforeStep();
-        } else {
+        if (_currentPlayer.StepsLeft == 0) {
             StartCoroutine(ConfirmNewPositionDefer());
+        } else {
+            StartCellCheckBeforeStep();
         }
     }
 
     public void MakeMove(int score) {
-        _isLassoMode = false;
-        _currentPlayer.StepsLeft = score;
-        _currentPlayer.Effects.SpendLightning();
         CellControl cell = _currentPlayer.GetCurrentCell();
+        _isLassoMode = false;
+        _currentPlayer.Effects.SpendLightning();
+
+        if (score == 0) {
+            StartCoroutine(ConfirmNewPositionDefer());
+            return;
+        }
+
+        if (_currentPlayer.StuckAttached > 0) {
+            string stuckText = _currentPlayer.StuckAttached == 1 ? "Прилипала" : _currentPlayer.StuckAttached + " прилипалы";
+            string slowText = _currentPlayer.StuckAttached == 1 ? " замедляет " : " замедляют ";
+            string message = Utils.Wrap(stuckText, UIColors.LimeGreen) + slowText + Utils.Wrap(_currentPlayer.PlayerName, UIColors.Yellow);
+            Messages.Instance.AddMessage(message);
+        }
+
+        _currentPlayer.StepsLeft = score;
         cell.RemoveToken(_currentPlayer.TokenObject);
         cell.AlignTokens(_alignTime);
         StartCellCheckBeforeStep();
@@ -340,7 +364,7 @@ public class MoveControl : MonoBehaviour
         StartCoroutine(ConfirmNewPositionDefer());
     }
 
-    private IEnumerator ConfirmNewPositionDefer() {
+    public IEnumerator ConfirmNewPositionDefer() {
         yield return new WaitForSeconds(_stepDelay);
         ConfirmNewPosition();
     }
@@ -349,6 +373,12 @@ public class MoveControl : MonoBehaviour
 
     public void ConfirmNewPosition() {
         CellControl cell = _currentPlayer.GetCurrentCell();
+
+        // Если фишка попала на клетку, которая не относится к тупиковой ветке, то отменить параметр
+        if (!cell.IsDeadEndCell) {
+            _currentPlayer.IsDeadEndMode = false;
+        }
+
         cell.AddToken(_currentPlayer.TokenObject);
         cell.AlignTokens(_alignTime, () => {
             CellChecker.Instance.CheckCellAfterMove(_currentPlayer);
@@ -375,7 +405,7 @@ public class MoveControl : MonoBehaviour
 
     // смена направления
 
-    public void SwitchBranch(GameObject nextCell) {
+    public void SwitchBranch(GameObject nextCell, bool isDeadEnd) {
         CellControl cell = _currentPlayer.GetCurrentCell();
 
         if (!cell.TryGetComponent(out BranchCell branchCell)) {
@@ -444,6 +474,7 @@ public class MoveControl : MonoBehaviour
         Messages.Instance.AddMessage(message);
         message = Utils.Wrap("пропуск", UIColors.Yellow);
         CubicControl.Instance.WriteStatus(message);
+        CubicControl.Instance.HideFinalScoreDisplay();
 
         yield return new WaitForSeconds(_skipMoveDelay);
 
@@ -464,7 +495,7 @@ public class MoveControl : MonoBehaviour
 
     public void EndMove() {
         // Дебаг
-        // CellsControl.Instance.ShowTokensAtCells();
+        CellsControl.Instance.ShowTokensAtCells();
 
         // Сброс параметров
 

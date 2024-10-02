@@ -214,7 +214,7 @@ public class EffectsControl : MonoBehaviour
             }
         }
 
-        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " ставит эффект <b>" + effectName + "</b> на клетку " + cell.GetCellText();
+        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " ставит эффект <b>" + effectName + "</b> на клетку №" + cell.NameDisplay;
         Messages.Instance.AddMessage(message);
 
         cell.ChangeEffect(_selectedEffect, sprite, effectLevel);
@@ -321,7 +321,7 @@ public class EffectsControl : MonoBehaviour
         brushSprite.SetActive(true);
 
         // сообщения в мессенджер
-        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " перемещает эффект <b>" + effectName + "</b> на клетку " + newCell.GetCellText();
+        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " перемещает эффект <b>" + effectName + "</b> на клетку №" + newCell.NameDisplay;
         Messages.Instance.AddMessage(message);
 
         // начать анимацию - отправить спрайт на координаты новой клетки

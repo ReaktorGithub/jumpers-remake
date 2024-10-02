@@ -14,6 +14,7 @@ public class PlayerBoosters : MonoBehaviour
     [SerializeField] private int _shieldIron = 0;
     [SerializeField] private int _vampire = 0;
     [SerializeField] private int _boombaster = 0;
+    [SerializeField] private int _stuck = 0;
 
     [SerializeField] private int _armor = 0; // сколько ходов осталось со щитом (включая ходы соперников)
     [SerializeField] private bool _isIronArmor = false;
@@ -87,6 +88,14 @@ public class PlayerBoosters : MonoBehaviour
         }
     }
 
+    public int Stuck {
+        get { return _stuck; }
+        set {
+            int newValue = Math.Clamp(value, 0, BoostersControl.Instance.MaxStuck);
+            _stuck = newValue;
+        }
+    }
+
     public int Armor {
         get { return _armor; }
         set { _armor = value; }
@@ -128,6 +137,10 @@ public class PlayerBoosters : MonoBehaviour
 
     public void AddBoombaster(int value) {
         Boombaster += value;
+    }
+
+    public void AddStuck(int value) {
+        Stuck += value;
     }
 
     public void AddArmor(int value) {
@@ -332,5 +345,12 @@ public class PlayerBoosters : MonoBehaviour
             }
             PlayersControl.Instance.UpdatePlayersInfo();
         }
+    }
+
+    public void ExecuteStuckAsAgressor() {
+        AddStuck(-1);
+        BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
+        string message = "Обнаружено заражение новой " + Utils.Wrap("прилипалой", UIColors.LimeGreen);
+        Messages.Instance.AddMessage(message);
     }
 }

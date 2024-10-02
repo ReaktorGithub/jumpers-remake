@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 // Класс предназначен для предварительной настройки игры перед запуском уровня
@@ -36,13 +35,14 @@ public class Jumpers : MonoBehaviour
         Instances.transform.Find("grind-dash3").gameObject.SetActive(false);
         Instances.transform.Find("star-icon").gameObject.SetActive(false);
         Instances.transform.Find("Boombaster").gameObject.SetActive(false);
+        Instances.transform.Find("stuck-icon").gameObject.SetActive(false);
     }
 
     // private void Update() {
     //     if (Input.GetKeyUp(KeyCode.F)) {
-    //         ModalHedgehogFinish modal = GameObject.Find("ModalScripts").GetComponent<ModalHedgehogFinish>();
-    //         modal.BuildContent(MoveControl.Instance.CurrentPlayer);
-    //         modal.OpenWindow();
+    //         MoveControl.Instance.CurrentPlayer.StuckAttached = 4;
+    //         ModalStuck modal = GameObject.Find("ModalScripts").GetComponent<ModalStuck>();
+    //         modal.OpenModal();
     //     }
     // }
 
