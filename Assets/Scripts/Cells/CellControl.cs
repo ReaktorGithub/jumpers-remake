@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class CellControl : MonoBehaviour
 {
@@ -16,15 +15,15 @@ public class CellControl : MonoBehaviour
     private int _oldEffectLevel = 1;
     [SerializeField] private int _coinBonusValue = 0;
     [SerializeField] private bool _isDeadEndCell = false;
-    private GameObject _container, _glow, _coinBonusObject, _brick, _boombasterPlace, _boombasterInstance, _intersection;
+    private GameObject _container, _glow, _coinBonusObject, _brick, _boombasterPlace, _boombasterInstance, _intersection, _trap;
     private GameObject _boombasterCurrentInstance; // ссылка на работающую бумку, может быть null
     private SpriteRenderer _spriteRenderer, _glowSpriteRenderer, _grindSpriteRenderer;
     private float[] _cellScale = new float[2];
     [SerializeField] private List<GameObject> _currentTokens = new();
-    private bool _isEffectPlacementMode, _isLassoMode = false;
+    private bool _isEffectPlacementMode, _isTrapPlacementMode, _isLassoMode = false;
     private TextMeshPro _text, _coinBonusText;
-    private bool _isChanging = false;
-    private IEnumerator _changingCoroutine;
+    private bool _isChanging, _isTrapPlacing = false;
+    private IEnumerator _changingCoroutine, _placingCoroutine;
     private Sprite _oldSprite, _newSprite;
     private Color _oldTextColor, _newTextColor;
     private IEnumerator _coroutine;
@@ -35,6 +34,7 @@ public class CellControl : MonoBehaviour
     private bool _isBoombaster = false;
     private int _boombasterTimer = 9;
     private int _boombasterLevel = 1;
+    private PlayerControl _whosTrap;
 
     private void Awake() {
         _container = transform.Find("container").gameObject;
@@ -61,6 +61,7 @@ public class CellControl : MonoBehaviour
         GameObject instances = GameObject.Find("Instances");
         _boombasterInstance = instances.transform.Find("Boombaster").gameObject;
         _intersection = _container.transform.Find("intersection").gameObject;
+        _trap = _container.transform.Find("trap").gameObject;
     }
 
     private void Start() {
@@ -69,6 +70,7 @@ public class CellControl : MonoBehaviour
         UpdateCoinBonusView();
         UpdateGrindVisual(_effectLevel);
         UpdateBoombasterVisual();
+        _trap.SetActive(false);
     }
 
     private void SetCursorDisabled(bool value) {
@@ -121,6 +123,11 @@ public class CellControl : MonoBehaviour
 
     public bool IsDeadEndCell {
         get { return _isDeadEndCell; }
+        private set {}
+    }
+
+    public PlayerControl WhosTrap {
+        get { return _whosTrap; }
         private set {}
     }
 
@@ -192,7 +199,7 @@ public class CellControl : MonoBehaviour
     }
 
     public bool IsSelectionMode() {
-        return _isEffectPlacementMode || _isLassoMode;
+        return _isEffectPlacementMode || _isLassoMode || _isTrapPlacementMode;
     }
 
     public bool IsPenaltyEffect() {
@@ -295,6 +302,18 @@ public class CellControl : MonoBehaviour
         SetCursorDisabled(true);
     }
 
+    public void TurnOnTrapPlacementMode() {
+        bool newValue = !CellsControl.Instance.ExcludeTrapTypes.Contains(cellType) && IsNoTokens();
+        _isTrapPlacementMode = newValue;
+        SetCursorDisabled(!newValue);
+    }
+
+    public void TurnOffTrapPlacementMode() {
+        DownscaleCell();
+        _isTrapPlacementMode = false;
+        SetCursorDisabled(true);
+    }
+
     public void TurnOnGlow() {
         _glow.SetActive(true);
         if (_coroutine != null) {
@@ -330,8 +349,8 @@ public class CellControl : MonoBehaviour
         if (!force && !IsSelectionMode()) {
             return;
         }
-        _spriteRenderer.sortingOrder = 2;
-        _glowSpriteRenderer.sortingOrder = 3;
+        _spriteRenderer.sortingOrder = 20;
+        _glowSpriteRenderer.sortingOrder = 30;
         _container.transform.localScale = new Vector3(
             _cellScale[1],
             _cellScale[1],
@@ -344,7 +363,7 @@ public class CellControl : MonoBehaviour
             return;
         }
         _spriteRenderer.sortingOrder = 0;
-        _glowSpriteRenderer.sortingOrder = 1;
+        _glowSpriteRenderer.sortingOrder = 10;
         _container.transform.localScale = new Vector3(
             _cellScale[0],
             _cellScale[0],
@@ -357,6 +376,8 @@ public class CellControl : MonoBehaviour
             EffectsControl.Instance.OnConfirmChangeEffect(this);
         } else if (_isLassoMode) {
             BoostersControl.Instance.ExecuteLasso(this);
+        } else if (_isTrapPlacementMode) {
+            BoostersControl.Instance.ExecuteTrap(this);
         }
     }
 
@@ -560,5 +581,44 @@ public class CellControl : MonoBehaviour
 
     public void SetIntersectionScale(Vector3 scale) {
         _intersection.transform.localScale = scale;
+    }
+
+    // Капкан
+
+    public void PlaceTrap(PlayerControl owner) {
+        if (!_isTrapPlacing) {
+            _isTrapPlacing = true;
+            _whosTrap = owner;
+            _placingCoroutine = PlacingTrap();
+            StartCoroutine(_placingCoroutine);
+            StartCoroutine(TrapPlacingAnimationScheduler());
+        }
+    }
+
+    private void StopPlacingTrap() {
+        if (_placingCoroutine != null) {
+            StopCoroutine(_placingCoroutine);
+            _isTrapPlacing = false;
+            _trap.SetActive(true);
+        }
+    }
+
+    private IEnumerator TrapPlacingAnimationScheduler() {
+        yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDuration);
+        StopPlacingTrap();
+    }
+
+    private IEnumerator PlacingTrap() {
+        while (true) {
+            _trap.SetActive(true);
+            yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectTime);
+            _trap.SetActive(false);
+            yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectTime);
+        }
+    }
+
+    public void RemoveTrap() {
+        _trap.SetActive(false);
+        _whosTrap = null;
     }
 }

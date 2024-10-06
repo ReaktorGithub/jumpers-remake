@@ -385,6 +385,26 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
+    public void ExecuteTrap(CellControl cell) {
+        PlayerControl owner = cell.WhosTrap;
+
+        AddMovesSkip(1);
+        GetTokenControl().UpdateSkips(MovesSkip);
+        string message;
+
+        if (this == owner) {
+            message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадается в свой же " + Utils.Wrap("капкан!", UIColors.Orange) + " Теперь пропустит ход";
+        } else {
+            message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадается в " + Utils.Wrap("капкан ", UIColors.Orange) + Utils.Wrap(owner.PlayerName, UIColors.Yellow) + "! Выплатит 400 монет и пропустит ход";
+            AddCoins(-400);
+            owner.AddCoins(400);
+            cell.RemoveTrap();
+        }
+        
+        Messages.Instance.AddMessage(message);
+        PlayersControl.Instance.UpdatePlayersInfo();
+    }
+
     // Модалки
 
     public void OpenPowerWarningModal(Action callback = null) {

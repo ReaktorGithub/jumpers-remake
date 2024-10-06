@@ -80,6 +80,10 @@ public class BoosterButton : MonoBehaviour
                 _booster.sprite = BoostersControl.Instance.StuckSprite;
                 break;
             }
+            case EBoosters.Trap: {
+                _booster.sprite = BoostersControl.Instance.TrapSprite;
+                break;
+            }
             default: {
                 _booster.sprite = null;
                 break;

@@ -15,6 +15,7 @@ public class PlayerBoosters : MonoBehaviour
     [SerializeField] private int _vampire = 0;
     [SerializeField] private int _boombaster = 0;
     [SerializeField] private int _stuck = 0;
+    [SerializeField] private int _trap = 0;
 
     [SerializeField] private int _armor = 0; // сколько ходов осталось со щитом (включая ходы соперников)
     [SerializeField] private bool _isIronArmor = false;
@@ -96,6 +97,14 @@ public class PlayerBoosters : MonoBehaviour
         }
     }
 
+    public int Trap {
+        get { return _trap; }
+        set {
+            int newValue = Math.Clamp(value, 0, BoostersControl.Instance.MaxTrap);
+            _trap = newValue;
+        }
+    }
+
     public int Armor {
         get { return _armor; }
         set { _armor = value; }
@@ -141,6 +150,10 @@ public class PlayerBoosters : MonoBehaviour
 
     public void AddStuck(int value) {
         Stuck += value;
+    }
+
+    public void AddTrap(int value) {
+        Trap += value;
     }
 
     public void AddArmor(int value) {
@@ -207,6 +220,10 @@ public class PlayerBoosters : MonoBehaviour
                 Vampire += value;
                 break;
             }
+            case EBoosters.Trap: {
+                Trap += value;
+                break;
+            }
         }
     }
 
@@ -237,6 +254,10 @@ public class PlayerBoosters : MonoBehaviour
 
         for (int i = 0; i < Vampire; i++) {
             result.Add(EBoosters.Vampire);
+        }
+
+        for (int i = 0; i < Trap; i++) {
+            result.Add(EBoosters.Trap);
         }
 
         return result;
@@ -347,10 +368,21 @@ public class PlayerBoosters : MonoBehaviour
         }
     }
 
+    // Прилипала
+
     public void ExecuteStuckAsAgressor() {
         AddStuck(-1);
         BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
         string message = "Обнаружено заражение новой " + Utils.Wrap("прилипалой", UIColors.LimeGreen);
+        Messages.Instance.AddMessage(message);
+    }
+
+    // Капкан
+
+    public void ExecuteTrapAsAgressor(CellControl cell) {
+        AddTrap(-1);
+        BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " ставит " + Utils.Wrap("капкан", UIColors.Orange) + " на клетке № " + cell.NameDisplay;
         Messages.Instance.AddMessage(message);
     }
 }

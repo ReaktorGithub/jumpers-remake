@@ -14,6 +14,7 @@ public class CellsControl : MonoBehaviour
     [SerializeField] private float _boombasterDelay = 3f;
     private Sprite _grind2Sprite, _grind3Sprite;
     private List<CellControl> _boombastersList = new();
+    [SerializeField] private List<ECellTypes> _excludeTrapTypes = new();
     private Explosion _explosion;
     private CameraControl _camera;
 
@@ -49,6 +50,11 @@ public class CellsControl : MonoBehaviour
         private set {}
     }
 
+    public List<ECellTypes> ExcludeTrapTypes {
+        get { return _excludeTrapTypes; }
+        private set {}
+    }
+
     public float ChangingEffectDuration {
         get { return _changingEffectDuration; }
         private set {}
@@ -68,6 +74,18 @@ public class CellsControl : MonoBehaviour
     public void TurnOffEffectPlacementMode() {
         foreach (CellControl cell in _allCellControls) {
             cell.TurnOffEffectPlacementMode();
+        }
+    }
+
+    public void TurnOnTrapPlacementMode() {
+        foreach (CellControl cell in _allCellControls) {
+            cell.TurnOnTrapPlacementMode();
+        }
+    }
+
+    public void TurnOffTrapPlacementMode() {
+        foreach (CellControl cell in _allCellControls) {
+            cell.TurnOffTrapPlacementMode();
         }
     }
 

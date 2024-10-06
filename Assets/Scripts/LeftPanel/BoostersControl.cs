@@ -1,19 +1,21 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class BoostersControl : MonoBehaviour
 {
     public static BoostersControl Instance { get; private set; }
-    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite, _stuckSprite;
-    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton, _boombasterButton, _stuckButton;
+    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite, _stuckSprite, _trapSprite;
+    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton, _boombasterButton, _stuckButton, _trapButton;
     private BoostersRow _magnetsRowScript, _lassoRowScript, _shieldsRowScript;
-    private BoosterButton _vampireButtonScript, _boombasterButtonScript, _stuckButtonScript;
+    private BoosterButton _vampireButtonScript, _boombasterButtonScript, _stuckButtonScript, _trapButtonScript;
     private PopupMagnet _popupMagnet;
     [SerializeField] private List<GameObject> _boostersList;
     private List<BoosterButton> _boosterButtonsList = new();
     private TopPanel _topPanel;
     private ModalWarning _modalWarning;
+    private CameraControl _cameraControl;
+    private CameraButton _cameraButton;
     [SerializeField] private int _maxMagnets = 3;
     [SerializeField] private int _maxSuperMagnets = 3;
     [SerializeField] private int _maxMagnetsTotal = 3;
@@ -24,6 +26,7 @@ public class BoostersControl : MonoBehaviour
     [SerializeField] private int _maxVampires = 1;
     [SerializeField] private int _maxBoombasters = 1;
     [SerializeField] private int _maxStuck = 1;
+    [SerializeField] private int _maxTrap = 1;
 
     private void Awake() {
         Instance = this;
@@ -37,6 +40,7 @@ public class BoostersControl : MonoBehaviour
         _vampireSprite = Instances.transform.Find("vampire").GetComponent<SpriteRenderer>().sprite;
         _boombasterSprite = Instances.transform.Find("boombaster-icon").GetComponent<SpriteRenderer>().sprite;
         _stuckSprite = Instances.transform.Find("stuck-icon").GetComponent<SpriteRenderer>().sprite;
+        _trapSprite = Instances.transform.Find("trap-icon").GetComponent<SpriteRenderer>().sprite;
 
         _magnetsRowScript = _magnetsRow.GetComponent<BoostersRow>();
         _lassoRowScript = _lassoRow.GetComponent<BoostersRow>();
@@ -44,6 +48,7 @@ public class BoostersControl : MonoBehaviour
         _vampireButtonScript = _vampireButton.GetComponent<BoosterButton>();
         _boombasterButtonScript = _boombasterButton.GetComponent<BoosterButton>();
         _stuckButtonScript = _stuckButton.GetComponent<BoosterButton>();
+        _trapButtonScript = _trapButton.GetComponent<BoosterButton>();
 
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
         foreach(GameObject button in _boostersList) {
@@ -51,6 +56,8 @@ public class BoostersControl : MonoBehaviour
         }
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
         _modalWarning = GameObject.Find("ModalScripts").GetComponent<ModalWarning>();
+        _cameraControl = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
+        _cameraButton = GameObject.Find("CameraButton").GetComponent<CameraButton>();
     }
 
     public Sprite MagnetSprite {
@@ -90,6 +97,11 @@ public class BoostersControl : MonoBehaviour
 
     public Sprite StuckSprite {
         get { return _stuckSprite; }
+        private set {}
+    }
+
+    public Sprite TrapSprite {
+        get { return _trapSprite; }
         private set {}
     }
 
@@ -140,6 +152,11 @@ public class BoostersControl : MonoBehaviour
 
     public int MaxStuck {
         get { return _maxStuck; }
+        private set {}
+    }
+
+    public int MaxTrap {
+        get { return _maxTrap; }
         private set {}
     }
 
@@ -228,6 +245,7 @@ public class BoostersControl : MonoBehaviour
         _vampireButtonScript.BoosterType = player.Boosters.Vampire > 0 ? EBoosters.Vampire : EBoosters.None;
         _boombasterButtonScript.BoosterType = player.Boosters.Boombaster > 0 ? EBoosters.Boombaster : EBoosters.None;
         _stuckButtonScript.BoosterType = player.Boosters.Stuck > 0 ? EBoosters.Stuck : EBoosters.None;
+        _trapButtonScript.BoosterType = player.Boosters.Trap > 0 ? EBoosters.Trap : EBoosters.None;
     }
 
     // Открытие разных усилителей при нажатиях на кнопки в левой панели
@@ -276,6 +294,24 @@ public class BoostersControl : MonoBehaviour
                 ExecuteBoombaster(player, cell);
                 break;
             }
+            case EBoosters.Trap: {
+                CubicControl.Instance.SetCubicInteractable(false);
+                CellsControl.Instance.TurnOnTrapPlacementMode();
+                _cameraControl.FollowOff();
+                _cameraControl.MoveCameraToLevelCenter();
+                _cameraButton.SetDisabled(true);
+                _topPanel.SetText("Установите капкан на клетку без фишек");
+                _topPanel.OpenWindow();
+                _topPanel.SetCancelButtonActive(true, () => {
+                    _topPanel.CloseWindow();
+                    CellsControl.Instance.TurnOffTrapPlacementMode();
+                    EffectsControl.Instance.TryToEnableAllEffectButtons();
+                    EffectsControl.Instance.RestoreCamera();
+                    EnableAllButtons();
+                    CubicControl.Instance.SetCubicInteractable(true);
+                });
+                break;
+            }
         }
     }
 
@@ -315,6 +351,24 @@ public class BoostersControl : MonoBehaviour
 
         string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " надевает " + shieldText;
         Messages.Instance.AddMessage(message);
+    }
+
+    public void ExecuteTrap(CellControl targetCell) {
+        PlayerControl player = MoveControl.Instance.CurrentPlayer;
+        CellsControl.Instance.TurnOffTrapPlacementMode();
+        targetCell.PlaceTrap(player);
+        _topPanel.CloseWindow();
+        UnselectAllButtons();
+        player.Boosters.ExecuteTrapAsAgressor(targetCell);
+        StartCoroutine(ExecuteTrapDefer());
+    }
+
+    private IEnumerator ExecuteTrapDefer() {
+        yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDelay);
+        EffectsControl.Instance.RestoreCamera();
+        EffectsControl.Instance.TryToEnableAllEffectButtons();
+        EnableAllButtons();
+        CubicControl.Instance.SetCubicInteractable(true);
     }
 
     public void DeactivateArmorButtons() {

@@ -121,10 +121,11 @@ public class CellChecker : MonoBehaviour
         Начало серии проверок клетки по окончании хода
         1. Проверка на ежа.
         2. Подбор бонуса.
-        3. Проверка, может ли игрок избежать вредного эффекта.
-        4. Исполнение эффекта.
-        5. Исполнение эффекта «стрелка».
-        6. Атака на соперников.
+        3. Проверка на капкан.
+        4. Проверка, может ли игрок избежать вредного эффекта.
+        5. Исполнение эффекта.
+        6. Исполнение эффекта «стрелка».
+        7. Атака на соперников.
     */
 
     public void CheckCellAfterMove(PlayerControl player) {
@@ -142,14 +143,20 @@ public class CellChecker : MonoBehaviour
             }
         }
 
-        CheckCellCharacter(player);
+        CheckTrap(player, cell);
+    }
+
+    private void CheckTrap(PlayerControl player, CellControl cell) {
+        if (cell.WhosTrap != null) {
+            player.ExecuteTrap(cell);
+        }
+
+        CheckCellCharacter(player, cell);
     }
 
     // Проверка, может ли игрок избежать вредного эффекта
 
-    public void CheckCellCharacter(PlayerControl player) {
-        CellControl cell = player.GetCurrentCell();
-        
+    public void CheckCellCharacter(PlayerControl player, CellControl cell) {
         if (cell.IsNegativeEffect() && player.Effects.IsEnoughEffects(cell.Effect)) {
             if (player.IsAi()) {
                 // todo научить принимать решения
