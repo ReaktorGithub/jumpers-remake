@@ -163,7 +163,6 @@ public class CellChecker : MonoBehaviour
                 CheckCellEffects(player);
                 return;
             }
-            EffectsControl.Instance.SelectedEffect = cell.Effect;
             _modalReplace.BuildContent(player);
             _modalReplace.OpenModal();
             return;

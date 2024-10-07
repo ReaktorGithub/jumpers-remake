@@ -273,6 +273,7 @@ public class BoostersControl : MonoBehaviour
                 int steps = manual.GetCauseEffect(level);
 
                 string stepsText = steps == 1 ? " шага" : " шагов";
+                // todo переделать
                 _topPanel.SetText("Подвиньте свою фишку в пределах " + steps + stepsText);
                 _topPanel.OpenWindow();
                 List<GameObject> collected = CellsControl.Instance.FindNearCellsDeepTwoSide(cell, steps);
@@ -296,7 +297,7 @@ public class BoostersControl : MonoBehaviour
             }
             case EBoosters.Trap: {
                 CubicControl.Instance.SetCubicInteractable(false);
-                CellsControl.Instance.TurnOnTrapPlacementMode();
+                CellsControl.Instance.TurnOffSelectionMode();
                 _cameraControl.FollowOff();
                 _cameraControl.MoveCameraToLevelCenter();
                 _cameraButton.SetDisabled(true);
@@ -304,9 +305,9 @@ public class BoostersControl : MonoBehaviour
                 _topPanel.OpenWindow();
                 _topPanel.SetCancelButtonActive(true, () => {
                     _topPanel.CloseWindow();
-                    CellsControl.Instance.TurnOffTrapPlacementMode();
+                    CellsControl.Instance.TurnOffSelectionMode();
                     EffectsControl.Instance.TryToEnableAllEffectButtons();
-                    EffectsControl.Instance.RestoreCamera();
+                    // EffectsControl.Instance.RestoreCamera();
                     EnableAllButtons();
                     CubicControl.Instance.SetCubicInteractable(true);
                 });
@@ -355,7 +356,7 @@ public class BoostersControl : MonoBehaviour
 
     public void ExecuteTrap(CellControl targetCell) {
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
-        CellsControl.Instance.TurnOffTrapPlacementMode();
+        CellsControl.Instance.TurnOffSelectionMode();
         targetCell.PlaceTrap(player);
         _topPanel.CloseWindow();
         UnselectAllButtons();
@@ -365,7 +366,7 @@ public class BoostersControl : MonoBehaviour
 
     private IEnumerator ExecuteTrapDefer() {
         yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDelay);
-        EffectsControl.Instance.RestoreCamera();
+        // EffectsControl.Instance.RestoreCamera();
         EffectsControl.Instance.TryToEnableAllEffectButtons();
         EnableAllButtons();
         CubicControl.Instance.SetCubicInteractable(true);

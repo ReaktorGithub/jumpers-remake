@@ -17,6 +17,7 @@ public class CellsControl : MonoBehaviour
     [SerializeField] private List<ECellTypes> _excludeTrapTypes = new();
     private Explosion _explosion;
     private CameraControl _camera;
+    private Action<CellControl> _cellClickAction;
 
     private void Awake() {
         Instance = this;
@@ -65,28 +66,25 @@ public class CellsControl : MonoBehaviour
         private set {}
     }
 
-    public void TurnOnEffectPlacementMode() {
-        foreach (CellControl cell in _allCellControls) {
-            cell.TurnOnEffectPlacementMode();
-        }
+    public Action<CellControl> CellClickAction {
+        get { return _cellClickAction; }
+        private set {}
     }
 
-    public void TurnOffEffectPlacementMode() {
+    public void TurnOnSelectionMode(Func<CellControl, bool> cellSelectionPredicate, Action<CellControl> cellClickAction) {
         foreach (CellControl cell in _allCellControls) {
-            cell.TurnOffEffectPlacementMode();
+            if (cellSelectionPredicate(cell)) {
+                cell.ActivateSelectionMode(true);
+            }
         }
+        _cellClickAction = cellClickAction;
     }
 
-    public void TurnOnTrapPlacementMode() {
+    public void TurnOffSelectionMode() {
         foreach (CellControl cell in _allCellControls) {
-            cell.TurnOnTrapPlacementMode();
+            cell.ActivateSelectionMode(false);
         }
-    }
-
-    public void TurnOffTrapPlacementMode() {
-        foreach (CellControl cell in _allCellControls) {
-            cell.TurnOffTrapPlacementMode();
-        }
+        _cellClickAction = null;
     }
 
     public Sprite Grind2Sprite {

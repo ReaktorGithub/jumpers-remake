@@ -20,7 +20,7 @@ public class CellControl : MonoBehaviour
     private SpriteRenderer _spriteRenderer, _glowSpriteRenderer, _grindSpriteRenderer;
     private float[] _cellScale = new float[2];
     [SerializeField] private List<GameObject> _currentTokens = new();
-    private bool _isEffectPlacementMode, _isTrapPlacementMode, _isLassoMode = false;
+    private bool _isSelectionMode = false;
     private TextMeshPro _text, _coinBonusText;
     private bool _isChanging, _isTrapPlacing = false;
     private IEnumerator _changingCoroutine, _placingCoroutine;
@@ -198,10 +198,6 @@ public class CellControl : MonoBehaviour
         private set {}
     }
 
-    public bool IsSelectionMode() {
-        return _isEffectPlacementMode || _isLassoMode || _isTrapPlacementMode;
-    }
-
     public bool IsPenaltyEffect() {
         return effect == EControllableEffects.Black || effect == EControllableEffects.Red;
     }
@@ -288,31 +284,21 @@ public class CellControl : MonoBehaviour
         }
     }
 
-    // выбор клетки игроком
+    // Взаимодействие игрока с клеткой
 
-    public void TurnOnEffectPlacementMode() {
-        bool newValue = cellType == ECellTypes.None && effect == EControllableEffects.None && IsNoTokens();
-        _isEffectPlacementMode = newValue;
-        SetCursorDisabled(!newValue);
+    public void ActivateSelectionMode(bool value) {
+        SetCursorDisabled(!value);
+        if (!value) {
+            DownscaleCell();
+        }
+        _isSelectionMode = value;
     }
 
-    public void TurnOffEffectPlacementMode() {
-        DownscaleCell();
-        _isEffectPlacementMode = false;
-        SetCursorDisabled(true);
-    }
-
-    public void TurnOnTrapPlacementMode() {
-        bool newValue = !CellsControl.Instance.ExcludeTrapTypes.Contains(cellType) && IsNoTokens();
-        _isTrapPlacementMode = newValue;
-        SetCursorDisabled(!newValue);
-    }
-
-    public void TurnOffTrapPlacementMode() {
-        DownscaleCell();
-        _isTrapPlacementMode = false;
-        SetCursorDisabled(true);
-    }
+    // public void TurnOnTrapPlacementMode() {
+    //     bool newValue = !CellsControl.Instance.ExcludeTrapTypes.Contains(cellType) && IsNoTokens();
+    //     _isTrapPlacementMode = newValue;
+    //     SetCursorDisabled(!newValue);
+    // }
 
     public void TurnOnGlow() {
         _glow.SetActive(true);
@@ -331,22 +317,22 @@ public class CellControl : MonoBehaviour
     }
 
     public void TurnOnLassoMode() {
-        _isLassoMode = true;
+        _isSelectionMode = true;
         SetCursorDisabled(false);
         TurnOnGlow();
     }
 
     public void TurnOffLassoMode() {
         DownscaleCell();
-        _isLassoMode = false;
         SetCursorDisabled(true);
         TurnOffGlow();
+        _isSelectionMode = false;
     }
 
     // Флаг force принудительно меняет размер клетки, даже если мы не находимся в режиме выбора
 
     public void UpscaleCell(bool force = false) {
-        if (!force && !IsSelectionMode()) {
+        if (!force && !_isSelectionMode) {
             return;
         }
         _spriteRenderer.sortingOrder = 20;
@@ -359,7 +345,7 @@ public class CellControl : MonoBehaviour
     }
 
     public void DownscaleCell(bool force = false) {
-        if (!force && !IsSelectionMode()) {
+        if (!force && !_isSelectionMode) {
             return;
         }
         _spriteRenderer.sortingOrder = 0;
@@ -372,13 +358,7 @@ public class CellControl : MonoBehaviour
     }
 
     public void OnClick() {
-        if (_isEffectPlacementMode) {
-            EffectsControl.Instance.OnConfirmChangeEffect(this);
-        } else if (_isLassoMode) {
-            BoostersControl.Instance.ExecuteLasso(this);
-        } else if (_isTrapPlacementMode) {
-            BoostersControl.Instance.ExecuteTrap(this);
-        }
+        CellsControl.Instance.CellClickAction?.Invoke(this);
     }
 
     // установка нового эффекта на эту клетку

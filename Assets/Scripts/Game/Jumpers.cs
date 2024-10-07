@@ -48,10 +48,14 @@ public class Jumpers : MonoBehaviour
     // }
 
     // private void Update() {
-    //     if (Input.GetKeyUp(KeyCode.U)) {
-    //         _arrowBody.SetActive(true);
-    //         _testArrow.SetActive(!_testArrow.activeInHierarchy);
-    //         _arrowBody.SetActive(false);
+    //     if (Input.GetKeyUp(KeyCode.C)) {
+    //         CellSelection.Instance.EnterSelectionMode("Выберите клетку", () => {
+    //             Debug.Log("cancel");
+    //         }, () => {
+    //             Debug.Log("confirm");
+    //         }, (CellControl cell) => {
+    //             return cell.IsNoTokens();
+    //         });
     //     }
     // }
 

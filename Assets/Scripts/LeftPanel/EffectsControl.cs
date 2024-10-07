@@ -6,12 +6,7 @@ using UnityEngine;
 public class EffectsControl : MonoBehaviour
 {
     public static EffectsControl Instance { get; private set; }
-    private CameraButton _cameraButton;
     private EControllableEffects _selectedEffect = EControllableEffects.None;
-    private bool _isSelectionMode;
-    private bool _isReplaceMode;
-    private CameraControl _cameraControl;
-    private TopPanel _topPanel;
     private List<EffectButton> _effectButtonsList = new();
     private EffectButton _greenEffectButton, _yellowEffectButton, _redEffectButton, _blackEffectButton, _starEffectButton;
     [SerializeField] private GameObject _emptyCellSprite, _greenCellSprite, _yellowCellSprite, _blackCellSprite, _redCellSprite, _starCellSprite;
@@ -23,9 +18,6 @@ public class EffectsControl : MonoBehaviour
 
     private void Awake() {
         Instance = this;
-        _cameraControl = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
-        _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
-        _cameraButton = GameObject.Find("CameraButton").GetComponent<CameraButton>();
         _greenQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityGreen").GetComponent<TextMeshProUGUI>();
         _yellowQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityYellow").GetComponent<TextMeshProUGUI>();
         _redQuantityText = Utils.FindChildByName(transform.gameObject, "QuantityRed").GetComponent<TextMeshProUGUI>();
@@ -58,113 +50,45 @@ public class EffectsControl : MonoBehaviour
 
     public EControllableEffects SelectedEffect {
         get { return _selectedEffect; }
-        set { _selectedEffect = value; }
-    }
-
-    public void ActivateSelectionMode(bool isReplace = false) {
-        if (_isSelectionMode) {
-            return;
-        }
-        _isSelectionMode = true;
-        _isReplaceMode = isReplace;
-        BoostersControl.Instance.DisableAllButtons();
-        CubicControl.Instance.SetCubicInteractable(false);
-        _cameraControl.FollowOff();
-        _cameraControl.MoveCameraToLevelCenter();
-        _cameraButton.SetDisabled(true);
-        _topPanel.SetText("Выберите свободную клетку на поле");
-        _topPanel.OpenWindow();
-        _topPanel.SetCancelButtonActive(true, OnCancel);
-        CellsControl.Instance.TurnOnEffectPlacementMode();
-    }
-
-    private void OnCancel() {
-        if (_isReplaceMode) {
-            DeactivateReplaceMode();
-            MoveControl.Instance.CheckCellEffects();
-        } else {
-            BoostersControl.Instance.EnableAllButtons();
-            DeactivateSelectionMode();
+        set {
+            _selectedEffect = value;
+            UpdateButtonsSelection();
         }
     }
 
-    // отмена во время установки нового эффекта
-
-    public void DeactivateSelectionMode() {
-        DeactivateSelectionModePhase1();
-        DeactivateSelectionModePhase2();
+    private bool CellSelectionPredicate(CellControl cell) {
+        return cell.CellType == ECellTypes.None && cell.Effect == EControllableEffects.None && cell.IsNoTokens();
     }
 
-    public IEnumerator DeactivateSelectionModeDefer() {
-        DeactivateSelectionModePhase1();
+    // Режим установки нового эффекта
+
+    public void ActivatePlaceNewEffectMode(EControllableEffects effect) {
+        SelectedEffect = effect;
+        CellSelection.Instance.DisableInterface(false);
+
+        CellSelection.Instance.EnterSelectionMode(
+            "Выберите свободную клетку на поле",
+            OnCancelPlaceNew,
+            OnPlaceNewEffect,
+            CellSelectionPredicate
+        );
+    }
+
+    private void OnCancelPlaceNew() {
+        SelectedEffect = EControllableEffects.None;
+        CellSelection.Instance.RestoreCamera();
+        CellSelection.Instance.EnableInterface();
+    }
+
+    private IEnumerator DeactivatePlaceNewEffectModeDefer() {
+        SelectedEffect = EControllableEffects.None;
+        CellSelection.Instance.ExitSelectionMode();
         yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDelay);
-        DeactivateSelectionModePhase2();
+        CellSelection.Instance.RestoreCamera();
+        CellSelection.Instance.EnableInterface();
     }
 
-    public void DeactivateSelectionModePhase1() {
-        if (!_isSelectionMode) {
-            return;
-        }
-        _isSelectionMode = false;
-        CellsControl.Instance.TurnOffEffectPlacementMode();
-        _topPanel.CloseWindow();
-        _selectedEffect = EControllableEffects.None;
-        UpdateButtonsSelection();
-    }
-
-    public void DeactivateSelectionModePhase2() {
-        CubicControl.Instance.SetCubicInteractable(true);
-        BoostersControl.Instance.EnableAllButtons();
-        RestoreCamera();
-    }
-
-    public void RestoreCamera() {
-        _cameraControl.RestoreSavedZoom();
-        _cameraButton.SetDisabled(false);
-        if (_cameraButton.IsOn) {
-            _cameraControl.FollowOn();
-        } else {
-            _cameraControl.FollowOff();
-        }
-    }
-
-    // отмена во время перемещения эффекта
-
-    public void DeactivateReplaceMode() {
-        DeactivateSelectionModePhase1();
-        RestoreCamera();
-    }
-
-    // отключение режима перемещения в момент подтверждения
-
-    public void DeactivateOnConfirmReplacePhase1() {
-        if (!_isSelectionMode) {
-            return;
-        }
-        _isSelectionMode = false;
-        CellsControl.Instance.TurnOffEffectPlacementMode();
-        _topPanel.CloseWindow();
-    }
-
-    // окончательное отключение режима перемещения
-
-    public void DeactivateOnConfirmReplacePhase2() {
-        _selectedEffect = EControllableEffects.None;
-        RestoreCamera();
-        MoveControl.Instance.CheckCellEffects();
-    }
-
-    public void OnConfirmChangeEffect(CellControl cell) {
-        if (_isReplaceMode) {
-            OnReplaceEffect(cell);
-        } else {
-            OnChangeEffect(cell);
-        }
-    }
-
-    // установка нового эффекта
-
-    public void OnChangeEffect(CellControl cell) {
+    private void OnPlaceNewEffect(CellControl cell) {
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
         player.Effects.IsEffectPlaced = true;
         Sprite sprite;
@@ -223,57 +147,41 @@ public class EffectsControl : MonoBehaviour
         UpdateQuantityText(player);
         UpdateButtonsVisual(player);
         DisableAllButtons(true);
-        StartCoroutine(DeactivateSelectionModeDefer());
+        StartCoroutine(DeactivatePlaceNewEffectModeDefer());
     }
 
-    public void UpdateButtonsSelection() {
-        foreach (EffectButton button in _effectButtonsList) {
-            button.SetSelected(button.GetComponent<EffectButton>().EffectType == _selectedEffect);
-        }
+    // Режим перемещения эффекта
+
+    public void ActivateReplaceEffectMode() {
+        CellSelection.Instance.DisableInterface(true);
+
+        CellSelection.Instance.EnterSelectionMode(
+            "Выберите свободную клетку на поле",
+            OnCancelReplace,
+            OnReplaceEffect,
+            CellSelectionPredicate
+        );
     }
 
-    public void UpdateButtonsVisual(PlayerControl player) {
-        PlayerGrind grind = player.Grind;
-        PlayerEffects effects = player.Effects;
-
-        _greenEffectButton.SetIsEmpty(effects.Green == 0, grind.Green);
-        _yellowEffectButton.SetIsEmpty(effects.Yellow == 0, grind.Yellow);
-        _redEffectButton.SetIsEmpty(effects.Red == 0, grind.Red);
-        _blackEffectButton.SetIsEmpty(effects.Black == 0, grind.Black);
-        _starEffectButton.SetIsEmpty(effects.Star == 0, grind.Star);
+    private void OnCancelReplace() {
+        MoveControl.Instance.CheckCellEffects();
+        CellSelection.Instance.RestoreCamera();
     }
 
-    public void UpdateQuantityText(PlayerControl player) {
-        _greenQuantityText.text = "x " + player.Effects.Green;
-        _yellowQuantityText.text = "x " + player.Effects.Yellow;
-        _redQuantityText.text = "x " + player.Effects.Red;
-        _blackQuantityText.text = "x " + player.Effects.Black;
-        _starQuantityText.text = "x " + player.Effects.Star;
+    private IEnumerator DeactivateReplaceEffectModeDefer() {
+        yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDelay);
+        CellSelection.Instance.RestoreCamera();
+        MoveControl.Instance.CheckCellEffects();
     }
 
-    public void DisableAllButtons(bool value) {
-        foreach (EffectButton button in _effectButtonsList) {
-            button.SetDisabled(value);
-        }
-    }
-
-    // Кнопки эффектов энейблятся, только если игрок их еще не использовал
-
-    public void TryToEnableAllEffectButtons() {
-        if (!MoveControl.Instance.CurrentPlayer.Effects.IsEffectPlaced) {
-            DisableAllButtons(false);
-        }
-    }
-
-    // перемещение эффекта
-
-    public void OnReplaceEffect(CellControl newCell) {
-        DeactivateOnConfirmReplacePhase1();
+    private void OnReplaceEffect(CellControl newCell) {
+        CellSelection.Instance.ExitSelectionMode();
 
         // изменить ресурсы игрока
 
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
-        player.Effects.ExecuteReplaceEffect(_selectedEffect);
+        EControllableEffects selectedEffect = player.GetCurrentCell().Effect;
+        player.Effects.ExecuteReplaceEffect(selectedEffect);
         UpdateQuantityText(player);
         UpdateButtonsVisual(player);
 
@@ -290,7 +198,7 @@ public class EffectsControl : MonoBehaviour
         GameObject brushSprite;
         string effectName = "";
 
-        switch(_selectedEffect) {
+        switch(selectedEffect) {
             case EControllableEffects.Red: {
                 brushSprite = Instantiate(_redBrush);
                 newCellSprite = _redCellSprite.GetComponent<SpriteRenderer>().sprite;
@@ -336,13 +244,54 @@ public class EffectsControl : MonoBehaviour
 
             // добавить эффект на новой клетке
 
-            newCell.ChangeEffect(_selectedEffect, newCellSprite, effectLevel);
+            newCell.ChangeEffect(selectedEffect, newCellSprite, effectLevel);
             newCell.StartChanging();
 
             // выйти из режима перемещения
 
-            DeactivateOnConfirmReplacePhase2();
+            StartCoroutine(DeactivateReplaceEffectModeDefer());
         });
         StartCoroutine(_coroutine);
+    }
+
+    // Апдейты визуала
+
+    public void UpdateButtonsSelection() {
+        foreach (EffectButton button in _effectButtonsList) {
+            button.SetSelected(button.GetComponent<EffectButton>().EffectType == _selectedEffect);
+        }
+    }
+
+    public void UpdateButtonsVisual(PlayerControl player) {
+        PlayerGrind grind = player.Grind;
+        PlayerEffects effects = player.Effects;
+
+        _greenEffectButton.SetIsEmpty(effects.Green == 0, grind.Green);
+        _yellowEffectButton.SetIsEmpty(effects.Yellow == 0, grind.Yellow);
+        _redEffectButton.SetIsEmpty(effects.Red == 0, grind.Red);
+        _blackEffectButton.SetIsEmpty(effects.Black == 0, grind.Black);
+        _starEffectButton.SetIsEmpty(effects.Star == 0, grind.Star);
+    }
+
+    public void UpdateQuantityText(PlayerControl player) {
+        _greenQuantityText.text = "x " + player.Effects.Green;
+        _yellowQuantityText.text = "x " + player.Effects.Yellow;
+        _redQuantityText.text = "x " + player.Effects.Red;
+        _blackQuantityText.text = "x " + player.Effects.Black;
+        _starQuantityText.text = "x " + player.Effects.Star;
+    }
+
+    public void DisableAllButtons(bool value) {
+        foreach (EffectButton button in _effectButtonsList) {
+            button.SetDisabled(value);
+        }
+    }
+
+    // Кнопки эффектов энейблятся, только если игрок их еще не использовал
+
+    public void TryToEnableAllEffectButtons() {
+        if (!MoveControl.Instance.CurrentPlayer.Effects.IsEffectPlaced) {
+            DisableAllButtons(false);
+        }
     }
 }

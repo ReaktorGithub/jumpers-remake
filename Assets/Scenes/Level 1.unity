@@ -19274,6 +19274,7 @@ GameObject:
   m_Component:
   - component: {fileID: 655775035}
   - component: {fileID: 655775036}
+  - component: {fileID: 655775037}
   m_Layer: 0
   m_Name: Cells
   m_TagString: Untagged
@@ -19382,6 +19383,18 @@ MonoBehaviour:
   _boombasterMaxTicks: 8
   _boombasterDelay: 3
   _excludeTrapTypes: 01000000020000000300000004000000
+--- !u!114 &655775037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655775034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2533fa161d781fe49a7546def2be1d00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &658043048
 GameObject:
   m_ObjectHideFlags: 0
@@ -21119,6 +21132,7 @@ MonoBehaviour:
   _imagePause: {fileID: 2145150671}
   _imagePlay: {fileID: 741366523}
   _pauseBlock: {fileID: 1305571837}
+  _timeScale: 0.5
 --- !u!1 &708039209
 GameObject:
   m_ObjectHideFlags: 0

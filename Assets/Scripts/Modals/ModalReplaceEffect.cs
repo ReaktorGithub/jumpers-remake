@@ -36,9 +36,8 @@ public class ModalReplaceEffect : MonoBehaviour
     }
 
     public void BuildContent(PlayerControl currentPlayer) {
-        EControllableEffects effect = EffectsControl.Instance.SelectedEffect;
-        
         CellControl cell = currentPlayer.GetCurrentCell();
+        EControllableEffects effect = cell.Effect;
         int effectLevel = cell.EffectLevel;
         
         // иконка
@@ -101,6 +100,6 @@ public class ModalReplaceEffect : MonoBehaviour
 
     public void OnReplaceClick() {
         _modal.CloseModal();
-        EffectsControl.Instance.ActivateSelectionMode(true);
+        EffectsControl.Instance.ActivateReplaceEffectMode();
     }
 }

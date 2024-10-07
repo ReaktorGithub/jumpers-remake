@@ -31,9 +31,7 @@ public class EffectButton : MonoBehaviour
     }
 
     public void OnSelect() {
-        EffectsControl.Instance.SelectedEffect = _effectType;
-        EffectsControl.Instance.UpdateButtonsSelection();
-        EffectsControl.Instance.ActivateSelectionMode();
+        EffectsControl.Instance.ActivatePlaceNewEffectMode(_effectType);
     }
 
     public void SetSelected(bool value) {
