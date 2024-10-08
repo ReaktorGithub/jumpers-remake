@@ -32,7 +32,9 @@ public class ModalHedgehogArrow : MonoBehaviour
         _branchButtonHedge.BranchControl.SetDisabledAllButtons(false);
     }
 
-    public void BuildContent(PlayerControl currentPlayer, BranchButtonHedge branchButton) {
+    public void BuildContent(BranchButtonHedge branchButton) {
+        PlayerControl player = MoveControl.Instance.CurrentPlayer;
+
         _boosterName.text = "";
         _boosterDescription.text = "";
         _maxSelected = branchButton.TaxCost;
@@ -58,13 +60,13 @@ public class ModalHedgehogArrow : MonoBehaviour
 
         _conditionDescription.text = "Выберите " + insertText + " вы готовы отдать ёжику-налоговику.";
 
-        _initialList.Add((EBoosters.Lasso, currentPlayer.Boosters.Lasso));
-        _initialList.Add((EBoosters.Magnet, currentPlayer.Boosters.Magnet));
-        _initialList.Add((EBoosters.MagnetSuper, currentPlayer.Boosters.SuperMagnet));
-        int shields = currentPlayer.Boosters.Shield;
-        int ironShields = currentPlayer.Boosters.ShieldIron;
-        if (currentPlayer.Boosters.Armor > 0) {
-            if (currentPlayer.Boosters.IsIronArmor) {
+        _initialList.Add((EBoosters.Lasso, player.Boosters.Lasso));
+        _initialList.Add((EBoosters.Magnet, player.Boosters.Magnet));
+        _initialList.Add((EBoosters.MagnetSuper, player.Boosters.SuperMagnet));
+        int shields = player.Boosters.Shield;
+        int ironShields = player.Boosters.ShieldIron;
+        if (player.Boosters.Armor > 0) {
+            if (player.Boosters.IsIronArmor) {
                 ironShields--;
             } else {
                 shields--;
@@ -72,7 +74,11 @@ public class ModalHedgehogArrow : MonoBehaviour
         }
         _initialList.Add((EBoosters.Shield, shields));
         _initialList.Add((EBoosters.ShieldIron, ironShields));
-        _initialList.Add((EBoosters.Vampire, currentPlayer.Boosters.Vampire));
+        _initialList.Add((EBoosters.Vampire, player.Boosters.Vampire));
+        _initialList.Add((EBoosters.Trap, player.Boosters.Trap));
+        _initialList.Add((EBoosters.Boombaster, player.Boosters.Boombaster));
+        _initialList.Add((EBoosters.Stuck, player.Boosters.Stuck));
+        _initialList.Add((EBoosters.Flash, player.Boosters.Flash));
 
         UpdateInitialList();
         UpdateSelectedList();
@@ -146,12 +152,15 @@ public class ModalHedgehogArrow : MonoBehaviour
     }
 
     public void OnItemClick(BoosterButton button) {
-        EBoosters booster = button.BoosterType;
-        ManualContent manual = BoostersControl.Instance.GetBoosterManual(button.BoosterType);
+        PlayerControl player = MoveControl.Instance.CurrentPlayer;
 
-        if (booster == EBoosters.Lasso) {
-            _boosterName.text = manual.GetEntityNameWithLevel(1); // todo
-            _boosterDescription.text = manual.GetShortDescription(1); // todo
+        EBoosters booster = button.BoosterType;
+        ManualContent manual = Manual.Instance.GetBoosterManual(button.BoosterType);
+
+        if (BoostersControl.Instance.BoostersWithGrind.Contains(booster)) {
+            int level = player.Grind.GetBoosterLevel(booster);
+            _boosterName.text = manual.GetEntityNameWithLevel(level);
+            _boosterDescription.text = manual.GetShortDescription(level);
         } else {
             _boosterName.text = manual.GetEntityName();
             _boosterDescription.text = manual.GetShortDescription();

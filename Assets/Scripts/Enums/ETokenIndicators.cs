@@ -1,4 +1,5 @@
 public enum ETokenIndicators
 {
-    Lightning
+    Lightning,
+    Flash,
 }

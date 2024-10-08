@@ -241,6 +241,15 @@ public class PlayersControl : MonoBehaviour
         }
     }
 
+    public void UpdateBoosterFlash() {
+        foreach(PlayerControl player in _players) {
+            player.Boosters.AddFlashMovesLeft(-1);
+            if (player.IsMe()) {
+                BoostersControl.Instance.LockInterfaceByFlash(player.Boosters.FlashMovesLeft > 0);
+            }
+        }
+    }
+
     // AI
 
     // Определеяется по кол-ву рубинов, денег и силы (именно в таком порядке)

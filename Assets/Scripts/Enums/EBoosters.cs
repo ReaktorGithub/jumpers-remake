@@ -11,8 +11,8 @@ public enum EBoosters
     Trap,
     Vampire,
     Vacuum,
-    BombElectro,
-    BombDirt,
+    Flash,
+    Blot,
     Mop,
     Lightning
 }

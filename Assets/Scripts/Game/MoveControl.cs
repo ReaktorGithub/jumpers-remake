@@ -126,6 +126,7 @@ public class MoveControl : MonoBehaviour
 
     private bool ExecuteSideEffects() {
         PlayersControl.Instance.SpendPlayersArmor();
+        PlayersControl.Instance.UpdateBoosterFlash();
         BranchHedgehog branch = _hedgehogsControl.FindCompletedHedgehogBranch();
         if (branch != null) {
             _hedgehogsControl.MoveHedgehog(branch);

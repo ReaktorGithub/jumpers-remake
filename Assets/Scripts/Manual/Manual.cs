@@ -4,7 +4,7 @@ public class Manual : MonoBehaviour
 {
     public static Manual Instance { get; private set; }
     private ManualContent _power, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect, _attackUsual, _attackMagicKick, _attackVampire, _attackKnockout,
-    _boosterLasso, _boosterMagnet, _boosterSuperMagnet, _boosterShield, _boosterIronShield, _boosterVampire, _boosterBoombaster, _boosterStuck;
+    _boosterLasso, _boosterMagnet, _boosterSuperMagnet, _boosterShield, _boosterIronShield, _boosterVampire, _boosterBoombaster, _boosterStuck, _boosterFlash, _boosterTrap;
 
     private void Awake() {
         Instance = this;
@@ -27,6 +27,8 @@ public class Manual : MonoBehaviour
         _boosterVampire = transform.Find("BoosterVampire").GetComponent<ManualContent>();
         _boosterBoombaster = transform.Find("BoosterBoombaster").GetComponent<ManualContent>();
         _boosterStuck = transform.Find("BoosterStuck").GetComponent<ManualContent>();
+        _boosterFlash = transform.Find("BoosterFlash").GetComponent<ManualContent>();
+        _boosterTrap = transform.Find("BoosterTrap").GetComponent<ManualContent>();
     }
 
     public ManualContent Power {
@@ -124,6 +126,16 @@ public class Manual : MonoBehaviour
         private set {}
     }
 
+    public ManualContent BoosterFlash {
+        get { return _boosterFlash; }
+        private set {}
+    }
+
+    public ManualContent BoosterTrap {
+        get { return _boosterTrap; }
+        private set {}
+    }
+
     public ManualContent GetEffectManual(EControllableEffects effect) {
         switch(effect) {
             case EControllableEffects.Green: {
@@ -161,6 +173,42 @@ public class Manual : MonoBehaviour
             default: {
                 return RedEffect.Character;
             }
+        }
+    }
+
+    public ManualContent GetBoosterManual(EBoosters booster) {
+        switch(booster) {
+            case EBoosters.Magnet: {
+                return BoosterMagnet;
+            }
+            case EBoosters.MagnetSuper: {
+                return BoosterSuperMagnet;
+            }
+            case EBoosters.Lasso: {
+                return BoosterLasso;
+            }
+            case EBoosters.Shield: {
+                return BoosterShield;
+            }
+            case EBoosters.ShieldIron: {
+                return BoosterIronShield;
+            }
+            case EBoosters.Vampire: {
+                return BoosterVampire;
+            }
+            case EBoosters.Boombaster: {
+                return BoosterBoombaster;
+            }
+            case EBoosters.Stuck: {
+                return BoosterStuck;
+            }
+            case EBoosters.Flash: {
+                return BoosterFlash;
+            }
+            case EBoosters.Trap: {
+                return BoosterTrap;
+            }
+            default: return null;
         }
     }
 }

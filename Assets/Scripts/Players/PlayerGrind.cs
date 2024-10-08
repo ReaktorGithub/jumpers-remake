@@ -13,8 +13,8 @@ public class PlayerGrind : MonoBehaviour
     [SerializeField] private int _knockout = 1;
     [SerializeField] private int _lasso = 1;
     [SerializeField] private int _boombaster = 1;
-    [SerializeField] private int _bombElectro = 1;
-    [SerializeField] private int _bombDirt = 1;
+    [SerializeField] private int _flash = 1;
+    [SerializeField] private int _blot = 1;
     [SerializeField] private int _mop = 1;
     [SerializeField] private int _cubic = 1;
     [SerializeField] private int _insurance = 1;
@@ -69,13 +69,13 @@ public class PlayerGrind : MonoBehaviour
         private set {}
     }
 
-    public int BombElectro {
-        get { return _bombElectro; }
+    public int Flash {
+        get { return _flash; }
         private set {}
     }
 
-    public int BombDirt {
-        get { return _bombDirt; }
+    public int Blot {
+        get { return _blot; }
         private set {}
     }
 
@@ -134,12 +134,12 @@ public class PlayerGrind : MonoBehaviour
         _boombaster++;
     }
 
-    public void IncreaseBombElectro() {
-        _bombElectro++;
+    public void IncreaseFlash() {
+        _flash++;
     }
 
-    public void IncreaseBombDirt() {
-        _bombDirt++;
+    public void IncreaseBlot() {
+        _blot++;
     }
 
     public void IncreaseMop() {
@@ -170,6 +170,27 @@ public class PlayerGrind : MonoBehaviour
             }
             case EControllableEffects.Red: {
                 return Red;
+            }
+            default: return 1;
+        }
+    }
+
+    public int GetBoosterLevel(EBoosters booster) {
+        switch(booster) {
+            case EBoosters.Lasso: {
+                return Lasso;
+            }
+            case EBoosters.Boombaster: {
+                return Boombaster;
+            }
+            case EBoosters.Flash: {
+                return Flash;
+            }
+            case EBoosters.Blot: {
+                return Blot;
+            }
+            case EBoosters.Mop: {
+                return Mop;
             }
             default: return 1;
         }

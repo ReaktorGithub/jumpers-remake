@@ -321,10 +321,16 @@ public class PlayerEffects : MonoBehaviour
     // Молния: При попадании на клетку с молнией
 
     public void ExecuteLightning() {
+        int oldValue = _lightningMoves;
         _lightningMoves = 3;
         _isLightning = true;
         TokenControl token = _player.GetTokenControl();
-        token.AddIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
+
+        if (oldValue > 0) {
+            token.UpdateIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
+        } else {
+            token.AddIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
+        }
 
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("молнию", UIColors.Green) + "! Очки на кубике x2";
         Messages.Instance.AddMessage(message);

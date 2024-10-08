@@ -39,7 +39,7 @@ public class BranchButtonHedge : MonoBehaviour
     public void InitiateHedgehogChoice() {
         if (_taxCost > 0) {
             _branchControl.SetDisabledAllButtons(true);
-            _modal.BuildContent(MoveControl.Instance.CurrentPlayer, this);
+            _modal.BuildContent(this);
             _modal.OpenModal();
             return;
         }

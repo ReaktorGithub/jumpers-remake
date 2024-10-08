@@ -52,6 +52,11 @@ public class BoosterButtonActivate : MonoBehaviour
     }
 
     public void OnSelect() {
+        if (_boosterButton.IsAttackOnly()) {
+            BoostersControl.Instance.ShowAttackOnlyWarning();
+            return;
+        }
+
         if (_boosterButton.IsShield()) {
             PlayerControl player;
 
@@ -63,17 +68,17 @@ public class BoosterButtonActivate : MonoBehaviour
 
             // мы должны запомнить, на какой кнопке игрок активировал щит
             player.Boosters.SelectedShieldButton = _boosterButton;
-            BoostersControl.Instance.ExecuteShield(player, _boosterButton.BoosterType == EBoosters.ShieldIron);
-            return;
-        }
-
-        if (_boosterButton.IsAttackOnly()) {
-            BoostersControl.Instance.ShowAttackOnlyWarning();
+            player.Boosters.ExecuteShield(_boosterButton.BoosterType == EBoosters.ShieldIron);
             return;
         }
 
         if (_boosterButton.BoosterType == EBoosters.Boombaster) {
-            BoostersControl.Instance.ActivateBooster(_boosterButton.BoosterType);
+            MoveControl.Instance.CurrentPlayer.Boosters.ExecuteBoombaster();
+            return;
+        }
+
+        if (_boosterButton.BoosterType == EBoosters.Flash) {
+            MoveControl.Instance.CurrentPlayer.Boosters.ExecuteFlash();
             return;
         }
 

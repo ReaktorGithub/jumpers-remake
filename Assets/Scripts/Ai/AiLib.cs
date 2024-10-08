@@ -44,7 +44,7 @@ public static class AiLib
     */
 
     public static int GetAttackUsualPoints(PlayerControl player) {
-        int needPower = Manual.Instance.AttackUsual.GetCost(1); // todo
+        int needPower = Manual.Instance.AttackUsual.GetCost(1); // todo прокачка
         int restPower = player.Power - needPower;
 
         if (restPower < 0) {
@@ -63,7 +63,7 @@ public static class AiLib
     */
 
     public static int GetAttackMagicKickPoints(PlayerControl player) {
-        int needPower = Manual.Instance.AttackMagicKick.GetCost(1); // todo
+        int needPower = Manual.Instance.AttackMagicKick.GetCost(1); // todo прокачка
         int restPower = player.Power - needPower;
 
         if (!player.AvailableAttackTypes.Contains(EAttackTypes.MagicKick) || restPower < 0) {
@@ -71,7 +71,7 @@ public static class AiLib
         }
 
         CellControl cell = player.GetCurrentCell();
-        int initialSteps = Manual.Instance.AttackMagicKick.GetCauseEffect(2); // todo
+        int initialSteps = Manual.Instance.AttackMagicKick.GetCauseEffect(2); // todo прокачка
         (GameObject, int) cellResult = CellsControl.Instance.FindCellBySteps(cell.gameObject, false, initialSteps);
 
         int steps = initialSteps - cellResult.Item2;
@@ -145,7 +145,7 @@ public static class AiLib
     */
 
     public static int GetAttackKnockoutPoints(PlayerControl player) {
-        int needPower = Manual.Instance.AttackKnockout.GetCost(1); // todo
+        int needPower = Manual.Instance.AttackKnockout.GetCost(1); // todo прокачка
         int restPower = player.Power - needPower;
 
         if (!player.AvailableAttackTypes.Contains(EAttackTypes.Knockout) || restPower < 0) {
