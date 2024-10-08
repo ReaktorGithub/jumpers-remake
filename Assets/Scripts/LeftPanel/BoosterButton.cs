@@ -84,6 +84,10 @@ public class BoosterButton : MonoBehaviour
                 _booster.sprite = BoostersControl.Instance.TrapSprite;
                 break;
             }
+            case EBoosters.Flash: {
+                _booster.sprite = BoostersControl.Instance.FlashSprite;
+                break;
+            }
             default: {
                 _booster.sprite = null;
                 break;

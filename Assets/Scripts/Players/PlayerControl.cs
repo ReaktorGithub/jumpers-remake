@@ -269,7 +269,7 @@ public class PlayerControl : MonoBehaviour
         addStuck += removeStuck;
 
         if (isAddStuck) {
-            _boosters.ExecuteStuckAsAgressor();
+            _boosters.ExecuteStuck();
         }
 
         selectedPlayer.ExecuteStuckAsVictim(addStuck);

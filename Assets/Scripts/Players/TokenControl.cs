@@ -309,6 +309,7 @@ public class TokenControl : MonoBehaviour
 
     public void AddIndicator(ETokenIndicators type, string text = "") {
         GameObject clone = Instantiate(TokensControl.Instance.TokenIndicatorSample);
+        GameObject image = clone.transform.Find("Image").gameObject;
         clone.transform.SetParent(_indicatorsList.transform);
         TokenIndicator indicator = clone.GetComponent<TokenIndicator>();
         indicator.UpdateLinks();
@@ -319,6 +320,13 @@ public class TokenControl : MonoBehaviour
             case ETokenIndicators.Lightning: {
                 indicator.SetSprite(TokensControl.Instance.IndicatorLightningSprite);
                 indicator.SetTextColor(new Color32(49,255,34,255));
+                image.transform.localScale = new Vector3(1f,1f,1f);
+                break;
+            }
+            case ETokenIndicators.Flash: {
+                indicator.SetSprite(TokensControl.Instance.IndicatorFlashSprite);
+                indicator.SetTextColor(new Color32(173,208,255,255));
+                image.transform.localScale = new Vector3(3f,3f,3f);
                 break;
             }
             default: {
@@ -328,7 +336,6 @@ public class TokenControl : MonoBehaviour
         }
 
         clone.SetActive(true);
-        clone.transform.localScale = new Vector3(1f,1f,1f);
         _indicatorBg.SetActive(true);
         _indicatorsCount++;
     }

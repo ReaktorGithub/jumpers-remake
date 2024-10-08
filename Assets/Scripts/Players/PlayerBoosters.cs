@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,13 +17,17 @@ public class PlayerBoosters : MonoBehaviour
     [SerializeField] private int _boombaster = 0;
     [SerializeField] private int _stuck = 0;
     [SerializeField] private int _trap = 0;
+    [SerializeField] private int _flash = 0;
+    [SerializeField] private int _flashMovesLeft = 0; // сколько ходов осталось до выключения флешки
 
     [SerializeField] private int _armor = 0; // сколько ходов осталось со щитом (включая ходы соперников)
     [SerializeField] private bool _isIronArmor = false;
     [SerializeField] private BoosterButton _selectedShieldButton;
+    private TopPanel _topPanel;
 
     private void Awake() {
         _player = GetComponent<PlayerControl>();
+        _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
     }
 
     public int Magnet {
@@ -105,6 +110,31 @@ public class PlayerBoosters : MonoBehaviour
         }
     }
 
+    public int Flash {
+        get { return _flash; }
+        set {
+            int newValue = Math.Clamp(value, 0, BoostersControl.Instance.MaxFlash);
+            _flash = newValue;
+        }
+    }
+
+    public int FlashMovesLeft {
+        get { return _flashMovesLeft; }
+        set {
+            int newValue = Math.Clamp(value, 0, 100000);
+            int oldValue = _flashMovesLeft;
+            _flashMovesLeft = newValue;
+
+            if (newValue > 0 && oldValue > 0) {
+                _player.GetTokenControl().UpdateIndicator(ETokenIndicators.Flash, newValue.ToString());
+            } else if (newValue > 0) {
+                _player.GetTokenControl().AddIndicator(ETokenIndicators.Flash, newValue.ToString());
+            } else {
+                _player.GetTokenControl().RemoveIndicator(ETokenIndicators.Flash);
+            }
+        }
+    }
+
     public int Armor {
         get { return _armor; }
         set { _armor = value; }
@@ -154,6 +184,14 @@ public class PlayerBoosters : MonoBehaviour
 
     public void AddTrap(int value) {
         Trap += value;
+    }
+
+    public void AddFlash(int value) {
+        Flash += value;
+    }
+
+    public void AddFlashMovesLeft(int value) {
+        FlashMovesLeft += value;
     }
 
     public void AddArmor(int value) {
@@ -220,8 +258,20 @@ public class PlayerBoosters : MonoBehaviour
                 Vampire += value;
                 break;
             }
+            case EBoosters.Boombaster: {
+                Boombaster += value;
+                break;
+            }
             case EBoosters.Trap: {
                 Trap += value;
+                break;
+            }
+            case EBoosters.Stuck: {
+                Stuck += value;
+                break;
+            }
+            case EBoosters.Flash: {
+                Flash += value;
                 break;
             }
         }
@@ -260,10 +310,22 @@ public class PlayerBoosters : MonoBehaviour
             result.Add(EBoosters.Trap);
         }
 
+        for (int i = 0; i < Stuck; i++) {
+            result.Add(EBoosters.Stuck);
+        }
+
+        for (int i = 0; i < Boombaster; i++) {
+            result.Add(EBoosters.Boombaster);
+        }
+
+        for (int i = 0; i < Flash; i++) {
+            result.Add(EBoosters.Flash);
+        }
+
         return result;
     }
 
-    // Щиты
+    // Трата щитов
 
     public void SpendArmor() {
         if (_armor == 0) {
@@ -324,9 +386,11 @@ public class PlayerBoosters : MonoBehaviour
         return firstIndex;
     }
 
+    // Исполнение усилителей
+
     // Бумка
 
-    public void ExecuteBoombaster(int powerPenalty) {
+    public void ExecuteBoombasterAsVictim(int powerPenalty) {
         if (powerPenalty == 0) {
             return;
         }
@@ -368,21 +432,112 @@ public class PlayerBoosters : MonoBehaviour
         }
     }
 
+    public void ExecuteBoombaster() {
+        CellControl targetCell = _player.GetCurrentCell();
+
+        if (targetCell.IsBoombaster) {
+            _player.OpenBoombasterModal();
+            return;
+        }
+        
+        CellsControl.Instance.AddBoombaster(targetCell, _player.Grind.Boombaster);
+        AddBoombaster(-1);
+        BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
+
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " устанавливает " + Utils.Wrap("бумку", UIColors.DarkYellow) + " на клетке №" + targetCell.NameDisplay;
+        Messages.Instance.AddMessage(message);
+    }
+
+    public void ExecuteFlash() {
+        int level = _player.Grind.Flash;
+        ManualContent manual = Manual.Instance.BoosterFlash;
+        int steps = manual.GetCauseEffect(level);
+
+        foreach(PlayerControl player in PlayersControl.Instance.Players) {
+            if (player.IsFinished) {
+                continue;
+            }
+
+            if (player != _player) {
+                player.Boosters.FlashMovesLeft = steps;
+            }
+        }
+
+        _player.Boosters.AddFlash(-1);
+        BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
+
+        string stepsText = steps < 5 ? " хода" : " ходов";
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " взорвал " + Utils.Wrap("флешку.", UIColors.Blue) + " Соперники остались без усилителей на " + steps + stepsText + "!";
+        Messages.Instance.AddMessage(message);
+    }
+
     // Прилипала
 
-    public void ExecuteStuckAsAgressor() {
+    public void ExecuteStuck() {
         AddStuck(-1);
         BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
         string message = "Обнаружено заражение новой " + Utils.Wrap("прилипалой", UIColors.LimeGreen);
         Messages.Instance.AddMessage(message);
     }
 
+    // Лассо
+
+    public void ExecuteLasso(CellControl targetCell) {
+        foreach(CellControl cell in CellsControl.Instance.AllCellsControls) {
+            cell.TurnOffLassoMode();
+        }
+        _topPanel.CloseWindow();
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " решает прокатиться на " + Utils.Wrap("лассо", UIColors.Orange);
+        Messages.Instance.AddMessage(message);
+        AddLasso(-1);
+        BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
+        BoostersControl.Instance.UnselectAllButtons();
+        MoveControl.Instance.MakeLassoMove(targetCell);
+    }
+
+    // Щит
+
+    public void ExecuteShield(bool _isIron) {
+        TokenControl token = _player.GetTokenControl();
+        string shieldText;
+
+        if (_isIron) {
+            IsIronArmor = true;
+            Armor = 12;
+            token.UpdateShield(EBoosters.ShieldIron);
+            shieldText = Utils.Wrap("железный щит", UIColors.ArmorIron);
+        } else {
+            IsIronArmor = false;
+            Armor = 4;
+            token.UpdateShield(EBoosters.Shield);
+            shieldText = Utils.Wrap("щит", UIColors.Armor);
+        }
+
+        BoostersControl.Instance.UpdatePlayersArmorButtons(_player);
+
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " надевает " + shieldText;
+        Messages.Instance.AddMessage(message);
+    }
+
     // Капкан
 
-    public void ExecuteTrapAsAgressor(CellControl cell) {
+    public void ExecuteTrap(CellControl targetCell) {
+        CellsControl.Instance.TurnOffTrapPlacementMode();
+        targetCell.PlaceTrap(_player);
+        _topPanel.CloseWindow();
         AddTrap(-1);
         BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
-        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " ставит " + Utils.Wrap("капкан", UIColors.Orange) + " на клетке № " + cell.NameDisplay;
+        BoostersControl.Instance.UnselectAllButtons();
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " ставит " + Utils.Wrap("капкан", UIColors.Orange) + " на клетке № " + targetCell.NameDisplay;
         Messages.Instance.AddMessage(message);
+        StartCoroutine(ExecuteTrapDefer());
+    }
+
+    private IEnumerator ExecuteTrapDefer() {
+        yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDelay);
+        EffectsControl.Instance.RestoreCamera();
+        EffectsControl.Instance.TryToEnableAllEffectButtons();
+        BoostersControl.Instance.EnableAllButtons();
+        CubicControl.Instance.SetCubicInteractable(true);
     }
 }

@@ -541,22 +541,22 @@ public class CellsControl : MonoBehaviour
         // Применение эффектов взрыва на игроках
         foreach(PlayerControl player in playersArea0) {
             int penalty = BoostersControl.Instance.GetBoombasterPowerPenalty(level, 0);
-            player.Boosters.ExecuteBoombaster(penalty);
+            player.Boosters.ExecuteBoombasterAsVictim(penalty);
         }
 
         foreach(PlayerControl player in playersArea1) {
             int penalty = BoostersControl.Instance.GetBoombasterPowerPenalty(level, 1);
-            player.Boosters.ExecuteBoombaster(penalty);
+            player.Boosters.ExecuteBoombasterAsVictim(penalty);
         }
 
         foreach(PlayerControl player in playersArea2) {
             int penalty = BoostersControl.Instance.GetBoombasterPowerPenalty(level, 2);
-            player.Boosters.ExecuteBoombaster(penalty);
+            player.Boosters.ExecuteBoombasterAsVictim(penalty);
         }
 
         foreach(PlayerControl player in playersArea3) {
             int penalty = BoostersControl.Instance.GetBoombasterPowerPenalty(level, 3);
-            player.Boosters.ExecuteBoombaster(penalty);
+            player.Boosters.ExecuteBoombasterAsVictim(penalty);
         }
 
         // камера

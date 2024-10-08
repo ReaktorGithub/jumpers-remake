@@ -37,6 +37,7 @@ public class Jumpers : MonoBehaviour
         Instances.transform.Find("Boombaster").gameObject.SetActive(false);
         Instances.transform.Find("stuck-icon").gameObject.SetActive(false);
         Instances.transform.Find("trap-icon").gameObject.SetActive(false);
+        Instances.transform.Find("flash-icon").gameObject.SetActive(false);
     }
 
     // private void Update() {

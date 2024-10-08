@@ -1,14 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BoostersControl : MonoBehaviour
 {
     public static BoostersControl Instance { get; private set; }
-    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite, _stuckSprite, _trapSprite;
-    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton, _boombasterButton, _stuckButton, _trapButton;
+    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite, _stuckSprite, _trapSprite, _flashSprite;
+    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton, _boombasterButton, _stuckButton, _trapButton, _flashButton, _flashBlock;
     private BoostersRow _magnetsRowScript, _lassoRowScript, _shieldsRowScript;
-    private BoosterButton _vampireButtonScript, _boombasterButtonScript, _stuckButtonScript, _trapButtonScript;
+    private BoosterButton _vampireButtonScript, _boombasterButtonScript, _stuckButtonScript, _trapButtonScript, _flashButtonScript;
     private PopupMagnet _popupMagnet;
     [SerializeField] private List<GameObject> _boostersList;
     private List<BoosterButton> _boosterButtonsList = new();
@@ -16,6 +17,10 @@ public class BoostersControl : MonoBehaviour
     private ModalWarning _modalWarning;
     private CameraControl _cameraControl;
     private CameraButton _cameraButton;
+    private Image _flashAnimateImage;
+    private IEnumerator _flashCoroutine;
+    [SerializeField] private List<EBoosters> _boostersWithGrind = new();
+    [SerializeField] private float _flashPulseTime = 0.5f;
     [SerializeField] private int _maxMagnets = 3;
     [SerializeField] private int _maxSuperMagnets = 3;
     [SerializeField] private int _maxMagnetsTotal = 3;
@@ -27,6 +32,7 @@ public class BoostersControl : MonoBehaviour
     [SerializeField] private int _maxBoombasters = 1;
     [SerializeField] private int _maxStuck = 1;
     [SerializeField] private int _maxTrap = 1;
+    [SerializeField] private int _maxFlash = 1;
 
     private void Awake() {
         Instance = this;
@@ -41,6 +47,7 @@ public class BoostersControl : MonoBehaviour
         _boombasterSprite = Instances.transform.Find("boombaster-icon").GetComponent<SpriteRenderer>().sprite;
         _stuckSprite = Instances.transform.Find("stuck-icon").GetComponent<SpriteRenderer>().sprite;
         _trapSprite = Instances.transform.Find("trap-icon").GetComponent<SpriteRenderer>().sprite;
+        _flashSprite = Instances.transform.Find("flash-icon").GetComponent<SpriteRenderer>().sprite;
 
         _magnetsRowScript = _magnetsRow.GetComponent<BoostersRow>();
         _lassoRowScript = _lassoRow.GetComponent<BoostersRow>();
@@ -49,6 +56,7 @@ public class BoostersControl : MonoBehaviour
         _boombasterButtonScript = _boombasterButton.GetComponent<BoosterButton>();
         _stuckButtonScript = _stuckButton.GetComponent<BoosterButton>();
         _trapButtonScript = _trapButton.GetComponent<BoosterButton>();
+        _flashButtonScript = _flashButton.GetComponent<BoosterButton>();
 
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
         foreach(GameObject button in _boostersList) {
@@ -58,6 +66,8 @@ public class BoostersControl : MonoBehaviour
         _modalWarning = GameObject.Find("ModalScripts").GetComponent<ModalWarning>();
         _cameraControl = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _cameraButton = GameObject.Find("CameraButton").GetComponent<CameraButton>();
+        _flashAnimateImage = _flashBlock.transform.Find("AnimateImage").GetComponent<Image>();
+        LockInterfaceByFlash(false);
     }
 
     public Sprite MagnetSprite {
@@ -102,6 +112,11 @@ public class BoostersControl : MonoBehaviour
 
     public Sprite TrapSprite {
         get { return _trapSprite; }
+        private set {}
+    }
+
+    public Sprite FlashSprite {
+        get { return _flashSprite; }
         private set {}
     }
 
@@ -157,6 +172,16 @@ public class BoostersControl : MonoBehaviour
 
     public int MaxTrap {
         get { return _maxTrap; }
+        private set {}
+    }
+
+    public int MaxFlash {
+        get { return _maxFlash; }
+        private set {}
+    }
+
+    public List<EBoosters> BoostersWithGrind {
+        get { return _boostersWithGrind; }
         private set {}
     }
 
@@ -246,129 +271,83 @@ public class BoostersControl : MonoBehaviour
         _boombasterButtonScript.BoosterType = player.Boosters.Boombaster > 0 ? EBoosters.Boombaster : EBoosters.None;
         _stuckButtonScript.BoosterType = player.Boosters.Stuck > 0 ? EBoosters.Stuck : EBoosters.None;
         _trapButtonScript.BoosterType = player.Boosters.Trap > 0 ? EBoosters.Trap : EBoosters.None;
+        _flashButtonScript.BoosterType = player.Boosters.Flash > 0 ? EBoosters.Flash : EBoosters.None;
     }
 
-    // Открытие разных усилителей при нажатиях на кнопки в левой панели
+    // Открытие разных усилителей при нажатиях на кнопки в левой панели (без исполнения их эффекта)
 
     public void ActivateBooster(EBoosters booster) {
-        PlayerControl player = MoveControl.Instance.CurrentPlayer;
-        CellControl cell = player.GetCurrentCell();
-
         switch(booster) {
             case EBoosters.Magnet: {
-                _popupMagnet.BuildContent(player, cell, false);
-                _popupMagnet.OnOpenWindow();
+                OpenMagnet(false);
                 break;
             }
             case EBoosters.MagnetSuper: {
-                _popupMagnet.BuildContent(player, cell, true);
-                _popupMagnet.OnOpenWindow();
+                OpenMagnet(true);
                 break;
             }
             case EBoosters.Lasso: {
-                CubicControl.Instance.SetCubicInteractable(false);
-
-                int level = player.Grind.Lasso;
-                ManualContent manual = Manual.Instance.BoosterLasso;
-                int steps = manual.GetCauseEffect(level);
-
-                string stepsText = steps == 1 ? " шага" : " шагов";
-                _topPanel.SetText("Подвиньте свою фишку в пределах " + steps + stepsText);
-                _topPanel.OpenWindow();
-                List<GameObject> collected = CellsControl.Instance.FindNearCellsDeepTwoSide(cell, steps);
-                foreach(GameObject cellFound in collected) {
-                    cellFound.GetComponent<CellControl>().TurnOnLassoMode();
-                }
-                _topPanel.SetCancelButtonActive(true, () => {
-                    _topPanel.CloseWindow();
-                    foreach(GameObject cellFound in collected) {
-                        cellFound.GetComponent<CellControl>().TurnOffLassoMode();
-                    }
-                    EffectsControl.Instance.TryToEnableAllEffectButtons();
-                    EnableAllButtons();
-                    CubicControl.Instance.SetCubicInteractable(true);
-                });
-                break;
-            }
-            case EBoosters.Boombaster: {
-                ExecuteBoombaster(player, cell);
+                OpenLasso();
                 break;
             }
             case EBoosters.Trap: {
-                CubicControl.Instance.SetCubicInteractable(false);
-                CellsControl.Instance.TurnOnTrapPlacementMode();
-                _cameraControl.FollowOff();
-                _cameraControl.MoveCameraToLevelCenter();
-                _cameraButton.SetDisabled(true);
-                _topPanel.SetText("Установите капкан на клетку без фишек");
-                _topPanel.OpenWindow();
-                _topPanel.SetCancelButtonActive(true, () => {
-                    _topPanel.CloseWindow();
-                    CellsControl.Instance.TurnOffTrapPlacementMode();
-                    EffectsControl.Instance.TryToEnableAllEffectButtons();
-                    EffectsControl.Instance.RestoreCamera();
-                    EnableAllButtons();
-                    CubicControl.Instance.SetCubicInteractable(true);
-                });
+                OpenTrap();
                 break;
             }
         }
     }
 
-    // Исполнение некоторых усилителей
-
-    public void ExecuteLasso(CellControl targetCell) {
-        foreach(CellControl cell in CellsControl.Instance.AllCellsControls) {
-            cell.TurnOffLassoMode();
-        }
-        _topPanel.CloseWindow();
+    private void OpenMagnet(bool isSuper) {
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
-        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " решает прокатиться на " + Utils.Wrap("лассо", UIColors.Orange);
-        Messages.Instance.AddMessage(message);
-        player.Boosters.AddLasso(-1);
-        UpdateBoostersFromPlayer(player);
-        UnselectAllButtons();
-        MoveControl.Instance.MakeLassoMove(targetCell);
+        CellControl cell = player.GetCurrentCell();
+        _popupMagnet.BuildContent(player, cell, isSuper);
+        _popupMagnet.OnOpenWindow();
     }
 
-    public void ExecuteShield(PlayerControl player, bool _isIron) {
-        TokenControl token = player.GetTokenControl();
-        string shieldText;
-
-        if (_isIron) {
-            player.Boosters.IsIronArmor = true;
-            player.Boosters.Armor = 12;
-            token.UpdateShield(EBoosters.ShieldIron);
-            shieldText = Utils.Wrap("железный щит", UIColors.ArmorIron);
-        } else {
-            player.Boosters.IsIronArmor = false;
-            player.Boosters.Armor = 4;
-            token.UpdateShield(EBoosters.Shield);
-            shieldText = Utils.Wrap("щит", UIColors.Armor);
-        }
-
-        UpdatePlayersArmorButtons(player);
-
-        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " надевает " + shieldText;
-        Messages.Instance.AddMessage(message);
-    }
-
-    public void ExecuteTrap(CellControl targetCell) {
+    private void OpenLasso() {
         PlayerControl player = MoveControl.Instance.CurrentPlayer;
-        CellsControl.Instance.TurnOffTrapPlacementMode();
-        targetCell.PlaceTrap(player);
-        _topPanel.CloseWindow();
-        UnselectAllButtons();
-        player.Boosters.ExecuteTrapAsAgressor(targetCell);
-        StartCoroutine(ExecuteTrapDefer());
+        CellControl cell = player.GetCurrentCell();
+
+        CubicControl.Instance.SetCubicInteractable(false);
+
+        int level = player.Grind.Lasso;
+        ManualContent manual = Manual.Instance.BoosterLasso;
+        int steps = manual.GetCauseEffect(level);
+
+        string stepsText = steps == 1 ? " шага" : " шагов";
+        _topPanel.SetText("Подвиньте свою фишку в пределах " + steps + stepsText);
+        _topPanel.OpenWindow();
+        List<GameObject> collected = CellsControl.Instance.FindNearCellsDeepTwoSide(cell, steps);
+        foreach(GameObject cellFound in collected) {
+            cellFound.GetComponent<CellControl>().TurnOnLassoMode();
+        }
+        _topPanel.SetCancelButtonActive(true, () => {
+            _topPanel.CloseWindow();
+            foreach(GameObject cellFound in collected) {
+                cellFound.GetComponent<CellControl>().TurnOffLassoMode();
+            }
+            EffectsControl.Instance.TryToEnableAllEffectButtons();
+            EnableAllButtons();
+            CubicControl.Instance.SetCubicInteractable(true);
+        });
     }
 
-    private IEnumerator ExecuteTrapDefer() {
-        yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDelay);
-        EffectsControl.Instance.RestoreCamera();
-        EffectsControl.Instance.TryToEnableAllEffectButtons();
-        EnableAllButtons();
-        CubicControl.Instance.SetCubicInteractable(true);
+    private void OpenTrap() {
+        CubicControl.Instance.SetCubicInteractable(false);
+        CellsControl.Instance.TurnOnTrapPlacementMode();
+        _cameraControl.FollowOff();
+        _cameraControl.MoveCameraToLevelCenter();
+        _cameraButton.SetDisabled(true);
+        _topPanel.SetText("Установите капкан на клетку без фишек");
+        _topPanel.OpenWindow();
+        _topPanel.SetCancelButtonActive(true, () => {
+            _topPanel.CloseWindow();
+            CellsControl.Instance.TurnOffTrapPlacementMode();
+            EffectsControl.Instance.TryToEnableAllEffectButtons();
+            EffectsControl.Instance.RestoreCamera();
+            EnableAllButtons();
+            CubicControl.Instance.SetCubicInteractable(true);
+        });
     }
 
     public void DeactivateArmorButtons() {
@@ -409,18 +388,29 @@ public class BoostersControl : MonoBehaviour
         );
     }
 
-    public void ExecuteBoombaster(PlayerControl player, CellControl targetCell) {
-        if (targetCell.IsBoombaster) {
-            player.OpenBoombasterModal();
-            return;
-        }
-        
-        CellsControl.Instance.AddBoombaster(targetCell, player.Grind.Boombaster);
-        player.Boosters.AddBoombaster(-1);
-        UpdateBoostersFromPlayer(player);
+    // разное
 
-        string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " устанавливает " + Utils.Wrap("бумку", UIColors.DarkYellow) + " на клетке №" + targetCell.NameDisplay;
-        Messages.Instance.AddMessage(message);
+    public void ShowAttackOnlyWarning() {
+        _modalWarning.SetHeadingText("Недоступно");
+        _modalWarning.SetBodyText("Этот усилитель доступен только во время атаки на соперника.");
+        _modalWarning.SetCallback();
+        _modalWarning.OpenModal();
+    }
+
+    public void LockInterfaceByFlash(bool value) {
+        if (value) {
+            _flashBlock.SetActive(true);
+            if (_flashCoroutine != null) {
+                StopCoroutine(_flashCoroutine);
+            }
+            _flashCoroutine = Utils.StartPulseImage(_flashAnimateImage, _flashPulseTime, 0.2f);
+            StartCoroutine(_flashCoroutine);
+        } else {
+            if (_flashCoroutine != null) {
+                StopCoroutine(_flashCoroutine);
+            }
+            _flashBlock.SetActive(false);
+        }
     }
 
     public int GetBoombasterPowerPenalty(int level, int areaRow) {
@@ -449,39 +439,6 @@ public class BoostersControl : MonoBehaviour
                 };
             }
             default: return 0;
-        }
-    }
-
-    // разное
-
-    public void ShowAttackOnlyWarning() {
-        _modalWarning.SetHeadingText("Недоступно");
-        _modalWarning.SetBodyText("Этот усилитель доступен только во время атаки на соперника.");
-        _modalWarning.SetCallback();
-        _modalWarning.OpenModal();
-    }
-
-    public ManualContent GetBoosterManual(EBoosters booster) {
-        switch(booster) {
-            case EBoosters.Magnet: {
-                return Manual.Instance.BoosterMagnet;
-            }
-            case EBoosters.MagnetSuper: {
-                return Manual.Instance.BoosterSuperMagnet;
-            }
-            case EBoosters.Lasso: {
-                return Manual.Instance.BoosterLasso;
-            }
-            case EBoosters.Shield: {
-                return Manual.Instance.BoosterShield;
-            }
-            case EBoosters.ShieldIron: {
-                return Manual.Instance.BoosterIronShield;
-            }
-            case EBoosters.Vampire: {
-                return Manual.Instance.BoosterVampire;
-            }
-            default: return null;
         }
     }
 }

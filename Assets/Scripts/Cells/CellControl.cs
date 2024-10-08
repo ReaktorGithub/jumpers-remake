@@ -375,9 +375,9 @@ public class CellControl : MonoBehaviour
         if (_isEffectPlacementMode) {
             EffectsControl.Instance.OnConfirmChangeEffect(this);
         } else if (_isLassoMode) {
-            BoostersControl.Instance.ExecuteLasso(this);
+            MoveControl.Instance.CurrentPlayer.Boosters.ExecuteLasso(this);
         } else if (_isTrapPlacementMode) {
-            BoostersControl.Instance.ExecuteTrap(this);
+            MoveControl.Instance.CurrentPlayer.Boosters.ExecuteTrap(this);
         }
     }
 
