@@ -174,9 +174,14 @@ public class CellChecker : MonoBehaviour
 
     public void CheckCellEffects(PlayerControl player) {
         CellControl cell = player.GetCurrentCell();
+        bool isBlot = player.Boosters.IsBlot();
 
         if (cell.Effect == EControllableEffects.Green) {
-            player.Effects.ExecuteGreen();
+            if (isBlot) {
+                player.Boosters.ExecuteBlotAsVictim("получить зелёный эффект");
+            } else {
+                player.Effects.ExecuteGreen();
+            }
         }
 
         if (cell.Effect == EControllableEffects.Yellow) {
@@ -184,7 +189,11 @@ public class CellChecker : MonoBehaviour
         }
 
         if (cell.Effect == EControllableEffects.Star) {
-            player.Effects.ExecuteStar();
+            if (isBlot) {
+                player.Boosters.ExecuteBlotAsVictim("получить звезду");
+            } else {
+                player.Effects.ExecuteStar();
+            }
         }
 
         if (cell.CellType == ECellTypes.Moneybox) {
@@ -192,11 +201,19 @@ public class CellChecker : MonoBehaviour
         }
 
         if (cell.CellType == ECellTypes.Lightning) {
-            player.Effects.ExecuteLightning();
+            if (isBlot) {
+                player.Boosters.ExecuteBlotAsVictim("получить молнию");
+            } else {
+                player.Effects.ExecuteLightning();
+            }
         }
 
         if (cell.CoinBonusValue != 0) {
-            player.Effects.ExecuteCoinBonus(cell.CoinBonusValue);
+            if (isBlot && cell.CoinBonusValue > 0) {
+                player.Boosters.ExecuteBlotAsVictim("получить монеты");
+            } else {
+                player.Effects.ExecuteCoinBonus(cell.CoinBonusValue);
+            }
         }
 
         if (cell.CellType == ECellTypes.Wall) {
@@ -329,7 +346,11 @@ public class CellChecker : MonoBehaviour
         }
 
         if (vault.OccupiedPlayer == null) {
-            vault.PutPlayerToVault(player);
+            if (player.Boosters.IsBlot()) {
+                player.Boosters.ExecuteBlotAsVictim("попасть в копилку");
+            } else {
+                vault.PutPlayerToVault(player);
+            }
         }
     }
 }

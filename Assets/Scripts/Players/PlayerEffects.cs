@@ -267,6 +267,13 @@ public class PlayerEffects : MonoBehaviour
     }
 
     public void ExecuteMoneybox(MoneyboxVault vault) {
+        if (_player.Boosters.IsBlot()) {
+            _player.Boosters.ExecuteBlotAsVictim("забрать бонус из копилки");
+            _player.AddMovesSkip(1);
+            MoveControl.Instance.CheckMoveSkipAndPreparePlayer();
+            return;
+        }
+
         (int, int, int) bonus = vault.GetBonus();
         _player.AddPower(bonus.Item1);
         _player.AddCoins(bonus.Item2);
@@ -339,8 +346,14 @@ public class PlayerEffects : MonoBehaviour
     // Молния: При подготовке игрока к ходу (в т.ч. дополнительному)
 
     public void CheckLightningStartMove() {
-        if (_isLightning && _player.IsMe()) {
+        bool isBlot = _player.Boosters.IsBlot();
+
+        if (_isLightning && !isBlot && _player.IsMe()) {
             CubicControl.Instance.ModifiersControl.ShowModifierLightning(true);
+        }
+
+        if (_isLightning && isBlot) {
+            _player.Boosters.ExecuteBlotAsVictim("использовать молнию");
         }
     }
 

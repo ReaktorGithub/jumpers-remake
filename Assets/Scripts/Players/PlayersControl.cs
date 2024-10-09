@@ -250,6 +250,12 @@ public class PlayersControl : MonoBehaviour
         }
     }
 
+    public void UpdateBoosterBlot() {
+        foreach(PlayerControl player in _players) {
+            player.Boosters.AddBlotMovesLeft(-1);
+        }
+    }
+
     // AI
 
     // Определеяется по кол-ву рубинов, денег и силы (именно в таком порядке)

@@ -18,8 +18,9 @@ public class PlayerBoosters : MonoBehaviour
     [SerializeField] private int _stuck = 0;
     [SerializeField] private int _trap = 0;
     [SerializeField] private int _flash = 0;
+    [SerializeField] private int _blot = 0;
     [SerializeField] private int _flashMovesLeft = 0; // сколько ходов осталось до выключения флешки
-
+    [SerializeField] private int _blotMovesLeft = 0; // сколько ходов осталось до выключения кляксы
     [SerializeField] private int _armor = 0; // сколько ходов осталось со щитом (включая ходы соперников)
     [SerializeField] private bool _isIronArmor = false;
     [SerializeField] private BoosterButton _selectedShieldButton;
@@ -118,10 +119,18 @@ public class PlayerBoosters : MonoBehaviour
         }
     }
 
+    public int Blot {
+        get { return _blot; }
+        set {
+            int newValue = Math.Clamp(value, 0, BoostersControl.Instance.MaxBlot);
+            _blot = newValue;
+        }
+    }
+
     public int FlashMovesLeft {
         get { return _flashMovesLeft; }
         set {
-            int newValue = Math.Clamp(value, 0, 100000);
+            int newValue = Math.Clamp(value, 0, 1000);
             int oldValue = _flashMovesLeft;
             _flashMovesLeft = newValue;
 
@@ -133,6 +142,27 @@ public class PlayerBoosters : MonoBehaviour
                 _player.GetTokenControl().RemoveIndicator(ETokenIndicators.Flash);
             }
         }
+    }
+
+    public int BlotMovesLeft {
+        get { return _blotMovesLeft; }
+        set {
+            int newValue = Math.Clamp(value, 0, 1000);
+            int oldValue = _blotMovesLeft;
+            _blotMovesLeft = newValue;
+
+            if (newValue > 0 && oldValue > 0) {
+                _player.GetTokenControl().UpdateIndicator(ETokenIndicators.Blot, newValue.ToString());
+            } else if (newValue > 0) {
+                _player.GetTokenControl().AddIndicator(ETokenIndicators.Blot, newValue.ToString());
+            } else {
+                _player.GetTokenControl().RemoveIndicator(ETokenIndicators.Blot);
+            }
+        }
+    }
+
+    public bool IsBlot() {
+        return _blotMovesLeft > 0;
     }
 
     public int Armor {
@@ -190,8 +220,16 @@ public class PlayerBoosters : MonoBehaviour
         Flash += value;
     }
 
+    public void AddBlot(int value) {
+        Blot += value;
+    }
+
     public void AddFlashMovesLeft(int value) {
         FlashMovesLeft += value;
+    }
+
+    public void AddBlotMovesLeft(int value) {
+        BlotMovesLeft += value;
     }
 
     public void AddArmor(int value) {
@@ -274,6 +312,10 @@ public class PlayerBoosters : MonoBehaviour
                 Flash += value;
                 break;
             }
+            case EBoosters.Blot: {
+                Blot += value;
+                break;
+            }
         }
     }
 
@@ -320,6 +362,10 @@ public class PlayerBoosters : MonoBehaviour
 
         for (int i = 0; i < Flash; i++) {
             result.Add(EBoosters.Flash);
+        }
+
+        for (int i = 0; i < Blot; i++) {
+            result.Add(EBoosters.Blot);
         }
 
         return result;
@@ -468,6 +514,36 @@ public class PlayerBoosters : MonoBehaviour
 
         string stepsText = steps < 5 ? " хода" : " ходов";
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " взорвал " + Utils.Wrap("флешку.", UIColors.Blue) + " Соперники остались без усилителей на " + steps + stepsText + "!";
+        Messages.Instance.AddMessage(message);
+    }
+
+    // Клякса
+
+    public void ExecuteBlot() {
+        int level = _player.Grind.Blot;
+        ManualContent manual = Manual.Instance.BoosterBlot;
+        int steps = manual.GetCauseEffect(level);
+
+        foreach(PlayerControl player in PlayersControl.Instance.Players) {
+            if (player.IsFinished) {
+                continue;
+            }
+
+            if (player != _player) {
+                player.Boosters.BlotMovesLeft = steps;
+            }
+        }
+
+        _player.Boosters.AddBlot(-1);
+        BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
+
+        string stepsText = steps < 5 ? " хода" : " ходов";
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " выпустил " + Utils.Wrap("кляксу.", UIColors.Black) + " Соперники остались без бонусов на " + steps + stepsText + "!";
+        Messages.Instance.AddMessage(message);
+    }
+
+    public void ExecuteBlotAsVictim(string bonusText) {
+        string message = Utils.Wrap("Клякса", UIColors.Black) + " помешала " + Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " " + bonusText;
         Messages.Instance.AddMessage(message);
     }
 
