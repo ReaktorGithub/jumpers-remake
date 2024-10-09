@@ -6,10 +6,10 @@ using UnityEngine.UI;
 public class BoostersControl : MonoBehaviour
 {
     public static BoostersControl Instance { get; private set; }
-    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite, _stuckSprite, _trapSprite, _flashSprite;
-    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton, _boombasterButton, _stuckButton, _trapButton, _flashButton, _flashBlock;
+    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite, _stuckSprite, _trapSprite, _flashSprite, _blotSprite;
+    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton, _boombasterButton, _stuckButton, _trapButton, _flashButton, _flashBlock, _blotButton;
     private BoostersRow _magnetsRowScript, _lassoRowScript, _shieldsRowScript;
-    private BoosterButton _vampireButtonScript, _boombasterButtonScript, _stuckButtonScript, _trapButtonScript, _flashButtonScript;
+    private BoosterButton _vampireButtonScript, _boombasterButtonScript, _stuckButtonScript, _trapButtonScript, _flashButtonScript, _blotButtonScript;
     private PopupMagnet _popupMagnet;
     [SerializeField] private List<GameObject> _boostersList;
     private List<BoosterButton> _boosterButtonsList = new();
@@ -33,6 +33,7 @@ public class BoostersControl : MonoBehaviour
     [SerializeField] private int _maxStuck = 1;
     [SerializeField] private int _maxTrap = 1;
     [SerializeField] private int _maxFlash = 1;
+    [SerializeField] private int _maxBlot = 1;
 
     private void Awake() {
         Instance = this;
@@ -48,6 +49,7 @@ public class BoostersControl : MonoBehaviour
         _stuckSprite = Instances.transform.Find("stuck-icon").GetComponent<SpriteRenderer>().sprite;
         _trapSprite = Instances.transform.Find("trap-icon").GetComponent<SpriteRenderer>().sprite;
         _flashSprite = Instances.transform.Find("flash-icon").GetComponent<SpriteRenderer>().sprite;
+        _blotSprite = Instances.transform.Find("blot").GetComponent<SpriteRenderer>().sprite;
 
         _magnetsRowScript = _magnetsRow.GetComponent<BoostersRow>();
         _lassoRowScript = _lassoRow.GetComponent<BoostersRow>();
@@ -57,6 +59,7 @@ public class BoostersControl : MonoBehaviour
         _stuckButtonScript = _stuckButton.GetComponent<BoosterButton>();
         _trapButtonScript = _trapButton.GetComponent<BoosterButton>();
         _flashButtonScript = _flashButton.GetComponent<BoosterButton>();
+        _blotButtonScript = _blotButton.GetComponent<BoosterButton>();
 
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
         foreach(GameObject button in _boostersList) {
@@ -120,6 +123,11 @@ public class BoostersControl : MonoBehaviour
         private set {}
     }
 
+    public Sprite BlotSprite {
+        get { return _blotSprite; }
+        private set {}
+    }
+
     public int MaxMagnets {
         get { return _maxMagnets; }
         private set {}
@@ -177,6 +185,11 @@ public class BoostersControl : MonoBehaviour
 
     public int MaxFlash {
         get { return _maxFlash; }
+        private set {}
+    }
+
+    public int MaxBlot {
+        get { return _maxBlot; }
         private set {}
     }
 
@@ -272,6 +285,7 @@ public class BoostersControl : MonoBehaviour
         _stuckButtonScript.BoosterType = player.Boosters.Stuck > 0 ? EBoosters.Stuck : EBoosters.None;
         _trapButtonScript.BoosterType = player.Boosters.Trap > 0 ? EBoosters.Trap : EBoosters.None;
         _flashButtonScript.BoosterType = player.Boosters.Flash > 0 ? EBoosters.Flash : EBoosters.None;
+        _blotButtonScript.BoosterType = player.Boosters.Blot > 0 ? EBoosters.Blot : EBoosters.None;
     }
 
     // Открытие разных усилителей при нажатиях на кнопки в левой панели (без исполнения их эффекта)

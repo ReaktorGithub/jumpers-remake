@@ -320,12 +320,18 @@ public class TokenControl : MonoBehaviour
             case ETokenIndicators.Lightning: {
                 indicator.SetSprite(TokensControl.Instance.IndicatorLightningSprite);
                 indicator.SetTextColor(new Color32(49,255,34,255));
-                image.transform.localScale = new Vector3(1f,1f,1f);
+                image.transform.localScale = new Vector3(0.75f,0.75f,0.75f);
                 break;
             }
             case ETokenIndicators.Flash: {
                 indicator.SetSprite(TokensControl.Instance.IndicatorFlashSprite);
                 indicator.SetTextColor(new Color32(173,208,255,255));
+                image.transform.localScale = new Vector3(3f,3f,3f);
+                break;
+            }
+            case ETokenIndicators.Blot: {
+                indicator.SetSprite(TokensControl.Instance.IndicatorBlotSprite);
+                indicator.SetTextColor(new Color32(180,180,180,180));
                 image.transform.localScale = new Vector3(3f,3f,3f);
                 break;
             }

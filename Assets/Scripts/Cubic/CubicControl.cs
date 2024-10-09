@@ -101,7 +101,7 @@ public class CubicControl : MonoBehaviour
         score -= player.StuckAttached;
 
         int multiplier = 1;
-        if (player.Effects.IsLightning) {
+        if (player.Effects.IsLightning && !player.Boosters.IsBlot()) {
             multiplier = 2;
         }
 

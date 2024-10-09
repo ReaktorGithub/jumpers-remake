@@ -87,7 +87,7 @@ public class MoneyboxVault : MonoBehaviour
         List<PlayerControl> allPlayers = _occupiedPlayer.GetCurrentCell().GetCurrentPlayers();
 
         foreach(PlayerControl player in allPlayers) {
-            if (player != _occupiedPlayer) {
+            if (player != _occupiedPlayer && !player.Boosters.IsBlot()) {
                 pretenders.Add(player);
             }
         }
