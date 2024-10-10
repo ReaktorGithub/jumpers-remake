@@ -21,16 +21,19 @@ public class PlayerBoosters : MonoBehaviour
     [SerializeField] private int _blot = 0;
     [SerializeField] private int _vacuum = 0;
     [SerializeField] private int _vacuumNozzle = 0;
+    [SerializeField] private int _mop = 0;
     [SerializeField] private int _flashMovesLeft = 0; // сколько ходов осталось до выключения флешки
     [SerializeField] private int _blotMovesLeft = 0; // сколько ходов осталось до выключения кляксы
     [SerializeField] private int _armor = 0; // сколько ходов осталось со щитом (включая ходы соперников)
     [SerializeField] private bool _isIronArmor = false;
     [SerializeField] private BoosterButton _selectedShieldButton;
     private TopPanel _topPanel;
+    private ModalMop _modalMop;
 
     private void Awake() {
         _player = GetComponent<PlayerControl>();
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
+        _modalMop = GameObject.Find("ModalScripts").GetComponent<ModalMop>();
     }
 
     public int Magnet {
@@ -145,6 +148,14 @@ public class PlayerBoosters : MonoBehaviour
         }
     }
 
+    public int Mop {
+        get { return _mop; }
+        set {
+            int newValue = Math.Clamp(value, 0, BoostersControl.Instance.MaxMop);
+            _mop = newValue;
+        }
+    }
+
     public int FlashMovesLeft {
         get { return _flashMovesLeft; }
         set {
@@ -250,6 +261,10 @@ public class PlayerBoosters : MonoBehaviour
         VacuumNozzle += value;
     }
 
+    public void AddMop(int value) {
+        Mop += value;
+    }
+
     public void AddFlashMovesLeft(int value) {
         FlashMovesLeft += value;
     }
@@ -348,6 +363,10 @@ public class PlayerBoosters : MonoBehaviour
             }
             case EBoosters.VacuumNozzle: {
                 VacuumNozzle += value;
+                break;
+            }
+            case EBoosters.Mop: {
+                Mop += value;
                 break;
             }
         }
@@ -641,7 +660,7 @@ public class PlayerBoosters : MonoBehaviour
 
     public void ExecuteTrap(CellControl targetCell) {
         CellsControl.Instance.TurnOffTrapPlacementMode();
-        targetCell.PlaceTrap(_player);
+        targetCell.PlaceTrap(true, _player);
         _topPanel.CloseWindow();
         AddTrap(-1);
         BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
@@ -683,5 +702,83 @@ public class PlayerBoosters : MonoBehaviour
     private IEnumerator MakeViolateMoveSeriesDefer(int steps) {
         yield return new WaitForSeconds(BoostersControl.Instance.ExecuteVacuumDelay);
         MoveControl.Instance.MakeViolateMoveSeries(steps);
+    }
+
+    // Швабра
+
+    public void TryExecuteMop(CellControl targetCell) {
+        int elementsCount = 0;
+        EMopOptions option = EMopOptions.None;
+
+        if (targetCell.Effect != EControllableEffects.None) {
+            elementsCount++;
+            option = EMopOptions.Effect;
+        }
+
+        if (targetCell.WhosTrap != null) {
+            elementsCount++;
+            option = EMopOptions.Trap;
+        }
+
+        if (targetCell.IsBoombaster) {
+            elementsCount++;
+            option = EMopOptions.Boombaster;
+        }
+
+        if (elementsCount < 2) {
+            _topPanel.CloseWindow();
+            ExecuteMop(targetCell, option);
+        } else {
+            _modalMop.BuildContent(targetCell);
+            _modalMop.OpenModal();
+        }
+    }
+
+    public void ExecuteMop(CellControl targetCell, EMopOptions options) {
+        BoostersControl.Instance.ExitMopMode();
+
+        if (options == EMopOptions.Effect && targetCell.EffectLevel == 3) {
+            _player.OpenMopWarningModal(() => {
+                BoostersControl.Instance.ExitMopModePhase2();
+            });
+            return;
+        }
+
+        AddMop(-1);
+        BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
+        string itemText;
+
+        switch(options) {
+            case EMopOptions.Effect: {
+                ManualContent manual = Manual.Instance.GetEffectManual(targetCell.Effect);
+                itemText = manual.GetEntityName(true);
+                targetCell.RemoveEffectByMop();
+                break;
+            }
+            case EMopOptions.Trap: {
+                targetCell.RemoveTrapByMop();
+                itemText = "капкан";
+                break;
+            }
+            case EMopOptions.Boombaster: {
+                targetCell.RemoveBoombasterByMop();
+                itemText = "бумку";
+                break;
+            }
+            default: {
+                itemText = "";
+                break;
+            }
+        }
+
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + Utils.Wrap(" удаляет ", UIColors.Red) + itemText + " на клетке №" + targetCell.NameDisplay;
+        Messages.Instance.AddMessage(message);
+
+        StartCoroutine(ExitMopModeDefer());
+    }
+
+    private IEnumerator ExitMopModeDefer() {
+        yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDelay);
+        BoostersControl.Instance.ExitMopModePhase2();
     }
 }

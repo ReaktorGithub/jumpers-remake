@@ -15,7 +15,8 @@ public class EffectsControl : MonoBehaviour
     private List<EffectButton> _effectButtonsList = new();
     private EffectButton _greenEffectButton, _yellowEffectButton, _redEffectButton, _blackEffectButton, _starEffectButton;
     [SerializeField] private GameObject _emptyCellSprite, _greenCellSprite, _yellowCellSprite, _blackCellSprite, _redCellSprite, _starCellSprite;
-    [SerializeField] private GameObject _yellowBrush, _redBrush, _blackBrush;
+    [SerializeField] private GameObject _yellowBrush, _redBrush, _blackBrush, _greenBrush, _starBrush;
+    private Sprite _yellowBrushSprite, _redBrushSprite, _blackBrushSprite, _greenBrushSprite, _starBrushSprite;
     private TextMeshProUGUI _greenQuantityText, _yellowQuantityText, _redQuantityText, _blackQuantityText, _starQuantityText;
     private GameObject _cellsObject;
     [SerializeField] private float _replaceTime = 1f;
@@ -42,6 +43,11 @@ public class EffectsControl : MonoBehaviour
         _effectButtonsList.Add(_blackEffectButton);
         _effectButtonsList.Add(_starEffectButton);
         _cellsObject = GameObject.Find("Cells");
+        _yellowBrushSprite = _yellowBrush.GetComponent<SpriteRenderer>().sprite;
+        _greenBrushSprite = _greenBrush.GetComponent<SpriteRenderer>().sprite;
+        _redBrushSprite = _redBrush.GetComponent<SpriteRenderer>().sprite;
+        _blackBrushSprite = _blackBrush.GetComponent<SpriteRenderer>().sprite;
+        _starBrushSprite = _starBrush.GetComponent<SpriteRenderer>().sprite;
     }
 
     private void Start() {
@@ -53,7 +59,59 @@ public class EffectsControl : MonoBehaviour
         _redBrush.SetActive(false);
         _yellowBrush.SetActive(false);
         _blackBrush.SetActive(false);
+        _greenBrush.SetActive(false);
+        _starBrush.SetActive(false);
         _starCellSprite.SetActive(false);
+    }
+
+    public Sprite EmptyCellSprite {
+        get { return _emptyCellSprite.GetComponent<SpriteRenderer>().sprite; }
+        private set {}
+    }
+
+    public Sprite YellowBrushSprite {
+        get { return _yellowBrushSprite; }
+        private set {}
+    }
+
+    public Sprite GreenBrushSprite {
+        get { return _greenBrushSprite; }
+        private set {}
+    }
+
+    public Sprite RedBrushSprite {
+        get { return _redBrushSprite; }
+        private set {}
+    }
+
+    public Sprite BlackBrushSprite {
+        get { return _blackBrushSprite; }
+        private set {}
+    }
+
+    public Sprite StarBrushSprite {
+        get { return _starBrushSprite; }
+        private set {}
+    }
+
+    public Sprite GetBrushSprite(EControllableEffects effect) {
+        switch(effect) {
+            case EControllableEffects.Green: {
+                return GreenBrushSprite;
+            }
+            case EControllableEffects.Red: {
+                return RedBrushSprite;
+            }
+            case EControllableEffects.Black: {
+                return BlackBrushSprite;
+            }
+            case EControllableEffects.Yellow: {
+                return YellowBrushSprite;
+            }
+            default: {
+                return StarBrushSprite;
+            }
+        }
     }
 
     public EControllableEffects SelectedEffect {

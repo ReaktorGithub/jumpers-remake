@@ -4,7 +4,7 @@ public class Manual : MonoBehaviour
 {
     public static Manual Instance { get; private set; }
     private ManualContent _power, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect, _attackUsual, _attackMagicKick, _attackVampire, _attackKnockout,
-    _boosterLasso, _boosterMagnet, _boosterSuperMagnet, _boosterShield, _boosterIronShield, _boosterVampire, _boosterBoombaster, _boosterStuck, _boosterFlash, _boosterTrap, _boosterBlot, _boosterVacuum, _boosterVacuumNozzle;
+    _boosterLasso, _boosterMagnet, _boosterSuperMagnet, _boosterShield, _boosterIronShield, _boosterVampire, _boosterBoombaster, _boosterStuck, _boosterFlash, _boosterTrap, _boosterBlot, _boosterVacuum, _boosterVacuumNozzle, _boosterMop;
 
     private void Awake() {
         Instance = this;
@@ -32,6 +32,7 @@ public class Manual : MonoBehaviour
         _boosterBlot = transform.Find("BoosterBlot").GetComponent<ManualContent>();
         _boosterVacuum = transform.Find("BoosterVacuum").GetComponent<ManualContent>();
         _boosterVacuumNozzle = transform.Find("BoosterVacuumNozzle").GetComponent<ManualContent>();
+        _boosterMop = transform.Find("BoosterMop").GetComponent<ManualContent>();
     }
 
     public ManualContent Power {
@@ -154,6 +155,11 @@ public class Manual : MonoBehaviour
         private set {}
     }
 
+    public ManualContent BoosterMop {
+        get { return _boosterMop; }
+        private set {}
+    }
+
     public ManualContent GetEffectManual(EControllableEffects effect) {
         switch(effect) {
             case EControllableEffects.Green: {
@@ -234,6 +240,9 @@ public class Manual : MonoBehaviour
             }
             case EBoosters.VacuumNozzle: {
                 return BoosterVacuumNozzle;
+            }
+            case EBoosters.Mop: {
+                return BoosterMop;
             }
             default: return null;
         }

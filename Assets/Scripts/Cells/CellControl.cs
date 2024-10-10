@@ -20,10 +20,10 @@ public class CellControl : MonoBehaviour
     private SpriteRenderer _spriteRenderer, _glowSpriteRenderer, _grindSpriteRenderer;
     private float[] _cellScale = new float[2];
     [SerializeField] private List<GameObject> _currentTokens = new();
-    private bool _isEffectPlacementMode, _isTrapPlacementMode, _isLassoMode = false;
+    private bool _isEffectPlacementMode, _isTrapPlacementMode, _isLassoMode, _isMopMode = false;
     private TextMeshPro _text, _coinBonusText;
-    private bool _isChanging, _isTrapPlacing = false;
-    private IEnumerator _changingCoroutine, _placingCoroutine;
+    private bool _isChanging, _isTrapPlacing, _isBoombasterPlacing = false;
+    private IEnumerator _changingCoroutine, _placingTrapCoroutine, _placingBoombasterCoroutine;
     private Sprite _oldSprite, _newSprite;
     private Color _oldTextColor, _newTextColor;
     private IEnumerator _coroutine;
@@ -199,7 +199,7 @@ public class CellControl : MonoBehaviour
     }
 
     public bool IsSelectionMode() {
-        return _isEffectPlacementMode || _isLassoMode || _isTrapPlacementMode;
+        return _isEffectPlacementMode || _isLassoMode || _isTrapPlacementMode || _isMopMode;
     }
 
     public bool IsPenaltyEffect() {
@@ -290,8 +290,7 @@ public class CellControl : MonoBehaviour
 
     // выбор клетки игроком
 
-    public void TurnOnEffectPlacementMode() {
-        bool newValue = cellType == ECellTypes.None && effect == EControllableEffects.None && IsNoTokens();
+    public void TurnOnEffectPlacementMode(bool newValue) {
         _isEffectPlacementMode = newValue;
         SetCursorDisabled(!newValue);
     }
@@ -302,8 +301,7 @@ public class CellControl : MonoBehaviour
         SetCursorDisabled(true);
     }
 
-    public void TurnOnTrapPlacementMode() {
-        bool newValue = !CellsControl.Instance.ExcludeTrapTypes.Contains(cellType) && IsNoTokens();
+    public void TurnOnTrapPlacementMode(bool newValue) {
         _isTrapPlacementMode = newValue;
         SetCursorDisabled(!newValue);
     }
@@ -311,6 +309,17 @@ public class CellControl : MonoBehaviour
     public void TurnOffTrapPlacementMode() {
         DownscaleCell();
         _isTrapPlacementMode = false;
+        SetCursorDisabled(true);
+    }
+
+    public void TurnOnMopMode(bool newValue) {
+        _isMopMode = newValue;
+        SetCursorDisabled(!newValue);
+    }
+
+    public void TurnOffMopMode() {
+        DownscaleCell();
+        _isMopMode = false;
         SetCursorDisabled(true);
     }
 
@@ -378,6 +387,8 @@ public class CellControl : MonoBehaviour
             MoveControl.Instance.CurrentPlayer.Boosters.ExecuteLasso(this);
         } else if (_isTrapPlacementMode) {
             MoveControl.Instance.CurrentPlayer.Boosters.ExecuteTrap(this);
+        } else if (_isMopMode) {
+            MoveControl.Instance.CurrentPlayer.Boosters.TryExecuteMop(this);
         }
     }
 
@@ -541,13 +552,20 @@ public class CellControl : MonoBehaviour
         _coinBonusObject.SetActive(true);
     }
 
+    // Бумка
+
     public void AddBoombasterInstance() {
         GameObject clone = Instantiate(_boombasterInstance);
         clone.transform.SetParent(_boombasterPlace.transform);
         clone.transform.localScale = new Vector3(1f,1f,1f);
         clone.transform.position = _boombasterPlace.transform.position;
-        clone.SetActive(true);
         _boombasterCurrentInstance = clone;
+        if (!_isBoombasterPlacing) {
+            _placingBoombasterCoroutine = PlacingBoombaster(true);
+            _isBoombasterPlacing = true;
+            StartCoroutine(_placingBoombasterCoroutine);
+            StartCoroutine(BoombasterPlacingAnimationScheduler(true));
+        }
     }
 
     public void RemoveBoombasterInstance() {
@@ -555,6 +573,31 @@ public class CellControl : MonoBehaviour
             Destroy(child.gameObject);
         }
         _boombasterCurrentInstance = null;
+    }
+
+    private IEnumerator BoombasterPlacingAnimationScheduler(bool isAdd) {
+        yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDuration);
+        StopPlacingBoombaster(isAdd);
+    }
+
+    private IEnumerator PlacingBoombaster(bool isAdd) {
+        while (true) {
+            _boombasterCurrentInstance.SetActive(isAdd);
+            yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectTime);
+            _boombasterCurrentInstance.SetActive(!isAdd);
+            yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectTime);
+        }
+    }
+
+    private void StopPlacingBoombaster(bool isAdd) {
+        if (_placingBoombasterCoroutine != null) {
+            StopCoroutine(_placingBoombasterCoroutine);
+            _isBoombasterPlacing = false;
+            _boombasterCurrentInstance.SetActive(isAdd);
+            if (!isAdd) {
+                RemoveBoombasterInstance();
+            }
+        }
     }
 
     // Если произошел взрыв, то возвращает true
@@ -585,40 +628,57 @@ public class CellControl : MonoBehaviour
 
     // Капкан
 
-    public void PlaceTrap(PlayerControl owner) {
+    public void PlaceTrap(bool isAdd, PlayerControl owner) {
         if (!_isTrapPlacing) {
             _isTrapPlacing = true;
             _whosTrap = owner;
-            _placingCoroutine = PlacingTrap();
-            StartCoroutine(_placingCoroutine);
-            StartCoroutine(TrapPlacingAnimationScheduler());
+            _placingTrapCoroutine = PlacingTrap(isAdd);
+            StartCoroutine(_placingTrapCoroutine);
+            StartCoroutine(TrapPlacingAnimationScheduler(isAdd));
         }
     }
 
-    private void StopPlacingTrap() {
-        if (_placingCoroutine != null) {
-            StopCoroutine(_placingCoroutine);
+    private void StopPlacingTrap(bool isAdd) {
+        if (_placingTrapCoroutine != null) {
+            StopCoroutine(_placingTrapCoroutine);
             _isTrapPlacing = false;
-            _trap.SetActive(true);
+            _trap.SetActive(isAdd);
         }
     }
 
-    private IEnumerator TrapPlacingAnimationScheduler() {
+    private IEnumerator TrapPlacingAnimationScheduler(bool isAdd) {
         yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDuration);
-        StopPlacingTrap();
+        StopPlacingTrap(isAdd);
     }
 
-    private IEnumerator PlacingTrap() {
+    private IEnumerator PlacingTrap(bool isAdd) {
         while (true) {
-            _trap.SetActive(true);
+            _trap.SetActive(isAdd);
             yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectTime);
-            _trap.SetActive(false);
+            _trap.SetActive(!isAdd);
             yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectTime);
         }
     }
 
-    public void RemoveTrap() {
-        _trap.SetActive(false);
-        _whosTrap = null;
+    // Швабра
+
+    public void RemoveEffectByMop() {
+        ChangeEffect(EControllableEffects.None, EffectsControl.Instance.EmptyCellSprite, 1);
+        StartChanging();
+    }
+
+    public void RemoveTrapByMop() {
+        PlaceTrap(false, null);
+    }
+
+    public void RemoveBoombasterByMop() {
+        if (_isBoombasterPlacing) {
+            StopCoroutine(_placingBoombasterCoroutine);
+        }
+        _placingBoombasterCoroutine = PlacingBoombaster(false);
+        _isBoombasterPlacing = true;
+        StartCoroutine(_placingBoombasterCoroutine);
+        StartCoroutine(BoombasterPlacingAnimationScheduler(false));
+        IsBoombaster = false;
     }
 }

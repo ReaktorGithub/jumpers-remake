@@ -15,6 +15,7 @@ public class CellsControl : MonoBehaviour
     private Sprite _grind2Sprite, _grind3Sprite;
     private List<CellControl> _boombastersList = new();
     [SerializeField] private List<ECellTypes> _excludeTrapTypes = new();
+    [SerializeField] private List<EControllableEffects> _mopGenericEffects = new();
     private Explosion _explosion;
     private CameraControl _camera;
 
@@ -55,6 +56,11 @@ public class CellsControl : MonoBehaviour
         private set {}
     }
 
+    public List<EControllableEffects> MopGenericEffects {
+        get { return _mopGenericEffects; }
+        private set {}
+    }
+
     public float ChangingEffectDuration {
         get { return _changingEffectDuration; }
         private set {}
@@ -67,7 +73,8 @@ public class CellsControl : MonoBehaviour
 
     public void TurnOnEffectPlacementMode() {
         foreach (CellControl cell in _allCellControls) {
-            cell.TurnOnEffectPlacementMode();
+            bool newValue = cell.CellType == ECellTypes.None && cell.Effect == EControllableEffects.None && cell.IsNoTokens();
+            cell.TurnOnEffectPlacementMode(newValue);
         }
     }
 
@@ -79,13 +86,37 @@ public class CellsControl : MonoBehaviour
 
     public void TurnOnTrapPlacementMode() {
         foreach (CellControl cell in _allCellControls) {
-            cell.TurnOnTrapPlacementMode();
+            bool newValue = !ExcludeTrapTypes.Contains(cell.CellType) && cell.IsNoTokens();
+            cell.TurnOnTrapPlacementMode(newValue);
         }
     }
 
     public void TurnOffTrapPlacementMode() {
         foreach (CellControl cell in _allCellControls) {
             cell.TurnOffTrapPlacementMode();
+        }
+    }
+
+    public void TurnOnMopMode(int level) {
+        foreach (CellControl cell in _allCellControls) {
+            bool newValue = MopGenericEffects.Contains(cell.Effect);
+            bool level2Condition = cell.Effect == EControllableEffects.Red;
+            bool level3Condition = level2Condition || cell.WhosTrap != null || cell.IsBoombaster;
+
+            if (level == 2 && level2Condition) {
+                newValue = true;
+            }
+            if (level == 3 && level3Condition) {
+                newValue = true;
+            }
+            
+            cell.TurnOnMopMode(newValue);
+        }
+    }
+
+    public void TurnOffMopMode() {
+        foreach (CellControl cell in _allCellControls) {
+            cell.TurnOffMopMode();
         }
     }
 
