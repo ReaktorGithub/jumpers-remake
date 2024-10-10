@@ -321,7 +321,7 @@ public class PlayerControl : MonoBehaviour
         Messages.Instance.AddMessage(message);
 
         int steps = manual.GetCauseEffect(level);
-        MoveControl.Instance.MakeMagicKickMove(rival, rival.GetCurrentCell(), steps);
+        MoveControl.Instance.MakeViolateMove(rival, rival.GetCurrentCell(), steps);
 
         PlayersControl.Instance.CheckIsPlayerOutOfPower(this);
     }

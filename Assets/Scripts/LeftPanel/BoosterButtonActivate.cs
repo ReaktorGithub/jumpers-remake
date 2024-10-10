@@ -87,6 +87,11 @@ public class BoosterButtonActivate : MonoBehaviour
             return;
         }
 
+        if (_boosterButton.BoosterType == EBoosters.Vacuum) {
+            MoveControl.Instance.CurrentPlayer.Boosters.ExecuteVacuum(false, 1);
+            return;
+        }
+
         _boosterButton.SetSelected(true);
         BoostersControl.Instance.DisableAllButtons(_boosterButton);
         EffectsControl.Instance.DisableAllButtons(true);

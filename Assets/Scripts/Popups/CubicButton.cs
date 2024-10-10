@@ -4,6 +4,8 @@ public class CubicButton : MonoBehaviour
 {
     private GameObject _selected, _hover;
     private PopupMagnet _popupMagnet;
+    private PopupVacuum _popupVacuum;
+    [SerializeField] private bool isVacuumMode = false;
     
     [SerializeField] private int _score = 1;
 
@@ -13,6 +15,7 @@ public class CubicButton : MonoBehaviour
         _selected.SetActive(false);
         _hover.SetActive(false);
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
+        _popupVacuum = GameObject.Find("GameScripts").GetComponent<PopupVacuum>();
     }
 
     public int Score {
@@ -33,8 +36,10 @@ public class CubicButton : MonoBehaviour
     }
 
     public void OnClick() {
-        _popupMagnet.SelectedScore = _score;
-        _popupMagnet.UpdateButonsSelection();
-        _popupMagnet.UpdateCellMagnetHint();
+        if (isVacuumMode) {
+            _popupVacuum.OnCubicButtonClick(_score);
+        } else {
+            _popupMagnet.OnCubicButtonClick(_score);
+        }
     }
 }

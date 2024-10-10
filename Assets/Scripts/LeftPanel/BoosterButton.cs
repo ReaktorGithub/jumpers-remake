@@ -92,6 +92,14 @@ public class BoosterButton : MonoBehaviour
                 _booster.sprite = BoostersControl.Instance.BlotSprite;
                 break;
             }
+            case EBoosters.Vacuum: {
+                _booster.sprite = BoostersControl.Instance.VacuumSprite;
+                break;
+            }
+            case EBoosters.VacuumNozzle: {
+                _booster.sprite = BoostersControl.Instance.VacuumNozzleSprite;
+                break;
+            }
             default: {
                 _booster.sprite = null;
                 break;

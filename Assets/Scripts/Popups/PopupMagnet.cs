@@ -14,13 +14,13 @@ public class PopupMagnet : MonoBehaviour
     private bool _isSuper = false;
     private ModifiersControl _modifiersControl;
     private GameObject _playerCell;
+    [SerializeField] GameObject _boxButtons;
 
     private void Awake() {
         GameObject popupMagnet = GameObject.Find("PopupMagnet");
         _popup = popupMagnet.GetComponent<Popup>();
         _confirmButton = Utils.FindChildByName(popupMagnet, "ButtonOk").GetComponent<Button>();
-        GameObject boxButtons = GameObject.Find("BoxScoreOptions");
-        CubicButton[] allButtons = boxButtons.GetComponentsInChildren<CubicButton>();
+        CubicButton[] allButtons = _boxButtons.GetComponentsInChildren<CubicButton>();
         foreach (CubicButton button in allButtons) {
             _cubicButtons.Add(button);
         }
@@ -65,7 +65,16 @@ public class PopupMagnet : MonoBehaviour
         _popup.CloseWindow();
     }
 
-    public void BuildContent(PlayerControl player, CellControl playerCell, bool isSuper) {
+    public void OnCubicButtonClick(int score) {
+        SelectedScore = score;
+        UpdateButonsSelection();
+        UpdateCellMagnetHint();
+    }
+
+    public void BuildContent(bool isSuper) {
+        PlayerControl player = MoveControl.Instance.CurrentPlayer;
+        CellControl playerCell = player.GetCurrentCell();
+
         _isSuper = isSuper;
         _headText.text = isSuper ? "Ход супер-магнитом" : "Ход магнитом";
         _descriptionText.text = isSuper ? "Выберите желаемое число очков на кубике. Вероятность выпадения этого числа будет увеличена <b>в 3 раза.</b>" : "Выберите желаемое число очков на кубике. Вероятность выпадения этого числа будет увеличена <b>в 2 раза.</b>";
