@@ -92,6 +92,11 @@ public class BoosterButtonActivate : MonoBehaviour
             return;
         }
 
+        if (_boosterButton.BoosterType == EBoosters.TameLightning) {
+            BoostersControl.Instance.OpenTameLightning();
+            return;
+        }
+
         _boosterButton.SetSelected(true);
         BoostersControl.Instance.DisableAllButtons(_boosterButton);
         EffectsControl.Instance.DisableAllButtons(true);

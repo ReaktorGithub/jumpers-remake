@@ -15,5 +15,5 @@ public enum EBoosters
     Flash,
     Blot,
     Mop,
-    Lightning
+    TameLightning
 }

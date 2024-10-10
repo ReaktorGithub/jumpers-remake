@@ -204,7 +204,7 @@ public class CellChecker : MonoBehaviour
             if (isBlot) {
                 player.Boosters.ExecuteBlotAsVictim("получить молнию");
             } else {
-                player.Effects.ExecuteLightning();
+                player.Effects.ExecuteLightning(false);
             }
         }
 

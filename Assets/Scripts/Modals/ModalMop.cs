@@ -12,7 +12,6 @@ public class ModalMop : MonoBehaviour
     private CellControl _selectedCell;
 
     private void Awake() {
-        // GameObject instances = GameObject.Find("Instances");
         _confirmButton = _confirmButtonObject.GetComponent<Button>();
         _modal = GameObject.Find("ModalMop").GetComponent<Modal>();
         _optionButtonEffectScript = _optionButtonEffectObject.GetComponent<TokenAttackButton>();
