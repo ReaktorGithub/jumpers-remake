@@ -376,6 +376,18 @@ public class MoveControl : MonoBehaviour
     }
 
     private void SetNextViolatedPlayer() {
+        // Мы должны проверить, все ли игроки из списка ещё в игре
+
+        List<PlayerControl> filteredList = new();
+        foreach(PlayerControl player in _violatedPlayers) {
+            if (!player.IsFinished) {
+                filteredList.Add(player);
+            }
+        }
+        _violatedPlayers = filteredList;
+
+        // Если игроков в списке больше нет, завершить серию атак
+        
         if (_violatedPlayers.Count == 0) {
             _violateSteps = 0;
             _isViolateSeriesMode = false;
@@ -387,8 +399,6 @@ public class MoveControl : MonoBehaviour
 
         PlayerControl nextVictim = PlayersControl.Instance.GetNearestPlayerByMoveOrder(_currentPlayer, _violatedPlayers);
         _violatedPlayers.Remove(nextVictim);
-        Debug.Log("nextVictim = " + nextVictim.PlayerName);
-        Debug.Log("_violatedPlayers count = " + _violatedPlayers.Count);
         
         MakeViolateMove(nextVictim, nextVictim.GetCurrentCell(), _violateSteps);
     }

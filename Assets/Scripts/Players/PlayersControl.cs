@@ -414,4 +414,18 @@ public class PlayersControl : MonoBehaviour
 
         return result;
     }
+
+    // Очищает список игроков от тех, которые финишировали
+
+    public List<PlayerControl> RemoveFinishedPlayers(List<PlayerControl> initialList) {
+        List<PlayerControl> result = new();
+
+        foreach(PlayerControl player in initialList) {
+            if (!player.IsFinished) {
+                result.Add(player);
+            }
+        }
+
+        return result;
+    }
 }

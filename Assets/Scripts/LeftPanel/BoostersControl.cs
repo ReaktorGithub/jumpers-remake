@@ -6,10 +6,10 @@ using UnityEngine.UI;
 public class BoostersControl : MonoBehaviour
 {
     public static BoostersControl Instance { get; private set; }
-    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite, _stuckSprite, _trapSprite, _flashSprite, _blotSprite, _vacuumSprite, _vacuumNozzleSprite;
-    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton, _boombasterButton, _stuckButton, _trapButton, _flashButton, _flashBlock, _blotButton, _vacuumButton, _vacuumNozzleButton;
+    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite, _stuckSprite, _trapSprite, _flashSprite, _blotSprite, _vacuumSprite, _vacuumNozzleSprite, _mopSprite;
+    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton, _boombasterButton, _stuckButton, _trapButton, _flashButton, _flashBlock, _blotButton, _vacuumButton, _vacuumNozzleButton, _mopButton;
     private BoostersRow _magnetsRowScript, _lassoRowScript, _shieldsRowScript;
-    private BoosterButton _vampireButtonScript, _boombasterButtonScript, _stuckButtonScript, _trapButtonScript, _flashButtonScript, _blotButtonScript, _vacuumButtonScript, _vacuumNozzleButtonScript;
+    private BoosterButton _vampireButtonScript, _boombasterButtonScript, _stuckButtonScript, _trapButtonScript, _flashButtonScript, _blotButtonScript, _vacuumButtonScript, _vacuumNozzleButtonScript, _mopButtonScript;
     private PopupMagnet _popupMagnet;
     private PopupVacuum _popupVacuum;
     [SerializeField] private List<GameObject> _boostersList;
@@ -38,6 +38,7 @@ public class BoostersControl : MonoBehaviour
     [SerializeField] private int _maxBlot = 1;
     [SerializeField] private int _maxVacuum = 1;
     [SerializeField] private int _maxVacuumNozzle = 1;
+    [SerializeField] private int _maxMop = 1;
 
     private void Awake() {
         Instance = this;
@@ -56,6 +57,7 @@ public class BoostersControl : MonoBehaviour
         _blotSprite = Instances.transform.Find("blot").GetComponent<SpriteRenderer>().sprite;
         _vacuumSprite = Instances.transform.Find("vacuum-icon").GetComponent<SpriteRenderer>().sprite;
         _vacuumNozzleSprite = Instances.transform.Find("vacuum-nozzle-icon").GetComponent<SpriteRenderer>().sprite;
+        _mopSprite = Instances.transform.Find("mop").GetComponent<SpriteRenderer>().sprite;
 
         _magnetsRowScript = _magnetsRow.GetComponent<BoostersRow>();
         _lassoRowScript = _lassoRow.GetComponent<BoostersRow>();
@@ -68,6 +70,7 @@ public class BoostersControl : MonoBehaviour
         _blotButtonScript = _blotButton.GetComponent<BoosterButton>();
         _vacuumButtonScript = _vacuumButton.GetComponent<BoosterButton>();
         _vacuumNozzleButtonScript = _vacuumNozzleButton.GetComponent<BoosterButton>();
+        _mopButtonScript = _mopButton.GetComponent<BoosterButton>();
 
         _popupMagnet = GameObject.Find("GameScripts").GetComponent<PopupMagnet>();
         _popupVacuum = GameObject.Find("GameScripts").GetComponent<PopupVacuum>();
@@ -152,6 +155,11 @@ public class BoostersControl : MonoBehaviour
         private set {}
     }
 
+    public Sprite MopSprite {
+        get { return _mopSprite; }
+        private set {}
+    }
+
     public int MaxMagnets {
         get { return _maxMagnets; }
         private set {}
@@ -224,6 +232,11 @@ public class BoostersControl : MonoBehaviour
 
     public int MaxVacuumNozzle {
         get { return _maxVacuumNozzle; }
+        private set {}
+    }
+
+    public int MaxMop {
+        get { return _maxMop; }
         private set {}
     }
 
@@ -322,6 +335,7 @@ public class BoostersControl : MonoBehaviour
         _blotButtonScript.BoosterType = player.Boosters.Blot > 0 ? EBoosters.Blot : EBoosters.None;
         _vacuumButtonScript.BoosterType = player.Boosters.Vacuum > 0 ? EBoosters.Vacuum : EBoosters.None;
         _vacuumNozzleButtonScript.BoosterType = player.Boosters.VacuumNozzle > 0 ? EBoosters.VacuumNozzle : EBoosters.None;
+        _mopButtonScript.BoosterType = player.Boosters.Mop > 0 ? EBoosters.Mop : EBoosters.None;
     }
 
     // Открытие разных усилителей при нажатиях на кнопки в левой панели (без исполнения их эффекта)
@@ -346,6 +360,10 @@ public class BoostersControl : MonoBehaviour
             }
             case EBoosters.VacuumNozzle: {
                 OpenVacuumNozzle();
+                break;
+            }
+            case EBoosters.Mop: {
+                OpenMop();
                 break;
             }
         }
@@ -405,6 +423,33 @@ public class BoostersControl : MonoBehaviour
     private void OpenVacuumNozzle() {
         _popupVacuum.BuildContent();
         _popupVacuum.OnOpenWindow();
+    }
+
+    private void OpenMop() {
+        PlayerControl player = MoveControl.Instance.CurrentPlayer;
+        CubicControl.Instance.SetCubicInteractable(false);
+        CellsControl.Instance.TurnOnMopMode(player.Grind.Mop);
+        _cameraControl.FollowOff();
+        _cameraControl.MoveCameraToLevelCenter();
+        _cameraButton.SetDisabled(true);
+        _topPanel.SetText("Сотрите элемент");
+        _topPanel.OpenWindow();
+        _topPanel.SetCancelButtonActive(true, () => {
+            ExitMopMode();
+            ExitMopModePhase2();
+        });
+    }
+
+    public void ExitMopMode() {
+        _topPanel.CloseWindow();
+        CellsControl.Instance.TurnOffMopMode();
+    }
+
+    public void ExitMopModePhase2 () {
+        EffectsControl.Instance.TryToEnableAllEffectButtons();
+        EffectsControl.Instance.RestoreCamera();
+        EnableAllButtons();
+        CubicControl.Instance.SetCubicInteractable(true);
     }
 
     public void DeactivateArmorButtons() {

@@ -398,7 +398,7 @@ public class PlayerControl : MonoBehaviour
             message = Utils.Wrap(PlayerName, UIColors.Yellow) + " попадается в " + Utils.Wrap("капкан ", UIColors.Orange) + Utils.Wrap(owner.PlayerName, UIColors.Yellow) + "! Выплатит 400 монет и пропустит ход";
             AddCoins(-400);
             owner.AddCoins(400);
-            cell.RemoveTrap();
+            cell.PlaceTrap(false, null);
         }
         
         Messages.Instance.AddMessage(message);
@@ -438,6 +438,13 @@ public class PlayerControl : MonoBehaviour
     public void OpenBoombasterModal(Action callback = null) {
         _modalWarning.SetHeadingText("Клетка занята");
         _modalWarning.SetBodyText("Бумка уже установлена на этой клетке.");
+        _modalWarning.SetCallback(callback);
+        _modalWarning.OpenModal();
+    }
+
+    public void OpenMopWarningModal(Action callback = null) {
+        _modalWarning.SetHeadingText("Действие отменено");
+        _modalWarning.SetBodyText("Нельзя удалить эффект 3 уровня");
         _modalWarning.SetCallback(callback);
         _modalWarning.OpenModal();
     }
