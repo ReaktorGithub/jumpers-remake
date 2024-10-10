@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -23,6 +24,9 @@ public class MoveControl : MonoBehaviour
     private bool _isLassoMode = false;
     private bool _isBoombasterMode = false;
     private bool _isViolateMode = false; // в этом режиме текущий игрок является жертвой волшебного пинка или пылесоса
+    private List<PlayerControl> _violatedPlayers = new(); // Список жертв пылесоса
+    private bool _isViolateSeriesMode = false; // режим пылесоса (насильственных ходов)
+    private int _violateSteps = 0; // Количество шагов по клеткам, которые должны сделать игроки при атаке пылесосом
     private int _restSteps = 0; // сохранение оставшихся шагов в режиме жертвы
 
     private void Awake() {
@@ -329,12 +333,12 @@ public class MoveControl : MonoBehaviour
         6. Продолжаем с п.4 предыдущего сценария
     */
 
-    public void MakeMagicKickMove(PlayerControl victim, CellControl currentCell, int steps) {
+    public void MakeViolateMove(PlayerControl victim, CellControl currentCell, int steps) {
         (GameObject, int) cellResult = CellsControl.Instance.FindCellBySteps(currentCell.gameObject, false, steps);
         Debug.Log("cellResult: " + cellResult.Item1 + ", rest steps: " + cellResult.Item2);
 
         if (cellResult.Item1 == null) {
-            Debug.Log("Error while magic kick attack");
+            Debug.Log("Error while the violate mode moving");
             return;
         }
 
@@ -359,6 +363,34 @@ public class MoveControl : MonoBehaviour
                 ConfirmNewPosition();
             }
         });
+    }
+
+    // Совершить серию из насильственных перемещений. Используется пылесосом
+    // Серия прекращается, когда список victimPlayers пуст
+
+    public void MakeViolateMoveSeries(int steps) {
+        _violateSteps = steps;
+        _isViolateSeriesMode = true;
+        _violatedPlayers = PlayersControl.Instance.GetUnfinishedRivals(_currentPlayer);
+        SetNextViolatedPlayer();
+    }
+
+    private void SetNextViolatedPlayer() {
+        if (_violatedPlayers.Count == 0) {
+            _violateSteps = 0;
+            _isViolateSeriesMode = false;
+            CancelViolateMode();
+            FollowCameraToCurrentPlayer();
+            PreparePlayerForMove();
+            return;
+        }
+
+        PlayerControl nextVictim = PlayersControl.Instance.GetNearestPlayerByMoveOrder(_currentPlayer, _violatedPlayers);
+        _violatedPlayers.Remove(nextVictim);
+        Debug.Log("nextVictim = " + nextVictim.PlayerName);
+        Debug.Log("_violatedPlayers count = " + _violatedPlayers.Count);
+        
+        MakeViolateMove(nextVictim, nextVictim.GetCurrentCell(), _violateSteps);
     }
 
     public void BreakMovingAndConfirmNewPosition() {
@@ -439,7 +471,7 @@ public class MoveControl : MonoBehaviour
         CubicControl.Instance.WriteStatus("");
 
         CellControl nextCellControl = nextCell.GetComponent<CellControl>();
-        MakeMagicKickMove(_currentPlayer, nextCellControl, _restSteps - 1);
+        MakeViolateMove(_currentPlayer, nextCellControl, _restSteps - 1);
     }
 
     public void SwitchBranchHedgehog(GameObject nextCell, SplineContainer nextArrowSpline) {
@@ -463,12 +495,22 @@ public class MoveControl : MonoBehaviour
 
     public IEnumerator EndMoveDefer() {
         yield return new WaitForSeconds(_endMoveDelay);
-        if (_isViolateMode) {
-            _currentPlayer = PlayersControl.Instance.GetPlayer(_currentPlayerIndex);
-            PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
-            _isViolateMode = false;
+
+        if (_isViolateSeriesMode) {
+            SetNextViolatedPlayer();
+        } else {
+            if (_isViolateMode) {
+                CancelViolateMode();
+            }
+
+            EndMove();
         }
-        EndMove();
+    }
+
+    private void CancelViolateMode() {
+        _currentPlayer = PlayersControl.Instance.GetPlayer(_currentPlayerIndex);
+        PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
+        _isViolateMode = false;
     }
 
     public IEnumerator SkipMoveDefer() {

@@ -19,6 +19,8 @@ public class PlayerBoosters : MonoBehaviour
     [SerializeField] private int _trap = 0;
     [SerializeField] private int _flash = 0;
     [SerializeField] private int _blot = 0;
+    [SerializeField] private int _vacuum = 0;
+    [SerializeField] private int _vacuumNozzle = 0;
     [SerializeField] private int _flashMovesLeft = 0; // сколько ходов осталось до выключения флешки
     [SerializeField] private int _blotMovesLeft = 0; // сколько ходов осталось до выключения кляксы
     [SerializeField] private int _armor = 0; // сколько ходов осталось со щитом (включая ходы соперников)
@@ -127,6 +129,22 @@ public class PlayerBoosters : MonoBehaviour
         }
     }
 
+    public int Vacuum {
+        get { return _vacuum; }
+        set {
+            int newValue = Math.Clamp(value, 0, BoostersControl.Instance.MaxVacuum);
+            _vacuum = newValue;
+        }
+    }
+
+    public int VacuumNozzle {
+        get { return _vacuumNozzle; }
+        set {
+            int newValue = Math.Clamp(value, 0, BoostersControl.Instance.MaxVacuumNozzle);
+            _vacuumNozzle = newValue;
+        }
+    }
+
     public int FlashMovesLeft {
         get { return _flashMovesLeft; }
         set {
@@ -224,6 +242,14 @@ public class PlayerBoosters : MonoBehaviour
         Blot += value;
     }
 
+    public void AddVacuum(int value) {
+        Vacuum += value;
+    }
+
+    public void AddVacuumNozzle(int value) {
+        VacuumNozzle += value;
+    }
+
     public void AddFlashMovesLeft(int value) {
         FlashMovesLeft += value;
     }
@@ -316,6 +342,14 @@ public class PlayerBoosters : MonoBehaviour
                 Blot += value;
                 break;
             }
+            case EBoosters.Vacuum: {
+                Vacuum += value;
+                break;
+            }
+            case EBoosters.VacuumNozzle: {
+                VacuumNozzle += value;
+                break;
+            }
         }
     }
 
@@ -366,6 +400,14 @@ public class PlayerBoosters : MonoBehaviour
 
         for (int i = 0; i < Blot; i++) {
             result.Add(EBoosters.Blot);
+        }
+
+        for (int i = 0; i < Vacuum; i++) {
+            result.Add(EBoosters.Vacuum);
+        }
+
+        for (int i = 0; i < VacuumNozzle; i++) {
+            result.Add(EBoosters.VacuumNozzle);
         }
 
         return result;
@@ -615,5 +657,31 @@ public class PlayerBoosters : MonoBehaviour
         EffectsControl.Instance.TryToEnableAllEffectButtons();
         BoostersControl.Instance.EnableAllButtons();
         CubicControl.Instance.SetCubicInteractable(true);
+    }
+
+    // Пылесос
+
+    public void ExecuteVacuum(bool isNozzle, int steps) {
+        if (isNozzle) {
+            AddVacuumNozzle(-1);
+        } else {
+            AddVacuum(-1);
+        }
+        BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
+        string vacuumText = isNozzle ? Utils.Wrap("пылесос с клапаном!", UIColors.Orange) : Utils.Wrap("пылесос!", UIColors.Yellow);
+        string cellsText = steps == 1 ? " клетку" : (steps > 1 && steps < 5 ? " клетки" : " клеток");
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " достал из кладовки " + vacuumText + " Все соперники едут назад на " + steps + cellsText;
+        Messages.Instance.AddMessage(message);
+
+        BoostersControl.Instance.DisableAllButtons();
+        EffectsControl.Instance.DisableAllButtons(true);
+        CubicControl.Instance.SetCubicInteractable(false);
+
+        StartCoroutine(MakeViolateMoveSeriesDefer(steps));
+    }
+
+    private IEnumerator MakeViolateMoveSeriesDefer(int steps) {
+        yield return new WaitForSeconds(BoostersControl.Instance.ExecuteVacuumDelay);
+        MoveControl.Instance.MakeViolateMoveSeries(steps);
     }
 }

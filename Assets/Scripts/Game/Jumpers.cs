@@ -39,6 +39,8 @@ public class Jumpers : MonoBehaviour
         Instances.transform.Find("trap-icon").gameObject.SetActive(false);
         Instances.transform.Find("flash-icon").gameObject.SetActive(false);
         Instances.transform.Find("blot").gameObject.SetActive(false);
+        Instances.transform.Find("vacuum-icon").gameObject.SetActive(false);
+        Instances.transform.Find("vacuum-nozzle-icon").gameObject.SetActive(false);
     }
 
     // private void Update() {

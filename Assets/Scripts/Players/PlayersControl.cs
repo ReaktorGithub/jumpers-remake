@@ -306,6 +306,7 @@ public class PlayersControl : MonoBehaviour
     // Допустим, текущий игрок ходит 2-м.
     // Получен список претендентов, которые ходят 1-м и 4-м.
     // Результат - игрок, который ходит 4-м.
+    // Текущий игрок не должен быть включен в список претендентов
 
     public PlayerControl GetNearestPlayerByMoveOrder(PlayerControl initialPlayer, List<PlayerControl> pretenders) {
         if (pretenders.Count == 0) {
@@ -398,5 +399,19 @@ public class PlayersControl : MonoBehaviour
         }
 
         return true;
+    }
+
+    // Вернет соперников текущего игрока, которые не финишировали
+
+    public List<PlayerControl> GetUnfinishedRivals(PlayerControl initialPlayer) {
+        List<PlayerControl> result = new();
+
+        foreach(PlayerControl player in _players) {
+            if (!player.IsFinished && player != initialPlayer) {
+                result.Add(player);
+            }
+        }
+
+        return result;
     }
 }

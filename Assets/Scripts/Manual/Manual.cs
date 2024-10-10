@@ -4,7 +4,7 @@ public class Manual : MonoBehaviour
 {
     public static Manual Instance { get; private set; }
     private ManualContent _power, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect, _attackUsual, _attackMagicKick, _attackVampire, _attackKnockout,
-    _boosterLasso, _boosterMagnet, _boosterSuperMagnet, _boosterShield, _boosterIronShield, _boosterVampire, _boosterBoombaster, _boosterStuck, _boosterFlash, _boosterTrap, _boosterBlot;
+    _boosterLasso, _boosterMagnet, _boosterSuperMagnet, _boosterShield, _boosterIronShield, _boosterVampire, _boosterBoombaster, _boosterStuck, _boosterFlash, _boosterTrap, _boosterBlot, _boosterVacuum, _boosterVacuumNozzle;
 
     private void Awake() {
         Instance = this;
@@ -30,6 +30,8 @@ public class Manual : MonoBehaviour
         _boosterFlash = transform.Find("BoosterFlash").GetComponent<ManualContent>();
         _boosterTrap = transform.Find("BoosterTrap").GetComponent<ManualContent>();
         _boosterBlot = transform.Find("BoosterBlot").GetComponent<ManualContent>();
+        _boosterVacuum = transform.Find("BoosterVacuum").GetComponent<ManualContent>();
+        _boosterVacuumNozzle = transform.Find("BoosterVacuumNozzle").GetComponent<ManualContent>();
     }
 
     public ManualContent Power {
@@ -142,6 +144,16 @@ public class Manual : MonoBehaviour
         private set {}
     }
 
+    public ManualContent BoosterVacuum {
+        get { return _boosterVacuum; }
+        private set {}
+    }
+
+    public ManualContent BoosterVacuumNozzle {
+        get { return _boosterVacuumNozzle; }
+        private set {}
+    }
+
     public ManualContent GetEffectManual(EControllableEffects effect) {
         switch(effect) {
             case EControllableEffects.Green: {
@@ -216,6 +228,12 @@ public class Manual : MonoBehaviour
             }
             case EBoosters.Blot: {
                 return BoosterBlot;
+            }
+            case EBoosters.Vacuum: {
+                return BoosterVacuum;
+            }
+            case EBoosters.VacuumNozzle: {
+                return BoosterVacuumNozzle;
             }
             default: return null;
         }
