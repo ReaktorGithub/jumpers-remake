@@ -6,9 +6,9 @@ using UnityEngine.UI;
 public class BoostersControl : MonoBehaviour
 {
     public static BoostersControl Instance { get; private set; }
-    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite, _stuckSprite, _trapSprite, _flashSprite, _blotSprite, _vacuumSprite, _vacuumNozzleSprite, _mopSprite;
-    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _vampireButton, _boombasterButton, _stuckButton, _trapButton, _flashButton, _flashBlock, _blotButton, _vacuumButton, _vacuumNozzleButton, _mopButton;
-    private BoostersRow _magnetsRowScript, _lassoRowScript, _shieldsRowScript;
+    private Sprite _magnetSprite, _magnetSuperSprite, _lassoSprite, _shieldSprite, _shieldIronSprite, _vampireSprite, _boombasterSprite, _stuckSprite, _trapSprite, _flashSprite, _blotSprite, _vacuumSprite, _vacuumNozzleSprite, _mopSprite, _tameLightningSprite;
+    [SerializeField] private GameObject _magnetsRow, _lassoRow, _shieldsRow, _tameLightningRow, _vampireButton, _boombasterButton, _stuckButton, _trapButton, _flashButton, _flashBlock, _blotButton, _vacuumButton, _vacuumNozzleButton, _mopButton;
+    private BoostersRow _magnetsRowScript, _lassoRowScript, _shieldsRowScript, _tameLightningRowScript;
     private BoosterButton _vampireButtonScript, _boombasterButtonScript, _stuckButtonScript, _trapButtonScript, _flashButtonScript, _blotButtonScript, _vacuumButtonScript, _vacuumNozzleButtonScript, _mopButtonScript;
     private PopupMagnet _popupMagnet;
     private PopupVacuum _popupVacuum;
@@ -20,6 +20,7 @@ public class BoostersControl : MonoBehaviour
     private CameraButton _cameraButton;
     private Image _flashAnimateImage;
     private IEnumerator _flashCoroutine;
+    private ModalTameLightning _modalTameLightning;
     [SerializeField] private List<EBoosters> _boostersWithGrind = new();
     [SerializeField] private float _flashPulseTime = 0.5f;
     [SerializeField] private float _executeVacuumDelay = 1f;
@@ -39,6 +40,7 @@ public class BoostersControl : MonoBehaviour
     [SerializeField] private int _maxVacuum = 1;
     [SerializeField] private int _maxVacuumNozzle = 1;
     [SerializeField] private int _maxMop = 1;
+    [SerializeField] private int _maxTameLightning = 3;
 
     private void Awake() {
         Instance = this;
@@ -58,10 +60,12 @@ public class BoostersControl : MonoBehaviour
         _vacuumSprite = Instances.transform.Find("vacuum-icon").GetComponent<SpriteRenderer>().sprite;
         _vacuumNozzleSprite = Instances.transform.Find("vacuum-nozzle-icon").GetComponent<SpriteRenderer>().sprite;
         _mopSprite = Instances.transform.Find("mop").GetComponent<SpriteRenderer>().sprite;
+        _tameLightningSprite = Instances.transform.Find("lightning-icon").GetComponent<SpriteRenderer>().sprite;
 
         _magnetsRowScript = _magnetsRow.GetComponent<BoostersRow>();
         _lassoRowScript = _lassoRow.GetComponent<BoostersRow>();
         _shieldsRowScript = _shieldsRow.GetComponent<BoostersRow>();
+        _tameLightningRowScript = _tameLightningRow.GetComponent<BoostersRow>();
         _vampireButtonScript = _vampireButton.GetComponent<BoosterButton>();
         _boombasterButtonScript = _boombasterButton.GetComponent<BoosterButton>();
         _stuckButtonScript = _stuckButton.GetComponent<BoosterButton>();
@@ -79,6 +83,7 @@ public class BoostersControl : MonoBehaviour
         }
         _topPanel = GameObject.Find("TopBlock").GetComponent<TopPanel>();
         _modalWarning = GameObject.Find("ModalScripts").GetComponent<ModalWarning>();
+        _modalTameLightning = GameObject.Find("ModalScripts").GetComponent<ModalTameLightning>();
         _cameraControl = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _cameraButton = GameObject.Find("CameraButton").GetComponent<CameraButton>();
         _flashAnimateImage = _flashBlock.transform.Find("AnimateImage").GetComponent<Image>();
@@ -160,6 +165,11 @@ public class BoostersControl : MonoBehaviour
         private set {}
     }
 
+    public Sprite TameLightningSprite {
+        get { return _tameLightningSprite; }
+        private set {}
+    }
+
     public int MaxMagnets {
         get { return _maxMagnets; }
         private set {}
@@ -237,6 +247,11 @@ public class BoostersControl : MonoBehaviour
 
     public int MaxMop {
         get { return _maxMop; }
+        private set {}
+    }
+
+    public int MaxTameLightning {
+        get { return _maxTameLightning; }
         private set {}
     }
 
@@ -324,6 +339,13 @@ public class BoostersControl : MonoBehaviour
 
         UpdateBoostersRow(player.Boosters.Shield, player.Boosters.ShieldIron, EBoosters.Shield, EBoosters.ShieldIron, _shieldsRowScript);
         UpdatePlayersArmorButtons(player);
+
+        // Ручные молнии
+
+        for (int i = 1; i <= 3; i++) {
+            EBoosters booster = player.Boosters.TameLightning >= i ? EBoosters.TameLightning : EBoosters.None;
+            _tameLightningRowScript.UpdateButton(i, booster);
+        }
 
         // Другие
 
@@ -440,6 +462,10 @@ public class BoostersControl : MonoBehaviour
         });
     }
 
+    public void OpenTameLightning() {
+        _modalTameLightning.OpenModal();
+    }
+
     public void ExitMopMode() {
         _topPanel.CloseWindow();
         CellsControl.Instance.TurnOffMopMode();
@@ -496,7 +522,7 @@ public class BoostersControl : MonoBehaviour
         _modalWarning.SetHeadingText("Недоступно");
         _modalWarning.SetBodyText("Этот усилитель доступен только во время атаки на соперника.");
         _modalWarning.SetCallback();
-        _modalWarning.OpenModal();
+        _modalWarning.OpenModal(true);
     }
 
     public void LockInterfaceByFlash(bool value) {

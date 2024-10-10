@@ -104,6 +104,10 @@ public class BoosterButton : MonoBehaviour
                 _booster.sprite = BoostersControl.Instance.MopSprite;
                 break;
             }
+            case EBoosters.TameLightning: {
+                _booster.sprite = BoostersControl.Instance.TameLightningSprite;
+                break;
+            }
             default: {
                 _booster.sprite = null;
                 break;

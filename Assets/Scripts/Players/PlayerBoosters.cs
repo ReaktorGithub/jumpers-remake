@@ -22,6 +22,7 @@ public class PlayerBoosters : MonoBehaviour
     [SerializeField] private int _vacuum = 0;
     [SerializeField] private int _vacuumNozzle = 0;
     [SerializeField] private int _mop = 0;
+    [SerializeField] private int _tameLightning = 0;
     [SerializeField] private int _flashMovesLeft = 0; // сколько ходов осталось до выключения флешки
     [SerializeField] private int _blotMovesLeft = 0; // сколько ходов осталось до выключения кляксы
     [SerializeField] private int _armor = 0; // сколько ходов осталось со щитом (включая ходы соперников)
@@ -156,6 +157,14 @@ public class PlayerBoosters : MonoBehaviour
         }
     }
 
+    public int TameLightning {
+        get { return _tameLightning; }
+        set {
+            int newValue = Math.Clamp(value, 0, BoostersControl.Instance.MaxTameLightning);
+            _tameLightning = newValue;
+        }
+    }
+
     public int FlashMovesLeft {
         get { return _flashMovesLeft; }
         set {
@@ -265,6 +274,10 @@ public class PlayerBoosters : MonoBehaviour
         Mop += value;
     }
 
+    public void AddTameLightning(int value) {
+        TameLightning += value;
+    }
+
     public void AddFlashMovesLeft(int value) {
         FlashMovesLeft += value;
     }
@@ -367,6 +380,10 @@ public class PlayerBoosters : MonoBehaviour
             }
             case EBoosters.Mop: {
                 Mop += value;
+                break;
+            }
+            case EBoosters.TameLightning: {
+                TameLightning += value;
                 break;
             }
         }
@@ -780,5 +797,14 @@ public class PlayerBoosters : MonoBehaviour
     private IEnumerator ExitMopModeDefer() {
         yield return new WaitForSeconds(CellsControl.Instance.ChangingEffectDelay);
         BoostersControl.Instance.ExitMopModePhase2();
+    }
+
+    // Ручная молния
+
+    public void ExecuteTameLightning() {
+        AddTameLightning(-1);
+        BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
+        _player.Effects.ExecuteLightning(true);
+        _player.Effects.CheckLightningStartMove();
     }
 }

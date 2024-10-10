@@ -327,9 +327,9 @@ public class PlayerEffects : MonoBehaviour
 
     // Молния: При попадании на клетку с молнией
 
-    public void ExecuteLightning() {
+    public void ExecuteLightning(bool isTame) {
         int oldValue = _lightningMoves;
-        _lightningMoves = 3;
+        _lightningMoves = isTame && oldValue == 0 ? 1 : 3;
         _isLightning = true;
         TokenControl token = _player.GetTokenControl();
 
@@ -339,7 +339,12 @@ public class PlayerEffects : MonoBehaviour
             token.AddIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
         }
 
-        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("молнию", UIColors.Green) + "! Очки на кубике x2";
+        string message;
+        if (isTame) {
+            message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " вызывает " + Utils.Wrap("ручную молнию", UIColors.Green) + "! Очки на кубике x2";
+        } else {
+            message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("молнию", UIColors.Green) + "! Очки на кубике x2";
+        }
         Messages.Instance.AddMessage(message);
     }
 
