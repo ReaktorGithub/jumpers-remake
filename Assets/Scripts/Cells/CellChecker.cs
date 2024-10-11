@@ -317,19 +317,22 @@ public class CellChecker : MonoBehaviour
         }
 
         if (vault.OccupiedPlayer == player) {
-            if (player.IsMe()) {
-                _modalMoneybox.BuildContent(player);
-                _modalMoneybox.OpenModal();
-            }
-
-            if (player.IsAi()) {
-                AiControl.Instance.AiMoneybox(player, vault);
-            }
-            
+            ActivateMoneyboxDialogue(player, vault);
             return false;
         }
 
         return true;
+    }
+
+    private void ActivateMoneyboxDialogue(PlayerControl player, MoneyboxVault vault) {
+        if (player.IsMe()) {
+            _modalMoneybox.BuildContent(player);
+            _modalMoneybox.OpenModal();
+        }
+
+        if (player.IsAi()) {
+            AiControl.Instance.AiMoneybox(player, vault);
+        }
     }
 
     private void CheckMoneyboxAfterMove(PlayerControl player) {
@@ -350,6 +353,9 @@ public class CellChecker : MonoBehaviour
                 player.Boosters.ExecuteBlotAsVictim("попасть в копилку");
             } else {
                 vault.PutPlayerToVault(player);
+                if (MoveControl.Instance.IsLassoMode) {
+                    ActivateMoneyboxDialogue(player, vault);
+                }
             }
         }
     }

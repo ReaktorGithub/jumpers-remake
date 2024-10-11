@@ -19,6 +19,11 @@ public class Counter : MonoBehaviour
         _image = _imageObject.GetComponent<Image>();
     }
 
+    public int Count {
+        get { return _count; }
+        private set {}
+    }
+
     public void Init(Sprite iconSprite, int count, int min, int max, int step = 1) {
         _image.sprite = iconSprite;
         _count = count;
@@ -31,7 +36,7 @@ public class Counter : MonoBehaviour
         SetRemoveButtonInteractable(_buttonRight, count != max);
     }
 
-    public int OnIncrease() {
+    public void OnIncrease() {
         _count += _step;
         _valueText.text = _count.ToString();
 
@@ -42,11 +47,9 @@ public class Counter : MonoBehaviour
         if (_count > _min) {
             SetRemoveButtonInteractable(_buttonLeft, true);
         }
-
-        return _count;
     }
 
-    public int OnDiscrease() {
+    public void OnDiscrease() {
         _count -= _step;
         _valueText.text = _count.ToString();
 
@@ -57,8 +60,6 @@ public class Counter : MonoBehaviour
         if (_count < _max) {
             SetRemoveButtonInteractable(_buttonRight, true);
         }
-
-        return _count;
     }
 
     private void SetRemoveButtonInteractable(Button button, bool value) {

@@ -116,6 +116,11 @@ public class MoveControl : MonoBehaviour
                 PlayersControl.Instance.UpdateTokenLayerOrder(_currentPlayerIndex);
                 PlayersControl.Instance.UpdateSqueezeAnimation();
 
+                // Это переназначение помогает избежать багов при игре с самим собой
+                if (!AiControl.Instance.EnableAi) {
+                    PlayersControl.Instance.ReassignPlayerSelfIdentity(_currentPlayer);
+                }
+
                 // применение сайд-эффектов и продолжение переключения игрока
                 bool check = ExecuteSideEffects();
                 if (check) {
@@ -188,6 +193,9 @@ public class MoveControl : MonoBehaviour
     }
 
     public void PreparePlayerForMove() {
+        // Дебаг
+        // CellsControl.Instance.ShowTokensAtCells();
+
         string cubicMessage;
         switch (_currentPlayer.Type) {
             case EPlayerTypes.Me: {
@@ -221,15 +229,21 @@ public class MoveControl : MonoBehaviour
         // сброс параметров
         _currentPlayer.SkipMoveCount = 0;
 
-        bool isMe = _currentPlayer.IsMe();
-        if (isMe) {
-            EffectsControl.Instance.TryToEnableAllEffectButtons();
-            CubicControl.Instance.SetCubicInteractable(true);
-            CubicControl.Instance.ModifiersControl.ShowModifierStuck(_currentPlayer.StuckAttached);
-        } else if (_currentPlayer.Type == EPlayerTypes.Ai) {
-            StartCoroutine(AiControl.Instance.AiThrowCubic());
+        // Обработка ситуации, когда попал на копилку во время лассо
+        CellControl cell = _currentPlayer.GetCurrentCell();
+        bool isMoneyboxLasso = _isLassoMode && cell.CellType == ECellTypes.Moneybox;
+
+        if (!isMoneyboxLasso) {
+            bool isMe = _currentPlayer.IsMe();
+            if (isMe) {
+                EffectsControl.Instance.TryToEnableAllEffectButtons();
+                CubicControl.Instance.SetCubicInteractable(true);
+                CubicControl.Instance.ModifiersControl.ShowModifierStuck(_currentPlayer.StuckAttached);
+            } else if (_currentPlayer.Type == EPlayerTypes.Ai) {
+                StartCoroutine(AiControl.Instance.AiThrowCubic());
+            }
+            BoostersControl.Instance.EnableAllButtons(!isMe);
         }
-        BoostersControl.Instance.EnableAllButtons(!isMe);
 
         // CellsControl.Instance.ShowTokensAtCells();
     }
@@ -345,9 +359,19 @@ public class MoveControl : MonoBehaviour
         CellControl targetCell = cellResult.Item1.GetComponent<CellControl>();
         _restSteps = cellResult.Item2;
         TokenControl victimToken = victim.GetTokenControl();
+
+        // Если жертва находится в копилке, то убрать её из копилки
+        if (currentCell.CellType == ECellTypes.Moneybox) {
+            MoneyboxVault vault = currentCell.GetComponent<MoneyboxCell>().MoneyboxVault;
+            if (vault.OccupiedPlayer == victim) {
+               vault.ReassignPlayers(); 
+            }
+        }
         
         victimToken.SetToSpecifiedCell(targetCell.gameObject, _specifiedMoveTime, () => {
-            currentCell.RemoveToken(victim.TokenObject);
+            if (currentCell != targetCell) {
+                currentCell.RemoveToken(victim.TokenObject);
+            }
             currentCell.AlignTokens(_alignTime);
 
             // жертва назначается текущим игроком
@@ -549,7 +573,7 @@ public class MoveControl : MonoBehaviour
 
     public void EndMove() {
         // Дебаг
-        CellsControl.Instance.ShowTokensAtCells();
+        // CellsControl.Instance.ShowTokensAtCells();
 
         // Сброс параметров
 
