@@ -22,7 +22,6 @@ public class PopupAttack : MonoBehaviour
     private Counter _counter;
     private PlayerControl _player;
     private bool _isAddStuck = false;
-    private int _removeStuckCount = 0;
 
     private void Awake() {
         GameObject instances = GameObject.Find("Instances");
@@ -97,7 +96,7 @@ public class PopupAttack : MonoBehaviour
         _optionalSectionStuckAdd.SetActive(_player.Boosters.Stuck > 0);
         _optionalSectionStuckRemove.SetActive(_player.StuckAttached > 0);
         _counter.Init(_counterSprite, 0, 0, _player.StuckAttached);
-        UpdateStuckRemoveCount(0);
+        UpdateStuckRemoveText(0);
 
         // сила
 
@@ -158,8 +157,7 @@ public class PopupAttack : MonoBehaviour
         _stuckAddButtonScript.SetSelected(newValue);
     }
 
-    private void UpdateStuckRemoveCount(int value) {
-        _removeStuckCount = value;
+    private void UpdateStuckRemoveText(int value) {
         _removeStuckCost.text = "Цена: " + value + " сила";
     }
 
@@ -284,7 +282,8 @@ public class PopupAttack : MonoBehaviour
             break;
         }
 
-        powerNeed += _removeStuckCount;
+        // remove stuck count
+        powerNeed += _counter.Count;
 
         int powerLeft = powerInitial - powerNeed;
         _powerNeed = powerNeed;
@@ -310,20 +309,20 @@ public class PopupAttack : MonoBehaviour
     }
 
     public void OnIncreaseStuckClick() {
-        int newValue = _counter.OnIncrease();
-        UpdateStuckRemoveCount(newValue);
+        _counter.OnIncrease();
+        UpdateStuckRemoveText(_counter.Count);
         UpdatePower();
     }
 
     public void OnDiscreaseStuckClick() {
-        int newValue = _counter.OnDiscrease();
-        UpdateStuckRemoveCount(newValue);
+        _counter.OnDiscrease();
+        UpdateStuckRemoveText(_counter.Count);
         UpdatePower();
     }
 
     private IEnumerator ConfirmAttackDefer() {
         yield return new WaitForSeconds(_attackDelay);
-        _player.ExecuteAttack(_selectedAttackType, _isAddStuck, _removeStuckCount, _selectedPlayer);
+        _player.ExecuteAttack(_selectedAttackType, _isAddStuck, _counter.Count, _selectedPlayer);
     }
 
     private IEnumerator CancelAttackDefer() {

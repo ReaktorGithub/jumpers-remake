@@ -69,7 +69,7 @@ public class PlayerControl : MonoBehaviour
     }
 
     public bool IsMe() {
-        return _type == EPlayerTypes.Me || !AiControl.Instance.EnableAi;
+        return _type == EPlayerTypes.Me;
     }
 
     public bool IsAi() {

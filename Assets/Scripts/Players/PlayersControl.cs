@@ -428,4 +428,21 @@ public class PlayersControl : MonoBehaviour
 
         return result;
     }
+
+    // Указанного игрока обозначает как Me, а всех остальных как AI (только если это не череп)
+    // !!! Не вызывать это во время сетевой игры !!!
+
+    public void ReassignPlayerSelfIdentity(PlayerControl currentPlayer) {
+        if (currentPlayer.Type == EPlayerTypes.Skull) {
+            return;
+        }
+
+        foreach(PlayerControl player in _players) {
+            if (player == currentPlayer) {
+                player.Type = EPlayerTypes.Me;
+            } else {
+                player.Type = EPlayerTypes.Ai;
+            }
+        }
+    }
 }
