@@ -13,6 +13,7 @@ public class TokensControl : MonoBehaviour
     [SerializeField] private float _indicatorWidthSmall = 2f;
     private GameObject _tokenIndicatorSample;
     [SerializeField] GameObject _indicatorLightningObject, _bonusEventSample, _indicatorFlashObject, _indicatorBlotObject;
+    [SerializeField] private float _teleportAnimationTime = 1f;
     private Sprite _indicatorLightningSprite, _indicatorFlashSprite, _indicatorBlotSprite;
 
     private void Awake() {
@@ -85,6 +86,11 @@ public class TokensControl : MonoBehaviour
 
     public Sprite IndicatorBlotSprite {
         get { return _indicatorBlotSprite; }
+        private set {}
+    }
+
+    public float TeleportAnimationTime {
+        get { return _teleportAnimationTime; }
         private set {}
     }
 }

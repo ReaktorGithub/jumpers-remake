@@ -232,6 +232,11 @@ public class CellChecker : MonoBehaviour
             return;
         }
 
+        if (cell.CellType == ECellTypes.Teleport) {
+            player.Effects.ExecuteTeleport();
+            return;
+        }
+
         CheckCellArrows(player);
     }
 

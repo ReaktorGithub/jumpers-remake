@@ -12,7 +12,7 @@ public class TokenControl : MonoBehaviour
     [SerializeField] private GameObject _currentCell, _playerName, _indicators, _aiThinking, _indicatorsList, _indicatorBg, _bonusEventsList, _stuck;
     [SerializeField] private float _bonushFlashTime = 3f;
     [SerializeField] private float _nextBonusTime = 1.5f;
-    private GameObject _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable;
+    private GameObject _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable, _rotate;
     private PlayerControl _playerControl;
     private SortingGroup _sortingGroup;
     private bool _isSqueeze = false;
@@ -22,9 +22,11 @@ public class TokenControl : MonoBehaviour
     private List<int> _bonusQueue = new();
     private bool _isProcessingQueue = false;
     private TokenStuck _stuckScript;
+    private Animator _teleportAnimator;
 
     private void Awake() {
-        _squeezable = transform.Find("Squeezable").gameObject;
+        _rotate = transform.Find("Rotate").gameObject;
+        _squeezable = _rotate.transform.Find("Squeezable").gameObject;
         _tokenImage = _squeezable.transform.Find("TokenImage").gameObject;
         _skip1 = _squeezable.transform.Find("skip1").gameObject;
         _skip2 = _squeezable.transform.Find("skip2").gameObject;
@@ -38,6 +40,7 @@ public class TokenControl : MonoBehaviour
         _pedestal = GameObject.Find("Pedestal");
         _splineAnimate = GetComponent<SplineAnimate>();
         _stuckScript = _stuck.GetComponent<TokenStuck>();
+        _teleportAnimator = _rotate.GetComponent<Animator>();
         RemoveAllIndicators();
     }
 
@@ -404,5 +407,19 @@ public class TokenControl : MonoBehaviour
         Animator animator = bonusObj.GetComponent<Animator>();
         animator.SetBool("isFlash", false);
         Destroy(bonusObj);
+    }
+
+    public void StartTeleportInAnimation() {
+        _teleportAnimator.SetInteger("teleport", 1);
+    }
+
+    public void StartTeleportOutAnimation() {
+        _teleportAnimator.SetInteger("teleport", 2);
+        StartCoroutine(StopTeleportAnimation());
+    }
+
+    private IEnumerator StopTeleportAnimation() {
+        yield return new WaitForSeconds(TokensControl.Instance.TeleportAnimationTime);
+        _teleportAnimator.SetInteger("teleport", 0);
     }
 }
