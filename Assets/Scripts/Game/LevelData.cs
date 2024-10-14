@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -13,6 +14,8 @@ public class LevelData : MonoBehaviour
     [SerializeField] private int _effectsBlack = 0;
     [SerializeField] private int _effectsRed = 0;
     [SerializeField] private int _effectsStar = 0;
+    [SerializeField] private bool _randomBonusMallow = false;
+    [SerializeField] private List<EBoosters> _randomBonusBoosters = new();
 
     public int[] PrizeCoins {
         get { return _prizeCoins; }
@@ -64,7 +67,7 @@ public class LevelData : MonoBehaviour
         private set {}
     }
 
-    private void Awake() {
+    public void SetUIPrizeList() {
         GameObject list = GameObject.Find("PrizeList");
         list.transform.Find("coins1").GetComponent<TextMeshProUGUI>().text = _prizeCoins[0].ToString();
         list.transform.Find("coins2").GetComponent<TextMeshProUGUI>().text = _prizeCoins[1].ToString();
@@ -78,5 +81,20 @@ public class LevelData : MonoBehaviour
         list.transform.Find("ruby2").GetComponent<TextMeshProUGUI>().text = _prizeRubies[1].ToString();
         list.transform.Find("ruby3").GetComponent<TextMeshProUGUI>().text = _prizeRubies[2].ToString();
         list.transform.Find("ruby4").GetComponent<TextMeshProUGUI>().text = _prizeRubies[3].ToString();
+    }
+
+    public void SetInitialRandomBonuses() {
+        int itemsCount = (_randomBonusMallow ? 1 : 0) + _randomBonusBoosters.Count;
+        List<CellControl> cells = CellsControl.Instance.GetRandomCellsForItems(itemsCount);
+
+        if (_randomBonusMallow) {
+            cells[0].SetPickableBonus(EPickables.Mallow, EBoosters.None);
+            cells.RemoveAt(0);
+        }
+
+        foreach(EBoosters booster in _randomBonusBoosters) {
+            cells[0].SetPickableBonus(EPickables.Booster, booster);
+            cells.RemoveAt(0);
+        }
     }
 }

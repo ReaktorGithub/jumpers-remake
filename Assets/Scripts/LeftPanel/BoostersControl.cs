@@ -569,4 +569,25 @@ public class BoostersControl : MonoBehaviour
             default: return 0;
         }
     }
+
+    public Sprite GetBoosterSprite(EBoosters booster) {
+        return booster switch {
+            EBoosters.Magnet => MagnetSprite,
+            EBoosters.MagnetSuper => MagnetSuperSprite,
+            EBoosters.Lasso => LassoSprite,
+            EBoosters.Shield => ShieldSprite,
+            EBoosters.ShieldIron => ShieldIronSprite,
+            EBoosters.Vampire => VampireSprite,
+            EBoosters.Trap => TrapSprite,
+            EBoosters.Vacuum => VacuumSprite,
+            EBoosters.VacuumNozzle => VacuumNozzleSprite,
+            EBoosters.Blot => BlotSprite,
+            EBoosters.Flash => FlashSprite,
+            EBoosters.Stuck => StuckSprite,
+            EBoosters.Boombaster => BoombasterSprite,
+            EBoosters.Mop => MopSprite,
+            EBoosters.TameLightning => TameLightningSprite,
+            _ => null,
+        };
+    }
 }

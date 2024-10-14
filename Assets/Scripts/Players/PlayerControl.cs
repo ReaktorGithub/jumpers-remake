@@ -230,7 +230,8 @@ public class PlayerControl : MonoBehaviour
 
     public void AddCoins(int value) {
         _coins += value;
-        GetTokenControl().AddBonusEventToQueue(value);
+        (string, Color32) values = Utils.GetTextWithSymbolAndColor(value);
+        GetTokenControl().AddBonusEventToQueue(values.Item1, values.Item2);
     }
 
     public void AddPower(int value) {
@@ -403,6 +404,50 @@ public class PlayerControl : MonoBehaviour
         
         Messages.Instance.AddMessage(message);
         PlayersControl.Instance.UpdatePlayersInfo();
+    }
+
+    // Подбираемый бонус
+
+    public void ExecutePickableBonus(CellControl cell) {
+        EPickables type = cell.PickableType;
+        EBoosters booster = cell.PickableBooster;
+
+        switch(type) {
+            case EPickables.Mallow: {
+                AddMallows(1);
+                PickupBonusProcessing(cell, "зефирка");
+                break;
+            }
+            case EPickables.Ruby: {
+                AddRubies(1);
+                PickupBonusProcessing(cell, "рубин");
+                break;
+            }
+            case EPickables.Booster: {
+                bool isSuccess = _boosters.AddTheBooster(booster, 1);
+                if (isSuccess) {
+                    ManualContent manual = Manual.Instance.GetBoosterManual(booster);
+                    string bonusName = manual.GetEntityName(true);
+                    string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " подбирает усилитель: " + Utils.Wrap(bonusName, UIColors.Orange);
+                    Messages.Instance.AddMessage(message);
+                    BoostersControl.Instance.UpdateBoostersFromPlayer(this);
+                    cell.SetPickableBonus(EPickables.None, EBoosters.None);
+                    GetTokenControl().AddBonusEventToQueue("+" + bonusName, new Color32(3,74,0,255));
+                } else {
+                    string message = "У " + Utils.Wrap(PlayerName, UIColors.Yellow) + " не хватило места в инвентаре для усилителя";
+                    Messages.Instance.AddMessage(message);
+                }
+                break;
+            }
+        }
+    }
+
+    private void PickupBonusProcessing(CellControl cell, string bonusName) {
+        PlayersControl.Instance.UpdatePlayersInfo();
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " подбирает бонус: " + Utils.Wrap(bonusName, UIColors.Orange);
+        Messages.Instance.AddMessage(message);
+        cell.SetPickableBonus(EPickables.None, EBoosters.None);
+        GetTokenControl().AddBonusEventToQueue("+" + bonusName, new Color32(3,74,0,255));
     }
 
     // Модалки
