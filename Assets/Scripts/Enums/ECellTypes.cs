@@ -8,5 +8,6 @@ public enum ECellTypes
     Lightning,
     Wall,
     Surprise,
+    Teleport,
     HedgehogBranch,
 }

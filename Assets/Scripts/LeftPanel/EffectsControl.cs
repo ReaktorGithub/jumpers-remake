@@ -20,6 +20,7 @@ public class EffectsControl : MonoBehaviour
     private TextMeshProUGUI _greenQuantityText, _yellowQuantityText, _redQuantityText, _blackQuantityText, _starQuantityText;
     private GameObject _cellsObject;
     [SerializeField] private float _replaceTime = 1f;
+    [SerializeField] private float _teleportDelay = 1f;
     private IEnumerator _coroutine;
 
     private void Awake() {
@@ -91,6 +92,11 @@ public class EffectsControl : MonoBehaviour
 
     public Sprite StarBrushSprite {
         get { return _starBrushSprite; }
+        private set {}
+    }
+
+    public float TeleportDelay {
+        get { return _teleportDelay; }
         private set {}
     }
 

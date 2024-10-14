@@ -625,6 +625,20 @@ public class CellsControl : MonoBehaviour
         return playersArea;
     }
 
+    // Выбрать случайную клетку для телепорта
+
+    public CellControl GetRandomCellForTeleport(CellControl initialCell) {
+        List<CellControl> filtered = new();
+
+        foreach(CellControl cell in _allCellControls) {
+            if (cell != initialCell && cell.CellType != ECellTypes.Finish) {
+                filtered.Add(cell);
+            }
+        }
+
+        return Utils.GetRandomElement(filtered);
+    }
+
     // Дебаг
 
     public void ShowTokensAtCells() {

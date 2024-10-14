@@ -392,6 +392,35 @@ public class PlayerEffects : MonoBehaviour
         }
     }
 
+    // Телепорт
+
+    public void ExecuteTeleport() {
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + Utils.Wrap(" телепортируется", UIColors.DarkBlue) + " на случайную клетку";
+        Messages.Instance.AddMessage(message);
+        StartCoroutine(ExecuteTeleportDefer());
+    }
+
+    private IEnumerator ExecuteTeleportDefer() {
+        TokenControl token = _player.GetTokenControl();
+        token.DisableIndicators(true);
+        yield return new WaitForSeconds(EffectsControl.Instance.TeleportDelay);
+        token.StartTeleportInAnimation();
+        yield return new WaitForSeconds(TokensControl.Instance.TeleportAnimationTime);
+
+        CellControl initialCell = _player.GetCurrentCell();
+        CellControl newCell = CellsControl.Instance.GetRandomCellForTeleport(initialCell);
+
+        token.SetToSpecifiedCell(newCell.gameObject, 10f, () => {
+            StartCoroutine(ConfirmTeleportPositionDefer(token));
+        });
+    }
+
+    private IEnumerator ConfirmTeleportPositionDefer(TokenControl token) {
+        token.StartTeleportOutAnimation();
+        yield return new WaitForSeconds(TokensControl.Instance.TeleportAnimationTime);
+        StartCoroutine(MoveControl.Instance.ConfirmNewPositionDefer());
+    }
+
     public void ExecuteReplaceEffect(EControllableEffects effect) {
         ManualContent manual = Manual.Instance.GetEffectManual(effect);
         CellControl cell = _player.GetCurrentCell();
