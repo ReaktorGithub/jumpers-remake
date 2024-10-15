@@ -43,6 +43,8 @@ public class Jumpers : MonoBehaviour
         Instances.transform.Find("vacuum-nozzle-icon").gameObject.SetActive(false);
         Instances.transform.Find("mop").gameObject.SetActive(false);
         Instances.transform.Find("lightning-icon").gameObject.SetActive(false);
+        Instances.transform.Find("mallow").gameObject.SetActive(false);
+        Instances.transform.Find("ruby").gameObject.SetActive(false);
     }
 
     // private void Update() {

@@ -15,6 +15,7 @@ public class CellsControl : MonoBehaviour
     private Sprite _grind2Sprite, _grind3Sprite;
     private List<CellControl> _boombastersList = new();
     [SerializeField] private List<ECellTypes> _excludeTrapTypes = new();
+    [SerializeField] private List<ECellTypes> _excludePickableBonusTypes = new();
     [SerializeField] private List<EControllableEffects> _mopGenericEffects = new();
     private Explosion _explosion;
     private CameraControl _camera;
@@ -637,6 +638,24 @@ public class CellsControl : MonoBehaviour
         }
 
         return Utils.GetRandomElement(filtered);
+    }
+
+    // Собрать случайные клетки для размещения подбираемых бонусов
+
+    public List<CellControl> GetRandomCellsForItems(int itemsCount) {
+        List<CellControl> filtered = new();
+
+        foreach(CellControl cell in _allCellControls) {
+            if (!_excludePickableBonusTypes.Contains(cell.CellType) && cell.PickableType == EPickables.None) {
+                filtered.Add(cell);
+            }
+        }
+
+        if (filtered.Count < itemsCount) {
+            throw new ArgumentException("Количество элементов в исходном списке меньше, чем запрошенное количество случайных элементов.");
+        }
+
+        return Utils.GetRandomElements(filtered, itemsCount);
     }
 
     // Дебаг

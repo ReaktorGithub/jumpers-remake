@@ -19,7 +19,7 @@ public class TokenControl : MonoBehaviour
     private GameObject _pedestal;
     private SplineAnimate _splineAnimate;
     private int _indicatorsCount = 0;
-    private List<int> _bonusQueue = new();
+    private List<(string, Color32)> _bonusQueue = new();
     private bool _isProcessingQueue = false;
     private TokenStuck _stuckScript;
     private Animator _teleportAnimator;
@@ -361,12 +361,12 @@ public class TokenControl : MonoBehaviour
 
     // Событие появления бонуса
 
-    public void AddBonusEventToQueue(int bonus) {
-        if (!transform.gameObject.activeInHierarchy || !_indicators.activeInHierarchy || bonus == 0) {
+    public void AddBonusEventToQueue(string message, Color32 color) {
+        if (!transform.gameObject.activeInHierarchy || !_indicators.activeInHierarchy || message == "0") {
             return;
         }
 
-        _bonusQueue.Add(bonus);
+        _bonusQueue.Add((message, color));
 
         if (!_isProcessingQueue) {
             StartCoroutine(StartBonusQueue());
@@ -377,7 +377,7 @@ public class TokenControl : MonoBehaviour
         _isProcessingQueue = true;
 
         while (_bonusQueue.Count > 0) {
-            FlashBonusEvent(_bonusQueue[0]);
+            FlashBonusEvent(_bonusQueue[0].Item1, _bonusQueue[0].Item2);
             _bonusQueue.RemoveAt(0);
             yield return new WaitForSeconds(_nextBonusTime);
         }
@@ -385,15 +385,14 @@ public class TokenControl : MonoBehaviour
         _isProcessingQueue = false; // Завершаем обработку очереди
     }
 
-    private void FlashBonusEvent(int bonus) {
+    private void FlashBonusEvent(string message, Color32 color) {
         GameObject clone = Instantiate(TokensControl.Instance.BonusEventSample);
         clone.transform.SetParent(_bonusEventsList.transform);
         clone.transform.localScale = new Vector3(1f,1f,1f);
 
         TextMeshPro text = clone.transform.Find("Text (TMP)").GetComponent<TextMeshPro>();
-        (string, Color32) values = Utils.GetTextWithSymbolAndColor(bonus);
-        text.text = values.Item1;
-        text.color = values.Item2;
+        text.text = message;
+        text.color = color;
 
         Animator animator = clone.GetComponent<Animator>();
         clone.SetActive(true);

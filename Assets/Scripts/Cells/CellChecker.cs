@@ -132,7 +132,7 @@ public class CellChecker : MonoBehaviour
         CheckCellHedgehog(player);
     }
 
-    public void CheckCellHedgehog(PlayerControl player) {
+    private void CheckCellHedgehog(PlayerControl player) {
         CellControl cell = player.GetCurrentCell();
 
         if (cell.CellType == ECellTypes.HedgehogBranch) {
@@ -143,10 +143,28 @@ public class CellChecker : MonoBehaviour
             }
         }
 
-        CheckTrap(player, cell);
+        CheckPickableBonus(player, cell);
     }
 
-    private void CheckTrap(PlayerControl player, CellControl cell) {
+    private void CheckPickableBonus(PlayerControl player, CellControl cell) {
+        bool check = true;
+
+        if (cell.PickableType != EPickables.None) {
+            if (player.Boosters.IsBlot()) {
+                player.Boosters.ExecuteBlotAsVictim("получить бонус");
+            } else {
+                check = player.ExecutePickableBonus(cell);
+            }
+        }
+
+        if (check) {
+            CheckTrap(player);
+        }
+    }
+
+    public void CheckTrap(PlayerControl player) {
+        CellControl cell = player.GetCurrentCell();
+        
         if (cell.WhosTrap != null) {
             player.ExecuteTrap(cell);
         }

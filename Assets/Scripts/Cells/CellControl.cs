@@ -15,9 +15,9 @@ public class CellControl : MonoBehaviour
     private int _oldEffectLevel = 1;
     [SerializeField] private int _coinBonusValue = 0;
     [SerializeField] private bool _isDeadEndCell = false;
-    private GameObject _container, _glow, _coinBonusObject, _brick, _boombasterPlace, _boombasterInstance, _intersection, _trap;
+    private GameObject _container, _glow, _coinBonusObject, _brick, _boombasterPlace, _boombasterInstance, _intersection, _trap, _pickableBonus;
     private GameObject _boombasterCurrentInstance; // ссылка на работающую бумку, может быть null
-    private SpriteRenderer _spriteRenderer, _glowSpriteRenderer, _grindSpriteRenderer;
+    private SpriteRenderer _spriteRenderer, _glowSpriteRenderer, _grindSpriteRenderer, _pickableSpriteRenderer;
     private float[] _cellScale = new float[2];
     [SerializeField] private List<GameObject> _currentTokens = new();
     private bool _isEffectPlacementMode, _isTrapPlacementMode, _isLassoMode, _isMopMode = false;
@@ -35,6 +35,8 @@ public class CellControl : MonoBehaviour
     private int _boombasterTimer = 9;
     private int _boombasterLevel = 1;
     private PlayerControl _whosTrap;
+    [SerializeField] private EPickables _pickableType = EPickables.None;
+    [SerializeField] private EBoosters _pickableBooster = EBoosters.None;
 
     private void Awake() {
         _container = transform.Find("container").gameObject;
@@ -62,6 +64,8 @@ public class CellControl : MonoBehaviour
         _boombasterInstance = instances.transform.Find("Boombaster").gameObject;
         _intersection = _container.transform.Find("intersection").gameObject;
         _trap = _container.transform.Find("trap").gameObject;
+        _pickableBonus = _container.transform.Find("PickableBonus").gameObject;
+        _pickableSpriteRenderer = _pickableBonus.transform.Find("Image").GetComponent<SpriteRenderer>();
     }
 
     private void Start() {
@@ -70,6 +74,7 @@ public class CellControl : MonoBehaviour
         UpdateCoinBonusView();
         UpdateGrindVisual(_effectLevel);
         UpdateBoombasterVisual();
+        UpdatePickableBonusView();
         _trap.SetActive(false);
     }
 
@@ -91,6 +96,16 @@ public class CellControl : MonoBehaviour
 
     public ECellTypes CellType {
         get { return cellType; }
+        private set {}
+    }
+
+    public EPickables PickableType {
+        get { return _pickableType; }
+        private set {}
+    }
+
+    public EBoosters PickableBooster {
+        get { return _pickableBooster; }
         private set {}
     }
 
@@ -550,6 +565,35 @@ public class CellControl : MonoBehaviour
         _coinBonusText.text = values.Item1;
         _coinBonusText.color = values.Item2;
         _coinBonusObject.SetActive(true);
+    }
+
+    public void SetPickableBonus(EPickables pickableType, EBoosters booster) {
+        _pickableType = pickableType;
+        _pickableBooster = booster;
+        UpdatePickableBonusView();
+    }
+
+    private void UpdatePickableBonusView() {
+        _pickableBonus.SetActive(_pickableType != EPickables.None);
+
+        switch(_pickableType) {
+            case EPickables.Mallow: {
+                _pickableSpriteRenderer.sprite = Icons.Instance.MallowSprite;
+                break;
+            }
+            case EPickables.Ruby: {
+                _pickableSpriteRenderer.sprite = Icons.Instance.RubySprite;
+                break;
+            }
+            case EPickables.Booster: {
+                _pickableSpriteRenderer.sprite = BoostersControl.Instance.GetBoosterSprite(_pickableBooster);
+                break;
+            }
+            default: {
+                _pickableSpriteRenderer.sprite = null;
+                break;
+            }
+        }
     }
 
     // Бумка

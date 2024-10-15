@@ -322,71 +322,118 @@ public class PlayerBoosters : MonoBehaviour
         return (newCount1, newCount2);
     }
 
-    // Для массового изменения бустеров
+    // Для массового изменения бустеров. Вернет false, если не хватает места
 
-    public void AddTheBooster(EBoosters booster, int value) {
+    public bool AddTheBooster(EBoosters booster, int value) {
         switch(booster) {
             case EBoosters.Lasso: {
+                if (Lasso + value > BoostersControl.Instance.MaxLasso) {
+                    return false;
+                }
                 Lasso += value;
                 break;
             }
             case EBoosters.Magnet: {
+                if (Magnet + SuperMagnet + value > BoostersControl.Instance.MaxMagnets) {
+                    return false;
+                }
                 Magnet += value;
                 break;
             }
             case EBoosters.MagnetSuper: {
+                if (Magnet + SuperMagnet + value > BoostersControl.Instance.MaxMagnets) {
+                    return false;
+                }
                 SuperMagnet += value;
                 break;
             }
             case EBoosters.Shield: {
+                if (Shield + ShieldIron + value > BoostersControl.Instance.MaxShields) {
+                    return false;
+                }
                 Shield += value;
                 break;
             }
             case EBoosters.ShieldIron: {
+                if (Shield + ShieldIron + value > BoostersControl.Instance.MaxShields) {
+                    return false;
+                }
                 ShieldIron += value;
                 break;
             }
             case EBoosters.Vampire: {
+                if (Vampire + value > BoostersControl.Instance.MaxVampires) {
+                    return false;
+                }
                 Vampire += value;
                 break;
             }
             case EBoosters.Boombaster: {
+                if (Boombaster + value > BoostersControl.Instance.MaxBoombasters) {
+                    return false;
+                }
                 Boombaster += value;
                 break;
             }
             case EBoosters.Trap: {
+                if (Trap + value > BoostersControl.Instance.MaxTrap) {
+                    return false;
+                }
                 Trap += value;
                 break;
             }
             case EBoosters.Stuck: {
+                if (Stuck + value > BoostersControl.Instance.MaxStuck) {
+                    return false;
+                }
                 Stuck += value;
                 break;
             }
             case EBoosters.Flash: {
+                if (Flash + value > BoostersControl.Instance.MaxFlash) {
+                    return false;
+                }
                 Flash += value;
                 break;
             }
             case EBoosters.Blot: {
+                if (Blot + value > BoostersControl.Instance.MaxBlot) {
+                    return false;
+                }
                 Blot += value;
                 break;
             }
             case EBoosters.Vacuum: {
+                if (Vacuum + value > BoostersControl.Instance.MaxVacuum) {
+                    return false;
+                }
                 Vacuum += value;
                 break;
             }
             case EBoosters.VacuumNozzle: {
+                if (VacuumNozzle + value > BoostersControl.Instance.MaxVacuumNozzle) {
+                    return false;
+                }
                 VacuumNozzle += value;
                 break;
             }
             case EBoosters.Mop: {
+                if (Mop + value > BoostersControl.Instance.MaxMop) {
+                    return false;
+                }
                 Mop += value;
                 break;
             }
             case EBoosters.TameLightning: {
+                if (TameLightning + value > BoostersControl.Instance.MaxTameLightning) {
+                    return false;
+                }
                 TameLightning += value;
                 break;
             }
         }
+
+        return true;
     }
 
     // Собирает все бустеры, не включая особые

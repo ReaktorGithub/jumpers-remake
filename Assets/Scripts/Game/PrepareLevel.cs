@@ -4,9 +4,17 @@ public class PrepareLevel : MonoBehaviour
 {
     [SerializeField] private float _moveToStartTime = 3.3f;
     [SerializeField] private GameObject _startCell;
+    private LevelData _levelData;
+
+    private void Awake() {
+        _levelData = GameObject.Find("LevelScripts").GetComponent<LevelData>();
+    }
 
     private void Start() {
         // порядок важен
+        _levelData.SetUIPrizeList();
+        _levelData.SetInitialRandomBonuses();
+        
         PlayersControl.Instance.PrepareTokenLayerOrder();
         PlayersControl.Instance.UpdatePlayersInfo();
         PlayersControl.Instance.GiveEffectsBeforeRace();
