@@ -8,6 +8,7 @@ public class PlayerEffects : MonoBehaviour
 {
     private PlayerControl _player;
     private ModalWin _modalWin;
+    private ModalSurprise _modalSurprise;
     private CameraControl _camera;
     private Pedestal _pedestal;
     [SerializeField] private int _green = 0;
@@ -22,6 +23,7 @@ public class PlayerEffects : MonoBehaviour
     private void Awake() {
         _player = GetComponent<PlayerControl>();
         _modalWin = GameObject.Find("ModalScripts").GetComponent<ModalWin>();
+        _modalSurprise = GameObject.Find("ModalScripts").GetComponent<ModalSurprise>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
     }
@@ -421,6 +423,15 @@ public class PlayerEffects : MonoBehaviour
         token.DisableIndicators(false);
         StartCoroutine(MoveControl.Instance.ConfirmNewPositionDefer());
     }
+
+    // Сюрприз
+
+    public void ExecuteSurprise() {
+        _modalSurprise.BuildContent();
+        _modalSurprise.OpenModal();
+    }
+
+    // Перемещение эффекта
 
     public void ExecuteReplaceEffect(EControllableEffects effect) {
         ManualContent manual = Manual.Instance.GetEffectManual(effect);

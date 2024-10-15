@@ -3,18 +3,22 @@ using UnityEngine;
 public class Manual : MonoBehaviour
 {
     public static Manual Instance { get; private set; }
-    private ManualContent _power, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect, _attackUsual, _attackMagicKick, _attackVampire, _attackKnockout,
+    private ManualContent _power, _mallow, _ruby, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect, _teleportEffect, _lightningEffect, _attackUsual, _attackMagicKick, _attackVampire, _attackKnockout,
     _boosterLasso, _boosterMagnet, _boosterSuperMagnet, _boosterShield, _boosterIronShield, _boosterVampire, _boosterBoombaster, _boosterStuck, _boosterFlash, _boosterTrap, _boosterBlot, _boosterVacuum, _boosterVacuumNozzle, _boosterMop, _boosterTameLightning;
 
     private void Awake() {
         Instance = this;
         _power = transform.Find("Power").GetComponent<ManualContent>();
         _coins = transform.Find("Coins").GetComponent<ManualContent>();
+        _ruby = transform.Find("Ruby").GetComponent<ManualContent>();
+        _mallow = transform.Find("Mallow").GetComponent<ManualContent>();
         _greenEffect = transform.Find("GreenEffect").GetComponent<ManualContent>();
         _yellowEffect = transform.Find("YellowEffect").GetComponent<ManualContent>();
         _blackEffect = transform.Find("BlackEffect").GetComponent<ManualContent>();
         _redEffect = transform.Find("RedEffect").GetComponent<ManualContent>();
         _starEffect = transform.Find("StarEffect").GetComponent<ManualContent>();
+        _teleportEffect = transform.Find("TeleportEffect").GetComponent<ManualContent>();
+        _lightningEffect = transform.Find("LightningEffect").GetComponent<ManualContent>();
         _attackUsual = transform.Find("AttackUsual").GetComponent<ManualContent>();
         _attackMagicKick = transform.Find("AttackMagicKick").GetComponent<ManualContent>();
         _attackVampire = transform.Find("AttackVampire").GetComponent<ManualContent>();
@@ -66,8 +70,28 @@ public class Manual : MonoBehaviour
         private set {}
     }
 
+    public ManualContent TeleportEffect {
+        get { return _teleportEffect; }
+        private set {}
+    }
+
+    public ManualContent LightningEffect {
+        get { return _lightningEffect; }
+        private set {}
+    }
+
     public ManualContent Coins {
         get { return _coins; }
+        private set {}
+    }
+
+    public ManualContent Ruby {
+        get { return _ruby; }
+        private set {}
+    }
+
+    public ManualContent Mallow {
+        get { return _mallow; }
         private set {}
     }
 
@@ -252,6 +276,33 @@ public class Manual : MonoBehaviour
             }
             case EBoosters.TameLightning: {
                 return BoosterTameLightning;
+            }
+            default: return null;
+        }
+    }
+
+    public ManualContent GetEffectManualBySurprise(ESurprise surprise) {
+        switch(surprise) {
+            case ESurprise.Green: {
+                return GreenEffect;
+            }
+            case ESurprise.Yellow: {
+                return YellowEffect;
+            }
+            case ESurprise.Black: {
+                return BlackEffect;
+            }
+            case ESurprise.Star: {
+                return StarEffect;
+            }
+            case ESurprise.Red: {
+                return RedEffect;
+            }
+            case ESurprise.Teleport: {
+                return TeleportEffect;
+            }
+            case ESurprise.Lightning: {
+                return LightningEffect;
             }
             default: return null;
         }

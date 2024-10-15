@@ -42,6 +42,9 @@ public class ManualContent : MonoBehaviour
     }
     
     public string GetEntityNameWithLevel(int level, bool lowercase = false) {
+        if (level == 0) {
+            return GetEntityName(lowercase);
+        }
         string suffix = " (ур." + level + ")";
         string myEntityName = GetEntityName(lowercase);
         return myEntityName + suffix;
@@ -51,16 +54,16 @@ public class ManualContent : MonoBehaviour
         List<string> found;
 
         switch(level) {
-            case 1: {
-                found = _shortDescriptionLevel1;
-                break;
-            }
             case 2: {
                 found = _shortDescriptionLevel2;
                 break;
             }
-            default: {
+            case 3: {
                 found = _shortDescriptionLevel3;
+                break;
+            }
+            default: {
+                found = _shortDescriptionLevel1;
                 break;
             }
         }

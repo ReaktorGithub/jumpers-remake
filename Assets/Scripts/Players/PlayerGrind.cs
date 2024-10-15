@@ -171,7 +171,7 @@ public class PlayerGrind : MonoBehaviour
             case EControllableEffects.Red: {
                 return Red;
             }
-            default: return 1;
+            default: return 0;
         }
     }
 
@@ -192,7 +192,7 @@ public class PlayerGrind : MonoBehaviour
             case EBoosters.Mop: {
                 return Mop;
             }
-            default: return 1;
+            default: return 0;
         }
     }
 }
