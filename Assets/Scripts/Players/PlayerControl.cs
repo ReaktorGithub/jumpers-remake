@@ -28,11 +28,13 @@ public class PlayerControl : MonoBehaviour
     private List<EAttackTypes> _availableAttackTypes = new();
     private ModalWarning _modalWarning;
     private ModalLose _modalLose;
+    private ModalPickableRuby _modalPickupRuby;
     private Pedestal _pedestal;
     private Sprite _tokenImage;
     private PlayerEffects _effects;
     private PlayerBoosters _boosters;
     private PlayerGrind _grind;
+    
 
     // Ресурсы игрока
     [SerializeField] private int _coins = 0;
@@ -46,6 +48,7 @@ public class PlayerControl : MonoBehaviour
         _availableAttackTypes.Add(EAttackTypes.Knockout);
         _modalWarning = GameObject.Find("ModalScripts").GetComponent<ModalWarning>();
         _modalLose = GameObject.Find("ModalScripts").GetComponent<ModalLose>();
+        _modalPickupRuby = GameObject.Find("ModalScripts").GetComponent<ModalPickableRuby>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
         _effects = GetComponent<PlayerEffects>();
         _boosters = GetComponent<PlayerBoosters>();
@@ -231,11 +234,14 @@ public class PlayerControl : MonoBehaviour
     public void AddCoins(int value) {
         _coins += value;
         (string, Color32) values = Utils.GetTextWithSymbolAndColor(value);
-        GetTokenControl().AddBonusEventToQueue(values.Item1, values.Item2);
+        GetTokenControl().AddBonusEventToQueue(values.Item1 + " монеты", values.Item2);
     }
 
     public void AddPower(int value) {
+        Debug.Log("AddPower to " + _playerName + ": " + value);
         _power += value;
+        (string, Color32) values = Utils.GetTextWithSymbolAndColor(value);
+        GetTokenControl().AddBonusEventToQueue(values.Item1 + " сила", values.Item2);
     }
 
     public void AddMallows(int value) {
@@ -275,7 +281,9 @@ public class PlayerControl : MonoBehaviour
 
         selectedPlayer.ExecuteStuckAsVictim(addStuck);
         StuckAttached -= removeStuck;
-        AddPower(-removeStuck);
+        if (removeStuck != 0) {
+            AddPower(-removeStuck);
+        }
 
         switch(type) {
             case EAttackTypes.MagicKick: {
@@ -408,7 +416,7 @@ public class PlayerControl : MonoBehaviour
 
     // Подбираемый бонус
 
-    public void ExecutePickableBonus(CellControl cell) {
+    public bool ExecutePickableBonus(CellControl cell) {
         EPickables type = cell.PickableType;
         EBoosters booster = cell.PickableBooster;
 
@@ -419,8 +427,15 @@ public class PlayerControl : MonoBehaviour
                 break;
             }
             case EPickables.Ruby: {
-                AddRubies(1);
-                PickupBonusProcessing(cell, "рубин");
+                if (IsMe()) {
+                    _modalPickupRuby.BuildContent();
+                    _modalPickupRuby.OpenModal();
+                    return false;
+                } else if (Power >= _modalPickupRuby.Cost) {
+                    PickupRubyProcessing(cell);
+                } else {
+                    RefuseRuby();
+                }
                 break;
             }
             case EPickables.Booster: {
@@ -440,6 +455,19 @@ public class PlayerControl : MonoBehaviour
                 break;
             }
         }
+
+        return true;
+    }
+
+    public void PickupRubyProcessing(CellControl cell) {
+        AddRubies(1);
+        PickupBonusProcessing(cell, "рубин");
+    }
+
+    public void RefuseRuby() {
+        bool isEnough = Power >= _modalPickupRuby.Cost;
+        string message = isEnough ? Utils.Wrap(PlayerName, UIColors.Yellow) + " отказывается от рубина" : "У " + Utils.Wrap(PlayerName, UIColors.Yellow) + " не хватило сил на подбор рубина";
+        Messages.Instance.AddMessage(message);
     }
 
     private void PickupBonusProcessing(CellControl cell, string bonusName) {

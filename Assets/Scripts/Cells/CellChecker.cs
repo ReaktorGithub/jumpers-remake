@@ -147,18 +147,24 @@ public class CellChecker : MonoBehaviour
     }
 
     private void CheckPickableBonus(PlayerControl player, CellControl cell) {
+        bool check = true;
+
         if (cell.PickableType != EPickables.None) {
             if (player.Boosters.IsBlot()) {
                 player.Boosters.ExecuteBlotAsVictim("получить бонус");
             } else {
-                player.ExecutePickableBonus(cell);
+                check = player.ExecutePickableBonus(cell);
             }
         }
 
-        CheckTrap(player, cell);
+        if (check) {
+            CheckTrap(player);
+        }
     }
 
-    private void CheckTrap(PlayerControl player, CellControl cell) {
+    public void CheckTrap(PlayerControl player) {
+        CellControl cell = player.GetCurrentCell();
+        
         if (cell.WhosTrap != null) {
             player.ExecuteTrap(cell);
         }

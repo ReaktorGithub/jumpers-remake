@@ -418,6 +418,7 @@ public class PlayerEffects : MonoBehaviour
     private IEnumerator ConfirmTeleportPositionDefer(TokenControl token) {
         token.StartTeleportOutAnimation();
         yield return new WaitForSeconds(TokensControl.Instance.TeleportAnimationTime);
+        token.DisableIndicators(false);
         StartCoroutine(MoveControl.Instance.ConfirmNewPositionDefer());
     }
 
