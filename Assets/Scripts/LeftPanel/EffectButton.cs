@@ -4,7 +4,8 @@ using UnityEngine.UI;
 
 public class EffectButton : MonoBehaviour
 {
-    private GameObject _effect, _selected, _grind1, _grind2, _grind3;
+    private GameObject _effect, _selected;
+    private SpriteRenderer _grind;
     private SpriteRenderer _effectRenderer;
     private Button _button;
     private bool _isEmpty = false;
@@ -16,9 +17,7 @@ public class EffectButton : MonoBehaviour
     private void Awake() {
         _effect = transform.Find("effect").gameObject;
         _selected = transform.Find("effect-selected").gameObject;
-        _grind1 = transform.Find("grind1").gameObject;
-        _grind2 = transform.Find("grind2").gameObject;
-        _grind3 = transform.Find("grind3").gameObject;
+        _grind = transform.Find("grind").GetComponent<SpriteRenderer>();
         _button = GetComponent<Button>();
         _effectRenderer = _effect.GetComponent<SpriteRenderer>();
         _quantityText = _quantityTextObject.GetComponent<TextMeshProUGUI>();
@@ -46,9 +45,25 @@ public class EffectButton : MonoBehaviour
         _button.interactable = !value;
         
         int level = value ? 0 : grindLevel;
-        _grind1.SetActive(level == 1);
-        _grind2.SetActive(level == 2);
-        _grind3.SetActive(level == 3);
+
+        switch(level) {
+            case 1: {
+                _grind.sprite = CellsControl.Instance.Grind1Sprite;
+                break;
+            }
+            case 2: {
+                _grind.sprite = CellsControl.Instance.Grind2Sprite;
+                break;
+            }
+            case 3: {
+                _grind.sprite = CellsControl.Instance.Grind3Sprite;
+                break;
+            }
+            default: {
+                _grind.sprite = null;
+                break;
+            }
+        }
     }
 
     // если кнопка энейблится, но при этом она пустая, то ничего не делать

@@ -5,8 +5,9 @@ using UnityEngine.UI;
 public class ModalReplaceEffect : MonoBehaviour
 {
     private Modal _modal;
-    [SerializeField] private GameObject _iconExecute, _iconCostEffect, _iconResource, _lowPower, _replaceButton, _shieldInfo, _shieldIcon;
-    [SerializeField] private TextMeshProUGUI _descriptionText, _effectCostName, _resourceCost, _resourceCostText, _effectName;
+    [SerializeField] private GameObject _effectDisplayerObject, _iconCostEffect, _iconResource, _lowPower, _replaceButton, _shieldInfo, _shieldIcon;
+    [SerializeField] private TextMeshProUGUI _descriptionText, _effectCostName, _resourceCost, _resourceCostText;
+    private EffectDisplayer _effectDisplayer;
     private TextMeshProUGUI _lowPowerText;
     private BigAnswerButton _replaceButtonScript;
     private Sprite _shieldSprite, _starSprite;
@@ -20,6 +21,7 @@ public class ModalReplaceEffect : MonoBehaviour
         _shieldSprite = Instances.transform.Find("shield-iron").GetComponent<SpriteRenderer>().sprite;
         _starSprite = Instances.transform.Find("star-icon").GetComponent<SpriteRenderer>().sprite;
         _shieldImage = _shieldIcon.GetComponent<Image>();
+        _effectDisplayer = _effectDisplayerObject.GetComponent<EffectDisplayer>();
     }
 
     private void Start() {
@@ -31,7 +33,6 @@ public class ModalReplaceEffect : MonoBehaviour
     }
 
     private void SetNewEffectIcon(Sprite sprite) {
-        _iconExecute.GetComponent<Image>().sprite = sprite;
         _iconCostEffect.GetComponent<Image>().sprite = sprite;
     }
 
@@ -48,7 +49,8 @@ public class ModalReplaceEffect : MonoBehaviour
 
         // имя эффекта
 
-        _effectName.text = manual.GetEntityNameWithLevel(effectLevel);
+        string text = manual.GetEntityNameWithLevel(effectLevel);
+        _effectDisplayer.BuildContent(text, manual.Sprite, effectLevel);
 
         // описание
 

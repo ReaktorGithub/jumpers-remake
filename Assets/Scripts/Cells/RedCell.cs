@@ -6,12 +6,7 @@ public class RedCell : MonoBehaviour
     [SerializeField] private GameObject _penaltyCell;
 
     private void Start() {
-        (GameObject cell, int _) = CellsControl.Instance.FindNearestCell(transform.gameObject, false, IsStartOrCheckpointPredicate);
-        _penaltyCell = cell;
-    }
-
-    private bool IsStartOrCheckpointPredicate(CellControl cell) {
-        return cell.CellType == ECellTypes.Start || cell.CellType == ECellTypes.Checkpoint;
+        _penaltyCell = CellsControl.Instance.FindPenaltyCell(transform.gameObject);
     }
 
     public GameObject PenaltyCell {

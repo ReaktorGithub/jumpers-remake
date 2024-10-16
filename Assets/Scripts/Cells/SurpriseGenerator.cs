@@ -2,7 +2,32 @@ using System.Collections.Generic;
 
 public static class SurpriseGenerator
 {
-    public static ESurprise GenerateSurpriseType(ESurprise forceReturn = ESurprise.None) {
+    public static (
+        ESurprise surpriseType,
+        EControllableEffects surpriseEffect,
+        EBoosters surpriseBooster,
+        int surpriseCoinsBonus,
+        int surpriseCoinsPenalty,
+        int surpriseLevel
+    ) GenerateSurprise() {
+        ESurprise surpriseType = GenerateSurpriseType();
+        EControllableEffects surpriseEffect = GenerateSurpriseInventoryEffect();
+        EBoosters surpriseBooster = GenerateSurpriseBooster();
+        int surpriseCoinsBonus = GenerateSurpriseCoins(false);
+        int surpriseCoinsPenalty = GenerateSurpriseCoins(true);
+        int surpriseLevel = GenerateEffectLevel();
+
+        return (
+            surpriseType,
+            surpriseEffect,
+            surpriseBooster,
+            surpriseCoinsBonus,
+            surpriseCoinsPenalty,
+            surpriseLevel
+        );
+    }
+
+    private static ESurprise GenerateSurpriseType(ESurprise forceReturn = ESurprise.None) {
         if (forceReturn != ESurprise.None) {
             return forceReturn;
         }
@@ -31,7 +56,7 @@ public static class SurpriseGenerator
         return Utils.GetRandomElement(types);
     }
 
-    public static EControllableEffects GenerateSurpriseInventoryEffect(EControllableEffects forceReturn = EControllableEffects.None) {
+    private static EControllableEffects GenerateSurpriseInventoryEffect(EControllableEffects forceReturn = EControllableEffects.None) {
         if (forceReturn != EControllableEffects.None) {
             return forceReturn;
         }
@@ -47,7 +72,7 @@ public static class SurpriseGenerator
         return Utils.GetRandomElement(effects);
     }
 
-    public static EBoosters GenerateSurpriseBooster(EBoosters forceReturn = EBoosters.None) {
+    private static EBoosters GenerateSurpriseBooster(EBoosters forceReturn = EBoosters.None) {
         if (forceReturn != EBoosters.None) {
             return forceReturn;
         }
@@ -76,7 +101,7 @@ public static class SurpriseGenerator
         return Utils.GetRandomElement(boosters);
     }
 
-    public static int GenerateSurpriseCoins(bool isPenalty, int forceReturn = 0) {
+    private static int GenerateSurpriseCoins(bool isPenalty, int forceReturn = 0) {
         if (forceReturn != 0) {
             return forceReturn;
         }
@@ -89,7 +114,7 @@ public static class SurpriseGenerator
         return isPenalty ? -result : result;
     }
 
-    public static int GenerateEffectLevel(int forceReturn = 0) {
+    private static int GenerateEffectLevel(int forceReturn = 0) {
         if (forceReturn != 0) {
             return forceReturn;
         }

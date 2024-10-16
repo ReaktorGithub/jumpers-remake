@@ -17,4 +17,5 @@ public static class UIColors
     public static string Brick = "#B43012";
     public static string Armor = "#29A3F6";
     public static string ArmorIron = "#B100FF";
+    public static string Violet = "#8500B1";
 }

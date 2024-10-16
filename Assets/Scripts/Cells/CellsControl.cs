@@ -12,7 +12,7 @@ public class CellsControl : MonoBehaviour
     [SerializeField] private float _changingEffectDelay = 1.85f;
     [SerializeField] private int _boombasterMaxTicks = 9;
     [SerializeField] private float _boombasterDelay = 3f;
-    private Sprite _grind2Sprite, _grind3Sprite;
+    private Sprite _grind1Sprite, _grind2Sprite, _grind3Sprite;
     private List<CellControl> _boombastersList = new();
     [SerializeField] private List<ECellTypes> _excludeTrapTypes = new();
     [SerializeField] private List<ECellTypes> _excludePickableBonusTypes = new();
@@ -24,6 +24,7 @@ public class CellsControl : MonoBehaviour
         Instance = this;
         AssignAllCellControls();
         GameObject Instances = GameObject.Find("Instances");
+        _grind1Sprite = Instances.transform.Find("grind-dash1").GetComponent<SpriteRenderer>().sprite;
         _grind2Sprite = Instances.transform.Find("grind-dash2").GetComponent<SpriteRenderer>().sprite;
         _grind3Sprite = Instances.transform.Find("grind-dash3").GetComponent<SpriteRenderer>().sprite;
         _explosion = GameObject.Find("Explosion").GetComponent<Explosion>();
@@ -119,6 +120,11 @@ public class CellsControl : MonoBehaviour
         foreach (CellControl cell in _allCellControls) {
             cell.TurnOffMopMode();
         }
+    }
+
+    public Sprite Grind1Sprite {
+        get { return _grind1Sprite; }
+        private set {}
     }
 
     public Sprite Grind2Sprite {
@@ -656,6 +662,17 @@ public class CellsControl : MonoBehaviour
         }
 
         return Utils.GetRandomElements(filtered, itemsCount);
+    }
+
+    // Найти клетку наказания для красной клетки
+
+    public GameObject FindPenaltyCell(GameObject initialCell) {
+        (GameObject cell, int _) = FindNearestCell(initialCell, false, IsStartOrCheckpointPredicate);
+        return cell;
+    }
+
+    private bool IsStartOrCheckpointPredicate(CellControl cell) {
+        return cell.CellType == ECellTypes.Start || cell.CellType == ECellTypes.Checkpoint;
     }
 
     // Дебаг

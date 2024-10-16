@@ -441,16 +441,7 @@ public class PlayerControl : MonoBehaviour
             case EPickables.Booster: {
                 bool isSuccess = _boosters.AddTheBooster(booster, 1);
                 if (isSuccess) {
-                    ManualContent manual = Manual.Instance.GetBoosterManual(booster);
-                    string bonusName = manual.GetEntityName(true);
-                    string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " подбирает усилитель: " + Utils.Wrap(bonusName, UIColors.Orange);
-                    Messages.Instance.AddMessage(message);
-                    BoostersControl.Instance.UpdateBoostersFromPlayer(this);
                     cell.SetPickableBonus(EPickables.None, EBoosters.None);
-                    GetTokenControl().AddBonusEventToQueue("+" + bonusName, new Color32(3,74,0,255));
-                } else {
-                    string message = "У " + Utils.Wrap(PlayerName, UIColors.Yellow) + " не хватило места в инвентаре для усилителя";
-                    Messages.Instance.AddMessage(message);
                 }
                 break;
             }
@@ -471,10 +462,16 @@ public class PlayerControl : MonoBehaviour
     }
 
     private void PickupBonusProcessing(CellControl cell, string bonusName) {
+        cell.SetPickableBonus(EPickables.None, EBoosters.None);
+        BonusProcessing(bonusName);
         PlayersControl.Instance.UpdatePlayersInfo();
+    }
+
+    // Общий метод обработки бонуса любого типа
+
+    public void BonusProcessing(string bonusName) {
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " подбирает бонус: " + Utils.Wrap(bonusName, UIColors.Orange);
         Messages.Instance.AddMessage(message);
-        cell.SetPickableBonus(EPickables.None, EBoosters.None);
         GetTokenControl().AddBonusEventToQueue("+" + bonusName, new Color32(3,74,0,255));
     }
 

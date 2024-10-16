@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -6,14 +7,17 @@ using UnityEngine.UI;
 public class ModalSurprise : MonoBehaviour
 {
     private Modal _modal;
-    [SerializeField] private GameObject _stopButtonObject, _confirmButtonObject, _rollObject, _resultEffectObject, _resultCoinsObject, _resultGiftObject, _effectIcon, _warningBox, _giftIcon;
-    [SerializeField] private TextMeshProUGUI _effectName, _effectDesription, _giftName, _giftDescription, _coinsCount;
+    [SerializeField] private GameObject _stopButtonObject, _confirmButtonObject, _rollObject, _resultEffectObject, _resultCoinsObject, _resultGiftObject, _warningBox, _giftIcon;
+    [SerializeField] private TextMeshProUGUI _effectDesription, _giftName, _giftDescription, _coinsCount;
     [SerializeField] private float _delayBeforeClick = 1.5f;
+    private EffectDisplayer _effectDisplayer;
     private Button _stopButton;
+    private Action _onConfirm;
 
     private void Awake() {
         _stopButton = _stopButtonObject.GetComponent<Button>();
         _modal = GameObject.Find("ModalSurprise").GetComponent<Modal>();
+        _effectDisplayer = _resultEffectObject.transform.Find("EffectDisplayer").GetComponent<EffectDisplayer>();
     }
 
     public void OpenModal() {
@@ -28,41 +32,44 @@ public class ModalSurprise : MonoBehaviour
         _rollObject.SetActive(false);
         _warningBox.SetActive(false);
 
-        ESurprise type = SurpriseGenerator.GenerateSurpriseType();
+        (
+            ESurprise surpriseType,
+            EControllableEffects surpriseEffect,
+            EBoosters surpriseBooster,
+            int surpriseCoinsBonus,
+            int surpriseCoinsPenalty,
+            int surpriseLevel
+        ) = SurpriseGenerator.GenerateSurprise();
 
-        switch(type) {
+        switch(surpriseType) {
             case ESurprise.InventoryEffect: {
-                EControllableEffects effect = SurpriseGenerator.GenerateSurpriseInventoryEffect();
                 _resultGiftObject.SetActive(true);
-                int level = player.Grind.GetEffectLevel(effect);
-                ManualContent manual = Manual.Instance.GetEffectManual(effect);
+                int level = player.Grind.GetEffectLevel(surpriseEffect);
+                ManualContent manual = Manual.Instance.GetEffectManual(surpriseEffect);
                 _giftIcon.GetComponent<Image>().sprite = manual.Sprite;
                 _giftName.text = manual.GetEntityNameWithLevel(level);
                 _giftDescription.text = manual.GetShortDescription(level);
                 break;
             }
             case ESurprise.Booster: {
-                EBoosters booster = SurpriseGenerator.GenerateSurpriseBooster();
                 _resultGiftObject.SetActive(true);
-                int level = player.Grind.GetBoosterLevel(booster);
-                ManualContent manual = Manual.Instance.GetBoosterManual(booster);
+                int level = player.Grind.GetBoosterLevel(surpriseBooster);
+                ManualContent manual = Manual.Instance.GetBoosterManual(surpriseBooster);
                 _giftIcon.GetComponent<Image>().sprite = manual.Sprite;
                 _giftName.text = manual.GetEntityNameWithLevel(level);
                 _giftDescription.text = manual.GetShortDescription(level);
                 break;
             }
             case ESurprise.Bonus: {
-                int coins = SurpriseGenerator.GenerateSurpriseCoins(false);
                 _resultCoinsObject.SetActive(true);
-                (string, Color32) values = Utils.GetTextWithSymbolAndColor(coins);
+                (string, Color32) values = Utils.GetTextWithSymbolAndColor(surpriseCoinsBonus);
                 _coinsCount.text = values.Item1;
                 _coinsCount.color = values.Item2;
                 break;
             }
             case ESurprise.Penalty: {
-                int coins = SurpriseGenerator.GenerateSurpriseCoins(true);
                 _resultCoinsObject.SetActive(true);
-                (string, Color32) values = Utils.GetTextWithSymbolAndColor(coins);
+                (string, Color32) values = Utils.GetTextWithSymbolAndColor(surpriseCoinsPenalty);
                 _coinsCount.text = values.Item1;
                 _coinsCount.color = values.Item2;
                 break;
@@ -77,24 +84,37 @@ public class ModalSurprise : MonoBehaviour
             }
             default: {
                 _resultEffectObject.SetActive(true);
-                ManualContent manual = Manual.Instance.GetEffectManualBySurprise(type);
-                _effectIcon.GetComponent<Image>().sprite = manual.Sprite;
+                ManualContent manual = Manual.Instance.GetEffectManualBySurprise(surpriseType);
                 int level = 0;
-                if (type != ESurprise.Teleport && type != ESurprise.Lightning) {
-                    level = SurpriseGenerator.GenerateEffectLevel();
+                if (surpriseType != ESurprise.Teleport && surpriseType != ESurprise.Lightning) {
+                    level = surpriseLevel;
                 }
-                _effectName.text = manual.GetEntityNameWithLevel(level);
+                string text = manual.GetEntityNameWithLevel(level);
+                _effectDisplayer.BuildContent(text, manual.Sprite, level);
                 _effectDesription.text = manual.GetShortDescription(level);
                 break;
             }
         }
+
+        _onConfirm = () => {
+            player.Effects.ProcessGeneratedSurprise(
+                surpriseType,
+                surpriseEffect,
+                surpriseBooster,
+                surpriseCoinsBonus,
+                surpriseCoinsPenalty,
+                surpriseLevel
+            );
+        };
     }
 
     public void OnConfirmSurprise() {
         _modal.CloseModal();
+        _onConfirm?.Invoke();
     }
 
     public void BuildContent() {
+        _rollObject.SetActive(true);
         _confirmButtonObject.SetActive(false);
         _stopButtonObject.SetActive(true);
         _resultEffectObject.SetActive(false);
