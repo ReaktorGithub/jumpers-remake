@@ -7,8 +7,8 @@ public class FinishCell : MonoBehaviour
 {
     private bool _isHedgehog = false;
     private HedgehogsControl _hedgehogsControl;
-    private int _coinsCollected = 0;
-    private List<EBoosters> _boostersCollected = new();
+    [SerializeField] private int _coinsCollected = 0;
+    [SerializeField] private List<EBoosters> _boostersCollected = new();
 
     private void Awake() {
         _hedgehogsControl = GameObject.Find("LevelScripts").GetComponent<HedgehogsControl>();
@@ -31,7 +31,7 @@ public class FinishCell : MonoBehaviour
 
     public bool CheckHedgehog() {
         if (_isHedgehog) {
-            _hedgehogsControl.ExecuteFinishHedgehog(this);
+            _hedgehogsControl.ExecuteFinishHedgehog();
         }
         return _isHedgehog;
     }

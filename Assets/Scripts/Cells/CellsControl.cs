@@ -650,6 +650,7 @@ public class CellsControl : MonoBehaviour
 
     public List<CellControl> GetRandomCellsForItems(int itemsCount) {
         List<CellControl> filtered = new();
+        int count = itemsCount;
 
         foreach(CellControl cell in _allCellControls) {
             if (!_excludePickableBonusTypes.Contains(cell.CellType) && cell.PickableType == EPickables.None) {
@@ -657,11 +658,12 @@ public class CellsControl : MonoBehaviour
             }
         }
 
-        if (filtered.Count < itemsCount) {
-            throw new ArgumentException("Количество элементов в исходном списке меньше, чем запрошенное количество случайных элементов.");
+        if (filtered.Count < count) {
+            Debug.Log("Слишком много бонусов для такого количества клеток. Некоторые из них не будут добавлены");
+            count = filtered.Count;
         }
 
-        return Utils.GetRandomElements(filtered, itemsCount);
+        return Utils.GetRandomElements(filtered, count);
     }
 
     // Найти клетку наказания для красной клетки
@@ -673,6 +675,23 @@ public class CellsControl : MonoBehaviour
 
     private bool IsStartOrCheckpointPredicate(CellControl cell) {
         return cell.CellType == ECellTypes.Start || cell.CellType == ECellTypes.Checkpoint;
+    }
+
+    public Sprite GetPickableBonusSprite(EPickables type, EBoosters booster) {
+        switch(type) {
+            case EPickables.Mallow: {
+                return Manual.Instance.Mallow.Sprite;
+            }
+            case EPickables.Ruby: {
+                return Manual.Instance.Ruby.Sprite;
+            }
+            case EPickables.Booster: {
+                return BoostersControl.Instance.GetBoosterSprite(booster);
+            }
+            default: {
+                return null;
+            }
+        }
     }
 
     // Дебаг

@@ -238,7 +238,6 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void AddPower(int value) {
-        Debug.Log("AddPower to " + _playerName + ": " + value);
         _power += value;
         (string, Color32) values = Utils.GetTextWithSymbolAndColor(value);
         GetTokenControl().AddBonusEventToQueue(values.Item1 + " сила", values.Item2);

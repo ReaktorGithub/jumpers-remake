@@ -11,6 +11,7 @@ public class PlayerEffects : MonoBehaviour
     private ModalSurprise _modalSurprise;
     private CameraControl _camera;
     private Pedestal _pedestal;
+    private HedgehogsControl _hedgehogsControl;
     [SerializeField] private int _green = 0;
     [SerializeField] private int _yellow = 0;
     [SerializeField] private int _black = 0;
@@ -26,6 +27,7 @@ public class PlayerEffects : MonoBehaviour
         _modalSurprise = GameObject.Find("ModalScripts").GetComponent<ModalSurprise>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
+        _hedgehogsControl = GameObject.Find("LevelScripts").GetComponent<HedgehogsControl>();
     }
 
     public int Green {
@@ -273,6 +275,14 @@ public class PlayerEffects : MonoBehaviour
     }
 
     public void ExecuteHedgehogFinishPay(int cost) {
+        CellControl cell = _player.GetCurrentCell();
+
+        if (cell.TryGetComponent(out FinishCell finishCell)) {
+            finishCell.AddCoinsCollected(cost);
+        } else {
+            Debug.Log("Finish cell not found");
+        }
+        
         _player.AddCoins(-cost);
         PlayersControl.Instance.UpdatePlayersInfo();
 
@@ -289,8 +299,13 @@ public class PlayerEffects : MonoBehaviour
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + Utils.Wrap(" ПОБИЛ ", UIColors.Red) + Utils.Wrap("ежа!", UIColors.DarkGreen) + " Финиш свободен";
         Messages.Instance.AddMessage(message);
 
-        // todo нужно разбрасывать дань по полю
-        ExecuteFinish();
+        CellControl cell = _player.GetCurrentCell();
+
+        if (cell.TryGetComponent(out FinishCell finishCell)) {
+            StartCoroutine(_hedgehogsControl.SpawnHedgehogItemsDefer(finishCell, _player));
+        } else {
+            Debug.Log("Finish cell not found");
+        }
     }
 
     public void ExecuteMoneybox(MoneyboxVault vault) {
