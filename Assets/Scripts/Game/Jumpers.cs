@@ -12,40 +12,10 @@ public class Jumpers : MonoBehaviour
     // }
 
     private void Start() {
-        CleanInstances();
+        // CleanInstances();
         PlayersControl.Instance.BindTokensToPlayers();
-    }
-
-    private void CleanInstances() {
         GameObject Instances = GameObject.Find("Instances");
-        Instances.transform.Find("arrow-body").gameObject.SetActive(false);
-        Instances.transform.Find("arrow-body-tax").gameObject.SetActive(false);
-        Instances.transform.Find("magnet").gameObject.SetActive(false);
-        Instances.transform.Find("magnet-super").gameObject.SetActive(false);
-        Instances.transform.Find("boombaster-icon").gameObject.SetActive(false);
-        Instances.transform.Find("lasso").gameObject.SetActive(false);
-        Instances.transform.Find("shield").gameObject.SetActive(false);
-        Instances.transform.Find("shield-iron").gameObject.SetActive(false);
-        Instances.transform.Find("vampire").gameObject.SetActive(false);
-        Instances.transform.Find("BoosterButtonPick").gameObject.SetActive(false);
-        Instances.transform.Find("TokenIndicator").gameObject.SetActive(false);
-        Instances.transform.Find("TokenBonusEvent").gameObject.SetActive(false);
-        Instances.transform.Find("lightning").gameObject.SetActive(false);
-        Instances.transform.Find("grind-dash1").gameObject.SetActive(false);
-        Instances.transform.Find("grind-dash2").gameObject.SetActive(false);
-        Instances.transform.Find("grind-dash3").gameObject.SetActive(false);
-        Instances.transform.Find("star-icon").gameObject.SetActive(false);
-        Instances.transform.Find("Boombaster").gameObject.SetActive(false);
-        Instances.transform.Find("stuck-icon").gameObject.SetActive(false);
-        Instances.transform.Find("trap-icon").gameObject.SetActive(false);
-        Instances.transform.Find("flash-icon").gameObject.SetActive(false);
-        Instances.transform.Find("blot").gameObject.SetActive(false);
-        Instances.transform.Find("vacuum-icon").gameObject.SetActive(false);
-        Instances.transform.Find("vacuum-nozzle-icon").gameObject.SetActive(false);
-        Instances.transform.Find("mop").gameObject.SetActive(false);
-        Instances.transform.Find("lightning-icon").gameObject.SetActive(false);
-        Instances.transform.Find("mallow").gameObject.SetActive(false);
-        Instances.transform.Find("ruby").gameObject.SetActive(false);
+        Instances.SetActive(false);
     }
 
     // private void Update() {

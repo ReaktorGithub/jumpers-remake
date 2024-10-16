@@ -88,13 +88,17 @@ public class LevelData : MonoBehaviour
         List<CellControl> cells = CellsControl.Instance.GetRandomCellsForItems(itemsCount);
 
         if (_randomBonusMallow) {
-            cells[0].SetPickableBonus(EPickables.Mallow, EBoosters.None);
-            cells.RemoveAt(0);
+            if (cells.Count > 0) {
+               cells[0].SetPickableBonus(EPickables.Mallow, EBoosters.None);
+                cells.RemoveAt(0); 
+            }
         }
 
         foreach(EBoosters booster in _randomBonusBoosters) {
-            cells[0].SetPickableBonus(EPickables.Booster, booster);
-            cells.RemoveAt(0);
+            if (cells.Count > 0) {
+                cells[0].SetPickableBonus(EPickables.Booster, booster);
+                cells.RemoveAt(0);
+            }
         }
     }
 }

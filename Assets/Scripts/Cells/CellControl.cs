@@ -575,25 +575,8 @@ public class CellControl : MonoBehaviour
 
     private void UpdatePickableBonusView() {
         _pickableBonus.SetActive(_pickableType != EPickables.None);
-
-        switch(_pickableType) {
-            case EPickables.Mallow: {
-                _pickableSpriteRenderer.sprite = Icons.Instance.MallowSprite;
-                break;
-            }
-            case EPickables.Ruby: {
-                _pickableSpriteRenderer.sprite = Icons.Instance.RubySprite;
-                break;
-            }
-            case EPickables.Booster: {
-                _pickableSpriteRenderer.sprite = BoostersControl.Instance.GetBoosterSprite(_pickableBooster);
-                break;
-            }
-            default: {
-                _pickableSpriteRenderer.sprite = null;
-                break;
-            }
-        }
+        Sprite sprite = CellsControl.Instance.GetPickableBonusSprite(_pickableType, _pickableBooster);
+        _pickableSpriteRenderer.sprite = sprite;
     }
 
     // Бумка
