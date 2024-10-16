@@ -325,115 +325,135 @@ public class PlayerBoosters : MonoBehaviour
     // Для массового изменения бустеров. Вернет false, если не хватает места
 
     public bool AddTheBooster(EBoosters booster, int value) {
+        bool isSuccess = true;
+
         switch(booster) {
             case EBoosters.Lasso: {
                 if (Lasso + value > BoostersControl.Instance.MaxLasso) {
-                    return false;
+                    isSuccess = false;
                 }
                 Lasso += value;
                 break;
             }
             case EBoosters.Magnet: {
                 if (Magnet + SuperMagnet + value > BoostersControl.Instance.MaxMagnets) {
-                    return false;
+                    isSuccess = false;
                 }
                 Magnet += value;
                 break;
             }
             case EBoosters.MagnetSuper: {
                 if (Magnet + SuperMagnet + value > BoostersControl.Instance.MaxMagnets) {
-                    return false;
+                    isSuccess = false;
                 }
                 SuperMagnet += value;
                 break;
             }
             case EBoosters.Shield: {
                 if (Shield + ShieldIron + value > BoostersControl.Instance.MaxShields) {
-                    return false;
+                    isSuccess = false;
                 }
                 Shield += value;
                 break;
             }
             case EBoosters.ShieldIron: {
                 if (Shield + ShieldIron + value > BoostersControl.Instance.MaxShields) {
-                    return false;
+                    isSuccess = false;
                 }
                 ShieldIron += value;
                 break;
             }
             case EBoosters.Vampire: {
                 if (Vampire + value > BoostersControl.Instance.MaxVampires) {
-                    return false;
+                    isSuccess = false;
                 }
                 Vampire += value;
                 break;
             }
             case EBoosters.Boombaster: {
                 if (Boombaster + value > BoostersControl.Instance.MaxBoombasters) {
-                    return false;
+                    isSuccess = false;
                 }
                 Boombaster += value;
                 break;
             }
             case EBoosters.Trap: {
                 if (Trap + value > BoostersControl.Instance.MaxTrap) {
-                    return false;
+                    isSuccess = false;
                 }
                 Trap += value;
                 break;
             }
             case EBoosters.Stuck: {
                 if (Stuck + value > BoostersControl.Instance.MaxStuck) {
-                    return false;
+                    isSuccess = false;
                 }
                 Stuck += value;
                 break;
             }
             case EBoosters.Flash: {
                 if (Flash + value > BoostersControl.Instance.MaxFlash) {
-                    return false;
+                    isSuccess = false;
                 }
                 Flash += value;
                 break;
             }
             case EBoosters.Blot: {
                 if (Blot + value > BoostersControl.Instance.MaxBlot) {
-                    return false;
+                    isSuccess = false;
                 }
                 Blot += value;
                 break;
             }
             case EBoosters.Vacuum: {
                 if (Vacuum + value > BoostersControl.Instance.MaxVacuum) {
-                    return false;
+                    isSuccess = false;
                 }
                 Vacuum += value;
                 break;
             }
             case EBoosters.VacuumNozzle: {
                 if (VacuumNozzle + value > BoostersControl.Instance.MaxVacuumNozzle) {
-                    return false;
+                    isSuccess = false;
                 }
                 VacuumNozzle += value;
                 break;
             }
             case EBoosters.Mop: {
                 if (Mop + value > BoostersControl.Instance.MaxMop) {
-                    return false;
+                    isSuccess = false;
                 }
                 Mop += value;
                 break;
             }
             case EBoosters.TameLightning: {
                 if (TameLightning + value > BoostersControl.Instance.MaxTameLightning) {
-                    return false;
+                    isSuccess = false;
                 }
                 TameLightning += value;
                 break;
             }
         }
 
-        return true;
+        if (value > 0) {
+            AfterAddingBooster(booster, isSuccess);
+        }
+
+        return isSuccess;
+    }
+
+    private void AfterAddingBooster(EBoosters booster, bool isSuccess) {
+        if (isSuccess) {
+            ManualContent manual = Manual.Instance.GetBoosterManual(booster);
+            string bonusName = manual.GetEntityName(true);
+            string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " подбирает усилитель: " + Utils.Wrap(bonusName, UIColors.Orange);
+            Messages.Instance.AddMessage(message);
+            BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
+            _player.GetTokenControl().AddBonusEventToQueue("+" + bonusName, new Color32(3,74,0,255));
+        } else {
+            string message = "У " + Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " не хватило места в инвентаре для усилителя";
+            Messages.Instance.AddMessage(message);
+        }
     }
 
     // Собирает все бустеры, не включая особые

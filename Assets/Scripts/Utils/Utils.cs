@@ -100,6 +100,11 @@ public static class Utils
         return result == 1;
     }
 
+    public static int GetRandomInt(int min, int max) {
+        System.Random random = new();
+        return random.Next(min, max);
+    }
+
     // Метод принимает список с кортежами вида (элемент любого типа, int)
     // Возвращает кортеж с наибольшим числом int.
     // Если есть несколько кортежей-претендентов, то возвращает случайный из них

@@ -114,9 +114,8 @@ public class BoosterButton : MonoBehaviour
             }
         }
 
-        bool isEnabled = !IsEmpty() && !_disabled;
-        _button.interactable = isEnabled;
-        _cursorManager.Disabled = !isEnabled;
+        bool isDisabled = IsEmpty() || _disabled;
+        SetDisabled(isDisabled);
     }
 
     // если кнопка энейблится, но при этом она пустая, или в режиме брони, то ничего не делать

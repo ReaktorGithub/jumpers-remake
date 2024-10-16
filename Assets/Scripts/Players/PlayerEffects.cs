@@ -8,6 +8,7 @@ public class PlayerEffects : MonoBehaviour
 {
     private PlayerControl _player;
     private ModalWin _modalWin;
+    private ModalSurprise _modalSurprise;
     private CameraControl _camera;
     private Pedestal _pedestal;
     [SerializeField] private int _green = 0;
@@ -22,6 +23,7 @@ public class PlayerEffects : MonoBehaviour
     private void Awake() {
         _player = GetComponent<PlayerControl>();
         _modalWin = GameObject.Find("ModalScripts").GetComponent<ModalWin>();
+        _modalSurprise = GameObject.Find("ModalScripts").GetComponent<ModalSurprise>();
         _camera = GameObject.Find("VirtualCamera").GetComponent<CameraControl>();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
     }
@@ -83,14 +85,18 @@ public class PlayerEffects : MonoBehaviour
 
     // исполнение эффектов
 
-    public void ExecuteGreen() {
+    public void ExecuteGreen(int level = 0) {
         ManualContent manual = Manual.Instance.GetEffectManual(EControllableEffects.Green);
         CellControl cell = _player.GetCurrentCell();
-        int moves = manual.GetCauseEffect(cell.EffectLevel);
-        int coins = cell.EffectLevel == 3 ? 50 : 0;
+        int effectLevel = level == 0 ? cell.EffectLevel : level;
+        int moves = manual.GetCauseEffect(effectLevel);
+        int coins = effectLevel == 3 ? 50 : 0;
 
         _player.AddMovesToDo(moves);
-        _player.AddCoins(coins);
+        if (coins != 0) {
+            _player.AddCoins(coins);
+            PlayersControl.Instance.UpdatePlayersInfo();
+        }
 
         string movesMessage = moves == 1 ? "раз" : (moves + " раза");
         string coinsMessage = coins > 0 ? ". " + Utils.Wrap("Бонус", UIColors.Green) + " +" + coins + " монет!" : "";
@@ -98,13 +104,17 @@ public class PlayerEffects : MonoBehaviour
         Messages.Instance.AddMessage(message);
     }
 
-    public void ExecuteYellow() {
+    public void ExecuteYellow(int level = 0) {
         ManualContent manual = Manual.Instance.GetEffectManual(EControllableEffects.Yellow);
         CellControl cell = _player.GetCurrentCell();
-        int coins = manual.GetCauseEffect(cell.EffectLevel);
+        int effectLevel = level == 0 ? cell.EffectLevel : level;
+        int coins = manual.GetCauseEffect(effectLevel);
 
         _player.SkipMoveIncrease();
-        _player.AddCoins(coins);
+        if (coins != 0) {
+            _player.AddCoins(coins);
+            PlayersControl.Instance.UpdatePlayersInfo();
+        }
 
         string coinsMessage = coins == 0 ? "" : ". " + Utils.Wrap("Штраф", UIColors.Red) + " " + coins + " монет";
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попал на " + Utils.Wrap("жёлтый", UIColors.Yellow) + " эффект и пропустит ход" + coinsMessage;
@@ -154,7 +164,7 @@ public class PlayerEffects : MonoBehaviour
         PlayersControl.Instance.CheckIsPlayerOutOfPower(_player, () => CellChecker.Instance.CheckCellArrows(_player));
     }
 
-    public void ExecuteRed() {
+    public void ExecuteRed(int level = 0, GameObject penaltyCell = null) {
         _player.MovesToDo = 0;
         _player.StepsLeft = 0;
 
@@ -169,7 +179,8 @@ public class PlayerEffects : MonoBehaviour
 
         CellControl cell = _player.GetCurrentCell();
         ManualContent manual = Manual.Instance.GetEffectManual(EControllableEffects.Red);
-        int powerPenalty = manual.GetCauseEffect(cell.EffectLevel);
+        int effectLevel = level == 0 ? cell.EffectLevel : level;
+        int powerPenalty = manual.GetCauseEffect(effectLevel);
 
         _player.AddPower(-powerPenalty);
         PlayersControl.Instance.UpdatePlayersInfo();
@@ -178,38 +189,54 @@ public class PlayerEffects : MonoBehaviour
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! -" + powerPenalty + " " + powerText + ". Возврат на чекпойнт";
         Messages.Instance.AddMessage(message);
 
-        PlayersControl.Instance.CheckIsPlayerOutOfPower(_player, RedEffectTokenMove, () => StartCoroutine(RedEffectTokenMoveDefer()));
+        PlayersControl.Instance.CheckIsPlayerOutOfPower(
+            _player,
+            () => RedEffectTokenMove(penaltyCell),
+            () => StartCoroutine(RedEffectTokenMoveDefer(penaltyCell))
+        );
     }
 
-    private IEnumerator RedEffectTokenMoveDefer() {
+    private IEnumerator RedEffectTokenMoveDefer(GameObject penaltyCell = null) {
         yield return new WaitForSeconds(PlayersControl.Instance.RedEffectDelay);
-        RedEffectTokenMove();
+        RedEffectTokenMove(penaltyCell);
     }
 
-    private void RedEffectTokenMove() {
+    private void RedEffectTokenMove(GameObject penaltyCell = null) {
         TokenControl tokenControl = _player.GetTokenControl();
         CellControl cellControl = tokenControl.GetCurrentCellControl();
-        if (!tokenControl.CurrentCell.TryGetComponent(out RedCell redCell)) {
-            Debug.Log("Red cell not found");
-            return;
+        
+        GameObject targetCell = penaltyCell;
+        if (targetCell == null) {
+            if (!tokenControl.CurrentCell.TryGetComponent(out RedCell redCell)) {
+                Debug.Log("Red cell not found");
+                return;
+            }
+
+            if (redCell != null) {
+                targetCell = redCell.PenaltyCell;
+            } else {
+                Debug.Log("Penalty cell not found");
+            }
         }
+        
         float moveTime = MoveControl.Instance.SpecifiedMoveTime;
-        tokenControl.SetToSpecifiedCell(redCell.PenaltyCell, moveTime, () => {
+        tokenControl.SetToSpecifiedCell(targetCell, moveTime, () => {
             cellControl.RemoveToken(_player.TokenObject);
             MoveControl.Instance.ConfirmNewPosition();
         });
     }
 
-    public void ExecuteStar() {
+    public void ExecuteStar(int level = 0) {
         CellControl cell = _player.GetCurrentCell();
         ManualContent manual = Manual.Instance.GetEffectManual(EControllableEffects.Star);
-        int powerBonus = manual.GetCauseEffect(cell.EffectLevel);
+        int effectLevel = level == 0 ? cell.EffectLevel : level;
+        int powerBonus = manual.GetCauseEffect(effectLevel);
 
         string powerText = powerBonus == 1 ? " силу" : " силы";
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("звезду", UIColors.DarkBlue) + " и получает " + powerBonus + powerText;
         Messages.Instance.AddMessage(message);
 
-        bool isLucky = cell.EffectLevel == 3;
+        bool isLucky = effectLevel == 3;
         if (isLucky && !_player.IsLuckyStar) {
             string luckyMessage = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " получает " + Utils.Wrap("счастливую звезду!", UIColors.DarkBlue) + " Защита от " + Utils.Wrap("чёрных", UIColors.Black) + " клеток до конца гонки";
             Messages.Instance.AddMessage(luckyMessage);
@@ -422,6 +449,127 @@ public class PlayerEffects : MonoBehaviour
         StartCoroutine(MoveControl.Instance.ConfirmNewPositionDefer());
     }
 
+    // Сюрприз
+
+    public void ExecuteSurprise() {
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("сюрприз", UIColors.Violet);
+        Messages.Instance.AddMessage(message);
+
+        if (_player.IsAi()) {
+            StartCoroutine(GenerateAndProcessSurpriseDefer());
+        } else {
+            _modalSurprise.BuildContent();
+            _modalSurprise.OpenModal();
+        }
+    }
+
+    private IEnumerator GenerateAndProcessSurpriseDefer() {
+        yield return new WaitForSeconds(EffectsControl.Instance.AiSurpriseDelay);
+        (
+            ESurprise surpriseType,
+            EControllableEffects surpriseEffect,
+            EBoosters surpriseBooster,
+            int surpriseCoinsBonus,
+            int surpriseCoinsPenalty,
+            int surpriseLevel
+        ) = SurpriseGenerator.GenerateSurprise();
+        ProcessGeneratedSurprise(
+            surpriseType,
+            surpriseEffect,
+            surpriseBooster,
+            surpriseCoinsBonus,
+            surpriseCoinsPenalty,
+            surpriseLevel
+        );
+    }
+
+    public void ProcessGeneratedSurprise(
+        ESurprise surpriseType,
+        EControllableEffects surpriseEffect,
+        EBoosters surpriseBooster,
+        int surpriseCoinsBonus,
+        int surpriseCoinsPenalty,
+        int surpriseLevel
+    ) {
+        switch(surpriseType) {
+            case ESurprise.InventoryEffect: {
+                AddTheEffect(surpriseEffect, 1);
+                ManualContent manual = Manual.Instance.GetEffectManual(surpriseEffect);
+                _player.BonusProcessing(manual.GetEntityName(true));
+                CellChecker.Instance.CheckCellArrows(_player);
+                break;
+            }
+            case ESurprise.Booster: {
+                _player.Boosters.AddTheBooster(surpriseBooster, 1);
+                CellChecker.Instance.CheckCellArrows(_player);
+                break;
+            }
+            case ESurprise.Bonus: {
+                ExecuteCoinBonus(surpriseCoinsBonus);
+                CellChecker.Instance.CheckCellArrows(_player);
+                break;
+            }
+            case ESurprise.Penalty: {
+                ExecuteCoinBonus(surpriseCoinsPenalty);
+                CellChecker.Instance.CheckCellArrows(_player);
+                break;
+            }
+            case ESurprise.Mallow: {
+                _player.AddMallows(1);
+                _player.BonusProcessing("зефирка");
+                PlayersControl.Instance.UpdatePlayersInfo();
+                CellChecker.Instance.CheckCellArrows(_player);
+                break;
+            }
+            default: {
+                ExecuteSurpriseEffect(surpriseType, surpriseLevel);
+                break;
+            }
+        }
+    }
+
+    private void ExecuteSurpriseEffect(ESurprise effect, int level) {
+        switch(effect) {
+            case ESurprise.Green: {
+                ExecuteGreen(level);
+                CellChecker.Instance.CheckCellArrows(_player);
+                break;
+            }
+            case ESurprise.Yellow: {
+                ExecuteYellow(level);
+                CellChecker.Instance.CheckCellArrows(_player);
+                break;
+            }
+            case ESurprise.Black: {
+                ExecuteBlack();
+                CellChecker.Instance.CheckCellArrows(_player);
+                break;
+            }
+            case ESurprise.Red: {
+                CellControl currentCell = _player.GetCurrentCell();
+                GameObject penaltyCell = CellsControl.Instance.FindPenaltyCell(currentCell.gameObject);
+                ExecuteRed(level, penaltyCell);
+                break;
+            }
+            case ESurprise.Star: {
+                ExecuteStar(level);
+                CellChecker.Instance.CheckCellArrows(_player);
+                break;
+            }
+            case ESurprise.Teleport: {
+                ExecuteTeleport();
+                break;
+            }
+            case ESurprise.Lightning: {
+                ExecuteLightning(false);
+                CellChecker.Instance.CheckCellArrows(_player);
+                break;
+            }
+        }
+    }
+
+    // Перемещение эффекта
+
     public void ExecuteReplaceEffect(EControllableEffects effect) {
         ManualContent manual = Manual.Instance.GetEffectManual(effect);
         CellControl cell = _player.GetCurrentCell();
@@ -433,29 +581,13 @@ public class PlayerEffects : MonoBehaviour
         } else {
             _player.AddCoins(-cost);
         }
+
         PlayersControl.Instance.UpdatePlayersInfo();
-
-        switch(effect) {
-            case EControllableEffects.Green: {
-                AddGreen(-1);
-                break;
-            }
-            case EControllableEffects.Red: {
-                AddRed(-1);
-                break;
-            }
-            case EControllableEffects.Yellow: {
-                AddYellow(-1);
-                break;
-            }
-            case EControllableEffects.Black: {
-                AddBlack(-1);
-                break;
-            }
-        }
-
+        AddTheEffect(effect, -1);
         PlayersControl.Instance.CheckIsPlayerOutOfPower(_player);
     }
+
+    // Разное
 
     public bool IsEnoughEffects(EControllableEffects effect) {
         switch(effect) {
@@ -473,5 +605,33 @@ public class PlayerEffects : MonoBehaviour
             }
             default: return false;
         }
+    }
+
+    public void AddTheEffect(EControllableEffects effect, int count) {
+        switch(effect) {
+            case EControllableEffects.Black: {
+                AddBlack(count);
+                break;
+            }
+            case EControllableEffects.Yellow: {
+                AddYellow(count);
+                break;
+            }
+            case EControllableEffects.Green: {
+                AddGreen(count);
+                break;
+            }
+            case EControllableEffects.Red: {
+                AddRed(count);
+                break;
+            }
+            case EControllableEffects.Star: {
+                AddStar(count);
+                break;
+            }
+        }
+
+        EffectsControl.Instance.UpdateQuantityText(_player);
+        EffectsControl.Instance.UpdateButtonsVisual(_player);
     }
 }

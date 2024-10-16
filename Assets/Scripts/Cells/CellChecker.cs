@@ -255,6 +255,11 @@ public class CellChecker : MonoBehaviour
             return;
         }
 
+        if (cell.CellType == ECellTypes.Surprise) {
+            player.Effects.ExecuteSurprise();
+            return;
+        }
+
         CheckCellArrows(player);
     }
 
