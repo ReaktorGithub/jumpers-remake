@@ -4,7 +4,8 @@ public class Manual : MonoBehaviour
 {
     public static Manual Instance { get; private set; }
     private ManualContent _power, _mallow, _ruby, _greenEffect, _yellowEffect, _blackEffect, _redEffect, _coins, _starEffect, _teleportEffect, _lightningEffect, _attackUsual, _attackMagicKick, _attackVampire, _attackKnockout,
-    _boosterLasso, _boosterMagnet, _boosterSuperMagnet, _boosterShield, _boosterIronShield, _boosterVampire, _boosterBoombaster, _boosterStuck, _boosterFlash, _boosterTrap, _boosterBlot, _boosterVacuum, _boosterVacuumNozzle, _boosterMop, _boosterTameLightning;
+    _boosterLasso, _boosterMagnet, _boosterSuperMagnet, _boosterShield, _boosterIronShield, _boosterVampire, _boosterBoombaster, _boosterStuck, _boosterFlash, _boosterTrap, _boosterBlot, _boosterVacuum, _boosterVacuumNozzle, _boosterMop, _boosterTameLightning,
+    _abilityLastChance, _abilityOreol, _abilityHammer, _abilitySoap;
 
     private void Awake() {
         Instance = this;
@@ -38,6 +39,10 @@ public class Manual : MonoBehaviour
         _boosterVacuumNozzle = transform.Find("BoosterVacuumNozzle").GetComponent<ManualContent>();
         _boosterMop = transform.Find("BoosterMop").GetComponent<ManualContent>();
         _boosterTameLightning = transform.Find("BoosterTameLightning").GetComponent<ManualContent>();
+        _abilityLastChance = transform.Find("AbilityLastChance").GetComponent<ManualContent>();
+        _abilityOreol = transform.Find("AbilityOreol").GetComponent<ManualContent>();
+        _abilityHammer = transform.Find("AbilityHammer").GetComponent<ManualContent>();
+        _abilitySoap = transform.Find("AbilitySoap").GetComponent<ManualContent>();
     }
 
     public ManualContent Power {
@@ -187,6 +192,26 @@ public class Manual : MonoBehaviour
 
     public ManualContent BoosterTameLightning {
         get { return _boosterTameLightning; }
+        private set {}
+    }
+
+    public ManualContent AbilityHammer {
+        get { return _abilityHammer; }
+        private set {}
+    }
+
+    public ManualContent AbilityLastChance {
+        get { return _abilityLastChance; }
+        private set {}
+    }
+
+    public ManualContent AbilityOreol {
+        get { return _abilityOreol; }
+        private set {}
+    }
+
+    public ManualContent AbilitySoap {
+        get { return _abilitySoap; }
         private set {}
     }
 

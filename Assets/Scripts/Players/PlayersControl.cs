@@ -12,12 +12,14 @@ public class PlayersControl : MonoBehaviour
     [SerializeField] private float _redEffectDelay = 1f;
     private Pedestal _pedestal;
     private LevelData _levelData;
+    private ModalLastChance _modalLastChance;
 
     private void Awake() {
         Instance = this;
         PreparePlayersControl();
         _pedestal = GameObject.Find("Pedestal").GetComponent<Pedestal>();
         _levelData = GameObject.Find("LevelScripts").GetComponent<LevelData>();
+        _modalLastChance = GameObject.Find("ModalScripts").GetComponent<ModalLastChance>();
     }
 
     private void Start() {
@@ -350,23 +352,33 @@ public class PlayersControl : MonoBehaviour
         return result;
     }
 
-    public void CheckIsPlayerOutOfPower(PlayerControl player, Action callback1 = null, Action callback2 = null) {
+    public void CheckIsPlayerOutOfPower(PlayerControl player, Action callback = null) {
         if (player.Power == 0 && player.IsMe()) {
             player.OpenPowerWarningModal(() => {
-                callback1?.Invoke();
+                callback?.Invoke();
             });
             return;
         }
 
         if (player.Power < 0) {
-            player.ConfirmLose();
+            if (player.IsAbilityLastChance) {
+                InitLastChance(player, callback);
+            } else {
+                player.ConfirmLose();
+            }
             return;
         }
 
-        if (callback2 != null) {
-            callback2.Invoke();
+        callback?.Invoke();
+    }
+
+    private void InitLastChance(PlayerControl player, Action callback = null) {
+        if (player.IsMe()) {
+            _modalLastChance.BuildContent(player, callback);
+            _modalLastChance.OpenModal();
         } else {
-            callback1?.Invoke();
+            player.ConfirmLose();
+            // todo ai
         }
     }
 

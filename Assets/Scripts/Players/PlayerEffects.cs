@@ -171,11 +171,11 @@ public class PlayerEffects : MonoBehaviour
         _player.StepsLeft = 0;
 
         if (_player.Boosters.Armor > 0 && _player.Boosters.IsIronArmor) {
-            _player.OpenSavedByShieldModal(() => {
-                string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Возврат на чекпойнт";
-                Messages.Instance.AddMessage(message);
-                RedEffectTokenMove();
-            });
+            if (_player.IsMe()) {
+                _player.OpenSavedByShieldModal(() => ProcessShieldRedEffect(penaltyCell));
+            } else {
+                ProcessShieldRedEffect(penaltyCell);
+            }
             return;
         }
 
@@ -193,9 +193,14 @@ public class PlayerEffects : MonoBehaviour
 
         PlayersControl.Instance.CheckIsPlayerOutOfPower(
             _player,
-            () => RedEffectTokenMove(penaltyCell),
             () => StartCoroutine(RedEffectTokenMoveDefer(penaltyCell))
         );
+    }
+
+    private void ProcessShieldRedEffect(GameObject penaltyCell = null) {
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Возврат на чекпойнт";
+        Messages.Instance.AddMessage(message);
+        StartCoroutine(RedEffectTokenMoveDefer(penaltyCell));
     }
 
     private IEnumerator RedEffectTokenMoveDefer(GameObject penaltyCell = null) {

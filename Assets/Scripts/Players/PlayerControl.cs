@@ -24,6 +24,7 @@ public class PlayerControl : MonoBehaviour
     private int _stepsLeft = 0; // сколько шагов фишкой осталось сделать, может быть
     private bool _isLuckyStar = false; // защита от чёрных клеток
     [SerializeField] private int _stuckAttached = 0; // количество зацепленных прилипал
+    private bool _isAbilityLastChance = true;
     
     private List<EAttackTypes> _availableAttackTypes = new();
     private ModalWarning _modalWarning;
@@ -115,6 +116,11 @@ public class PlayerControl : MonoBehaviour
     public bool IsDeadEndMode {
         get { return _isDeadEndMode; }
         set { _isDeadEndMode = value; }
+    }
+
+    public bool IsAbilityLastChance {
+        get { return _isAbilityLastChance; }
+        set { _isAbilityLastChance = value; }
     }
 
     public GameObject TokenObject {
@@ -536,6 +542,19 @@ public class PlayerControl : MonoBehaviour
             MoveControl.Instance.ConfirmLosePlayer(this);
         });
         StartCoroutine(coroutine);
+    }
+
+    // Навыки
+
+    public IEnumerator ExecuteLastChanceDefer(int powerPrice, Action callback = null) {
+        int paid = Math.Abs(Power) * powerPrice;
+        AddCoins(-paid);
+        Power = 0;
+        PlayersControl.Instance.UpdatePlayersInfo();
+        string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" СПАСАЕТ", UIColors.Green) + " свою фишку за " + paid + " монет";
+        Messages.Instance.AddMessage(message);
+        yield return new WaitForSeconds(PlayersControl.Instance.RedEffectDelay);
+        callback?.Invoke();
     }
 
     // Разное
