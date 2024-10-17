@@ -24,7 +24,10 @@ public class PlayerControl : MonoBehaviour
     private int _stepsLeft = 0; // сколько шагов фишкой осталось сделать, может быть
     private bool _isLuckyStar = false; // защита от чёрных клеток
     [SerializeField] private int _stuckAttached = 0; // количество зацепленных прилипал
-    private bool _isAbilityLastChance = true;
+    private bool _isAbilityLastChance = false;
+    private bool _isAbilityOreol = false;
+    private bool _isAbilityHammer = true;
+    [SerializeField] private bool _isAbilitySoap = true;
     
     private List<EAttackTypes> _availableAttackTypes = new();
     private ModalWarning _modalWarning;
@@ -121,6 +124,24 @@ public class PlayerControl : MonoBehaviour
     public bool IsAbilityLastChance {
         get { return _isAbilityLastChance; }
         set { _isAbilityLastChance = value; }
+    }
+
+    public bool IsAbilityOreol {
+        get { return _isAbilityOreol; }
+        set {
+            _isAbilityOreol = value;
+            GetTokenControl().SetOreol(value, _grind.Oreol);
+        }
+    }
+
+    public bool IsAbilityHammer {
+        get { return _isAbilityHammer; }
+        set { _isAbilityHammer = value; }
+    }
+
+    public bool IsAbilitySoap {
+        get { return _isAbilitySoap; }
+        set { _isAbilitySoap = value; }
     }
 
     public GameObject TokenObject {

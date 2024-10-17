@@ -18,12 +18,11 @@ public class Jumpers : MonoBehaviour
         Instances.SetActive(false);
     }
 
-    // private void Update() {
-    //     if (Input.GetKeyUp(KeyCode.F)) {
-    //         ModalLastChance modal = GameObject.Find("ModalScripts").GetComponent<ModalLastChance>();
-    //         modal.OpenModal();
-    //     }
-    // }
+    private void Update() {
+        if (Input.GetKeyUp(KeyCode.F)) {
+            MoveControl.Instance.CurrentPlayer.IsAbilityOreol = !MoveControl.Instance.CurrentPlayer.IsAbilityOreol;
+        }
+    }
 
     // private void Update() {
     //     if (Input.GetKeyUp(KeyCode.U)) {

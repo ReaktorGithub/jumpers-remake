@@ -77,6 +77,7 @@ public class CellChecker : MonoBehaviour
 
     public bool CheckCellAfterStep(CellControl currentCell, PlayerControl player) {
         ECellTypes cellType = currentCell.CellType;
+        bool isLastStep = player.StepsLeft == 0;
 
         if (cellType == ECellTypes.Checkpoint) {
             string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " достигает " + Utils.Wrap("чекпойнта", UIColors.Blue);
@@ -85,9 +86,14 @@ public class CellChecker : MonoBehaviour
 
         // Могут вызвать прерывание
 
-        if (currentCell.IsWallEffect()) {
-            MoveControl.Instance.BreakMovingAndConfirmNewPosition();
-            return false;
+        if (currentCell.IsWallProperty() && !isLastStep) {
+            if (player.IsAbilityHammer) {
+                string message = Utils.Wrap(player.PlayerName, UIColors.Yellow) + " пробивается сквозь " + Utils.Wrap("стену", UIColors.Red) + " с помощью " + Utils.Wrap("молотка", UIColors.CellDefault);
+                Messages.Instance.AddMessage(message);
+            } else {
+                MoveControl.Instance.BreakMovingAndConfirmNewPosition();
+                return false;
+            }
         }
 
         if (cellType == ECellTypes.Finish) {
@@ -278,50 +284,79 @@ public class CellChecker : MonoBehaviour
     }
 
     public void CheckCellRivals(PlayerControl player) {
-        CellControl cell = player.GetCurrentCell();
+        CellControl currentCell = player.GetCurrentCell();
+        
+        // Собираем клетки
+
+        List<CellControl> cells = new();
 
         // на некоторых клетках атаки не проводятся
-        if (_skipRivalCheckTypes.Contains(cell.CellType)) {
+        if (!_skipRivalCheckTypes.Contains(currentCell.CellType)) {
+            cells.Add(currentCell);
+        }
+
+        if (player.IsAbilityOreol) {
+            int areaSize = player.Grind.Oreol > 1 ? 2 : 1;
+            List<CellControl> list = CellsControl.Instance.GetCellsInArea(currentCell, areaSize);
+            foreach(CellControl cell in list) {
+                // на некоторых клетках атаки не проводятся
+                if (!_skipRivalCheckTypes.Contains(cell.CellType)) {
+                    cells.Add(cell);
+                }
+            }
+        }
+
+        
+        if (cells.Count == 0) {
             StartCoroutine(MoveControl.Instance.EndMoveDefer());
             return;
         }
         
-        List<GameObject> tokens = cell.CurrentTokens;
+        // Собираем соперников
 
-        // Для проверки на атаку должно быть больше 1 фишки на клетке
-        // Сортировать соперников на тех, что со щитами и без щитов
+        List<PlayerControl> rivals = new();
+
+        foreach(CellControl cell in cells) {
+            foreach(GameObject tokenObject in cell.CurrentTokens) {
+                TokenControl token = tokenObject.GetComponent<TokenControl>();
+                if (token.PlayerControl != player) {
+                    rivals.Add(token.PlayerControl);
+                }
+            }
+        }
+
+        if (rivals.Count == 0) {
+            StartCoroutine(MoveControl.Instance.EndMoveDefer());
+            return;
+        }
+
+        // Сгруппировать соперников на тех, что со щитами и без щитов
         // Применить эффекты щитов
         // Если еще остались соперники без щитов, то открыть диалоговое окно с атакой
 
-        if (tokens.Count > 1) {
-            List<PlayerControl> rivalsUnprotected = new();
-            List<PlayerControl> rivalsWithShields = new();
-            List<PlayerControl> rivals = new();
+        List<PlayerControl> rivalsUnprotected = new();
+        List<PlayerControl> rivalsWithShields = new();
 
-            foreach(PlayerControl playerForCheck in PlayersControl.Instance.Players) {
-                if (tokens.Contains(playerForCheck.TokenObject) && player.TokenObject != playerForCheck.TokenObject) {
-                    rivals.Add(playerForCheck);
-                    if (playerForCheck.Boosters.Armor > 0) {
-                        rivalsWithShields.Add(playerForCheck);
-                    } else {
-                        rivalsUnprotected.Add(playerForCheck);
-                    }
-                }
+        foreach(PlayerControl rival in rivals) {
+            if (rival.Boosters.Armor > 0) {
+                rivalsWithShields.Add(rival);
+            } else {
+                rivalsUnprotected.Add(rival);
             }
+        }
 
-            if (rivalsWithShields.Count > 0) {
-                player.Boosters.HarvestShieldBonus(rivalsWithShields);
-            }
+        if (rivalsWithShields.Count > 0) {
+            player.Boosters.HarvestShieldBonus(rivalsWithShields);
+        }
 
-            if (rivalsUnprotected.Count > 0) {
-                if (player.IsAi()) {
-                    AiControl.Instance.AiAttackPlayer(player, rivalsUnprotected);
-                } else {
-                    _popupAttack.BuildContent(player, rivals);
-                    _popupAttack.OnOpenWindow();
-                }
-                return;
+        if (rivalsUnprotected.Count > 0) {
+            if (player.IsAi()) {
+                AiControl.Instance.AiAttackPlayer(player, rivalsUnprotected);
+            } else {
+                _popupAttack.BuildContent(player, rivals);
+                _popupAttack.OnOpenWindow();
             }
+            return;
         }
 
         // закончить ход, если нет соперников
@@ -381,9 +416,6 @@ public class CellChecker : MonoBehaviour
                 player.Boosters.ExecuteBlotAsVictim("попасть в копилку");
             } else {
                 vault.PutPlayerToVault(player);
-                if (MoveControl.Instance.IsLassoMode) {
-                    ActivateMoneyboxDialogue(player, vault);
-                }
             }
         }
     }

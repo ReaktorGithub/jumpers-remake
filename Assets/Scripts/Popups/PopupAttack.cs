@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class PopupAttack : MonoBehaviour
 {
-    private GameObject _attack, _optionalSectionTokens;
+    private GameObject _attack, _whosAttackObject;
     private Popup _popup;
     private TextMeshProUGUI _tokenName, _attackHeading, _attackDescription, _powerNow, _powerLeft, _warningText, _removeStuckCost;
     private Sprite _counterSprite;
@@ -28,12 +28,13 @@ public class PopupAttack : MonoBehaviour
         _counterSprite = instances.transform.Find("stuck-icon").GetComponent<SpriteRenderer>().sprite;
         _attack = GameObject.Find("PopupAttack");
         _popup = _attack.GetComponent<Popup>();
-        _optionalSectionTokens = _attack.transform.Find("OptionalSectionTokens").gameObject;
-        _tokenName = Utils.FindChildByName(_optionalSectionTokens, "TokenName").GetComponent<TextMeshProUGUI>();
-        TokenAttackButton[] allButtons = _optionalSectionTokens.GetComponentsInChildren<TokenAttackButton>();
+        GameObject optionalSectionTokens = _attack.transform.Find("OptionalSectionTokens").gameObject;
+        _tokenName = Utils.FindChildByName(optionalSectionTokens, "TokenName").GetComponent<TextMeshProUGUI>();
+        TokenAttackButton[] allButtons = optionalSectionTokens.GetComponentsInChildren<TokenAttackButton>();
         foreach (TokenAttackButton button in allButtons) {
             _tokenAttackButtons.Add(button);
         }
+        _whosAttackObject = optionalSectionTokens.transform.Find("Subhead1").gameObject;
         AttackTypeButton[] allAttackButtons = Utils.FindChildByName(_attack, "AttackList").GetComponentsInChildren<AttackTypeButton>();
         foreach (AttackTypeButton button in allAttackButtons) {
             button.GetComponent<Button>().onClick.AddListener(() => {
@@ -104,51 +105,61 @@ public class PopupAttack : MonoBehaviour
 
         // раздел с соперниками
 
-        if (rivals.Count < 2) {
-            _optionalSectionTokens.SetActive(false);
+        bool isSingle = rivals.Count < 2;
+
+        if (isSingle) {
             _selectedPlayer = rivals[0];
+            _tokenName.text = rivals[0].PlayerName;
         } else {
-            _optionalSectionTokens.SetActive(true);
             _selectedPlayer = null;
             _tokenName.text = "";
-            int index = 0;
-            foreach(TokenAttackButton button in _tokenAttackButtons) {
-                if (index < rivals.Count) {
-                    PlayerControl rival = rivals[index];
-                    button.SetTokenImage(rival.TokenImage);
-                    button.BindPlayer(rival);
-                    Button buttonComponent = button.gameObject.GetComponent<Button>();
-                    buttonComponent.onClick.RemoveAllListeners();
+        }
 
-                    if (rival.Boosters.Armor > 0) {
-                        TokenControl token = rival.GetTokenControl();
-                        Sprite sprite = rival.Boosters.IsIronArmor ? token.GetArmorIronSprite() : token.GetArmorSprite();
-                        button.SetShieldImage(sprite);
-                        button.DisableShieldImage(false);
-                        button.SetDisabled(true);
-                        buttonComponent.onClick.AddListener(() => {
-                            _player.OpenAttackShieldModal();
-                        });
-                    } else {
-                        button.SetShieldImage(null);
-                        button.DisableShieldImage(true);
-                        button.SetDisabled(false);
-                        buttonComponent.onClick.AddListener(() => {
-                            SetSelectedPlayer(button.Player);
-                        });
-                    }
+        _whosAttackObject.SetActive(!isSingle);
 
-                    button.gameObject.SetActive(true);
-                } else {
-                    button.gameObject.SetActive(false);
-                }
-                index++;
+        for (int i = 0; i <_tokenAttackButtons.Count; i++) {
+            TokenAttackButton button = _tokenAttackButtons[i];
+
+            if (i < rivals.Count) {
+                PlayerControl rival = rivals[i];
+                SetTokenAttackButton(button, rival, isSingle);
+                button.gameObject.SetActive(true);
+            } else {
+                button.gameObject.SetActive(false);
             }
         }
 
         // кнопка атаки
 
         UpdateAttackButtonStatus();
+    }
+
+    private void SetTokenAttackButton(TokenAttackButton button, PlayerControl rival, bool disable = false) {
+        button.SetTokenImage(rival.TokenImage);
+        button.BindPlayer(rival);
+        button.ShowSoapImage(rival.IsAbilitySoap);
+        Button buttonComponent = button.gameObject.GetComponent<Button>();
+        buttonComponent.onClick.RemoveAllListeners();
+
+        if (rival.Boosters.Armor > 0) {
+            TokenControl token = rival.GetTokenControl();
+            Sprite sprite = rival.Boosters.IsIronArmor ? token.GetArmorIronSprite() : token.GetArmorSprite();
+            button.SetShieldImage(sprite);
+            button.DisableShieldImage(false);
+            button.SetDisabled(disable || true);
+            buttonComponent.onClick.AddListener(() => {
+                _player.OpenAttackShieldModal();
+            });
+        } else {
+            button.SetShieldImage(null);
+            button.DisableShieldImage(true);
+            button.SetDisabled(disable || false);
+            if (!disable) {
+                buttonComponent.onClick.AddListener(() => {
+                    SetSelectedPlayer(button.Player);
+                });
+            }
+        }
     }
 
     public void ToggleStuckAdd() {
