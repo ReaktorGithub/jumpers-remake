@@ -18,6 +18,7 @@ public class PopupAttack : MonoBehaviour
     private int _powerNeed = 0;
     [SerializeField] private float _attackDelay = 0.7f;
     [SerializeField] private GameObject _stuckAddButton, _optionalSectionStuckAdd, _optionalSectionStuckRemove, _removeStuckCostObject, _counterObject;
+    [SerializeField] private TextMeshProUGUI _stuckTextNormal, _stuckTextLocked;
     private TokenAttackButton _stuckAddButtonScript;
     private Counter _counter;
     private PlayerControl _player;
@@ -91,18 +92,6 @@ public class PopupAttack : MonoBehaviour
             }
         }
 
-        // Прилипалы
-        _stuckAddButtonScript.SetSelected(false);
-        _isAddStuck = false;
-        _optionalSectionStuckAdd.SetActive(_player.Boosters.Stuck > 0);
-        _optionalSectionStuckRemove.SetActive(_player.StuckAttached > 0);
-        _counter.Init(_counterSprite, 0, 0, _player.StuckAttached);
-        UpdateStuckRemoveText(0);
-
-        // сила
-
-        UpdatePower();
-
         // раздел с соперниками
 
         bool isSingle = rivals.Count < 2;
@@ -128,6 +117,15 @@ public class PopupAttack : MonoBehaviour
                 button.gameObject.SetActive(false);
             }
         }
+
+        // Прилипалы
+        _counter.Init(_counterSprite, 0, 0, _player.StuckAttached);
+        UpdateStuckRemoveText(0);
+        UpdateStuckBlocks();
+
+        // сила
+
+        UpdatePower();
 
         // кнопка атаки
 
@@ -172,6 +170,27 @@ public class PopupAttack : MonoBehaviour
         _removeStuckCost.text = "Цена: " + value + " сила";
     }
 
+    private void UpdateStuckBlocks() {
+        if (_selectedPlayer == null) {
+            _optionalSectionStuckAdd.SetActive(false);
+            _stuckTextNormal.gameObject.SetActive(true);
+            _stuckTextLocked.gameObject.SetActive(false);
+            _stuckAddButtonScript.ShowSoapImage(false);
+            _stuckAddButtonScript.SetDisabled(true);
+            _optionalSectionStuckRemove.SetActive(false);
+            _isAddStuck = false;
+        } else {
+            bool isSoap = _selectedPlayer.IsAbilitySoap;
+            _optionalSectionStuckAdd.SetActive(_player.Boosters.Stuck > 0);
+            _stuckTextNormal.gameObject.SetActive(!isSoap);
+            _stuckTextLocked.gameObject.SetActive(isSoap);
+            _stuckAddButtonScript.ShowSoapImage(isSoap);
+            _stuckAddButtonScript.SetDisabled(isSoap);
+            _optionalSectionStuckRemove.SetActive(!isSoap && _player.StuckAttached > 0);
+            _isAddStuck = false;
+        }
+    }
+
     public void SetSelectedPlayer(PlayerControl player) {
         if (_selectedPlayer == player) {
             _selectedPlayer = null;
@@ -190,6 +209,7 @@ public class PopupAttack : MonoBehaviour
             button.SetSelected(button.Player == _selectedPlayer);
         }
         UpdateAttackButtonStatus();
+        UpdateStuckBlocks();
     }
 
     public void SetSelectedAttackType(EAttackTypes type) {

@@ -14,6 +14,7 @@ public static class UIColors
     public static string Blue = "#5197FF";
     public static string DarkBlue = "#1136FF";
     public static string Orange = "#FF8100";
+    public static string Pink = "#FF879B";
     public static string Brick = "#B43012";
     public static string Armor = "#29A3F6";
     public static string ArmorIron = "#B100FF";

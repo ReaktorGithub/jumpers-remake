@@ -20,7 +20,7 @@ public class Jumpers : MonoBehaviour
 
     private void Update() {
         if (Input.GetKeyUp(KeyCode.F)) {
-            MoveControl.Instance.CurrentPlayer.IsAbilityOreol = !MoveControl.Instance.CurrentPlayer.IsAbilityOreol;
+            MoveControl.Instance.CurrentPlayer.IsAbilitySoap = !MoveControl.Instance.CurrentPlayer.IsAbilitySoap;
         }
     }
 

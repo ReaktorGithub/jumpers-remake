@@ -19,7 +19,6 @@ public class TokenAttackButton : MonoBehaviour
         _cursorManager = GetComponent<CursorManager>();
         _selected.SetActive(false);
         _hover.SetActive(false);
-        _soap.SetActive(false);
     }
 
     public void SetTokenImage(Sprite sprite) {
@@ -43,7 +42,7 @@ public class TokenAttackButton : MonoBehaviour
         _cursorManager.Disabled = value;
         if (value) {
             OnHoverOut();
-            SetSelected(false);
+            _selected.SetActive(false);
         }
     }
 

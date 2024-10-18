@@ -141,7 +141,12 @@ public class PlayerControl : MonoBehaviour
 
     public bool IsAbilitySoap {
         get { return _isAbilitySoap; }
-        set { _isAbilitySoap = value; }
+        set {
+            _isAbilitySoap = value;
+            if (value) {
+                _boosters.ExecuteSoap();
+            }
+        }
     }
 
     public GameObject TokenObject {
