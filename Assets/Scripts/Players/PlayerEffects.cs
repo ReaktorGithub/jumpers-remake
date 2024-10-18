@@ -171,11 +171,11 @@ public class PlayerEffects : MonoBehaviour
         _player.StepsLeft = 0;
 
         if (_player.Boosters.Armor > 0 && _player.Boosters.IsIronArmor) {
-            _player.OpenSavedByShieldModal(() => {
-                string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Возврат на чекпойнт";
-                Messages.Instance.AddMessage(message);
-                RedEffectTokenMove();
-            });
+            if (_player.IsMe()) {
+                _player.OpenSavedByShieldModal(() => ProcessShieldRedEffect(penaltyCell));
+            } else {
+                ProcessShieldRedEffect(penaltyCell);
+            }
             return;
         }
 
@@ -193,9 +193,14 @@ public class PlayerEffects : MonoBehaviour
 
         PlayersControl.Instance.CheckIsPlayerOutOfPower(
             _player,
-            () => RedEffectTokenMove(penaltyCell),
             () => StartCoroutine(RedEffectTokenMoveDefer(penaltyCell))
         );
+    }
+
+    private void ProcessShieldRedEffect(GameObject penaltyCell = null) {
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " попадает на " + Utils.Wrap("КРАСНЫЙ", UIColors.Red) + " эффект! Возврат на чекпойнт";
+        Messages.Instance.AddMessage(message);
+        StartCoroutine(RedEffectTokenMoveDefer(penaltyCell));
     }
 
     private IEnumerator RedEffectTokenMoveDefer(GameObject penaltyCell = null) {
@@ -317,9 +322,15 @@ public class PlayerEffects : MonoBehaviour
         }
 
         (int, int, int) bonus = vault.GetBonus();
-        _player.AddPower(bonus.Item1);
-        _player.AddCoins(bonus.Item2);
-        _player.AddRubies(bonus.Item3);
+        if (bonus.Item1 != 0) {
+            _player.AddPower(bonus.Item1);
+        }
+        if (bonus.Item2 != 0) {
+           _player.AddCoins(bonus.Item2); 
+        }
+        if (bonus.Item3 != 0) {
+            _player.AddRubies(bonus.Item3);
+        }
         _player.AddMovesSkip(1);
         PlayersControl.Instance.UpdatePlayersInfo();
 
@@ -337,13 +348,13 @@ public class PlayerEffects : MonoBehaviour
     }
 
     public void LeaveMoneybox(MoneyboxVault vault) {
-        _player.AddMovesToDo(1);
-
-        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " покидает " + Utils.Wrap("копилку", UIColors.Green);
-        Messages.Instance.AddMessage(message);
-
+        RemovePlayerFromMoneybox(vault);
         MoveControl.Instance.PreparePlayerForMove();
-        
+    }
+
+    public void RemovePlayerFromMoneybox(MoneyboxVault vault) {
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " уходит из " + Utils.Wrap("копилки", UIColors.Green);
+        Messages.Instance.AddMessage(message);
         vault.ReassignPlayers();
     }
 

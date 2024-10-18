@@ -221,7 +221,7 @@ public class CellControl : MonoBehaviour
         return effect == EControllableEffects.Black || effect == EControllableEffects.Red;
     }
 
-    public bool IsWallEffect() {
+    public bool IsWallProperty() {
         return EffectLevel == 3 && IsPenaltyEffect();
     }
 

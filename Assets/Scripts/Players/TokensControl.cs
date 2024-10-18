@@ -14,6 +14,8 @@ public class TokensControl : MonoBehaviour
     private GameObject _tokenIndicatorSample;
     [SerializeField] GameObject _indicatorLightningObject, _bonusEventSample, _indicatorFlashObject, _indicatorBlotObject;
     [SerializeField] private float _teleportAnimationTime = 1f;
+    [SerializeField] private float _oreolScale1 = 25f;
+    [SerializeField] private float _oreolScale2 = 46f;
     private Sprite _indicatorLightningSprite, _indicatorFlashSprite, _indicatorBlotSprite;
 
     private void Awake() {
@@ -46,6 +48,16 @@ public class TokensControl : MonoBehaviour
 
     public float SqueezeDefaultValue {
         get { return _squeezeDefaultValue; }
+        private set {}
+    }
+
+    public float OreolScale1 {
+        get { return _oreolScale1; }
+        private set {}
+    }
+
+    public float OreolScale2 {
+        get { return _oreolScale2; }
         private set {}
     }
 

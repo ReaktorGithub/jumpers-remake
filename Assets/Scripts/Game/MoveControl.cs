@@ -28,6 +28,7 @@ public class MoveControl : MonoBehaviour
     private bool _isViolateSeriesMode = false; // режим пылесоса (насильственных ходов)
     private int _violateSteps = 0; // Количество шагов по клеткам, которые должны сделать игроки при атаке пылесосом
     private int _restSteps = 0; // сохранение оставшихся шагов в режиме жертвы
+    private bool _isMoneyboxChecked = false; // Была ли уже произведена проверка на нахождение в копилке
 
     private void Awake() {
         Instance = this;
@@ -174,12 +175,6 @@ public class MoveControl : MonoBehaviour
             BoostersControl.Instance.UpdateBoostersFromPlayer(_currentPlayer);
         }
 
-        // проверка на копилку
-        bool check = CellChecker.Instance.CheckMoneyboxBeforeMove(_currentPlayer);
-        if (!check) {
-            return;
-        }
-
         CheckMoveSkipAndPreparePlayer();
     }
 
@@ -195,6 +190,20 @@ public class MoveControl : MonoBehaviour
     public void PreparePlayerForMove() {
         // Дебаг
         // CellsControl.Instance.ShowTokensAtCells();
+
+        // Проверка на копилку
+
+        if (!_isMoneyboxChecked) {
+            _isMoneyboxChecked = true;
+            bool isSuccess = CellChecker.Instance.CheckMoneyboxBeforeMove(_currentPlayer);
+            if (!isSuccess) {
+                return;
+            }
+        }
+
+        _isMoneyboxChecked = false;
+
+        // Сообщение на кубике
 
         string cubicMessage;
         switch (_currentPlayer.Type) {
@@ -217,33 +226,32 @@ public class MoveControl : MonoBehaviour
         }
         CubicControl.Instance.WriteStatus(cubicMessage);
 
-        // возможность применять эффекты должна восстанавливаться только если это новый ход, а не возвращение хода после лассо / пылесоса и т.д
+        // Возможность применять эффекты должна восстанавливаться только если это новый ход, а не возвращение хода после лассо / пылесоса и т.д
+
         bool isNewMove = !_isLassoMode;
         if (isNewMove) {
            _currentPlayer.Effects.IsEffectPlaced = false;
         }
 
-        // включение индикатора молнии на кубике
+        // Включение индикатора молнии на кубике
+
         _currentPlayer.Effects.CheckLightningStartMove();
 
-        // сброс параметров
+        // Сброс параметров
+
         _currentPlayer.SkipMoveCount = 0;
 
-        // Обработка ситуации, когда попал на копилку во время лассо
-        CellControl cell = _currentPlayer.GetCurrentCell();
-        bool isMoneyboxLasso = _isLassoMode && cell.CellType == ECellTypes.Moneybox;
+        // Включение интерфейса
 
-        if (!isMoneyboxLasso) {
-            bool isMe = _currentPlayer.IsMe();
-            if (isMe) {
-                EffectsControl.Instance.TryToEnableAllEffectButtons();
-                CubicControl.Instance.SetCubicInteractable(true);
-                CubicControl.Instance.ModifiersControl.ShowModifierStuck(_currentPlayer.StuckAttached);
-            } else if (_currentPlayer.Type == EPlayerTypes.Ai) {
-                StartCoroutine(AiControl.Instance.AiThrowCubic());
-            }
-            BoostersControl.Instance.EnableAllButtons(!isMe);
+        bool isMe = _currentPlayer.IsMe();
+        if (isMe) {
+            EffectsControl.Instance.TryToEnableAllEffectButtons();
+            CubicControl.Instance.SetCubicInteractable(true);
+            CubicControl.Instance.ModifiersControl.ShowModifierStuck(_currentPlayer.StuckAttached);
+        } else if (_currentPlayer.Type == EPlayerTypes.Ai) {
+            StartCoroutine(AiControl.Instance.AiThrowCubic());
         }
+        BoostersControl.Instance.EnableAllButtons(!isMe);
 
         // CellsControl.Instance.ShowTokensAtCells();
     }
@@ -360,11 +368,12 @@ public class MoveControl : MonoBehaviour
         _restSteps = cellResult.Item2;
         TokenControl victimToken = victim.GetTokenControl();
 
-        // Если жертва находится в копилке, то убрать её из копилки
-        if (currentCell.CellType == ECellTypes.Moneybox) {
+        // Если жертва изменит положение и сейчас находится в копилке, то убрать её из копилки
+
+        if (currentCell != targetCell && currentCell.CellType == ECellTypes.Moneybox) {
             MoneyboxVault vault = currentCell.GetComponent<MoneyboxCell>().MoneyboxVault;
             if (vault.OccupiedPlayer == victim) {
-               vault.ReassignPlayers(); 
+                victim.Effects.RemovePlayerFromMoneybox(vault);
             }
         }
         

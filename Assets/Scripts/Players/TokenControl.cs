@@ -23,6 +23,7 @@ public class TokenControl : MonoBehaviour
     private bool _isProcessingQueue = false;
     private TokenStuck _stuckScript;
     private Animator _teleportAnimator;
+    private SpriteRenderer _oreol;
 
     private void Awake() {
         _rotate = transform.Find("Rotate").gameObject;
@@ -33,15 +34,20 @@ public class TokenControl : MonoBehaviour
         _skip3 = _squeezable.transform.Find("skip3").gameObject;
         _armor = _squeezable.transform.Find("armor").gameObject;
         _armorIron = _squeezable.transform.Find("armor-iron").gameObject;
-        UpdateSkips(0);
-        UpdateShield(EBoosters.None);
-        ShowAi(false);
         _sortingGroup = GetComponent<SortingGroup>();
         _pedestal = GameObject.Find("Pedestal");
         _splineAnimate = GetComponent<SplineAnimate>();
         _stuckScript = _stuck.GetComponent<TokenStuck>();
         _teleportAnimator = _rotate.GetComponent<Animator>();
+        _oreol = transform.Find("Indicators").transform.Find("Oreol").GetComponent<SpriteRenderer>();
+    }
+
+    private void Start() {
+        UpdateSkips(0);
+        UpdateShield(EBoosters.None);
+        ShowAi(false);
         RemoveAllIndicators();
+        SetOreol(false);
     }
 
     public GameObject CurrentCell {
@@ -420,5 +426,15 @@ public class TokenControl : MonoBehaviour
     private IEnumerator StopTeleportAnimation() {
         yield return new WaitForSeconds(TokensControl.Instance.TeleportAnimationTime);
         _teleportAnimator.SetInteger("teleport", 0);
+    }
+
+    public void SetOreol(bool isOn, int level = 1) {
+        float scale = level > 1 ? TokensControl.Instance.OreolScale2 : TokensControl.Instance.OreolScale1;
+        _oreol.transform.localScale = new Vector3(
+            scale,
+            scale,
+            _oreol.transform.localScale.z
+        );
+        _oreol.gameObject.SetActive(isOn);
     }
 }

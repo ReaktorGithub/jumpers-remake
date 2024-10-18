@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class PopupAttack : MonoBehaviour
 {
-    private GameObject _attack, _optionalSectionTokens;
+    private GameObject _attack, _whosAttackObject;
     private Popup _popup;
     private TextMeshProUGUI _tokenName, _attackHeading, _attackDescription, _powerNow, _powerLeft, _warningText, _removeStuckCost;
     private Sprite _counterSprite;
@@ -18,6 +18,7 @@ public class PopupAttack : MonoBehaviour
     private int _powerNeed = 0;
     [SerializeField] private float _attackDelay = 0.7f;
     [SerializeField] private GameObject _stuckAddButton, _optionalSectionStuckAdd, _optionalSectionStuckRemove, _removeStuckCostObject, _counterObject;
+    [SerializeField] private TextMeshProUGUI _stuckTextNormal, _stuckTextLocked;
     private TokenAttackButton _stuckAddButtonScript;
     private Counter _counter;
     private PlayerControl _player;
@@ -28,12 +29,13 @@ public class PopupAttack : MonoBehaviour
         _counterSprite = instances.transform.Find("stuck-icon").GetComponent<SpriteRenderer>().sprite;
         _attack = GameObject.Find("PopupAttack");
         _popup = _attack.GetComponent<Popup>();
-        _optionalSectionTokens = _attack.transform.Find("OptionalSectionTokens").gameObject;
-        _tokenName = Utils.FindChildByName(_optionalSectionTokens, "TokenName").GetComponent<TextMeshProUGUI>();
-        TokenAttackButton[] allButtons = _optionalSectionTokens.GetComponentsInChildren<TokenAttackButton>();
+        GameObject optionalSectionTokens = _attack.transform.Find("OptionalSectionTokens").gameObject;
+        _tokenName = Utils.FindChildByName(optionalSectionTokens, "TokenName").GetComponent<TextMeshProUGUI>();
+        TokenAttackButton[] allButtons = optionalSectionTokens.GetComponentsInChildren<TokenAttackButton>();
         foreach (TokenAttackButton button in allButtons) {
             _tokenAttackButtons.Add(button);
         }
+        _whosAttackObject = optionalSectionTokens.transform.Find("Subhead1").gameObject;
         AttackTypeButton[] allAttackButtons = Utils.FindChildByName(_attack, "AttackList").GetComponentsInChildren<AttackTypeButton>();
         foreach (AttackTypeButton button in allAttackButtons) {
             button.GetComponent<Button>().onClick.AddListener(() => {
@@ -90,65 +92,72 @@ public class PopupAttack : MonoBehaviour
             }
         }
 
+        // раздел с соперниками
+
+        bool isSingle = rivals.Count < 2;
+
+        if (isSingle) {
+            _selectedPlayer = rivals[0];
+            _tokenName.text = rivals[0].PlayerName;
+        } else {
+            _selectedPlayer = null;
+            _tokenName.text = "";
+        }
+
+        _whosAttackObject.SetActive(!isSingle);
+
+        for (int i = 0; i <_tokenAttackButtons.Count; i++) {
+            TokenAttackButton button = _tokenAttackButtons[i];
+
+            if (i < rivals.Count) {
+                PlayerControl rival = rivals[i];
+                SetTokenAttackButton(button, rival, isSingle);
+                button.gameObject.SetActive(true);
+            } else {
+                button.gameObject.SetActive(false);
+            }
+        }
+
         // Прилипалы
-        _stuckAddButtonScript.SetSelected(false);
-        _isAddStuck = false;
-        _optionalSectionStuckAdd.SetActive(_player.Boosters.Stuck > 0);
-        _optionalSectionStuckRemove.SetActive(_player.StuckAttached > 0);
         _counter.Init(_counterSprite, 0, 0, _player.StuckAttached);
         UpdateStuckRemoveText(0);
+        UpdateStuckBlocks();
 
         // сила
 
         UpdatePower();
 
-        // раздел с соперниками
-
-        if (rivals.Count < 2) {
-            _optionalSectionTokens.SetActive(false);
-            _selectedPlayer = rivals[0];
-        } else {
-            _optionalSectionTokens.SetActive(true);
-            _selectedPlayer = null;
-            _tokenName.text = "";
-            int index = 0;
-            foreach(TokenAttackButton button in _tokenAttackButtons) {
-                if (index < rivals.Count) {
-                    PlayerControl rival = rivals[index];
-                    button.SetTokenImage(rival.TokenImage);
-                    button.BindPlayer(rival);
-                    Button buttonComponent = button.gameObject.GetComponent<Button>();
-                    buttonComponent.onClick.RemoveAllListeners();
-
-                    if (rival.Boosters.Armor > 0) {
-                        TokenControl token = rival.GetTokenControl();
-                        Sprite sprite = rival.Boosters.IsIronArmor ? token.GetArmorIronSprite() : token.GetArmorSprite();
-                        button.SetShieldImage(sprite);
-                        button.DisableShieldImage(false);
-                        button.SetDisabled(true);
-                        buttonComponent.onClick.AddListener(() => {
-                            _player.OpenAttackShieldModal();
-                        });
-                    } else {
-                        button.SetShieldImage(null);
-                        button.DisableShieldImage(true);
-                        button.SetDisabled(false);
-                        buttonComponent.onClick.AddListener(() => {
-                            SetSelectedPlayer(button.Player);
-                        });
-                    }
-
-                    button.gameObject.SetActive(true);
-                } else {
-                    button.gameObject.SetActive(false);
-                }
-                index++;
-            }
-        }
-
         // кнопка атаки
 
         UpdateAttackButtonStatus();
+    }
+
+    private void SetTokenAttackButton(TokenAttackButton button, PlayerControl rival, bool disable = false) {
+        button.SetTokenImage(rival.TokenImage);
+        button.BindPlayer(rival);
+        button.ShowSoapImage(rival.IsAbilitySoap);
+        Button buttonComponent = button.gameObject.GetComponent<Button>();
+        buttonComponent.onClick.RemoveAllListeners();
+
+        if (rival.Boosters.Armor > 0) {
+            TokenControl token = rival.GetTokenControl();
+            Sprite sprite = rival.Boosters.IsIronArmor ? token.GetArmorIronSprite() : token.GetArmorSprite();
+            button.SetShieldImage(sprite);
+            button.DisableShieldImage(false);
+            button.SetDisabled(disable || true);
+            buttonComponent.onClick.AddListener(() => {
+                _player.OpenAttackShieldModal();
+            });
+        } else {
+            button.SetShieldImage(null);
+            button.DisableShieldImage(true);
+            button.SetDisabled(disable || false);
+            if (!disable) {
+                buttonComponent.onClick.AddListener(() => {
+                    SetSelectedPlayer(button.Player);
+                });
+            }
+        }
     }
 
     public void ToggleStuckAdd() {
@@ -159,6 +168,27 @@ public class PopupAttack : MonoBehaviour
 
     private void UpdateStuckRemoveText(int value) {
         _removeStuckCost.text = "Цена: " + value + " сила";
+    }
+
+    private void UpdateStuckBlocks() {
+        if (_selectedPlayer == null) {
+            _optionalSectionStuckAdd.SetActive(false);
+            _stuckTextNormal.gameObject.SetActive(true);
+            _stuckTextLocked.gameObject.SetActive(false);
+            _stuckAddButtonScript.ShowSoapImage(false);
+            _stuckAddButtonScript.SetDisabled(true);
+            _optionalSectionStuckRemove.SetActive(false);
+            _isAddStuck = false;
+        } else {
+            bool isSoap = _selectedPlayer.IsAbilitySoap;
+            _optionalSectionStuckAdd.SetActive(_player.Boosters.Stuck > 0);
+            _stuckTextNormal.gameObject.SetActive(!isSoap);
+            _stuckTextLocked.gameObject.SetActive(isSoap);
+            _stuckAddButtonScript.ShowSoapImage(isSoap);
+            _stuckAddButtonScript.SetDisabled(isSoap);
+            _optionalSectionStuckRemove.SetActive(!isSoap && _player.StuckAttached > 0);
+            _isAddStuck = false;
+        }
     }
 
     public void SetSelectedPlayer(PlayerControl player) {
@@ -179,6 +209,7 @@ public class PopupAttack : MonoBehaviour
             button.SetSelected(button.Player == _selectedPlayer);
         }
         UpdateAttackButtonStatus();
+        UpdateStuckBlocks();
     }
 
     public void SetSelectedAttackType(EAttackTypes type) {

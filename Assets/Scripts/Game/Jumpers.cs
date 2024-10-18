@@ -18,13 +18,11 @@ public class Jumpers : MonoBehaviour
         Instances.SetActive(false);
     }
 
-    // private void Update() {
-    //     if (Input.GetKeyUp(KeyCode.F)) {
-    //         MoveControl.Instance.CurrentPlayer.StuckAttached = 4;
-    //         ModalStuck modal = GameObject.Find("ModalScripts").GetComponent<ModalStuck>();
-    //         modal.OpenModal();
-    //     }
-    // }
+    private void Update() {
+        if (Input.GetKeyUp(KeyCode.F)) {
+            MoveControl.Instance.CurrentPlayer.IsAbilitySoap = !MoveControl.Instance.CurrentPlayer.IsAbilitySoap;
+        }
+    }
 
     // private void Update() {
     //     if (Input.GetKeyUp(KeyCode.U)) {

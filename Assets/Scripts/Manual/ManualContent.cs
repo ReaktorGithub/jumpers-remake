@@ -13,6 +13,7 @@ public class ManualContent : MonoBehaviour
     [SerializeField] private EResourceTypes _costResourceType;
     [SerializeField] private EResourceCharacters _character;
     [SerializeField] private List<int> _causeEffect = new();
+    [SerializeField] private bool _needChamomile = false;
 
     private void Awake() {
         _sprite = GetComponent<SpriteRenderer>().sprite;
@@ -24,6 +25,11 @@ public class ManualContent : MonoBehaviour
 
     public Sprite Sprite {
         get { return _sprite; }
+        private set {}
+    }
+
+    public bool NeedChamomile {
+        get { return _needChamomile; }
         private set {}
     }
 

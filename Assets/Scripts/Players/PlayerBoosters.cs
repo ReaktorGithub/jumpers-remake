@@ -669,22 +669,27 @@ public class PlayerBoosters : MonoBehaviour
         ManualContent manual = Manual.Instance.BoosterBlot;
         int steps = manual.GetCauseEffect(level);
 
+        string stepsText = steps < 5 ? " хода" : " ходов";
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " выпустил " + Utils.Wrap("кляксу.", UIColors.Black) + " Соперники остались без бонусов на " + steps + stepsText + "!";
+        Messages.Instance.AddMessage(message);
+
         foreach(PlayerControl player in PlayersControl.Instance.Players) {
             if (player.IsFinished) {
                 continue;
             }
 
             if (player != _player) {
-                player.Boosters.BlotMovesLeft = steps;
+                if (player.IsAbilitySoap) {
+                    string soapMessage = "У " + Utils.Wrap(player.PlayerName, UIColors.Yellow) + " есть " + Utils.Wrap("мыло!", UIColors.Pink) + Utils.Wrap(" Клякса", UIColors.Black) + " не сработала";
+                    Messages.Instance.AddMessage(soapMessage);
+                } else {
+                    player.Boosters.BlotMovesLeft = steps;
+                }
             }
         }
 
         _player.Boosters.AddBlot(-1);
         BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
-
-        string stepsText = steps < 5 ? " хода" : " ходов";
-        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " выпустил " + Utils.Wrap("кляксу.", UIColors.Black) + " Соперники остались без бонусов на " + steps + stepsText + "!";
-        Messages.Instance.AddMessage(message);
     }
 
     public void ExecuteBlotAsVictim(string bonusText) {
@@ -699,6 +704,15 @@ public class PlayerBoosters : MonoBehaviour
         BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
         string message = "Обнаружено заражение новой " + Utils.Wrap("прилипалой", UIColors.LimeGreen);
         Messages.Instance.AddMessage(message);
+    }
+
+    // Мыло
+
+    public void ExecuteSoap() {
+        string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " получает " + Utils.Wrap("мыло!", UIColors.Pink) + Utils.Wrap(" Кляксы", UIColors.Black) + " и " + Utils.Wrap("прилипалы", UIColors.LimeGreen) + " больше не страшны";
+        Messages.Instance.AddMessage(message);
+        BlotMovesLeft = 0;
+        _player.StuckAttached = 0;
     }
 
     // Лассо
