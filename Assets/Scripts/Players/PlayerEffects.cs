@@ -60,6 +60,11 @@ public class PlayerEffects : MonoBehaviour
         private set {}
     }
 
+    public int LightningMoves {
+        get { return _lightningMoves; }
+        private set {}
+    }
+
     public bool IsEffectPlaced {
         get { return _isEffectPlaced; }
         set { _isEffectPlaced = value; }
@@ -384,13 +389,7 @@ public class PlayerEffects : MonoBehaviour
         int oldValue = _lightningMoves;
         _lightningMoves = isTame && oldValue == 0 ? 1 : 3;
         _isLightning = true;
-        TokenControl token = _player.GetTokenControl();
-
-        if (oldValue > 0) {
-            token.UpdateIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
-        } else {
-            token.AddIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
-        }
+        _player.GetTokenControl().UpdateIndicatorLightning(_lightningMoves);
 
         string message;
         if (isTame) {
@@ -435,13 +434,12 @@ public class PlayerEffects : MonoBehaviour
         }
 
         TokenControl token = _player.GetTokenControl();
+        token.UpdateIndicatorLightning(_lightningMoves);
+
         if (_lightningMoves == 0) {
-            token.RemoveIndicator(ETokenIndicators.Lightning);
             string message = "У " + Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " закончилась " + Utils.Wrap("молния", UIColors.Green);
             Messages.Instance.AddMessage(message);
             _isLightning = false;
-        } else {
-            token.UpdateIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
         }
     }
 

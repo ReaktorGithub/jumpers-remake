@@ -3,66 +3,53 @@ using UnityEngine;
 
 public class PlayerInfo : MonoBehaviour
 {
-    private TextMeshProUGUI _playerNameText;
-    private SpriteRenderer _tokenImage;
-    private TextMeshProUGUI _coinText;
-    private TextMeshProUGUI _rubyText;
-    private GameObject _powerCells, _powerOn, _powerOff, _place, _finish, _hover, _active;
-    private SpriteRenderer[] _powerOffImages = new SpriteRenderer[20];
-    private SpriteRenderer[] _symbolImages = new SpriteRenderer[4];
-    [SerializeField] private int _infoOrder; // todo sort
+    [SerializeField] private GameObject _current, _finish, _tokenImage, _hover, _chamomileActive, _chamomileInactive;
+    [SerializeField] private TextMeshProUGUI _placeText, _playerNameText, _powerText, _rubiesText, _coinsText;
+    private SpriteRenderer _tokenImageRenderer;
 
     private void Awake() {
-        _hover = transform.Find("hover_player").gameObject;
-        _active = transform.Find("current_player").gameObject;
-        _playerNameText = transform.Find("player_name").gameObject.GetComponent<TextMeshProUGUI>();
-        _finish = transform.Find("icon_finish").gameObject;
-        _place = transform.Find("place").gameObject;
-        _tokenImage = transform.Find("token_image").gameObject.GetComponent<SpriteRenderer>();
-        _coinText = transform.Find("coin_text").gameObject.GetComponent<TextMeshProUGUI>();
-        _rubyText = transform.Find("ruby_text").gameObject.GetComponent<TextMeshProUGUI>();
-        _powerCells = transform.Find("PowerCells").gameObject;
-        _powerOn = _powerCells.transform.Find("power_cell_on").gameObject;
-        _powerOff = _powerCells.transform.Find("power_cell_off").gameObject;
-        for (int i = 0; i < 20; i++) {
-            string name = "power_cell_" + (i + 1);
-            _powerOffImages[i] = _powerCells.transform.Find(name).GetComponent<SpriteRenderer>();
-        }
-        for (int i = 0; i < 4; i++) {
-            string name = "symbol_" + (i + 1);
-            _symbolImages[i] = GameObject.Find(name).GetComponent<SpriteRenderer>();
-        }
+        UpdateLinks();
+        SetChamomileActive(false); // todo удалить это после того, как будет готова ромашка
+        OnMouseExit();
     }
 
-    private void Start() {
+    public void UpdateLinks() {
+        _tokenImageRenderer = _tokenImage.GetComponent<SpriteRenderer>();
+    }
+
+    public void OnMouseEnter() {
+        _hover.SetActive(true);
+    }
+
+    public void OnMouseExit() {
         _hover.SetActive(false);
-        _powerOn.SetActive(false);
-        _powerOff.SetActive(false);
-        _active.SetActive(false);
-        _finish.SetActive(false);
-        foreach (SpriteRenderer sprite in _symbolImages) {
-            sprite.gameObject.SetActive(false);
-        }
+    }
+
+    private void SetChamomileActive(bool value) {
+        _chamomileActive.SetActive(value);
+        _chamomileInactive.SetActive(!value);
     }
 
     public void UpdatePlayerInfoDisplay(PlayerControl player) {
-        _coinText.text = player.Coins.ToString();
-        _rubyText.text = player.Rubies.ToString();
+        _current.SetActive(player.IsCurrent());
         _finish.SetActive(player.IsFinished);
-        _place.SetActive(!player.IsFinished);
+        _tokenImageRenderer.sprite = player.GetTokenControl().GetTokenSymbolSprite();
+        _tokenImageRenderer.transform.localScale = new Vector3(10f,10f,10f);
+        _placeText.text = GetPlaceText(player.MoveOrder);
+        _placeText.gameObject.SetActive(!player.IsFinished);
         _playerNameText.text = player.PlayerName;
-        SpriteRenderer offSprite = _powerOff.GetComponent<SpriteRenderer>();
-        SpriteRenderer onSprite = _powerOn.GetComponent<SpriteRenderer>();
-        int count = 1;
-        foreach (SpriteRenderer sprite in _powerOffImages) {
-            if (player.Power >= count) {
-                sprite.sprite = onSprite.sprite;
-            } else {
-                sprite.sprite = offSprite.sprite;
-            }
-            count++;
-        }
-        _active.SetActive(player.MoveOrder == MoveControl.Instance.CurrentPlayerIndex);
-        _tokenImage.sprite = _symbolImages[player.MoveOrder - 1].sprite;
+        _powerText.text = player.Power.ToString();
+        _rubiesText.text = player.Rubies.ToString();
+        _coinsText.text = player.Coins.ToString();
+    }
+
+    private string GetPlaceText(int place) {
+        return place switch
+        {
+            1 => "I",
+            2 => "II",
+            3 => "III",
+            _ => "IV",
+        };
     }
 }

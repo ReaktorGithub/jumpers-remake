@@ -10,6 +10,7 @@ public class PlayersControl : MonoBehaviour
     [SerializeField] private float _finishDelay = 0.5f;
     [SerializeField] private float _loseDelay = 2f;
     [SerializeField] private float _redEffectDelay = 1f;
+    [SerializeField] private GameObject _playersInfoList, _playerInfoSample;
     private Pedestal _pedestal;
     private LevelData _levelData;
     private ModalLastChance _modalLastChance;
@@ -197,11 +198,32 @@ public class PlayersControl : MonoBehaviour
         }
     }
 
+    public void CreatePlayersInfo() {
+        Transform[] children = _playersInfoList.GetComponentsInChildren<Transform>();
+        foreach (Transform child in children) {
+            if (child.CompareTag("PlayerInfo")) {
+                Destroy(child.gameObject);
+            }
+        }
+
+        List<PlayerControl> sortedPlayers = SortPlayersByMoveOrder(_players);
+
+        foreach (PlayerControl player in sortedPlayers) {
+            GameObject clone = Instantiate(_playerInfoSample);
+            PlayerInfo playerInfo = clone.GetComponent<PlayerInfo>();
+            playerInfo.UpdateLinks();
+            playerInfo.UpdatePlayerInfoDisplay(player);
+            
+            clone.transform.SetParent(_playersInfoList.transform);
+            clone.transform.localScale = new Vector3(1f,1f,1f);
+        }
+    }
+
     public void UpdatePlayersInfo() {
         foreach(PlayerControl player in _players) {
-            string name = "PlayerInfo" + player.MoveOrder;
-            PlayerInfo info = GameObject.Find(name).GetComponent<PlayerInfo>();
-            info.UpdatePlayerInfoDisplay(player);
+            if (player.PlayerInfo != null) {
+                player.PlayerInfo.UpdatePlayerInfoDisplay(player);
+            }
         }
     }
 
@@ -255,6 +277,12 @@ public class PlayersControl : MonoBehaviour
     public void UpdateBoosterBlot() {
         foreach(PlayerControl player in _players) {
             player.Boosters.AddBlotMovesLeft(-1);
+        }
+    }
+
+    public void UpdateAllIndicators() {
+        foreach(PlayerControl player in _players) {
+            player.GetTokenControl().UpdateAllIndicators();
         }
     }
 

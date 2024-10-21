@@ -171,14 +171,7 @@ public class PlayerBoosters : MonoBehaviour
             int newValue = Math.Clamp(value, 0, 1000);
             int oldValue = _flashMovesLeft;
             _flashMovesLeft = newValue;
-
-            if (newValue > 0 && oldValue > 0) {
-                _player.GetTokenControl().UpdateIndicator(ETokenIndicators.Flash, newValue.ToString());
-            } else if (newValue > 0) {
-                _player.GetTokenControl().AddIndicator(ETokenIndicators.Flash, newValue.ToString());
-            } else {
-                _player.GetTokenControl().RemoveIndicator(ETokenIndicators.Flash);
-            }
+            _player.GetTokenControl().UpdateIndicatorFlash(newValue);
         }
     }
 
@@ -188,14 +181,7 @@ public class PlayerBoosters : MonoBehaviour
             int newValue = Math.Clamp(value, 0, 1000);
             int oldValue = _blotMovesLeft;
             _blotMovesLeft = newValue;
-
-            if (newValue > 0 && oldValue > 0) {
-                _player.GetTokenControl().UpdateIndicator(ETokenIndicators.Blot, newValue.ToString());
-            } else if (newValue > 0) {
-                _player.GetTokenControl().AddIndicator(ETokenIndicators.Blot, newValue.ToString());
-            } else {
-                _player.GetTokenControl().RemoveIndicator(ETokenIndicators.Blot);
-            }
+            _player.GetTokenControl().UpdateIndicatorBlot(newValue);
         }
     }
 

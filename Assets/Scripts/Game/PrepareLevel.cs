@@ -16,7 +16,7 @@ public class PrepareLevel : MonoBehaviour
         _levelData.SetInitialRandomBonuses();
         
         PlayersControl.Instance.PrepareTokenLayerOrder();
-        PlayersControl.Instance.UpdatePlayersInfo();
+        PlayersControl.Instance.CreatePlayersInfo();
         PlayersControl.Instance.GiveEffectsBeforeRace();
 
         MoveTokensToStart();

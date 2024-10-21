@@ -14,8 +14,11 @@ public class Jumpers : MonoBehaviour
     private void Start() {
         // CleanInstances();
         PlayersControl.Instance.BindTokensToPlayers();
+        PlayersControl.Instance.UpdateAllIndicators();
         GameObject Instances = GameObject.Find("Instances");
+        GameObject CanvasInstances = GameObject.Find("CanvasInstances");
         Instances.SetActive(false);
+        CanvasInstances.SetActive(false);
     }
 
     private void Update() {

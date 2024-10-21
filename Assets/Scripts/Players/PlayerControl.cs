@@ -16,6 +16,7 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private int _moveOrder;
     [SerializeField] private bool _isReverseMove = false;
     [SerializeField] private bool _isDeadEndMode = false; // режим активируется в момент достижения стены
+    private PlayerInfo _playerInfo;
     private int _placeAfterFinish;
     private bool _isFinished = false;
     private int _movesSkip = 0; // пропуски хода
@@ -73,6 +74,11 @@ public class PlayerControl : MonoBehaviour
     public EPlayerTypes Type {
         get { return _type; }
         set { _type = value; }
+    }
+
+    public PlayerInfo PlayerInfo {
+        get { return _playerInfo; }
+        set { _playerInfo = value; }
     }
 
     public bool IsMe() {
@@ -206,7 +212,10 @@ public class PlayerControl : MonoBehaviour
 
     public int Power {
         get { return _power; }
-        set { _power = value; }
+        set {
+            _power = value;
+            GetTokenControl().UpdateIndicatorPower(value);
+        }
     }
 
     public PlayerEffects Effects {
@@ -270,7 +279,7 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void AddPower(int value) {
-        _power += value;
+        Power += value;
         (string, Color32) values = Utils.GetTextWithSymbolAndColor(value);
         GetTokenControl().AddBonusEventToQueue(values.Item1 + " сила", values.Item2);
     }
@@ -591,6 +600,10 @@ public class PlayerControl : MonoBehaviour
 
     public CellControl GetCurrentCell() {
         return GetTokenControl().GetCurrentCellControl();
+    }
+
+    public bool IsCurrent() {
+        return MoveControl.Instance.CurrentPlayerIndex == MoveOrder;
     }
 
     public int GetCubicMaxScore() {

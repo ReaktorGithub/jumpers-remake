@@ -9,16 +9,14 @@ using System.Collections.Generic;
 public class TokenControl : MonoBehaviour
 {
     private IEnumerator _coroutine, _squeezeCoroutine;
-    [SerializeField] private GameObject _currentCell, _playerName, _indicators, _aiThinking, _indicatorsList, _indicatorBg, _bonusEventsList, _stuck;
-    [SerializeField] private float _bonushFlashTime = 3f;
-    [SerializeField] private float _nextBonusTime = 1.5f;
+    [SerializeField] private GameObject _currentCell, _playerName, _indicators, _aiThinking, _bonusEventsList, _stuck, _tokenSymbol, _indicatorLightning, _indicatorBlot, _indicatorFlash;
+    [SerializeField] private TextMeshPro _indicatorPowerText, _indicatorLightningText, _indicatorBlotText, _indicatorFlashText;
     private GameObject _tokenImage, _skip1, _skip2, _skip3, _armor, _armorIron, _squeezable, _rotate;
     private PlayerControl _playerControl;
     private SortingGroup _sortingGroup;
     private bool _isSqueeze = false;
     private GameObject _pedestal;
     private SplineAnimate _splineAnimate;
-    private int _indicatorsCount = 0;
     private List<(string, Color32)> _bonusQueue = new();
     private bool _isProcessingQueue = false;
     private TokenStuck _stuckScript;
@@ -46,7 +44,6 @@ public class TokenControl : MonoBehaviour
         UpdateSkips(0);
         UpdateShield(EBoosters.None);
         ShowAi(false);
-        RemoveAllIndicators();
         SetOreol(false);
     }
 
@@ -58,6 +55,10 @@ public class TokenControl : MonoBehaviour
     public GameObject TokenImage {
         get { return _tokenImage; }
         private set {}
+    }
+
+    public Sprite GetTokenSymbolSprite() {
+        return _tokenSymbol.GetComponent<SpriteRenderer>().sprite;
     }
 
     public PlayerControl PlayerControl {
@@ -276,93 +277,32 @@ public class TokenControl : MonoBehaviour
 
     // Индикаторы
 
-    private List<TokenIndicator> GetAllIndicators() {
-        List<TokenIndicator> result = new();
-
-        Transform[] children = _indicatorsList.GetComponentsInChildren<Transform>();
-
-        foreach (Transform child in children) {
-            if (child.CompareTag("TokenIndicator")) {
-                TokenIndicator control = child.gameObject.GetComponent<TokenIndicator>();
-                result.Add(control);
-            }
-        }
-
-        return result;
+    public void UpdateIndicatorPower(int value = 0) {
+        Color32 color = value == 1 ? new Color32(217,107,0,255) : (value < 1 ? new Color32(255,0,0,255) : new Color32(255,255,255,255));
+        _indicatorPowerText.text = value.ToString();
+        _indicatorPowerText.color = color;
     }
 
-    public void RemoveIndicator(ETokenIndicators type) {
-        List<TokenIndicator> indicators = GetAllIndicators();
-
-        foreach (TokenIndicator indicator in indicators) {
-            if (indicator.Type == type) {
-                _indicatorsCount--;
-                Destroy(indicator.gameObject);
-            }
-        }
-
-        // если индикаторов не осталось, то убрать фон
-        _indicatorBg.SetActive(_indicatorsCount != 0);
+    public void UpdateIndicatorLightning(int value = 0) {
+        _indicatorLightningText.text = value.ToString();
+        _indicatorLightning.SetActive(value > 0);
     }
 
-    public void RemoveAllIndicators() {
-        List<TokenIndicator> indicators = GetAllIndicators();
-
-        foreach (TokenIndicator indicator in indicators) {
-            Destroy(indicator.gameObject);
-        }
-
-        _indicatorsCount = 0;
-        _indicatorBg.SetActive(false);
+    public void UpdateIndicatorBlot(int value = 0) {
+        _indicatorBlotText.text = value.ToString();
+        _indicatorBlot.SetActive(value > 0);
     }
 
-    public void AddIndicator(ETokenIndicators type, string text = "") {
-        GameObject clone = Instantiate(TokensControl.Instance.TokenIndicatorSample);
-        GameObject image = clone.transform.Find("Image").gameObject;
-        clone.transform.SetParent(_indicatorsList.transform);
-        TokenIndicator indicator = clone.GetComponent<TokenIndicator>();
-        indicator.UpdateLinks();
-        indicator.Type = type;
-        indicator.SetText(TokensControl.Instance.IndicatorWidthSmall, TokensControl.Instance.IndicatorWidthDefault, text);
-
-        switch(type) {
-            case ETokenIndicators.Lightning: {
-                indicator.SetSprite(TokensControl.Instance.IndicatorLightningSprite);
-                indicator.SetTextColor(new Color32(49,255,34,255));
-                image.transform.localScale = new Vector3(0.75f,0.75f,0.75f);
-                break;
-            }
-            case ETokenIndicators.Flash: {
-                indicator.SetSprite(TokensControl.Instance.IndicatorFlashSprite);
-                indicator.SetTextColor(new Color32(173,208,255,255));
-                image.transform.localScale = new Vector3(3f,3f,3f);
-                break;
-            }
-            case ETokenIndicators.Blot: {
-                indicator.SetSprite(TokensControl.Instance.IndicatorBlotSprite);
-                indicator.SetTextColor(new Color32(180,180,180,180));
-                image.transform.localScale = new Vector3(3f,3f,3f);
-                break;
-            }
-            default: {
-                indicator.SetSprite(null);
-                break;
-            }
-        }
-
-        clone.SetActive(true);
-        _indicatorBg.SetActive(true);
-        _indicatorsCount++;
+    public void UpdateIndicatorFlash(int value = 0) {
+        _indicatorFlashText.text = value.ToString();
+        _indicatorFlash.SetActive(value > 0);
     }
 
-    public void UpdateIndicator(ETokenIndicators type, string newText) {
-        List<TokenIndicator> indicators = GetAllIndicators();
-
-        foreach (TokenIndicator indicator in indicators) {
-            if (indicator.Type == type) {
-                indicator.SetText(TokensControl.Instance.IndicatorWidthSmall, TokensControl.Instance.IndicatorWidthDefault, newText);
-            }
-        }
+    public void UpdateAllIndicators() {
+        UpdateIndicatorPower(_playerControl.Power);
+        UpdateIndicatorLightning(_playerControl.Effects.LightningMoves);
+        UpdateIndicatorBlot(_playerControl.Boosters.BlotMovesLeft);
+        UpdateIndicatorFlash(_playerControl.Boosters.FlashMovesLeft);
     }
 
     // Событие появления бонуса
@@ -385,7 +325,7 @@ public class TokenControl : MonoBehaviour
         while (_bonusQueue.Count > 0) {
             FlashBonusEvent(_bonusQueue[0].Item1, _bonusQueue[0].Item2);
             _bonusQueue.RemoveAt(0);
-            yield return new WaitForSeconds(_nextBonusTime);
+            yield return new WaitForSeconds(TokensControl.Instance.NextBonusTime);
         }
 
         _isProcessingQueue = false; // Завершаем обработку очереди
@@ -408,7 +348,7 @@ public class TokenControl : MonoBehaviour
     }
 
     private IEnumerator DestroyBonusEventDefer(GameObject bonusObj) {
-        yield return new WaitForSeconds(_bonushFlashTime);
+        yield return new WaitForSeconds(TokensControl.Instance.BonusFlashTime);
         Animator animator = bonusObj.GetComponent<Animator>();
         animator.SetBool("isFlash", false);
         Destroy(bonusObj);
