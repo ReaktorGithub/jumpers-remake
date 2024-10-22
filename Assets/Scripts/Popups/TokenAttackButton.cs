@@ -4,13 +4,14 @@ using UnityEngine.UI;
 public class TokenAttackButton : MonoBehaviour
 {
     private GameObject _selected, _hover, _shield, _soap;
-    private Image _tokenImage, _shieldImage;
+    private Image _tokenImage, _tokenSymbol, _shieldImage;
     private PlayerControl _player;
     private bool _disabled = false;
     private CursorManager _cursorManager;
 
     private void Awake() {
         _tokenImage = transform.Find("TokenImage").gameObject.GetComponent<Image>();
+        _tokenSymbol = transform.Find("TokenSymbol").gameObject.GetComponent<Image>();
         _shield = transform.Find("ShieldImage").gameObject;
         _soap = transform.Find("SoapImage").gameObject;
         _shieldImage = _shield.GetComponent<Image>();
@@ -23,6 +24,10 @@ public class TokenAttackButton : MonoBehaviour
 
     public void SetTokenImage(Sprite sprite) {
         _tokenImage.sprite = sprite;
+    }
+
+    public void SetSymbolImage(Sprite sprite) {
+        _tokenSymbol.sprite = sprite;
     }
 
     public void DisableShieldImage(bool value) {

@@ -13,6 +13,7 @@ TagManager:
   - BranchButton
   - MoneyboxStep
   - TokenIndicator
+  - PlayerInfo
   layers:
   - Default
   - TransparentFX

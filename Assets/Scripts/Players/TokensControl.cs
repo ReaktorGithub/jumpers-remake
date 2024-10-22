@@ -9,21 +9,15 @@ public class TokensControl : MonoBehaviour
     [SerializeField] private float _squeezeMinValue = 4.6f;
     [SerializeField] private float _squeezeDefaultValue = 4.6f;
     [SerializeField] private float _arrowMovingTime = 1.5f;
-    [SerializeField] private float _indicatorWidthDefault = 3.4f;
-    [SerializeField] private float _indicatorWidthSmall = 2f;
-    private GameObject _tokenIndicatorSample;
+    [SerializeField] private float _bonusFlashTime = 3f;
+    [SerializeField] private float _nextBonusTime = 1.5f;
     [SerializeField] GameObject _indicatorLightningObject, _bonusEventSample, _indicatorFlashObject, _indicatorBlotObject;
     [SerializeField] private float _teleportAnimationTime = 1f;
     [SerializeField] private float _oreolScale1 = 25f;
     [SerializeField] private float _oreolScale2 = 46f;
-    private Sprite _indicatorLightningSprite, _indicatorFlashSprite, _indicatorBlotSprite;
 
     private void Awake() {
         Instance = this;
-        _tokenIndicatorSample = GameObject.Find("Instances").transform.Find("TokenIndicator").gameObject;
-        _indicatorLightningSprite = _indicatorLightningObject.GetComponent<SpriteRenderer>().sprite;
-        _indicatorFlashSprite = _indicatorFlashObject.GetComponent<SpriteRenderer>().sprite;
-        _indicatorBlotSprite = _indicatorBlotObject.GetComponent<SpriteRenderer>().sprite;
     }
 
     public float PedestalMoveTime {
@@ -66,38 +60,18 @@ public class TokensControl : MonoBehaviour
         private set {}
     }
 
-    public float IndicatorWidthDefault {
-        get { return _indicatorWidthDefault; }
+    public float BonusFlashTime {
+        get { return _bonusFlashTime; }
         private set {}
     }
 
-    public float IndicatorWidthSmall {
-        get { return _indicatorWidthSmall; }
-        private set {}
-    }
-
-    public GameObject TokenIndicatorSample {
-        get { return _tokenIndicatorSample; }
+    public float NextBonusTime {
+        get { return _nextBonusTime; }
         private set {}
     }
 
     public GameObject BonusEventSample {
         get { return _bonusEventSample; }
-        private set {}
-    }
-
-    public Sprite IndicatorLightningSprite {
-        get { return _indicatorLightningSprite; }
-        private set {}
-    }
-
-    public Sprite IndicatorFlashSprite {
-        get { return _indicatorFlashSprite; }
-        private set {}
-    }
-
-    public Sprite IndicatorBlotSprite {
-        get { return _indicatorBlotSprite; }
         private set {}
     }
 

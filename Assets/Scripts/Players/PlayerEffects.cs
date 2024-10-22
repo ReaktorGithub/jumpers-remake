@@ -60,6 +60,11 @@ public class PlayerEffects : MonoBehaviour
         private set {}
     }
 
+    public int LightningMoves {
+        get { return _lightningMoves; }
+        private set {}
+    }
+
     public bool IsEffectPlaced {
         get { return _isEffectPlaced; }
         set { _isEffectPlaced = value; }
@@ -260,6 +265,7 @@ public class PlayerEffects : MonoBehaviour
         }
         _player.IsFinished = true;
         int place = _pedestal.SetPlayerToMaxPlace(_player);
+        PlayersControl.Instance.UpdatePlayersInfo();
 
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + Utils.Wrap(" ФИНИШИРУЕТ ", UIColors.Green) + " на " + place + " месте!";
         Messages.Instance.AddMessage(message);
@@ -384,13 +390,7 @@ public class PlayerEffects : MonoBehaviour
         int oldValue = _lightningMoves;
         _lightningMoves = isTame && oldValue == 0 ? 1 : 3;
         _isLightning = true;
-        TokenControl token = _player.GetTokenControl();
-
-        if (oldValue > 0) {
-            token.UpdateIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
-        } else {
-            token.AddIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
-        }
+        _player.GetTokenControl().UpdateIndicatorLightning(_lightningMoves);
 
         string message;
         if (isTame) {
@@ -435,13 +435,12 @@ public class PlayerEffects : MonoBehaviour
         }
 
         TokenControl token = _player.GetTokenControl();
+        token.UpdateIndicatorLightning(_lightningMoves);
+
         if (_lightningMoves == 0) {
-            token.RemoveIndicator(ETokenIndicators.Lightning);
             string message = "У " + Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " закончилась " + Utils.Wrap("молния", UIColors.Green);
             Messages.Instance.AddMessage(message);
             _isLightning = false;
-        } else {
-            token.UpdateIndicator(ETokenIndicators.Lightning, _lightningMoves.ToString());
         }
     }
 
@@ -521,7 +520,8 @@ public class PlayerEffects : MonoBehaviour
             case ESurprise.InventoryEffect: {
                 AddTheEffect(surpriseEffect, 1);
                 ManualContent manual = Manual.Instance.GetEffectManual(surpriseEffect);
-                _player.BonusProcessing(manual.GetEntityName(true));
+                string name = manual.GetEntityName(true);
+                _player.BonusProcessing(name, manual.Sprite, 1);
                 CellChecker.Instance.CheckCellArrows(_player);
                 break;
             }
@@ -542,7 +542,8 @@ public class PlayerEffects : MonoBehaviour
             }
             case ESurprise.Mallow: {
                 _player.AddMallows(1);
-                _player.BonusProcessing("зефирка");
+                ManualContent manual = Manual.Instance.Mallow;
+                _player.BonusProcessing("зефирка", manual.Sprite, 1);
                 PlayersControl.Instance.UpdatePlayersInfo();
                 CellChecker.Instance.CheckCellArrows(_player);
                 break;

@@ -171,14 +171,7 @@ public class PlayerBoosters : MonoBehaviour
             int newValue = Math.Clamp(value, 0, 1000);
             int oldValue = _flashMovesLeft;
             _flashMovesLeft = newValue;
-
-            if (newValue > 0 && oldValue > 0) {
-                _player.GetTokenControl().UpdateIndicator(ETokenIndicators.Flash, newValue.ToString());
-            } else if (newValue > 0) {
-                _player.GetTokenControl().AddIndicator(ETokenIndicators.Flash, newValue.ToString());
-            } else {
-                _player.GetTokenControl().RemoveIndicator(ETokenIndicators.Flash);
-            }
+            _player.GetTokenControl().UpdateIndicatorFlash(newValue);
         }
     }
 
@@ -188,14 +181,7 @@ public class PlayerBoosters : MonoBehaviour
             int newValue = Math.Clamp(value, 0, 1000);
             int oldValue = _blotMovesLeft;
             _blotMovesLeft = newValue;
-
-            if (newValue > 0 && oldValue > 0) {
-                _player.GetTokenControl().UpdateIndicator(ETokenIndicators.Blot, newValue.ToString());
-            } else if (newValue > 0) {
-                _player.GetTokenControl().AddIndicator(ETokenIndicators.Blot, newValue.ToString());
-            } else {
-                _player.GetTokenControl().RemoveIndicator(ETokenIndicators.Blot);
-            }
+            _player.GetTokenControl().UpdateIndicatorBlot(newValue);
         }
     }
 
@@ -436,20 +422,20 @@ public class PlayerBoosters : MonoBehaviour
         }
 
         if (value > 0) {
-            AfterAddingBooster(booster, isSuccess);
+            AfterAddingBooster(booster, value, isSuccess);
         }
 
         return isSuccess;
     }
 
-    private void AfterAddingBooster(EBoosters booster, bool isSuccess) {
+    private void AfterAddingBooster(EBoosters booster, int value, bool isSuccess) {
         if (isSuccess) {
             ManualContent manual = Manual.Instance.GetBoosterManual(booster);
             string bonusName = manual.GetEntityName(true);
             string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " подбирает усилитель: " + Utils.Wrap(bonusName, UIColors.Orange);
             Messages.Instance.AddMessage(message);
             BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
-            _player.GetTokenControl().AddBonusEventToQueue("+" + bonusName, new Color32(3,74,0,255));
+            _player.GetTokenControl().AddBonusEventToQueue("+" + value, new Color32(3,74,0,255), manual.Sprite);
         } else {
             string message = "У " + Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " не хватило места в инвентаре для усилителя";
             Messages.Instance.AddMessage(message);
