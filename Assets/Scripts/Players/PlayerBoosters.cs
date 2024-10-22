@@ -422,20 +422,20 @@ public class PlayerBoosters : MonoBehaviour
         }
 
         if (value > 0) {
-            AfterAddingBooster(booster, isSuccess);
+            AfterAddingBooster(booster, value, isSuccess);
         }
 
         return isSuccess;
     }
 
-    private void AfterAddingBooster(EBoosters booster, bool isSuccess) {
+    private void AfterAddingBooster(EBoosters booster, int value, bool isSuccess) {
         if (isSuccess) {
             ManualContent manual = Manual.Instance.GetBoosterManual(booster);
             string bonusName = manual.GetEntityName(true);
             string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " подбирает усилитель: " + Utils.Wrap(bonusName, UIColors.Orange);
             Messages.Instance.AddMessage(message);
             BoostersControl.Instance.UpdateBoostersFromPlayer(_player);
-            _player.GetTokenControl().AddBonusEventToQueue("+" + bonusName, new Color32(3,74,0,255));
+            _player.GetTokenControl().AddBonusEventToQueue("+" + value, new Color32(3,74,0,255), manual.Sprite);
         } else {
             string message = "У " + Utils.Wrap(_player.PlayerName, UIColors.Yellow) + " не хватило места в инвентаре для усилителя";
             Messages.Instance.AddMessage(message);

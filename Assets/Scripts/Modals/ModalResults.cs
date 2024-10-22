@@ -28,7 +28,9 @@ public class ModalResults : MonoBehaviour
         foreach(PlayerControl player in players) {
             GameObject row = GetRow(player.PlaceAfterFinish);
             Image tokenImage = row.transform.Find("TokenImage").gameObject.GetComponent<Image>();
+            Image tokenSymbol = row.transform.Find("TokenSymbol").gameObject.GetComponent<Image>();
             tokenImage.sprite = player.TokenImage;
+            tokenSymbol.sprite = player.GetTokenControl().GetTokenSymbolSprite();
 
             TextMeshProUGUI playerName = row.transform.Find("PlayerNameText").gameObject.GetComponent<TextMeshProUGUI>();
             playerName.text = player.PlayerName;

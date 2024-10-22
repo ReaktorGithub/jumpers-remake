@@ -265,6 +265,7 @@ public class PlayerEffects : MonoBehaviour
         }
         _player.IsFinished = true;
         int place = _pedestal.SetPlayerToMaxPlace(_player);
+        PlayersControl.Instance.UpdatePlayersInfo();
 
         string message = Utils.Wrap(_player.PlayerName, UIColors.Yellow) + Utils.Wrap(" ФИНИШИРУЕТ ", UIColors.Green) + " на " + place + " месте!";
         Messages.Instance.AddMessage(message);
@@ -519,7 +520,8 @@ public class PlayerEffects : MonoBehaviour
             case ESurprise.InventoryEffect: {
                 AddTheEffect(surpriseEffect, 1);
                 ManualContent manual = Manual.Instance.GetEffectManual(surpriseEffect);
-                _player.BonusProcessing(manual.GetEntityName(true));
+                string name = manual.GetEntityName(true);
+                _player.BonusProcessing(name, manual.Sprite, 1);
                 CellChecker.Instance.CheckCellArrows(_player);
                 break;
             }
@@ -540,7 +542,8 @@ public class PlayerEffects : MonoBehaviour
             }
             case ESurprise.Mallow: {
                 _player.AddMallows(1);
-                _player.BonusProcessing("зефирка");
+                ManualContent manual = Manual.Instance.Mallow;
+                _player.BonusProcessing("зефирка", manual.Sprite, 1);
                 PlayersControl.Instance.UpdatePlayersInfo();
                 CellChecker.Instance.CheckCellArrows(_player);
                 break;

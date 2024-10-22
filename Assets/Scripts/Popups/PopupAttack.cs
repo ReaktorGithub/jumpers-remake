@@ -133,14 +133,16 @@ public class PopupAttack : MonoBehaviour
     }
 
     private void SetTokenAttackButton(TokenAttackButton button, PlayerControl rival, bool disable = false) {
+        TokenControl token = rival.GetTokenControl();
+
         button.SetTokenImage(rival.TokenImage);
+        button.SetSymbolImage(token.GetTokenSymbolSprite());
         button.BindPlayer(rival);
         button.ShowSoapImage(rival.IsAbilitySoap);
         Button buttonComponent = button.gameObject.GetComponent<Button>();
         buttonComponent.onClick.RemoveAllListeners();
 
         if (rival.Boosters.Armor > 0) {
-            TokenControl token = rival.GetTokenControl();
             Sprite sprite = rival.Boosters.IsIronArmor ? token.GetArmorIronSprite() : token.GetArmorSprite();
             button.SetShieldImage(sprite);
             button.DisableShieldImage(false);

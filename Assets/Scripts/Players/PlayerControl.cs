@@ -24,11 +24,11 @@ public class PlayerControl : MonoBehaviour
     private int _movesToDo = 0; // сколько нужно сделать ходов с броском кубика
     private int _stepsLeft = 0; // сколько шагов фишкой осталось сделать, может быть
     private bool _isLuckyStar = false; // защита от чёрных клеток
-    [SerializeField] private int _stuckAttached = 0; // количество зацепленных прилипал
+    private int _stuckAttached = 0; // количество зацепленных прилипал
     private bool _isAbilityLastChance = false;
     private bool _isAbilityOreol = false;
-    private bool _isAbilityHammer = true;
-    [SerializeField] private bool _isAbilitySoap = true;
+    private bool _isAbilityHammer = false;
+    private bool _isAbilitySoap = false;
     
     private List<EAttackTypes> _availableAttackTypes = new();
     private ModalWarning _modalWarning;
@@ -39,7 +39,6 @@ public class PlayerControl : MonoBehaviour
     private PlayerEffects _effects;
     private PlayerBoosters _boosters;
     private PlayerGrind _grind;
-    
 
     // Ресурсы игрока
     [SerializeField] private int _coins = 0;
@@ -275,13 +274,15 @@ public class PlayerControl : MonoBehaviour
     public void AddCoins(int value) {
         _coins += value;
         (string, Color32) values = Utils.GetTextWithSymbolAndColor(value);
-        GetTokenControl().AddBonusEventToQueue(values.Item1 + " монеты", values.Item2);
+        ManualContent manual = Manual.Instance.Coins;
+        GetTokenControl().AddBonusEventToQueue(values.Item1, values.Item2, manual.Sprite);
     }
 
     public void AddPower(int value) {
         Power += value;
         (string, Color32) values = Utils.GetTextWithSymbolAndColor(value);
-        GetTokenControl().AddBonusEventToQueue(values.Item1 + " сила", values.Item2);
+        ManualContent manual = Manual.Instance.Power;
+        GetTokenControl().AddBonusEventToQueue(values.Item1, values.Item2, manual.Sprite);
     }
 
     public void AddMallows(int value) {
@@ -463,7 +464,8 @@ public class PlayerControl : MonoBehaviour
         switch(type) {
             case EPickables.Mallow: {
                 AddMallows(1);
-                PickupBonusProcessing(cell, "зефирка");
+                ManualContent manual = Manual.Instance.Mallow;
+                PickupBonusProcessing(cell, "зефирка", manual.Sprite, 1);
                 break;
             }
             case EPickables.Ruby: {
@@ -492,7 +494,8 @@ public class PlayerControl : MonoBehaviour
 
     public void PickupRubyProcessing(CellControl cell) {
         AddRubies(1);
-        PickupBonusProcessing(cell, "рубин");
+        ManualContent manual = Manual.Instance.Ruby;
+        PickupBonusProcessing(cell, "рубин", manual.Sprite, 1);
     }
 
     public void RefuseRuby() {
@@ -501,18 +504,19 @@ public class PlayerControl : MonoBehaviour
         Messages.Instance.AddMessage(message);
     }
 
-    private void PickupBonusProcessing(CellControl cell, string bonusName) {
+    private void PickupBonusProcessing(CellControl cell, string bonusName, Sprite sprite, int count) {
         cell.SetPickableBonus(EPickables.None, EBoosters.None);
-        BonusProcessing(bonusName);
+        BonusProcessing(bonusName, sprite, count);
         PlayersControl.Instance.UpdatePlayersInfo();
     }
 
     // Общий метод обработки бонуса любого типа
 
-    public void BonusProcessing(string bonusName) {
+    public void BonusProcessing(string bonusName, Sprite sprite, int count) {
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + " подбирает бонус: " + Utils.Wrap(bonusName, UIColors.Orange);
         Messages.Instance.AddMessage(message);
-        GetTokenControl().AddBonusEventToQueue("+" + bonusName, new Color32(3,74,0,255));
+        (string, Color32) values = Utils.GetTextWithSymbolAndColor(count);
+        GetTokenControl().AddBonusEventToQueue(values.Item1, values.Item2, sprite);
     }
 
     // Модалки
@@ -568,6 +572,8 @@ public class PlayerControl : MonoBehaviour
         
         _isFinished = true;
         int place = _pedestal.SetPlayerToMinPlace(this);
+        PlayersControl.Instance.UpdatePlayersInfo();
+        
         string message = Utils.Wrap(PlayerName, UIColors.Yellow) + Utils.Wrap(" ВЫЛЕТАЕТ С ТРАССЫ!", UIColors.Red);
         Messages.Instance.AddMessage(message);
 

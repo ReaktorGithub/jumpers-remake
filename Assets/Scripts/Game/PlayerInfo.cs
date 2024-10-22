@@ -38,9 +38,15 @@ public class PlayerInfo : MonoBehaviour
         _placeText.text = GetPlaceText(player.MoveOrder);
         _placeText.gameObject.SetActive(!player.IsFinished);
         _playerNameText.text = player.PlayerName;
+        Color32 powerColor = player.Power == 1 ? new Color32(217,107,0,255) : (player.Power < 1 ? new Color32(255,0,0,255) : new Color32(255,255,255,255));
         _powerText.text = player.Power.ToString();
+        _powerText.color = powerColor;
+        Color32 rubiesColor = player.Rubies > 0 ? new Color32(255,255,255,255) : new Color32(255,0,0,255);
         _rubiesText.text = player.Rubies.ToString();
+        _rubiesText.color = rubiesColor;
+        Color32 coinsColor = player.Coins > 0 ? new Color32(255,255,255,255) : new Color32(255,0,0,255);
         _coinsText.text = player.Coins.ToString();
+        _coinsText.color = coinsColor;
     }
 
     private string GetPlaceText(int place) {

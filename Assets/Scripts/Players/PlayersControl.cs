@@ -185,9 +185,6 @@ public class PlayersControl : MonoBehaviour
             if (!player.IsFinished) {
                 player.IsFinished = true;
                 int place = _pedestal.SetPlayerToMinPlace(player);
-                string name = "PlayerInfo" + player.MoveOrder;
-                PlayerInfo info = GameObject.Find(name).GetComponent<PlayerInfo>();
-                info.UpdatePlayerInfoDisplay(player);
 
                 TokenControl tokenControl = player.GetTokenControl();
                 IEnumerator coroutine = tokenControl.MoveToPedestalDefer(delay, () => {
@@ -196,6 +193,8 @@ public class PlayersControl : MonoBehaviour
                 StartCoroutine(coroutine);
             }
         }
+
+        UpdatePlayersInfo();
     }
 
     public void CreatePlayersInfo() {
@@ -221,6 +220,7 @@ public class PlayersControl : MonoBehaviour
 
     public void UpdatePlayersInfo() {
         foreach(PlayerControl player in _players) {
+            Debug.Log(player.PlayerInfo);
             if (player.PlayerInfo != null) {
                 player.PlayerInfo.UpdatePlayerInfoDisplay(player);
             }

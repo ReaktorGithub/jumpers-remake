@@ -1,31 +1,19 @@
-using TMPro;
 using UnityEngine;
 
 public class Pedestal : MonoBehaviour
 {
     private bool[] _pedestal = new bool[4];
-    private SpriteRenderer _place1;
-    private SpriteRenderer _place2;
-    private SpriteRenderer _place3;
-    private SpriteRenderer _place4;
-    private TextMeshPro _name1;
-    private TextMeshPro _name2;
-    private TextMeshPro _name3;
-    private TextMeshPro _name4;
+    private PedestalPlace _place1, _place2, _place3, _place4;
+    
 
     private void Awake() {
-        _place1 = transform.Find("place1").gameObject.GetComponent<SpriteRenderer>();
-        _place2 = transform.Find("place2").gameObject.GetComponent<SpriteRenderer>();
-        _place3 = transform.Find("place3").gameObject.GetComponent<SpriteRenderer>();
-        _place4 = transform.Find("place4").gameObject.GetComponent<SpriteRenderer>();
-        _name1 = transform.Find("name1").gameObject.GetComponent<TextMeshPro>();
-        _name2 = transform.Find("name2").gameObject.GetComponent<TextMeshPro>();
-        _name3 = transform.Find("name3").gameObject.GetComponent<TextMeshPro>();
-        _name4 = transform.Find("name4").gameObject.GetComponent<TextMeshPro>();
-        _name1.text = "";
-        _name2.text = "";
-        _name3.text = "";
-        _name4.text = "";
+        _place1 = transform.Find("place1").gameObject.GetComponent<PedestalPlace>();
+        _place2 = transform.Find("place2").gameObject.GetComponent<PedestalPlace>();
+        _place3 = transform.Find("place3").gameObject.GetComponent<PedestalPlace>();
+        _place4 = transform.Find("place4").gameObject.GetComponent<PedestalPlace>();
+    }
+
+    private void Start() {
         CleanPedestal();
     }
 
@@ -52,23 +40,18 @@ public class Pedestal : MonoBehaviour
     }
 
     public void SetTokenToPedestal(PlayerControl player, int place) {
-        Sprite tokenSprite = player.TokenImage;
         switch (place) {
             case 1:
-            _place1.sprite = tokenSprite;
-            _name1.text = player.PlayerName;
+            _place1.SetPlayer(player);
             break;
             case 2:
-            _place2.sprite = tokenSprite;
-            _name2.text = player.PlayerName;
+            _place2.SetPlayer(player);
             break;
             case 3:
-            _place3.sprite = tokenSprite;
-            _name3.text = player.PlayerName;
+            _place3.SetPlayer(player);
             break;
             case 4:
-            _place4.sprite = tokenSprite;
-            _name4.text = player.PlayerName;
+            _place4.SetPlayer(player);
             break;
         }
         player.TokenObject.SetActive(false); 
@@ -79,5 +62,9 @@ public class Pedestal : MonoBehaviour
         _pedestal[1] = false;
         _pedestal[2] = false;
         _pedestal[3] = false;
+        _place1.CleanPedestalVisual();
+        _place2.CleanPedestalVisual();
+        _place3.CleanPedestalVisual();
+        _place4.CleanPedestalVisual();
     }
 }

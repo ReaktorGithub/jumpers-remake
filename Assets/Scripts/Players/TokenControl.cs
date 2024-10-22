@@ -17,7 +17,7 @@ public class TokenControl : MonoBehaviour
     private bool _isSqueeze = false;
     private GameObject _pedestal;
     private SplineAnimate _splineAnimate;
-    private List<(string, Color32)> _bonusQueue = new();
+    private List<(string, Color32, Sprite)> _bonusQueue = new();
     private bool _isProcessingQueue = false;
     private TokenStuck _stuckScript;
     private Animator _teleportAnimator;
@@ -307,12 +307,12 @@ public class TokenControl : MonoBehaviour
 
     // Событие появления бонуса
 
-    public void AddBonusEventToQueue(string message, Color32 color) {
+    public void AddBonusEventToQueue(string message, Color32 color, Sprite sprite = null) {
         if (!transform.gameObject.activeInHierarchy || !_indicators.activeInHierarchy || message == "0") {
             return;
         }
 
-        _bonusQueue.Add((message, color));
+        _bonusQueue.Add((message, color, sprite));
 
         if (!_isProcessingQueue) {
             StartCoroutine(StartBonusQueue());
@@ -323,7 +323,7 @@ public class TokenControl : MonoBehaviour
         _isProcessingQueue = true;
 
         while (_bonusQueue.Count > 0) {
-            FlashBonusEvent(_bonusQueue[0].Item1, _bonusQueue[0].Item2);
+            FlashBonusEvent(_bonusQueue[0].Item1, _bonusQueue[0].Item2, _bonusQueue[0].Item3);
             _bonusQueue.RemoveAt(0);
             yield return new WaitForSeconds(TokensControl.Instance.NextBonusTime);
         }
@@ -331,14 +331,16 @@ public class TokenControl : MonoBehaviour
         _isProcessingQueue = false; // Завершаем обработку очереди
     }
 
-    private void FlashBonusEvent(string message, Color32 color) {
+    private void FlashBonusEvent(string message, Color32 color, Sprite sprite = null) {
         GameObject clone = Instantiate(TokensControl.Instance.BonusEventSample);
         clone.transform.SetParent(_bonusEventsList.transform);
         clone.transform.localScale = new Vector3(1f,1f,1f);
 
-        TextMeshPro text = clone.transform.Find("Text (TMP)").GetComponent<TextMeshPro>();
+        TextMeshPro text = clone.transform.Find("Text").GetComponent<TextMeshPro>();
+        SpriteRenderer image = clone.transform.Find("Sprite").GetComponent<SpriteRenderer>();
         text.text = message;
         text.color = color;
+        image.sprite = sprite;
 
         Animator animator = clone.GetComponent<Animator>();
         clone.SetActive(true);
