@@ -21,19 +21,20 @@ public class Jumpers : MonoBehaviour
         CanvasInstances.SetActive(false);
     }
 
-    private void Update() {
-        if (Input.GetKeyUp(KeyCode.F)) {
-            MoveControl.Instance.CurrentPlayer.IsAbilitySoap = !MoveControl.Instance.CurrentPlayer.IsAbilitySoap;
-        }
-    }
-
     // private void Update() {
-    //     if (Input.GetKeyUp(KeyCode.U)) {
-    //         _arrowBody.SetActive(true);
-    //         _testArrow.SetActive(!_testArrow.activeInHierarchy);
-    //         _arrowBody.SetActive(false);
+    //     if (Input.GetKeyUp(KeyCode.F)) {
+    //         MoveControl.Instance.CurrentPlayer.IsAbilitySoap = !MoveControl.Instance.CurrentPlayer.IsAbilitySoap;
     //     }
     // }
+
+    private void Update() {
+        if (Input.GetKeyUp(KeyCode.G)) {
+            ModalGarage modal = GameObject.Find("ModalScripts").GetComponent<ModalGarage>();
+            PlayerControl player = PlayersControl.Instance.GetMe();
+            GarageControl.Instance.BuildContent(player);
+            modal.OpenModal();
+        }
+    }
 
     // private void Update() {
     //     if (Input.GetKeyUp(KeyCode.B)) {

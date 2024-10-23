@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ModalWindow : MonoBehaviour
 {
-    private float _fadeInTime = 0.3f;
+    [SerializeField] private float _fadeInTime = 0.3f;
 
     private void Awake() {
         ResetScale();
