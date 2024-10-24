@@ -220,7 +220,6 @@ public class PlayersControl : MonoBehaviour
 
     public void UpdatePlayersInfo() {
         foreach(PlayerControl player in _players) {
-            Debug.Log(player.PlayerInfo);
             if (player.PlayerInfo != null) {
                 player.PlayerInfo.UpdatePlayerInfoDisplay(player);
             }

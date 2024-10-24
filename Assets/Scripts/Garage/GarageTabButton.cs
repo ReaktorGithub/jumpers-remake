@@ -25,7 +25,6 @@ public class GarageTabButton : MonoBehaviour
 
     private void Start() {
         _instances.SetActive(false);
-        SetSelected(false);
     }
 
     public EGarageTabs Tab {
