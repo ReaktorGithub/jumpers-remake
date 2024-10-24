@@ -16,6 +16,7 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private int _moveOrder;
     [SerializeField] private bool _isReverseMove = false;
     [SerializeField] private bool _isDeadEndMode = false; // режим активируется в момент достижения стены
+    private GameObject _garageObject;
     private PlayerInfo _playerInfo;
     private int _placeAfterFinish;
     private bool _isFinished = false;
@@ -57,6 +58,7 @@ public class PlayerControl : MonoBehaviour
         _effects = GetComponent<PlayerEffects>();
         _boosters = GetComponent<PlayerBoosters>();
         _grind = GetComponent<PlayerGrind>();
+        _garageObject = transform.Find("Garage").gameObject;
     }
 
     // Изменение свойств напрямую
@@ -563,6 +565,20 @@ public class PlayerControl : MonoBehaviour
         _modalWarning.OpenModal();
     }
 
+    public void OpenShopLackOfCoinsModal(Action callback = null) {
+        _modalWarning.SetHeadingText("Дефицит монет");
+        _modalWarning.SetBodyText("Не хватает монет для покупки этого предмета");
+        _modalWarning.SetCallback(callback);
+        _modalWarning.OpenModal();
+    }
+
+    public void OpenShopTokenAlreadyExistModal(Action callback = null) {
+        _modalWarning.SetHeadingText("Отмена");
+        _modalWarning.SetBodyText("У вас уже есть такая фишка");
+        _modalWarning.SetCallback(callback);
+        _modalWarning.OpenModal();
+    }
+
     public void ConfirmLose() {
         bool isRaceOver = PlayersControl.Instance.IsRaceOver();
 
@@ -647,5 +663,58 @@ public class PlayerControl : MonoBehaviour
 
     public bool AmIBehingMyRivals(int criticalSteps = 10) {
         return GetOtherPlayersMeanGap() > criticalSteps;
+    }
+
+    // Гараж
+
+    public List<PlayerTokenInGarage> GetAllGarageTokens() {
+        List<PlayerTokenInGarage> result = new();
+
+        Transform[] children = _garageObject.GetComponentsInChildren<Transform>();
+        foreach (Transform child in children) {
+            if (child.CompareTag("PlayerTokenInGarage")) {
+                result.Add(child.GetComponent<PlayerTokenInGarage>());
+            }
+        }
+
+        return result;
+    }
+
+    public void AddNewTokenToGarage(GarageShopToken token) {
+        if (IsTokenInGarageAlreadyExist(token)) {
+            OpenShopTokenAlreadyExistModal();
+            return;
+        }
+        
+        AddCoins(-token.Cost);
+        GameObject clone = Instantiate(PlayersControl.Instance.PlayerTokenInGarageSample);
+        clone.transform.SetParent(_garageObject.transform);
+        clone.SetActive(true);
+        PlayerTokenInGarage garageToken = clone.GetComponent<PlayerTokenInGarage>();
+        garageToken.UpdateLinks();
+        garageToken.Token = token;
+        ReselectTokens(token);
+    }
+
+    // При доавлении новой фишки она становится выбранной. Все остальные фишки в гараже становятся невыбранными.
+
+    private void ReselectTokens(GarageShopToken tokenToSelect) {
+        List<PlayerTokenInGarage> list = GetAllGarageTokens();
+
+        foreach(PlayerTokenInGarage garageToken in list) {
+            garageToken.Selected = garageToken.Token == tokenToSelect;
+        }
+    }
+
+    public bool IsTokenInGarageAlreadyExist(GarageShopToken token) {
+        List<PlayerTokenInGarage> list = GetAllGarageTokens();
+
+        foreach(PlayerTokenInGarage garageToken in list) {
+            if (garageToken.Token == token) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

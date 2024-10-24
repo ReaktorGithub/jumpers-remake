@@ -6,21 +6,65 @@ public class GarageControl : MonoBehaviour
     public static GarageControl Instance { get; private set; }
     [SerializeField] private EGarageTabs _currentTab = EGarageTabs.Token;
     [SerializeField] private List<GarageTabButton> _tabButtonsList = new();
-    [SerializeField] private GameObject _garageBody, _shopTabObject, _awardsTabObject, _boostersTabObject, _grindTabObject, _tokenTabObject;
+    [SerializeField] private GameObject _garageBody, _shopTabObject, _awardsTabObject, _boostersTabObject, _grindTabObject, _tokenTabObject, _tokensListObject;
+    private List<GarageShopToken> _shopTokensList = new(); // список всех фишек в игре
     private PlayerControl _player;
-    private GarageTabShop _shopTab;
-    private GarageTabAwards _awardsTab;
-    private GarageTabBoosters _boostersTab;
-    private GarageTabGrind _grindTab;
-    private GarageTabToken _tokenTab;
+    private GarageTabShop _tabShop;
+    private GarageTabAwards _tabAwards;
+    private GarageTabBoosters _tabBoosters;
+    private GarageTabGrind _tabGrind;
+    private GarageTabToken _tabToken;
+    private ModalByuItem _modalBuyItem;
 
     private void Awake() {
         Instance = this;
-        _shopTab = _shopTabObject.GetComponent<GarageTabShop>();
-        _awardsTab = _awardsTabObject.GetComponent<GarageTabAwards>();
-        _boostersTab = _boostersTabObject.GetComponent<GarageTabBoosters>();
-        _grindTab = _grindTabObject.GetComponent<GarageTabGrind>();
-        _tokenTab = _tokenTabObject.GetComponent<GarageTabToken>();
+        _tabShop = _shopTabObject.GetComponent<GarageTabShop>();
+        _tabAwards = _awardsTabObject.GetComponent<GarageTabAwards>();
+        _tabBoosters = _boostersTabObject.GetComponent<GarageTabBoosters>();
+        _tabGrind = _grindTabObject.GetComponent<GarageTabGrind>();
+        _tabToken = _tokenTabObject.GetComponent<GarageTabToken>();
+        _modalBuyItem = GameObject.Find("ModalScripts").GetComponent<ModalByuItem>();
+
+        foreach(Transform child in _tokensListObject.transform) {
+            if (child.TryGetComponent(out GarageShopToken token)) {
+                _shopTokensList.Add(token);
+            }
+        }
+    }
+
+    public List<GarageShopToken> ShopTokensList {
+        get { return _shopTokensList; }
+        private set {}
+    }
+
+    public PlayerControl Player {
+        get { return _player; }
+        private set {}
+    }
+
+    public GarageTabShop TabShop {
+        get { return _tabShop; }
+        private set {}
+    }
+
+    public GarageTabAwards TabAwards {
+        get { return _tabAwards; }
+        private set {}
+    }
+
+    public GarageTabBoosters TabBoosters {
+        get { return _tabBoosters; }
+        private set {}
+    }
+
+    public GarageTabGrind TabGrind {
+        get { return _tabGrind; }
+        private set {}
+    }
+
+    public GarageTabToken TabToken {
+        get { return _tabToken; }
+        private set {}
     }
 
     public void ShowBody(bool value) {
@@ -48,23 +92,23 @@ public class GarageControl : MonoBehaviour
     private void UpdateTabContentDisplay() {
         switch(_currentTab) {
             case EGarageTabs.Token: {
-                _tokenTab.BuildContent();
+                _tabToken.BuildContent(_player);
                 break;
             }
             case EGarageTabs.Shop: {
-                _shopTab.BuildContent();
+                _tabShop.BuildContent();
                 break;
             }
             case EGarageTabs.Boosters: {
-                _boostersTab.BuildContent();
+                _tabBoosters.BuildContent();
                 break;
             }
             case EGarageTabs.Grind: {
-                _grindTab.BuildContent();
+                _tabGrind.BuildContent();
                 break;
             }
             case EGarageTabs.Awards: {
-                _awardsTab.BuildContent();
+                _tabAwards.BuildContent();
                 break;
             }
         }
@@ -84,5 +128,46 @@ public class GarageControl : MonoBehaviour
             ETokenTypes.Elite => "Элита",
             _ => "Базовая",
         };
+    }
+
+    public List<GarageShopToken> GetSortedGarageShopTokens() {
+        List<GarageShopToken> array = new();
+
+        foreach(GarageShopToken token in _shopTokensList) {
+            array.Add(token);
+        }
+
+        array.Sort((a, b) => a.SortingOrder - b.SortingOrder);
+
+        return array;
+    }
+
+    public List<PlayerTokenInGarage> GetSortedPlayerTokensInGarage(List<PlayerTokenInGarage> list) {
+        List<PlayerTokenInGarage> array = new();
+
+        foreach(PlayerTokenInGarage token in list) {
+            array.Add(token);
+        }
+
+        array.Sort((a, b) => a.Token.SortingOrder - b.Token.SortingOrder);
+
+        return array;
+    }
+
+    public void AddNewTokenToGarage() {
+        // todo IsTokenInGarageAlreadyExist
+        _player.AddNewTokenToGarage(TabShop.SelectedToken);
+        OnTabClick(EGarageTabs.Token);
+    }
+
+    public void OnBuyToken() {
+        int cost = TabShop.SelectedToken.Cost;
+
+        if (cost > _player.Coins) {
+            _player.OpenShopLackOfCoinsModal();
+        } else {
+            _modalBuyItem.BuildContent(TabShop.SelectedToken.Name, cost, TabShop.SelectedToken.TokenSprite);
+            _modalBuyItem.OpenModal();
+        }
     }
 }

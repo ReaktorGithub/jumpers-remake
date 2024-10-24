@@ -3,11 +3,12 @@ using UnityEngine.UI;
 
 public class GarageOwnedTokenButton : MonoBehaviour
 {
-    private Image _image;
+    private PlayerTokenInGarage _garageToken;
     [SerializeField] private GameObject _selected, _hover, _imageObject;
 
-    private void Awake() {
-        _image = _imageObject.GetComponent<Image>();
+    public PlayerTokenInGarage GarageToken {
+        get { return _garageToken; }
+        private set {}
     }
 
     public void OnHoverIn() {
@@ -22,7 +23,12 @@ public class GarageOwnedTokenButton : MonoBehaviour
         _selected.SetActive(value);
     }
 
-    public void SetImage(Sprite sprite) {
-        _image.sprite = sprite;
+    public void SetGarageToken(PlayerTokenInGarage garageToken) {
+        _garageToken = garageToken;
+        _imageObject.GetComponent<Image>().sprite = garageToken.Token.TokenSprite;
+    }
+
+    public void OnClick() {
+        GarageControl.Instance.TabToken.OnOwnedTokenButtonClick(_garageToken);
     }
 }

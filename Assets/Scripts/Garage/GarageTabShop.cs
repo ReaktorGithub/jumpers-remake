@@ -4,29 +4,22 @@ using UnityEngine;
 
 public class GarageTabShop : MonoBehaviour
 {
-    [SerializeField] private GameObject _tokensListObject, _shopTokenButtonSample, _shopTokensList, _itemDisplayerObject, _abilityMagicKick, _abilityLastChance, _abilityOreol, _abilityKnockout, _abilityHammer;
-    private List<GarageShopToken> _tokensList = new();
+    [SerializeField] private GameObject _shopTokenButtonSample, _shopTokensList, _itemDisplayerObject, _abilityMagicKick, _abilityLastChance, _abilityOreol, _abilityKnockout, _abilityHammer;
+    
     private GarageShopToken _selectedToken;
     private GarageItemDisplayer _itemDisplayer;
-    [SerializeField] private TextMeshProUGUI _detailName, _detailType, _detailPower, _detailSlots;
+    [SerializeField] private TextMeshProUGUI _detailName, _detailType, _detailPower, _detailSlots, _description, _playerBalance;
 
     private void Awake() {
-        foreach(Transform child in _tokensListObject.transform) {
-            if (child.TryGetComponent(out GarageShopToken token)) {
-                _tokensList.Add(token);
-            }
-        }
-
         _itemDisplayer = _itemDisplayerObject.GetComponent<GarageItemDisplayer>();
     }
 
     private void Start() {
-        _tokensListObject.SetActive(false);
         _shopTokenButtonSample.SetActive(false);
     }
 
-    public List<GarageShopToken> TokensList {
-        get { return _tokensList; }
+    public GarageShopToken SelectedToken {
+        get { return _selectedToken; }
         private set {}
     }
 
@@ -37,16 +30,20 @@ public class GarageTabShop : MonoBehaviour
             }
         }
 
-        foreach(GarageShopToken token in _tokensList) {
+        List<GarageShopToken> sorted = GarageControl.Instance.GetSortedGarageShopTokens();
+
+        foreach(GarageShopToken token in sorted) {
             if (!token.EnableInShop) {
                 continue;
             }
 
             GameObject clone = Instantiate(_shopTokenButtonSample);
             GarageShopTokenButton button = clone.GetComponent<GarageShopTokenButton>();
+            button.UpdateLinks();
             button.SetToken(token);
             clone.transform.SetParent(_shopTokensList.transform);
             clone.transform.localScale = new Vector3(1f,1f,1f);
+            clone.SetActive(true);
 
             if (!_selectedToken) {
                 _selectedToken = token;
@@ -81,5 +78,9 @@ public class GarageTabShop : MonoBehaviour
         _abilityLastChance.SetActive(_selectedToken.UnlockAbilities.Contains(EAbilities.LastChance));
         _abilityMagicKick.SetActive(_selectedToken.UnlockAbilities.Contains(EAbilities.MagicKick));
         _abilityOreol.SetActive(_selectedToken.UnlockAbilities.Contains(EAbilities.Oreol));
+
+        _description.text = _selectedToken.Description;
+
+        _playerBalance.text = GarageControl.Instance.Player.Coins.ToString();
     }
 }

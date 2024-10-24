@@ -12,6 +12,10 @@ public class GarageShopTokenButton : MonoBehaviour
     private Image _bg;
 
     private void Awake() {
+        UpdateLinks();
+    }
+
+    public void UpdateLinks() {
         _image = _imageObject.GetComponent<Image>();
         _bg = GetComponent<Image>();
         _garageTabShop = _garageTabShopObject.GetComponent<GarageTabShop>();

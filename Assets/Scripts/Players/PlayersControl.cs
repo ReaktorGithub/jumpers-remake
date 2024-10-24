@@ -14,6 +14,7 @@ public class PlayersControl : MonoBehaviour
     private Pedestal _pedestal;
     private LevelData _levelData;
     private ModalLastChance _modalLastChance;
+    [SerializeField] private GameObject _playerTokenInGarageSample;
 
     private void Awake() {
         Instance = this;
@@ -24,7 +25,7 @@ public class PlayersControl : MonoBehaviour
     }
 
     private void Start() {
-        
+        _playerTokenInGarageSample.SetActive(false);
     }
 
     public float FinishDelay {
@@ -44,6 +45,11 @@ public class PlayersControl : MonoBehaviour
 
     public PlayerControl[] Players {
         get { return _players; }
+        private set {}
+    }
+
+    public GameObject PlayerTokenInGarageSample {
+        get { return _playerTokenInGarageSample; }
         private set {}
     }
 
@@ -95,6 +101,16 @@ public class PlayersControl : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public void AddAvailableTokensToPlayers() {
+        foreach(GarageShopToken token in GarageControl.Instance.ShopTokensList) {
+            if (token.AvailableAtStart) {
+                foreach(PlayerControl player in _players) {
+                    player.AddNewTokenToGarage(token);
+                }
+            }
+        }
     }
 
     // в игроке сохранить изображение фишки и ссылку на фишку

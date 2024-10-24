@@ -14,7 +14,7 @@ TagManager:
   - MoneyboxStep
   - TokenIndicator
   - PlayerInfo
-  - OwnedTokenButton
+  - PlayerTokenInGarage
   layers:
   - Default
   - TransparentFX

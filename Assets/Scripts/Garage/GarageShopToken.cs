@@ -15,6 +15,7 @@ public class GarageShopToken : MonoBehaviour
     [SerializeField] private string _description = "";
     [SerializeField] private int _sortingOrder = 0;
     [SerializeField] private bool _enableInShop = true;
+    [SerializeField] private bool _availableAtStart = false;
 
     private void Awake() {
         _tokenSprite = GetComponent<Image>().sprite;
@@ -72,6 +73,11 @@ public class GarageShopToken : MonoBehaviour
 
     public bool EnableInShop {
         get { return _enableInShop; }
+        private set {}
+    }
+
+    public bool AvailableAtStart {
+        get { return _availableAtStart; }
         private set {}
     }
 }

@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3230141224697425308}
   m_Layer: 5
   m_Name: OwnedTokenButton
-  m_TagString: OwnedTokenButton
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -85,7 +85,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 150399062864902856}
+        m_TargetAssemblyTypeName: GarageOwnedTokenButton, Assembly-CSharp
+        m_MethodName: OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &150399062864902856
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,0 +1,170 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2005264707933549332
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5351229255499046233}
+  - component: {fileID: 6868334053328726147}
+  - component: {fileID: 2803396840690348802}
+  - component: {fileID: 216237227852086991}
+  - component: {fileID: 7673616229409002467}
+  m_Layer: 0
+  m_Name: Player
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5351229255499046233
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005264707933549332}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 397896969858449911}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6868334053328726147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005264707933549332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d93a5abc978e26943a7babfaee6ab935, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerName: "\u0418\u0433\u0440\u043E\u043A \u0410"
+  _type: 0
+  _aiType: 0
+  _tokenObject: {fileID: 0}
+  _moveOrder: 0
+  _isReverseMove: 0
+  _isDeadEndMode: 0
+  _coins: 400
+  _mallows: 0
+  _rubies: 0
+  _power: 2
+--- !u!114 &2803396840690348802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005264707933549332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 634b3dc8fd0a3784b8a3d23f75810712, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _green: 2
+  _yellow: 2
+  _black: 2
+  _red: 2
+  _star: 2
+  _lightningMoves: 0
+  _isLightning: 0
+--- !u!114 &216237227852086991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005264707933549332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1ec307e4623d92489209a3f1f2b403f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _magnet: 2
+  _superMagnet: 1
+  _lasso: 3
+  _shield: 2
+  _shieldIron: 1
+  _vampire: 1
+  _boombaster: 1
+  _stuck: 1
+  _trap: 1
+  _flash: 1
+  _blot: 1
+  _vacuum: 1
+  _vacuumNozzle: 1
+  _mop: 1
+  _tameLightning: 3
+  _flashMovesLeft: 0
+  _blotMovesLeft: 0
+  _armor: 0
+  _isIronArmor: 0
+  _selectedShieldButton: {fileID: 0}
+--- !u!114 &7673616229409002467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005264707933549332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0933f259d45c0b24b991283c1d0e6b68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _green: 3
+  _yellow: 3
+  _red: 3
+  _black: 3
+  _star: 3
+  _magicKick: 3
+  _oreol: 3
+  _knockout: 3
+  _lasso: 3
+  _boombaster: 3
+  _flash: 3
+  _blot: 3
+  _mop: 3
+  _cubic: 3
+  _insurance: 3
+--- !u!1 &6543315425364208614
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 397896969858449911}
+  m_Layer: 0
+  m_Name: Garage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &397896969858449911
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6543315425364208614}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5351229255499046233}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
