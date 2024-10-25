@@ -1,24 +1,24 @@
 using UnityEngine;
 
-// Класс предназначен для предварительной настройки игры перед запуском уровня
-
 public class Jumpers : MonoBehaviour
 {
-    // private GameObject _testArrow, _arrowBody;
-
-    // private void Awake() {
-    //     _testArrow = GameObject.Find("ArrowHedge1d");
-    //     _arrowBody = GameObject.Find("arrow-body");
-    // }
+    [SerializeField] private GameObject _ui, _field;
 
     private void Start() {
-        // CleanInstances();
         PlayersControl.Instance.BindTokensToPlayers();
         PlayersControl.Instance.UpdateAllIndicators();
         GameObject Instances = GameObject.Find("Instances");
         GameObject CanvasInstances = GameObject.Find("CanvasInstances");
         Instances.SetActive(false);
         CanvasInstances.SetActive(false);
+    }
+
+    public void ShowUI(bool value) {
+        _ui.SetActive(value);
+    }
+
+    public void ShowField(bool value) {
+        _field.SetActive(value);
     }
 
     // private void Update() {
@@ -29,10 +29,19 @@ public class Jumpers : MonoBehaviour
 
     private void Update() {
         if (Input.GetKeyUp(KeyCode.G)) {
+            ShowUI(false);
+            ShowField(false);
             ModalGarage modal = GameObject.Find("ModalScripts").GetComponent<ModalGarage>();
             PlayerControl player = PlayersControl.Instance.GetMe();
             GarageControl.Instance.BuildContent(player);
             modal.OpenModal();
+        }
+
+        if (Input.GetKeyUp(KeyCode.H)) {
+            ModalGarage modal = GameObject.Find("ModalScripts").GetComponent<ModalGarage>();
+            modal.CloseModal();
+            ShowUI(true);
+            ShowField(true);
         }
     }
 

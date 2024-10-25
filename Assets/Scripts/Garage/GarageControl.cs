@@ -7,6 +7,7 @@ public class GarageControl : MonoBehaviour
     [SerializeField] private EGarageTabs _currentTab = EGarageTabs.Token;
     [SerializeField] private List<GarageTabButton> _tabButtonsList = new();
     [SerializeField] private GameObject _garageBody, _shopTabObject, _awardsTabObject, _boostersTabObject, _grindTabObject, _tokenTabObject, _tokensListObject;
+    [SerializeField] private int _slotsForBuyCount = 2;
     private List<GarageShopToken> _shopTokensList = new(); // список всех фишек в игре
     private PlayerControl _player;
     private GarageTabShop _tabShop;
@@ -34,6 +35,11 @@ public class GarageControl : MonoBehaviour
 
     public List<GarageShopToken> ShopTokensList {
         get { return _shopTokensList; }
+        private set {}
+    }
+
+    public int SlotsForBuyCount {
+        get { return _slotsForBuyCount; }
         private set {}
     }
 
@@ -69,6 +75,7 @@ public class GarageControl : MonoBehaviour
 
     public void ShowBody(bool value) {
         _garageBody.SetActive(value);
+        StartAllAnimations();
     }
 
     public void BuildContent(PlayerControl player) {
@@ -92,7 +99,7 @@ public class GarageControl : MonoBehaviour
     private void UpdateTabContentDisplay() {
         switch(_currentTab) {
             case EGarageTabs.Token: {
-                _tabToken.BuildContent(_player);
+                _tabToken.BuildContent();
                 break;
             }
             case EGarageTabs.Shop: {
@@ -118,6 +125,8 @@ public class GarageControl : MonoBehaviour
         _boostersTabObject.SetActive(_currentTab == EGarageTabs.Boosters);
         _grindTabObject.SetActive(_currentTab == EGarageTabs.Grind);
         _awardsTabObject.SetActive(_currentTab == EGarageTabs.Awards);
+
+        StartAllAnimations();
     }
 
     public string GetTokenTypeText(ETokenTypes type) {
@@ -173,5 +182,9 @@ public class GarageControl : MonoBehaviour
             _modalBuyItem.BuildContent(TabShop.SelectedToken.Name, cost, TabShop.SelectedToken.TokenSprite);
             _modalBuyItem.OpenModal();
         }
+    }
+
+    private void StartAllAnimations() {
+        TabToken.StartAllAnimations();
     }
 }

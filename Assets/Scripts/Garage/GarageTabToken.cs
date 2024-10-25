@@ -3,13 +3,20 @@ using UnityEngine;
 
 public class GarageTabToken : MonoBehaviour
 {
-    [SerializeField] private GameObject _ownedTokenButtonSample, _ownedListObject;
+    [SerializeField] private GameObject _ownedTokenButtonSample, _ownedListObject, _bigTokenObject;
+    private GarageBigToken _bigToken;
+
+    private void Awake() {
+        _bigToken = _bigTokenObject.GetComponent<GarageBigToken>();
+    }
 
     private void Start() {
         _ownedTokenButtonSample.SetActive(false);
     }
 
-    public void BuildContent(PlayerControl player) {
+    public void BuildContent() {
+        PlayerControl player = GarageControl.Instance.Player;
+
         foreach(Transform child in _ownedListObject.transform) {
             if (child.TryGetComponent(out GarageOwnedTokenButton button)) {
                 Destroy(button.gameObject);
@@ -23,23 +30,34 @@ public class GarageTabToken : MonoBehaviour
             GameObject clone = Instantiate(_ownedTokenButtonSample);
             GarageOwnedTokenButton button = clone.GetComponent<GarageOwnedTokenButton>();
             button.SetGarageToken(token);
-            button.SetSelected(token.Selected);
             clone.transform.SetParent(_ownedListObject.transform);
             clone.transform.localScale = new Vector3(1f,1f,1f);
             clone.SetActive(true);
         }
+
+        UpdateContent();
     }
 
-    private void UpdateOwnedTokensSelection() {
+    private void UpdateContent() {
         foreach(Transform child in _ownedListObject.transform) {
             if (child.TryGetComponent(out GarageOwnedTokenButton button)) {
-                button.SetSelected(button.GarageToken.Selected);
+                bool selected = button.GarageToken.Selected;
+                button.SetSelected(selected);
+                if (selected) {
+                    PlayerControl player = GarageControl.Instance.Player;
+                    Sprite symbolSprite = player.GetTokenControl().GetTokenSymbolSprite();
+                    _bigToken.SetToken(button.GarageToken.Token, symbolSprite);
+                }
             }
         }
     }
 
     public void OnOwnedTokenButtonClick(PlayerTokenInGarage garageToken) {
         GarageControl.Instance.Player.ReselectTokens(garageToken.Token);
-        UpdateOwnedTokensSelection();
+        UpdateContent();
+    }
+
+    public void StartAllAnimations() {
+        _bigToken.SetSqueezeAnimation(true);
     }
 }

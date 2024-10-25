@@ -33,11 +33,48 @@ public class PlayerTokenInGarage : MonoBehaviour
 
     public GarageShopToken Token {
         get { return _token; }
-        set {_token = value; }
+        set {
+            _token = value;
+            UpdateSlots(_token);
+        }
     }
 
     public bool Selected {
         get { return _selected; }
-        set {_selected = value; }
+        set { _selected = value; }
+    }
+
+    /*
+        Первый слот всегда с обычной атакой.
+        Оставшиеся слоты фишки открыты, но без навыка.
+        Следующие несколько слотов могут быть вскрыты игроком (обычно их 2, см. GarageControl.Instance.SlotsForBuyCount).
+        Остальные слоты disabled (скрыты и никогда не отобразятся).
+    */
+
+    private void UpdateSlots(GarageShopToken token) {
+        int slots = token.InitialAbilitySlots;
+        int lastFilled = 0;
+
+        for (int i = 0; i < _slotsList.Count; i++) {
+            if (i + 1 == slots) {
+                lastFilled = i;
+            }
+
+            if (i == 0) {
+                _slotsList[i].Disabled = false;
+                _slotsList[i].Locked = false;
+                _slotsList[i].Ability = EAbilities.AttackUsual;
+            } else if (i < slots) {
+                _slotsList[i].Disabled = false;
+                _slotsList[i].Locked = false;
+                _slotsList[i].Ability = EAbilities.None;
+            } else if (i <= lastFilled + GarageControl.Instance.SlotsForBuyCount) {
+                _slotsList[i].Disabled = false;
+                _slotsList[i].Locked = true;
+                _slotsList[i].Ability = EAbilities.None;
+            } else {
+                _slotsList[i].Disabled = true;
+            }
+        }
     }
 }
