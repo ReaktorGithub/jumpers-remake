@@ -17,8 +17,7 @@ public class ModalWarning : MonoBehaviour
         _backgroundImage = _modal.transform.Find("Modal").GetComponent<Image>();
     }
 
-    public void OpenModal(bool withBackground = false) {
-        _backgroundImage.enabled = withBackground;
+    public void OpenModal() {
         _modal.OpenModal();
     }
 

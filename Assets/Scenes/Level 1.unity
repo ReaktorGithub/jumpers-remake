@@ -21858,15 +21858,15 @@ RectTransform:
   - {fileID: 470787297}
   - {fileID: 1581038009}
   - {fileID: 1666896840}
-  - {fileID: 2143561862}
   - {fileID: 1527965888}
-  - {fileID: 849801328}
   - {fileID: 1809687280}
-  - {fileID: 1370879995}
   - {fileID: 2083827605}
+  - {fileID: 2143561862}
+  - {fileID: 849801328}
   - {fileID: 1894385379}
   - {fileID: 1907498533}
   - {fileID: 4308562385241673363}
+  - {fileID: 1370879995}
   m_Father: {fileID: 1559014522}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

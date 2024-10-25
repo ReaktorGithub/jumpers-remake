@@ -681,11 +681,6 @@ public class PlayerControl : MonoBehaviour
     }
 
     public void AddNewTokenToGarage(GarageShopToken token) {
-        if (IsTokenInGarageAlreadyExist(token)) {
-            OpenShopTokenAlreadyExistModal();
-            return;
-        }
-        
         AddCoins(-token.Cost);
         GameObject clone = Instantiate(PlayersControl.Instance.PlayerTokenInGarageSample);
         clone.transform.SetParent(_garageObject.transform);
@@ -696,9 +691,9 @@ public class PlayerControl : MonoBehaviour
         ReselectTokens(token);
     }
 
-    // При доавлении новой фишки она становится выбранной. Все остальные фишки в гараже становятся невыбранными.
+    // Указанную фишку делает выбранной. Все остальные делает невыбранными
 
-    private void ReselectTokens(GarageShopToken tokenToSelect) {
+    public void ReselectTokens(GarageShopToken tokenToSelect) {
         List<PlayerTokenInGarage> list = GetAllGarageTokens();
 
         foreach(PlayerTokenInGarage garageToken in list) {

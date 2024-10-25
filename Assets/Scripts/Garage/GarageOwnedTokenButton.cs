@@ -26,6 +26,7 @@ public class GarageOwnedTokenButton : MonoBehaviour
     public void SetGarageToken(PlayerTokenInGarage garageToken) {
         _garageToken = garageToken;
         _imageObject.GetComponent<Image>().sprite = garageToken.Token.TokenSprite;
+        OnHoverOut();
     }
 
     public void OnClick() {

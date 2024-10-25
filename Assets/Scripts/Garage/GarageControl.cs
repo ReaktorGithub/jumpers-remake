@@ -155,12 +155,16 @@ public class GarageControl : MonoBehaviour
     }
 
     public void AddNewTokenToGarage() {
-        // todo IsTokenInGarageAlreadyExist
         _player.AddNewTokenToGarage(TabShop.SelectedToken);
         OnTabClick(EGarageTabs.Token);
     }
 
     public void OnBuyToken() {
+        if (_player.IsTokenInGarageAlreadyExist(TabShop.SelectedToken)) {
+            _player.OpenShopTokenAlreadyExistModal();
+            return;
+        }
+
         int cost = TabShop.SelectedToken.Cost;
 
         if (cost > _player.Coins) {

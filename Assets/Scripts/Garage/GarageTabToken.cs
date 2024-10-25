@@ -4,7 +4,6 @@ using UnityEngine;
 public class GarageTabToken : MonoBehaviour
 {
     [SerializeField] private GameObject _ownedTokenButtonSample, _ownedListObject;
-    private PlayerTokenInGarage _selectedGarageToken;
 
     private void Start() {
         _ownedTokenButtonSample.SetActive(false);
@@ -24,10 +23,7 @@ public class GarageTabToken : MonoBehaviour
             GameObject clone = Instantiate(_ownedTokenButtonSample);
             GarageOwnedTokenButton button = clone.GetComponent<GarageOwnedTokenButton>();
             button.SetGarageToken(token);
-            if (_selectedGarageToken == null) {
-                _selectedGarageToken = token;
-            }
-            button.SetSelected(_selectedGarageToken == token);
+            button.SetSelected(token.Selected);
             clone.transform.SetParent(_ownedListObject.transform);
             clone.transform.localScale = new Vector3(1f,1f,1f);
             clone.SetActive(true);
@@ -37,13 +33,13 @@ public class GarageTabToken : MonoBehaviour
     private void UpdateOwnedTokensSelection() {
         foreach(Transform child in _ownedListObject.transform) {
             if (child.TryGetComponent(out GarageOwnedTokenButton button)) {
-                button.SetSelected(_selectedGarageToken == button.GarageToken);
+                button.SetSelected(button.GarageToken.Selected);
             }
         }
     }
 
     public void OnOwnedTokenButtonClick(PlayerTokenInGarage garageToken) {
-        _selectedGarageToken = garageToken;
+        GarageControl.Instance.Player.ReselectTokens(garageToken.Token);
         UpdateOwnedTokensSelection();
     }
 }

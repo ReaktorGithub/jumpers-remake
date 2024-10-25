@@ -522,7 +522,7 @@ public class BoostersControl : MonoBehaviour
         _modalWarning.SetHeadingText("Недоступно");
         _modalWarning.SetBodyText("Этот усилитель доступен только во время атаки на соперника.");
         _modalWarning.SetCallback();
-        _modalWarning.OpenModal(true);
+        _modalWarning.OpenModal();
     }
 
     public void LockInterfaceByFlash(bool value) {
