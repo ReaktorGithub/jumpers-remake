@@ -712,4 +712,19 @@ public class PlayerControl : MonoBehaviour
 
         return false;
     }
+
+    public List<EAbilities> GetAllPermittedAbilities() {
+        List<EAbilities> result = new();
+        List<PlayerTokenInGarage> list = GetAllGarageTokens();
+
+        foreach(PlayerTokenInGarage garageToken in list) {
+            foreach(EAbilities ability in garageToken.Token.UnlockAbilities) {
+                if (!result.Contains(ability)) {
+                    result.Add(ability);
+                }
+            }
+        }
+
+        return result;
+    }
 }

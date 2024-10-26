@@ -332,4 +332,31 @@ public class Manual : MonoBehaviour
             default: return null;
         }
     }
+
+    public ManualContent GetAbilityManual(EAbilities ability) {
+        switch(ability) {
+            case EAbilities.AttackUsual: {
+                return AttackUsual;
+            }
+            case EAbilities.Hammer: {
+                return AbilityHammer;
+            }
+            case EAbilities.Knockout: {
+                return AttackKnockout;
+            }
+            case EAbilities.LastChance: {
+                return AbilityLastChance;
+            }
+            case EAbilities.MagicKick: {
+                return AttackMagicKick;
+            }
+            case EAbilities.Oreol: {
+                return AbilityOreol;
+            }
+            case EAbilities.Soap: {
+                return AbilitySoap;
+            }
+            default: return null;
+        }
+    }
 }

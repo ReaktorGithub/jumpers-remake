@@ -12,7 +12,6 @@ public class GarageBigToken : MonoBehaviour
 
     public void SetSqueezeAnimation(bool value) {
         Animator animator = transform.GetComponent<Animator>();
-        Debug.Log(animator);
         animator.SetBool("squeeze", value);
     }
 }

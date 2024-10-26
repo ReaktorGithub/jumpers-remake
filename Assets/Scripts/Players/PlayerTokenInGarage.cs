@@ -44,6 +44,11 @@ public class PlayerTokenInGarage : MonoBehaviour
         set { _selected = value; }
     }
 
+    public List<PlayerTokenSlot> SlotsList {
+        get { return _slotsList; }
+        private set {}
+    }
+
     /*
         Первый слот всегда с обычной атакой.
         Оставшиеся слоты фишки открыты, но без навыка.
@@ -76,5 +81,17 @@ public class PlayerTokenInGarage : MonoBehaviour
                 _slotsList[i].Disabled = true;
             }
         }
+    }
+
+    public List<EAbilities> GetAllPlacedAbilities() {
+        List<EAbilities> result = new();
+
+        foreach(PlayerTokenSlot slot in _slotsList) {
+            if (!result.Contains(slot.Ability)) {
+                result.Add(slot.Ability);
+            }
+        }
+
+        return result;
     }
 }

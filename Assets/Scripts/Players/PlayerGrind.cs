@@ -195,4 +195,19 @@ public class PlayerGrind : MonoBehaviour
             default: return 0;
         }
     }
+
+    public int GetAbilityLevel(EAbilities booster) {
+        switch(booster) {
+            case EAbilities.MagicKick: {
+                return MagicKick;
+            }
+            case EAbilities.Oreol: {
+                return Oreol;
+            }
+            case EAbilities.Knockout: {
+                return Knockout;
+            }
+            default: return 0;
+        }
+    }
 }

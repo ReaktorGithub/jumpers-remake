@@ -187,4 +187,31 @@ public class GarageControl : MonoBehaviour
     private void StartAllAnimations() {
         TabToken.StartAllAnimations();
     }
+
+    public Sprite GetAbilitySprite(EAbilities ability) {
+        switch(ability) {
+            case EAbilities.AttackUsual: {
+                return Manual.Instance.AttackUsual.SpriteAlt;
+            }
+            case EAbilities.Hammer: {
+                return Manual.Instance.AbilityHammer.SpriteAlt;
+            }
+            case EAbilities.Knockout: {
+                return Manual.Instance.AttackKnockout.SpriteAlt;
+            }
+            case EAbilities.LastChance: {
+                return Manual.Instance.AttackUsual.SpriteAlt;
+            }
+            case EAbilities.MagicKick: {
+                return Manual.Instance.AttackUsual.SpriteAlt;
+            }
+            case EAbilities.Oreol: {
+                return Manual.Instance.AttackUsual.SpriteAlt;
+            }
+            case EAbilities.Soap: {
+                return Manual.Instance.AttackUsual.SpriteAlt;
+            }
+            default: return null;
+        }
+    }
 }

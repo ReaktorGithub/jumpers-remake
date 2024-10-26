@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ManualContent : MonoBehaviour
@@ -14,6 +15,7 @@ public class ManualContent : MonoBehaviour
     [SerializeField] private EResourceCharacters _character;
     [SerializeField] private List<int> _causeEffect = new();
     [SerializeField] private bool _needChamomile = false;
+    [SerializeField] private GameObject _spriteAlt;
 
     private void Awake() {
         _sprite = GetComponent<SpriteRenderer>().sprite;
@@ -25,6 +27,16 @@ public class ManualContent : MonoBehaviour
 
     public Sprite Sprite {
         get { return _sprite; }
+        private set {}
+    }
+
+    public Sprite SpriteAlt {
+        get {
+            if (_spriteAlt != null) {
+                return _spriteAlt.GetComponent<SpriteRenderer>().sprite;
+            }
+            return null;
+        }
         private set {}
     }
 
