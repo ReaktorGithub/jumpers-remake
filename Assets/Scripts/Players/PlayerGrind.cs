@@ -210,4 +210,21 @@ public class PlayerGrind : MonoBehaviour
             default: return 0;
         }
     }
+
+    public Sprite GetGrindSprite(int level) {
+        switch(level) {
+            case 1: {
+                return CellsControl.Instance.Grind1Sprite;
+            }
+            case 2: {
+                return CellsControl.Instance.Grind2Sprite;
+            }
+            case 3: {
+                return CellsControl.Instance.Grind3Sprite;
+            }
+            default: {
+                return null;
+            }
+        }
+    }
 }

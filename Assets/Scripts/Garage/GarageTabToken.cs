@@ -1,15 +1,19 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GarageTabToken : MonoBehaviour
 {
-    [SerializeField] private GameObject _ownedTokenButtonSample, _ownedListObject, _bigTokenObject, _abilitiesListObject;
+    [SerializeField] private GameObject _ownedTokenButtonSample, _ownedListObject, _bigTokenObject, _abilitiesListObject, _detailsBox, _detailsIcon, _detailsGrindIcon, _detailsChamomile, _detailsButtonSetObject, _detailsButtonRemoveObject;
+    [SerializeField] private TextMeshProUGUI _detailsEmptyText, _detailsName, _detailsText, _tokenName, _tokenType, _tokenPower, _tokenSlots;
     private GarageBigToken _bigToken;
     [SerializeField] private List<GameObject> _slotButtonsListObjects = new();
     private List<GarageTokenSlotButton> _slotButtonsList = new();
     private PlayerTokenInGarage _selectedGarageToken;
     private List<GarageTokenAbilityCard> _cardsList = new();
     [SerializeField] private List<EAbilities> _allAbilitiesList = new();
+    [SerializeField] private EAbilities _selectedAbility = EAbilities.None;
 
     private void Awake() {
         _bigToken = _bigTokenObject.GetComponent<GarageBigToken>();
@@ -32,6 +36,10 @@ public class GarageTabToken : MonoBehaviour
     public void BuildContent() {
         PlayerControl player = GarageControl.Instance.Player;
 
+        _selectedAbility = EAbilities.None;
+
+        // Построение списка фишек во владении
+
         foreach(Transform child in _ownedListObject.transform) {
             if (child.TryGetComponent(out GarageOwnedTokenButton button)) {
                 Destroy(button.gameObject);
@@ -51,22 +59,19 @@ public class GarageTabToken : MonoBehaviour
             clone.SetActive(true);
         }
 
+        // Построение списка навыков
+
         List<EAbilities> permittedAbilities = player.GetAllPermittedAbilities();
 
         for (int i = 0; i < _allAbilitiesList.Count; i++) {
             EAbilities ability = _allAbilitiesList[i];
-            ManualContent manual = Manual.Instance.GetAbilityManual(ability);
 
             if (permittedAbilities.Contains(ability)) {
                 int level = player.Grind.GetAbilityLevel(ability);
-                _cardsList[i].BuildContent(
-                    manual.Sprite,
-                    manual.GetEntityNameWithLevel(level),
-                    manual.NeedChamomile,
-                    level
-                );
+                Sprite sprite = player.Grind.GetGrindSprite(level);
+                _cardsList[i].BuildContent(ability, level, sprite);
             } else {
-                _cardsList[i].SetDisabled(manual.Sprite);
+                _cardsList[i].SetDisabled(ability);
             }
         }
 
@@ -74,22 +79,37 @@ public class GarageTabToken : MonoBehaviour
     }
 
     private void UpdateContent() {
+        PlayerControl player = GarageControl.Instance.Player;
+
+        // Фишки во владении
+
         foreach(Transform child in _ownedListObject.transform) {
             if (child.TryGetComponent(out GarageOwnedTokenButton button)) {
                 bool selected = button.GarageToken.Selected;
                 button.SetSelected(selected);
                 if (selected) {
-                    PlayerControl player = GarageControl.Instance.Player;
                     Sprite symbolSprite = player.GetTokenControl().GetTokenSymbolSprite();
                     _bigToken.SetToken(button.GarageToken.Token, symbolSprite);
                 }
             }
         }
 
+        // Детали о фишке
+        
+        GarageShopToken token = _selectedGarageToken.Token;
+        _tokenName.text = token.Name;
+        _tokenType.text = GarageControl.Instance.GetTokenTypeText(token.Type);
+        _tokenPower.text = token.InitialPower.ToString();
+        _tokenSlots.text = token.InitialAbilitySlots.ToString();
+
+        // Слоты фишки
+
         for (int i = 0; i < _slotButtonsList.Count; i++) {
             PlayerTokenSlot slot = _selectedGarageToken.SlotsList[i];
             _slotButtonsList[i].UpdateContent(slot);
         }
+
+        // Список навыков
 
         List<EAbilities> placedAbilities = _selectedGarageToken.GetAllPlacedAbilities();
 
@@ -98,6 +118,50 @@ public class GarageTabToken : MonoBehaviour
             bool isSelected = placedAbilities.Contains(ability);
             _cardsList[i].SetSelected(isSelected);
         }
+
+        // Подробности о выбранном навыке
+
+        bool isSomeSelected = _selectedAbility != EAbilities.None;
+
+        _detailsEmptyText.gameObject.SetActive(!isSomeSelected);
+        _detailsBox.SetActive(isSomeSelected);
+
+        if (!isSomeSelected) {
+            return;
+        }
+
+        bool isAbilityPlaced = _selectedGarageToken.IsAbilityPlaced(_selectedAbility);
+        bool isAbilityEnabled = IsAbilityEnabled(_selectedAbility);
+
+        ManualContent manual = Manual.Instance.GetAbilityManual(_selectedAbility);
+        int level = player.Grind.GetAbilityLevel(_selectedAbility);
+
+        _detailsIcon.GetComponent<Image>().sprite = manual.Sprite;
+        _detailsButtonSetObject.SetActive(isAbilityEnabled && !isAbilityPlaced);
+        _detailsButtonRemoveObject.SetActive(isAbilityEnabled && isAbilityPlaced);
+
+        if (!isAbilityEnabled) {
+            _detailsName.text = "НЕДОСТУПНО";
+            _detailsName.color = new Color32(109,0,0,255);
+            _detailsText.text = manual.UnlockCondition;
+            _detailsChamomile.SetActive(false);
+            _detailsGrindIcon.SetActive(false);
+            return;
+        } else {
+            _detailsName.text = manual.GetEntityNameWithLevel(level);
+            _detailsName.color = new Color32(255,255,255,255);
+        }
+        
+        Sprite grindSprite = player.Grind.GetGrindSprite(level);
+        _detailsGrindIcon.GetComponent<Image>().sprite = grindSprite;
+        _detailsGrindIcon.SetActive(grindSprite != null);
+        _detailsText.text = manual.GetDescriptionAndAdditionalInfo(level == 0 ? 1 : level);
+        _detailsChamomile.SetActive(manual.NeedChamomile);
+    }
+
+    private bool IsAbilityEnabled(EAbilities ability) {
+        List<EAbilities> permittedAbilities = GarageControl.Instance.Player.GetAllPermittedAbilities();
+        return permittedAbilities.Contains(ability);
     }
 
     public void OnOwnedTokenButtonClick(PlayerTokenInGarage garageToken) {
@@ -108,5 +172,30 @@ public class GarageTabToken : MonoBehaviour
 
     public void StartAllAnimations() {
         _bigToken.SetSqueezeAnimation(true);
+    }
+
+    public void OnSelectAbilityCard(EAbilities ability) {
+        _selectedAbility = ability;
+        UpdateContent();
+    }
+
+    public void OnSetAbility() {
+        bool isSuccess = _selectedGarageToken.PlaceAbility(_selectedAbility);
+
+        if (isSuccess) {
+            UpdateContent();
+        } else {
+            GarageControl.Instance.Player.OpenShopLackOfSlotsModal();
+        }
+    }
+
+    public void OnRemoveAbility() {
+        bool isSuccess = _selectedGarageToken.RemoveAbility(_selectedAbility);
+
+        if (isSuccess) {
+            UpdateContent();
+        } else {
+            GarageControl.Instance.Player.OpenShopRemoveAbilityNotSuccessModal();
+        }
     }
 }

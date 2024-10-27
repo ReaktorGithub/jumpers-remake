@@ -560,21 +560,35 @@ public class PlayerControl : MonoBehaviour
 
     public void OpenMopWarningModal(Action callback = null) {
         _modalWarning.SetHeadingText("Действие отменено");
-        _modalWarning.SetBodyText("Нельзя удалить эффект 3 уровня");
+        _modalWarning.SetBodyText("Нельзя удалить эффект 3 уровня.");
         _modalWarning.SetCallback(callback);
         _modalWarning.OpenModal();
     }
 
     public void OpenShopLackOfCoinsModal(Action callback = null) {
         _modalWarning.SetHeadingText("Дефицит монет");
-        _modalWarning.SetBodyText("Не хватает монет для покупки этого предмета");
+        _modalWarning.SetBodyText("Не хватает монет для покупки этого предмета.");
         _modalWarning.SetCallback(callback);
         _modalWarning.OpenModal();
     }
 
     public void OpenShopTokenAlreadyExistModal(Action callback = null) {
         _modalWarning.SetHeadingText("Отмена");
-        _modalWarning.SetBodyText("У вас уже есть такая фишка");
+        _modalWarning.SetBodyText("У вас уже есть такая фишка.");
+        _modalWarning.SetCallback(callback);
+        _modalWarning.OpenModal();
+    }
+
+    public void OpenShopLackOfSlotsModal(Action callback = null) {
+        _modalWarning.SetHeadingText("Отмена");
+        _modalWarning.SetBodyText("Не хватает свободных слотов. Освободите любой слот от навыка, либо купите дополнительный слот.");
+        _modalWarning.SetCallback(callback);
+        _modalWarning.OpenModal();
+    }
+
+    public void OpenShopRemoveAbilityNotSuccessModal(Action callback = null) {
+        _modalWarning.SetHeadingText("Отмена");
+        _modalWarning.SetBodyText("Этот навык нельзя снять");
         _modalWarning.SetCallback(callback);
         _modalWarning.OpenModal();
     }
@@ -714,7 +728,9 @@ public class PlayerControl : MonoBehaviour
     }
 
     public List<EAbilities> GetAllPermittedAbilities() {
-        List<EAbilities> result = new();
+        List<EAbilities> result = new() {
+            EAbilities.AttackUsual,
+        };
         List<PlayerTokenInGarage> list = GetAllGarageTokens();
 
         foreach(PlayerTokenInGarage garageToken in list) {

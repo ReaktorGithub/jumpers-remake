@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class ManualContent : MonoBehaviour
@@ -16,6 +15,7 @@ public class ManualContent : MonoBehaviour
     [SerializeField] private List<int> _causeEffect = new();
     [SerializeField] private bool _needChamomile = false;
     [SerializeField] private GameObject _spriteAlt;
+    [SerializeField] private string _unlockCondition;
 
     private void Awake() {
         _sprite = GetComponent<SpriteRenderer>().sprite;
@@ -42,6 +42,11 @@ public class ManualContent : MonoBehaviour
 
     public bool NeedChamomile {
         get { return _needChamomile; }
+        private set {}
+    }
+
+    public string UnlockCondition {
+        get { return _unlockCondition; }
         private set {}
     }
 
@@ -89,7 +94,7 @@ public class ManualContent : MonoBehaviour
         string result = "";
 
         for (int i = 0; i < found.Count; i++) {
-            string myText = found.Count == i - 1 ? found[i] : found[i] + "<br><br>";
+            string myText = i == found.Count - 1 ? found[i] : found[i] + "<br><br>";
             result += myText;
         }
 
@@ -98,6 +103,28 @@ public class ManualContent : MonoBehaviour
 
     public string GetAdditionalInfo(int level = 1) {
         return _additionalInfo[level - 1];
+    }
+
+    public string GetAllAdditionalInfo() {
+        string result = "";
+
+        for (int i = 0; i < _additionalInfo.Count; i++) {
+            string myText = i == _additionalInfo.Count - 1 ? _additionalInfo[i] : _additionalInfo[i] + "<br><br>";
+            result += myText;
+        }
+
+        return result;
+    }
+
+    public string GetDescriptionAndAdditionalInfo(int level = 1) {
+        string part1 = GetShortDescription(level);
+        string part2 = GetAllAdditionalInfo();
+
+        if (part2 != "") {
+            part1 += "<br><br>";
+        }
+
+        return part1 + part2;
     }
 
     public int GetCost(int level = 1) {

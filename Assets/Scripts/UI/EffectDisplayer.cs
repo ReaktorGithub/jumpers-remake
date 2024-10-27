@@ -14,28 +14,9 @@ public class EffectDisplayer : MonoBehaviour
         _text = transform.Find("EffectName").GetComponent<TextMeshProUGUI>();
     }
 
-    public void BuildContent(string text, Sprite sprite, int level) {
+    public void BuildContent(string text, Sprite sprite, Sprite grindSprite) {
         _image.sprite = sprite;
-        
-        switch(level) {
-            case 1: {
-                _grind.sprite = CellsControl.Instance.Grind1Sprite;
-                break;
-            }
-            case 2: {
-                _grind.sprite = CellsControl.Instance.Grind2Sprite;
-                break;
-            }
-            case 3: {
-                _grind.sprite = CellsControl.Instance.Grind3Sprite;
-                break;
-            }
-            default: {
-                _grind.sprite = null;
-                break;
-            }
-        }
-
+        _grind.sprite = grindSprite;
         _text.text = text;
     }
 }

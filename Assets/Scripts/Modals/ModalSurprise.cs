@@ -90,7 +90,8 @@ public class ModalSurprise : MonoBehaviour
                     level = surpriseLevel;
                 }
                 string text = manual.GetEntityNameWithLevel(level);
-                _effectDisplayer.BuildContent(text, manual.Sprite, level);
+                Sprite sprite = player.Grind.GetGrindSprite(level);
+                _effectDisplayer.BuildContent(text, manual.Sprite, sprite);
                 _effectDesription.text = manual.GetShortDescription(level);
                 break;
             }

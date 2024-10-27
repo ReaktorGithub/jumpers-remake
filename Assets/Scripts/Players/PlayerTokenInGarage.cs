@@ -50,6 +50,7 @@ public class PlayerTokenInGarage : MonoBehaviour
     }
 
     /*
+        Срабатывает при добавлении фишки в гараж игрока.
         Первый слот всегда с обычной атакой.
         Оставшиеся слоты фишки открыты, но без навыка.
         Следующие несколько слотов могут быть вскрыты игроком (обычно их 2, см. GarageControl.Instance.SlotsForBuyCount).
@@ -65,20 +66,23 @@ public class PlayerTokenInGarage : MonoBehaviour
                 lastFilled = i;
             }
 
+            PlayerTokenSlot slot = _slotsList[i];
+
             if (i == 0) {
-                _slotsList[i].Disabled = false;
-                _slotsList[i].Locked = false;
-                _slotsList[i].Ability = EAbilities.AttackUsual;
+                slot.Disabled = false;
+                slot.Locked = false;
+                slot.Ability = EAbilities.AttackUsual;
             } else if (i < slots) {
-                _slotsList[i].Disabled = false;
-                _slotsList[i].Locked = false;
-                _slotsList[i].Ability = EAbilities.None;
+                slot.Disabled = false;
+                slot.Locked = false;
+                slot.Ability = EAbilities.None;
             } else if (i <= lastFilled + GarageControl.Instance.SlotsForBuyCount) {
-                _slotsList[i].Disabled = false;
-                _slotsList[i].Locked = true;
-                _slotsList[i].Ability = EAbilities.None;
+                slot.Disabled = false;
+                slot.Locked = true;
+                slot.Ability = EAbilities.None;
             } else {
-                _slotsList[i].Disabled = true;
+                slot.Disabled = true;
+                slot.Ability = EAbilities.None;
             }
         }
     }
@@ -93,5 +97,50 @@ public class PlayerTokenInGarage : MonoBehaviour
         }
 
         return result;
+    }
+
+    public bool IsAbilityPlaced(EAbilities ability) {
+        foreach(PlayerTokenSlot slot in _slotsList) {
+            if (slot.Ability == ability) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Если установка удалась, то возвращает true
+
+    public bool PlaceAbility(EAbilities ability) {
+        if (IsAbilityPlaced(ability)) {
+            Debug.Log("Ability is already placed");
+            return false;
+        }
+
+        for (int i = 0; i < _slotsList.Count; i++) {
+            PlayerTokenSlot slot = _slotsList[i];
+
+            if (!slot.Disabled && !slot.Locked && slot.Ability == EAbilities.None) {
+                slot.Ability = ability;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Если удаление удалось, то возвращает true
+
+    public bool RemoveAbility(EAbilities ability) {
+        for (int i = 0; i < _slotsList.Count; i++) {
+            PlayerTokenSlot slot = _slotsList[i];
+
+            if (!slot.Disabled && !slot.Locked && slot.Ability == ability && slot.Ability != EAbilities.AttackUsual) {
+                slot.Ability = EAbilities.None;
+                return true;
+            }
+        }
+
+        return false;
     }
 }

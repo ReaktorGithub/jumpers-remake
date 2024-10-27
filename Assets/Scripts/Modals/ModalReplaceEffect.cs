@@ -50,7 +50,8 @@ public class ModalReplaceEffect : MonoBehaviour
         // имя эффекта
 
         string text = manual.GetEntityNameWithLevel(effectLevel);
-        _effectDisplayer.BuildContent(text, manual.Sprite, effectLevel);
+        Sprite sprite = currentPlayer.Grind.GetGrindSprite(effectLevel);
+        _effectDisplayer.BuildContent(text, manual.Sprite, sprite);
 
         // описание
 

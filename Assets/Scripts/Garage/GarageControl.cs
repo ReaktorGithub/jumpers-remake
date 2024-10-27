@@ -214,4 +214,16 @@ public class GarageControl : MonoBehaviour
             default: return null;
         }
     }
+
+    public void OnAbilityClick(EAbilities ability) {
+        TabToken.OnSelectAbilityCard(ability);
+    }
+
+    public void OnSetAbility() {
+        TabToken.OnSetAbility();
+    }
+
+    public void OnRemoveAbility() {
+        TabToken.OnRemoveAbility();
+    }
 }
