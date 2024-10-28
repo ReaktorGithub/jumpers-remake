@@ -6,8 +6,9 @@ public class GarageTokenSlotButton : MonoBehaviour
 {
     [SerializeField] private GameObject _instances, _bgObject, _nodeObject, _nodeIconObject, _abilityIconObject, _slotObject;
     [SerializeField] private TextMeshProUGUI _abilityText;
-    private Sprite _bgFilledSprite, _bgLockedSprite, _nodeSprite, _nodeHoverSprite, _iconLockSprite, _iconPlusSprite, _iconMinusSprite;
+    private Sprite _bgFilledSprite, _bgLockedSprite, _nodeSprite, _nodeHoverSprite, _iconLockSprite, _iconMinusSprite;
     private bool _isLocked, _isEmpty, _isFilled;
+    private EAbilities _ability = EAbilities.None;
 
     private void Awake() {
         _bgFilledSprite = _instances.transform.Find("bg-filled").GetComponent<Image>().sprite;
@@ -15,7 +16,6 @@ public class GarageTokenSlotButton : MonoBehaviour
         _nodeSprite = _instances.transform.Find("node").GetComponent<Image>().sprite;
         _nodeHoverSprite = _instances.transform.Find("node-hover").GetComponent<Image>().sprite;
         _iconLockSprite = _instances.transform.Find("icon-lock").GetComponent<Image>().sprite;
-        _iconPlusSprite = _instances.transform.Find("icon-plus").GetComponent<Image>().sprite;
         _iconMinusSprite = _instances.transform.Find("icon-minus").GetComponent<Image>().sprite;
     }
 
@@ -33,28 +33,42 @@ public class GarageTokenSlotButton : MonoBehaviour
     }
 
     public void UpdateContent(PlayerTokenSlot data) {
+        _ability = data.Ability;
+
+        // Слот не будет отображаться в интерфейсе, если он отключен
+
         if (data.Disabled) {
             _slotObject.SetActive(false);
             return;
         } else {
             _slotObject.SetActive(true);
         }
+
+        // Разные состояния слота
         
         _isLocked = data.Locked;
         _isEmpty = !_isLocked && data.Ability == EAbilities.None;
         _isFilled = !_isLocked && data.Ability != EAbilities.None;
 
-        _bgObject.GetComponent<Image>().sprite = _isLocked ? _bgLockedSprite : _bgFilledSprite;
+        // Узел
 
-        Sprite nodeIconSprite;
-        
-        if (_isLocked) {
-            nodeIconSprite = _iconLockSprite;
-        } else {
-            nodeIconSprite = _isFilled ? _iconMinusSprite : _iconPlusSprite;
+        if (_isFilled) {
+            _nodeIconObject.GetComponent<Image>().sprite = _iconMinusSprite;
+            _nodeObject.SetActive(true);
         }
 
-        _nodeIconObject.GetComponent<Image>().sprite = nodeIconSprite;
+        if (_isLocked) {
+            _nodeIconObject.GetComponent<Image>().sprite = _iconLockSprite;
+            _nodeObject.SetActive(true);
+        }
+
+        if (_isEmpty) {
+            _nodeObject.SetActive(false);
+        }
+
+        // Отображение выбранного навыка слота
+
+        _bgObject.GetComponent<Image>().sprite = _isLocked ? _bgLockedSprite : _bgFilledSprite;
 
         Sprite abilitySprite = null;
         
@@ -84,10 +98,13 @@ public class GarageTokenSlotButton : MonoBehaviour
     }
 
     public void OnNodeClick() {
-        // todo
-    }
-
-    public void OnBodyClick() {
-        // todo
+        if (_isFilled) {
+            GarageControl.Instance.TabToken.SelectedAbility = _ability;
+            GarageControl.Instance.TabToken.OnRemoveAbility();
+        }
+        
+        if (_isLocked) {
+            GarageControl.Instance.OnBuySlot();
+        }
     }
 }

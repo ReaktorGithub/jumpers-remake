@@ -8,6 +8,7 @@ public class GarageControl : MonoBehaviour
     [SerializeField] private List<GarageTabButton> _tabButtonsList = new();
     [SerializeField] private GameObject _garageBody, _shopTabObject, _awardsTabObject, _boostersTabObject, _grindTabObject, _tokenTabObject, _tokensListObject;
     [SerializeField] private int _slotsForBuyCount = 2;
+    [SerializeField] private int _slotCost = 500;
     private List<GarageShopToken> _shopTokensList = new(); // список всех фишек в игре
     private PlayerControl _player;
     private GarageTabShop _tabShop;
@@ -16,6 +17,9 @@ public class GarageControl : MonoBehaviour
     private GarageTabGrind _tabGrind;
     private GarageTabToken _tabToken;
     private ModalByuItem _modalBuyItem;
+    private ModalSellItem _modalSellItem;
+    private Sprite _newSlotSprite;
+    private EGarageProductTypes _productType;
 
     private void Awake() {
         Instance = this;
@@ -24,7 +28,9 @@ public class GarageControl : MonoBehaviour
         _tabBoosters = _boostersTabObject.GetComponent<GarageTabBoosters>();
         _tabGrind = _grindTabObject.GetComponent<GarageTabGrind>();
         _tabToken = _tokenTabObject.GetComponent<GarageTabToken>();
-        _modalBuyItem = GameObject.Find("ModalScripts").GetComponent<ModalByuItem>();
+        _modalBuyItem = GameObject.Find("GarageScripts").GetComponent<ModalByuItem>();
+        _newSlotSprite = GameObject.Find("Instances").transform.Find("ability-node-plus").GetComponent<SpriteRenderer>().sprite;
+        _modalSellItem = GameObject.Find("GarageScripts").GetComponent<ModalSellItem>();
 
         foreach(Transform child in _tokensListObject.transform) {
             if (child.TryGetComponent(out GarageShopToken token)) {
@@ -40,6 +46,16 @@ public class GarageControl : MonoBehaviour
 
     public int SlotsForBuyCount {
         get { return _slotsForBuyCount; }
+        private set {}
+    }
+
+    public EGarageProductTypes ProductType {
+        get { return _productType; }
+        private set {}
+    }
+
+    public int SlotCost {
+        get { return _slotCost; }
         private set {}
     }
 
@@ -96,7 +112,7 @@ public class GarageControl : MonoBehaviour
         }
     }
 
-    private void UpdateTabContentDisplay() {
+    public void UpdateTabContentDisplay() {
         switch(_currentTab) {
             case EGarageTabs.Token: {
                 _tabToken.BuildContent();
@@ -163,9 +179,47 @@ public class GarageControl : MonoBehaviour
         return array;
     }
 
-    public void AddNewTokenToGarage() {
+    public void OnProductBuy() {
+        switch(_productType) {
+            case EGarageProductTypes.Token: {
+                AddNewTokenToGarage();
+                break;
+            }
+            case EGarageProductTypes.Slot: {
+                AddNewSlotToToken();
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
+    public void OnProductSell() {
+        switch(_productType) {
+            case EGarageProductTypes.Token: {
+                SellToken();
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
+    private void AddNewTokenToGarage() {
         _player.AddNewTokenToGarage(TabShop.SelectedToken);
         OnTabClick(EGarageTabs.Token);
+    }
+
+    private void SellToken() {
+        _player.SellToken();
+        // UpdateTabContentDisplay происходит в корутине
+    }
+
+    private void AddNewSlotToToken() {
+        _player.AddNewSlotToToken();
+        UpdateTabContentDisplay();
     }
 
     public void OnBuyToken() {
@@ -179,8 +233,32 @@ public class GarageControl : MonoBehaviour
         if (cost > _player.Coins) {
             _player.OpenShopLackOfCoinsModal();
         } else {
+            _productType = EGarageProductTypes.Token;
             _modalBuyItem.BuildContent(TabShop.SelectedToken.Name, cost, TabShop.SelectedToken.TokenSprite);
             _modalBuyItem.OpenModal();
+        }
+    }
+
+    public void OnBuySlot() {
+        if (_slotCost > _player.Coins) {
+            _player.OpenShopLackOfCoinsModal();
+        } else {
+            _productType = EGarageProductTypes.Slot;
+            _modalBuyItem.BuildContent("Слот для навыков", _slotCost, _newSlotSprite);
+            _modalBuyItem.OpenModal();
+        }
+    }
+
+    public void OnSellToken() {
+        _productType = EGarageProductTypes.Token;
+        GarageShopToken token = _player.GetSelectedPlayerTokenInGarage().Token;
+
+        if (token.Type == ETokenTypes.Base) {
+            _player.OpenShopSellBaseTokenModal();
+        } else {
+            _productType = EGarageProductTypes.Token;
+            _modalSellItem.BuildContent(token.Name, token.SellCost, token.TokenSprite);
+            _modalSellItem.OpenModal();
         }
     }
 

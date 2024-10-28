@@ -4,7 +4,6 @@ using UnityEngine;
 public class ModalWindow : MonoBehaviour
 {
     [SerializeField] private float _fadeInTime = 0.3f;
-    [SerializeField] private bool _lockY = false;
 
     private void Awake() {
         ResetScale();
@@ -17,7 +16,7 @@ public class ModalWindow : MonoBehaviour
         while (Time.time - startTime < _fadeInTime) {
             float progress = (Time.time - startTime) / _fadeInTime;
             float size = Mathf.SmoothDamp(0f, 1f, ref velocity, 0.1f, Mathf.Infinity, progress); 
-            transform.localScale = new Vector3(_lockY ? 1f : size, size, 1f);
+            transform.localScale = new Vector3(size, size, 1f);
             yield return null;
         }
     }

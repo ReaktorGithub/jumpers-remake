@@ -78,7 +78,7 @@ public class PlayerTokenInGarage : MonoBehaviour
                 slot.Disabled = false;
                 slot.Locked = false;
                 slot.Ability = EAbilities.None;
-            } else if (i <= lastFilled + GarageControl.Instance.SlotsForBuyCount) {
+            } else if (i < lastFilled + GarageControl.Instance.SlotsForBuyCount) {
                 // Экстра-слот
                 slot.Disabled = false;
                 slot.Locked = true;
@@ -147,5 +147,34 @@ public class PlayerTokenInGarage : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void AddNewSlot() {
+        foreach(PlayerTokenSlot slot in _slotsList) {
+            if (slot.Locked) {
+                slot.Locked = false;
+                break;
+            }
+        }
+
+        foreach(PlayerTokenSlot slot in _slotsList) {
+            if (slot.Disabled) {
+                slot.Disabled = false;
+                slot.Locked = true;
+                break;
+            }
+        }
+    }
+
+    public int GetEnabledSlotsCount() {
+        int result = 0;
+
+        foreach(PlayerTokenSlot slot in _slotsList) {
+            if (!slot.Disabled && !slot.Locked) {
+                result++;
+            }
+        }
+
+        return result;
     }
 }

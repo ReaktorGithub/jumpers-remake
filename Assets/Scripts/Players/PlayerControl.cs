@@ -588,7 +588,14 @@ public class PlayerControl : MonoBehaviour
 
     public void OpenShopRemoveAbilityNotSuccessModal(Action callback = null) {
         _modalWarning.SetHeadingText("Отмена");
-        _modalWarning.SetBodyText("Этот навык нельзя снять");
+        _modalWarning.SetBodyText("Этот навык нельзя снять.");
+        _modalWarning.SetCallback(callback);
+        _modalWarning.OpenModal();
+    }
+
+    public void OpenShopSellBaseTokenModal(Action callback = null) {
+        _modalWarning.SetHeadingText("Отмена");
+        _modalWarning.SetBodyText("Вы не можете продать базовую фишку.");
         _modalWarning.SetCallback(callback);
         _modalWarning.OpenModal();
     }
@@ -705,6 +712,43 @@ public class PlayerControl : MonoBehaviour
         ReselectTokens(token);
     }
 
+    public void SellToken() {
+        PlayerTokenInGarage tokenToDelete = GetSelectedPlayerTokenInGarage();
+        Debug.Log(tokenToDelete.Token.Name);
+        AddCoins(-tokenToDelete.Token.SellCost);
+        StartCoroutine(TokenDestroyer(tokenToDelete.gameObject, () => {
+            SelectLastToken();
+            GarageControl.Instance.UpdateTabContentDisplay();
+        }));
+    }
+
+    private IEnumerator TokenDestroyer(GameObject obj, Action callback = null) {
+        Destroy(obj);
+        yield return null;
+        callback?.Invoke();
+    }
+
+    public void AddNewSlotToToken() {
+        int cost = GarageControl.Instance.SlotCost;
+        AddCoins(-cost);
+        PlayerTokenInGarage garageToken = GetSelectedPlayerTokenInGarage();
+        garageToken.AddNewSlot();
+    }
+
+    // Выбрать крайнюю фишку в коллекции
+
+    public void SelectLastToken() {
+        List<PlayerTokenInGarage> list = GetAllGarageTokens();
+
+         foreach(PlayerTokenInGarage garageToken in list) {
+            Debug.Log("fgsgs " + garageToken.Token.Name);
+         }
+
+        if (list.Count > 0) {
+            list[^1].Selected = true;
+        }
+    }
+
     // Указанную фишку делает выбранной. Все остальные делает невыбранными
 
     public void ReselectTokens(GarageShopToken tokenToSelect) {
@@ -727,17 +771,28 @@ public class PlayerControl : MonoBehaviour
         return false;
     }
 
+    public PlayerTokenInGarage GetSelectedPlayerTokenInGarage() {
+        List<PlayerTokenInGarage> list = GetAllGarageTokens();
+
+        foreach(PlayerTokenInGarage garageToken in list) {
+            if (garageToken.Selected) {
+                return garageToken;
+            }
+        }
+
+        return null;
+    }
+
     public List<EAbilities> GetAllPermittedAbilities() {
         List<EAbilities> result = new() {
             EAbilities.AttackUsual,
         };
-        List<PlayerTokenInGarage> list = GetAllGarageTokens();
 
-        foreach(PlayerTokenInGarage garageToken in list) {
-            foreach(EAbilities ability in garageToken.Token.UnlockAbilities) {
-                if (!result.Contains(ability)) {
-                    result.Add(ability);
-                }
+        PlayerTokenInGarage garageToken = GetSelectedPlayerTokenInGarage();
+
+        foreach(EAbilities ability in garageToken.Token.UnlockAbilities) {
+            if (!result.Contains(ability)) {
+                result.Add(ability);
             }
         }
 

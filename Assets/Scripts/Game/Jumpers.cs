@@ -31,14 +31,14 @@ public class Jumpers : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.G)) {
             ShowUI(false);
             ShowField(false);
-            ModalGarage modal = GameObject.Find("ModalScripts").GetComponent<ModalGarage>();
+            ModalGarage modal = GameObject.Find("GarageScripts").GetComponent<ModalGarage>();
             PlayerControl player = PlayersControl.Instance.GetMe();
             GarageControl.Instance.BuildContent(player);
             modal.OpenModal();
         }
 
         if (Input.GetKeyUp(KeyCode.H)) {
-            ModalGarage modal = GameObject.Find("ModalScripts").GetComponent<ModalGarage>();
+            ModalGarage modal = GameObject.Find("GarageScripts").GetComponent<ModalGarage>();
             modal.CloseModal();
             ShowUI(true);
             ShowField(true);

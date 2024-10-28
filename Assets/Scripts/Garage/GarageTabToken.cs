@@ -33,6 +33,11 @@ public class GarageTabToken : MonoBehaviour
         _ownedTokenButtonSample.SetActive(false);
     }
 
+    public EAbilities SelectedAbility {
+        get { return _selectedAbility; }
+        set { _selectedAbility = value; }
+    }
+
     public void BuildContent() {
         PlayerControl player = GarageControl.Instance.Player;
 
@@ -59,6 +64,13 @@ public class GarageTabToken : MonoBehaviour
             clone.SetActive(true);
         }
 
+        UpdateContent();
+    }
+
+    private void UpdateContent() {
+        PlayerControl player = GarageControl.Instance.Player;
+        PlayerTokenInGarage garageToken = player.GetSelectedPlayerTokenInGarage();
+
         // Построение списка навыков
 
         List<EAbilities> permittedAbilities = player.GetAllPermittedAbilities();
@@ -67,19 +79,13 @@ public class GarageTabToken : MonoBehaviour
             EAbilities ability = _allAbilitiesList[i];
 
             if (permittedAbilities.Contains(ability)) {
-                int level = player.Grind.GetAbilityLevel(ability);
-                Sprite sprite = player.Grind.GetGrindSprite(level);
-                _cardsList[i].BuildContent(ability, level, sprite);
+                int grindLevel = player.Grind.GetAbilityLevel(ability);
+                Sprite sprite = player.Grind.GetGrindSprite(grindLevel);
+                _cardsList[i].BuildContent(ability, grindLevel, sprite);
             } else {
                 _cardsList[i].SetDisabled(ability);
             }
         }
-
-        UpdateContent();
-    }
-
-    private void UpdateContent() {
-        PlayerControl player = GarageControl.Instance.Player;
 
         // Фишки во владении
 
@@ -100,7 +106,7 @@ public class GarageTabToken : MonoBehaviour
         _tokenName.text = token.Name;
         _tokenType.text = GarageControl.Instance.GetTokenTypeText(token.Type);
         _tokenPower.text = token.InitialPower.ToString();
-        _tokenSlots.text = token.InitialAbilitySlots.ToString();
+        _tokenSlots.text = garageToken.GetEnabledSlotsCount().ToString();
 
         // Слоты фишки
 
@@ -167,6 +173,7 @@ public class GarageTabToken : MonoBehaviour
     public void OnOwnedTokenButtonClick(PlayerTokenInGarage garageToken) {
         GarageControl.Instance.Player.ReselectTokens(garageToken.Token);
         _selectedGarageToken = garageToken;
+        _selectedAbility = EAbilities.None;
         UpdateContent();
     }
 
@@ -197,9 +204,5 @@ public class GarageTabToken : MonoBehaviour
         } else {
             GarageControl.Instance.Player.OpenShopRemoveAbilityNotSuccessModal();
         }
-    }
-
-    public void OnTokenSlotOptionClick() {
-        // todo
     }
 }
