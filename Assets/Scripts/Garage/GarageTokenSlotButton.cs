@@ -90,5 +90,4 @@ public class GarageTokenSlotButton : MonoBehaviour
     public void OnBodyClick() {
         // todo
     }
-
 }

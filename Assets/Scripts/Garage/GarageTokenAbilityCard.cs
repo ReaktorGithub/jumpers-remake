@@ -44,6 +44,6 @@ public class GarageTokenAbilityCard : MonoBehaviour
     }
 
     public void OnClick() {
-        GarageControl.Instance.OnAbilityClick(_ability);
+        GarageControl.Instance.TabToken.OnSelectAbilityCard(_ability);
     }
 }

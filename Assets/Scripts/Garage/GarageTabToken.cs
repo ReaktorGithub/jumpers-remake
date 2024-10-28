@@ -198,4 +198,8 @@ public class GarageTabToken : MonoBehaviour
             GarageControl.Instance.Player.OpenShopRemoveAbilityNotSuccessModal();
         }
     }
+
+    public void OnTokenSlotOptionClick() {
+        // todo
+    }
 }

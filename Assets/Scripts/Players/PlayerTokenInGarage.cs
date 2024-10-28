@@ -35,7 +35,7 @@ public class PlayerTokenInGarage : MonoBehaviour
         get { return _token; }
         set {
             _token = value;
-            UpdateSlots(_token);
+            PrepareSlots(_token);
         }
     }
 
@@ -57,7 +57,7 @@ public class PlayerTokenInGarage : MonoBehaviour
         Остальные слоты disabled (скрыты и никогда не отобразятся).
     */
 
-    private void UpdateSlots(GarageShopToken token) {
+    private void PrepareSlots(GarageShopToken token) {
         int slots = token.InitialAbilitySlots;
         int lastFilled = 0;
 
@@ -69,19 +69,24 @@ public class PlayerTokenInGarage : MonoBehaviour
             PlayerTokenSlot slot = _slotsList[i];
 
             if (i == 0) {
+                // Обычная атака
                 slot.Disabled = false;
                 slot.Locked = false;
                 slot.Ability = EAbilities.AttackUsual;
             } else if (i < slots) {
+                // Обычный слот для заполнения
                 slot.Disabled = false;
                 slot.Locked = false;
                 slot.Ability = EAbilities.None;
             } else if (i <= lastFilled + GarageControl.Instance.SlotsForBuyCount) {
+                // Экстра-слот
                 slot.Disabled = false;
                 slot.Locked = true;
                 slot.Ability = EAbilities.None;
             } else {
+                // Слот не будет отображаться в интерфейсе
                 slot.Disabled = true;
+                slot.Locked = false;
                 slot.Ability = EAbilities.None;
             }
         }
