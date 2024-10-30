@@ -4,19 +4,11 @@ using UnityEngine.UI;
 public class GarageOwnedTokenButton : MonoBehaviour
 {
     private PlayerTokenInGarage _garageToken;
-    [SerializeField] private GameObject _selected, _hover, _imageObject;
+    [SerializeField] private GameObject _selected, _imageObject;
 
     public PlayerTokenInGarage GarageToken {
         get { return _garageToken; }
         private set {}
-    }
-
-    public void OnHoverIn() {
-        _hover.SetActive(true);
-    }
-
-    public void OnHoverOut() {
-        _hover.SetActive(false);
     }
 
     public void SetSelected(bool value) {
@@ -26,7 +18,6 @@ public class GarageOwnedTokenButton : MonoBehaviour
     public void SetGarageToken(PlayerTokenInGarage garageToken) {
         _garageToken = garageToken;
         _imageObject.GetComponent<Image>().sprite = garageToken.Token.TokenSprite;
-        OnHoverOut();
     }
 
     public void OnClick() {

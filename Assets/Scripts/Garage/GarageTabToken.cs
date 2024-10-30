@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class GarageTabToken : MonoBehaviour
 {
     [SerializeField] private GameObject _ownedTokenButtonSample, _ownedListObject, _bigTokenObject, _abilitiesListObject, _detailsBox, _detailsIcon, _detailsGrindIcon, _detailsChamomile, _detailsButtonSetObject, _detailsButtonRemoveObject;
-    [SerializeField] private TextMeshProUGUI _detailsEmptyText, _detailsName, _detailsText, _tokenName, _tokenType, _tokenPower, _tokenSlots;
+    [SerializeField] private TextMeshProUGUI _detailsEmptyText, _detailsName, _detailsText, _tokenName, _tokenType, _tokenPower, _tokenSlots, _balanceText;
     private GarageBigToken _bigToken;
     [SerializeField] private List<GameObject> _slotButtonsListObjects = new();
     private List<GarageTokenSlotButton> _slotButtonsList = new();
@@ -71,6 +71,10 @@ public class GarageTabToken : MonoBehaviour
         PlayerControl player = GarageControl.Instance.Player;
         PlayerTokenInGarage garageToken = player.GetSelectedPlayerTokenInGarage();
 
+        // Баланс игрока
+
+        _balanceText.text = player.Coins.ToString();
+
         // Построение списка навыков
 
         List<EAbilities> permittedAbilities = player.GetAllPermittedAbilities();
@@ -91,7 +95,8 @@ public class GarageTabToken : MonoBehaviour
 
         foreach(Transform child in _ownedListObject.transform) {
             if (child.TryGetComponent(out GarageOwnedTokenButton button)) {
-                bool selected = button.GarageToken.Selected;
+                
+                bool selected = button.GarageToken.Selected; // ошибка
                 button.SetSelected(selected);
                 if (selected) {
                     Sprite symbolSprite = player.GetTokenControl().GetTokenSymbolSprite();
